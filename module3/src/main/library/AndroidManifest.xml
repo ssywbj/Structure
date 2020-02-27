@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.suheng.structure.module3">
+
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application android:usesCleartextTraffic="true">
+        <activity
+            android:name=".MVCLoginActivity"
+            android:launchMode="singleTask" />
+
+        <activity
+            android:name=".MVPLoginActivity"
+            android:label="MVP Activity" />
+
+        <activity
+            android:name=".FragmentActivity"
+            android:label="Fragment Apply"
+            android:launchMode="singleTask" />
+
+        <activity
+            android:name=".application.Module3MainActivity"
+            android:launchMode="singleTask" />
+    </application>
+</manifest>

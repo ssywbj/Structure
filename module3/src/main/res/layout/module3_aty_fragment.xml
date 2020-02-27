@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--<fragment
+        android:id="@+id/mvc_login_frg"
+        android:userName="com.suheng.structure.module3.MVCLoginFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <fragment
+        android:id="@+id/mvp_login_frg"
+        android:name="com.suheng.structure.module3.MVPLoginFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</merge>

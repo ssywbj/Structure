@@ -1,0 +1,36 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    /*如果支持了Java8并在module中运用Lambda表达式等新特性，而其它引用的module没有支持Java8就会
+    报"java.lang.BootstrapMethodError: Exception from call site #4 bootstrap method"错误*/
+    /*compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }*/
+}
+
+dependencies {
+    implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
+
+    //PermissionsDispatcher权限框架配置1（共5步，注意是api集成方式，否则其它引用ui module的module会编译不过）
+    api 'com.github.hotchemi:permissionsdispatcher:3.1.0'
+    //PermissionsDispatcher权限框架配置2（共5步）
+    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.1.0'
+}

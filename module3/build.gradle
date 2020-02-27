@@ -1,0 +1,87 @@
+if (isModule3Library.toBoolean()) {
+    apply plugin: 'com.android.library'
+} else {
+    apply plugin: 'com.android.application'
+}
+apply plugin: 'com.alibaba.arouter'//ARouter配置5(共5步)
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    //resourcePrefix "${project.name}_"
+
+    defaultConfig {
+        if (!isModule3Library.toBoolean()) {
+            applicationId "com.suheng.structure.module3"
+        }
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [moduleName: project.getName()/*ARouter配置1(共5步)*/]
+            }
+        }
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('../zhipu-keystore.jks')
+            storePassword 'Zhipu@520'
+            keyAlias = 'modules_apply'
+            keyPassword 'Zhipu@520_'
+        }
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField "boolean", "IS_LIBRARY", "${isModule3Library}"
+            signingConfig signingConfigs.release
+        }
+
+        release {
+            buildConfigField "boolean", "IS_LIBRARY", "${isModule3Library}"
+            signingConfig signingConfigs.release
+            minifyEnabled false //代码混淆：true开启，false不开启
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            if (isModule3Library.toBoolean()) {
+                //编译为library时的功能清单文件
+                manifest.srcFile 'src/main/library/AndroidManifest.xml'
+                java {
+                    //排除不需要加载的类
+                    exclude '**/application/**'
+                }
+            } else {
+                //编译为application时的功能清单文件
+                manifest.srcFile 'src/main/application/AndroidManifest.xml'
+            }
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
+    implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintlayoutVersion"
+    testImplementation "junit:junit:$rootProject.junitVersion"
+    androidTestImplementation "androidx.test:runner:$rootProject.runnerVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoCoreVersion"
+
+    //ARouter配置3(共5步)：配置ARouter注解
+    annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation project(path: ':common')
+    implementation project(path: ':ui')
+    implementation project(path: ':okhttp')
+}

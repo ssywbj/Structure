@@ -1,0 +1,6 @@
+<resources>
+
+    <style name="Module3LoginBtnStyle" parent="UIBtnStyle">
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+</resources>

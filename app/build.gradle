@@ -1,0 +1,92 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.alibaba.arouter'//ARouter配置5(共5步)
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    //resourcePrefix "${project.name}_"//资源命名规范暂不约束
+
+    defaultConfig {
+        applicationId "com.suheng.structure"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [moduleName: project.getName()/*ARouter配置1(共5步)*/]
+            }
+        }
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('../zhipu-keystore.jks')
+            storePassword 'Zhipu@520'
+            keyAlias = 'modules_apply'
+            keyPassword 'Zhipu@520_'
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.release
+            buildConfigField "boolean", "MODULE1_IS_LIBRARY", "${isModule1Library}"
+        }
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "boolean", "MODULE1_IS_LIBRARY", "${isModule1Library}"
+            signingConfig signingConfigs.release
+        }
+    }
+
+    applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                outputFileName = rootProject.name + versionName + "_" + getDate() + ".apk"
+            }
+    }
+
+    lintOptions {
+        disable 'GoogleAppIndexingWarning'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
+    testImplementation "junit:junit:$rootProject.junitVersion"
+    androidTestImplementation "androidx.test:runner:$rootProject.runnerVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoCoreVersion"
+
+    //ARouter配置3(共5步)：配置ARouter的"annotationProcessor"
+    annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
+    implementation project(path: ':common')
+    implementation project(path: ':ui')
+    if (isModule1Library.toBoolean()) {
+        implementation project(path: ':module1')
+    }
+    if (isModule2Library.toBoolean()) {
+        implementation project(path: ':module2')
+    }
+    if (isModule3Library.toBoolean()) {
+        implementation project(path: ':module3')
+    }
+}
+
+import java.text.SimpleDateFormat
+
+static String getDate() {
+    return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())
+}

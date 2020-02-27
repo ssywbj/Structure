@@ -1,0 +1,25 @@
+ext {
+    //Sdk and Tools
+    minSdkVersion = 23
+    targetSdkVersion = 29
+    compileSdkVersion = 29
+    buildToolsVersion = '29.0.2'
+
+    //App Version
+    versionCode = 2
+    versionName = "1.0.1"
+
+    //dependencies system
+    appcompatVersion = '1.1.0'
+    constraintlayoutVersion = '1.1.3'
+    junitVersion = '4.12'
+    runnerVersion = '1.2.0'
+    espressoCoreVersion = '3.2.0'
+
+    //dependencies custom
+    arouterApiVersion = '1.3.1'//ARouter
+    arouterCompilerVersion = '1.1.4'
+    eventBusVersion = '3.0.0'//EventBus
+    okhttp3Version = '3.10.0'//网络请求
+    fastjasnVersion = '1.1.64.android'//json框架
+}

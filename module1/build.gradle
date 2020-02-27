@@ -1,0 +1,78 @@
+if (isModule1Library.toBoolean()) {
+    apply plugin: 'com.android.library'
+} else {
+    apply plugin: 'com.android.application'
+}
+apply plugin: 'com.alibaba.arouter'//ARouter配置5(共5步)
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    //resourcePrefix "${project.name}_"//资源命名规范暂不约束
+
+    defaultConfig {
+        if (!isModule1Library.toBoolean()) {
+            applicationId "com.suheng.structure.module1"
+        }
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [moduleName: project.getName()/*ARouter配置1(共5步)*/]
+            }
+        }
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('../zhipu-keystore.jks')
+            storePassword 'Zhipu@520'
+            keyAlias = 'modules_apply'
+            keyPassword 'Zhipu@520_'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    sourceSets {
+        main {
+            if (isModule1Library.toBoolean()) {
+                //编译为library时的功能清单文件
+                manifest.srcFile 'src/main/library/AndroidManifest.xml'
+                java {
+                    //排除不需要加载的类
+                    exclude '**/application/**'
+                }
+            } else {
+                //编译为application时的功能清单文件
+                manifest.srcFile 'src/main/application/AndroidManifest.xml'
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
+    implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintlayoutVersion"
+    testImplementation "junit:junit:$rootProject.junitVersion"
+    androidTestImplementation "androidx.test:runner:$rootProject.runnerVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoCoreVersion"
+
+    implementation project(path: ':common')
+    implementation project(path: ':ui')
+    //ARouter配置3(共5步)：配置ARouter的"annotationProcessor"
+    annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
+}
