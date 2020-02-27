@@ -12,11 +12,12 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.suheng.structure.common.arouter.RouteTable;
 import com.suheng.structure.common.data.PrefsManager;
 import com.suheng.structure.common.data.net.RequestManager;
-import com.suheng.structure.common.data.net.callback.LoginListener;
 import com.suheng.structure.common.event.ExitLoginEvent;
 import com.suheng.structure.module2.request.BeautyTask;
+import com.suheng.structure.module2.request.LoginTask3;
 import com.suheng.structure.net.callback.OnDownloadListener;
 import com.suheng.structure.net.callback.OnFailureListener;
+import com.suheng.structure.net.callback.OnResponseListener;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
 import org.greenrobot.eventbus.EventBus;
@@ -26,7 +27,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.File;
 
 @Route(path = RouteTable.MODULE2_ATY_MODULE2_MAIN)
-public class Module2MainActivity extends BasicActivity implements LoginListener {
+public class Module2MainActivity extends BasicActivity {
 
     private Button mBtnLoginStatus;
     @Autowired
@@ -42,10 +43,6 @@ public class Module2MainActivity extends BasicActivity implements LoginListener 
         ARouter.getInstance().inject(this);
         EventBus.getDefault().register(this);
 
-        /*RequestManager loginManager = (RequestManager) ARouter.getInstance()
-                .build(RouteTable.COMMON_PROVIDER_REQUEST_MANAGER).navigation();*/
-        Log.d("RequestManager", "init request manager dagger = " + mRequestManager);
-
         mBtnLoginStatus = findViewById(R.id.btn_login_status);
         mBtnLoginStatus.setText(mPrefsManager.getLoginStatus() ? "退出" : "登录");
 
@@ -56,7 +53,25 @@ public class Module2MainActivity extends BasicActivity implements LoginListener 
                 if (mPrefsManager.getLoginStatus()) {
                     mRequestManager.doExitRequest();
                 } else {
-                    mRequestManager.doLoginRequest("Zhipu", "123456", Module2MainActivity.this);
+                    final LoginTask3 loginTask3 = new LoginTask3("Wbj", "wbj89");
+                    loginTask3.doRequest();
+                    loginTask3.setOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(String error) {
+                            Log.e(loginTask3.getLogTag(), "onFailure: " + error);
+                            dismissProgressDialog();
+                            showToast(error);
+                        }
+                    });
+                    loginTask3.setOnResponseListener(new OnResponseListener() {
+                        @Override
+                        public void onResponse(String result) {
+                            Log.d(loginTask3.getLogTag(), "onResponse: " + result);
+                            dismissProgressDialog();
+                            mPrefsManager.putLoginStatus(true);
+                            mBtnLoginStatus.setText("退出");
+                        }
+                    });
                 }
             }
         });
@@ -91,19 +106,6 @@ public class Module2MainActivity extends BasicActivity implements LoginListener 
         } else {
             showToast("退出登录失败！");
         }
-    }
-
-    @Override
-    public void onLoginFail(String reason, int code) {
-        dismissProgressDialog();
-        showToast(reason);
-    }
-
-    @Override
-    public void onLoginSuccess() {
-        dismissProgressDialog();
-        mPrefsManager.putLoginStatus(true);
-        mBtnLoginStatus.setText("退出");
     }
 
     @Override

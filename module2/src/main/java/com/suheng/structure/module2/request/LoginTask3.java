@@ -1,4 +1,4 @@
-package com.suheng.structure.module3.net.request;
+package com.suheng.structure.module2.request;
 
 import com.suheng.structure.common.net.URLConstants;
 import com.suheng.structure.net.request.normal.RequestTask;

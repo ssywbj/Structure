@@ -16,8 +16,8 @@ import java.lang.ref.WeakReference;
 import okhttp3.ResponseBody;
 
 public abstract class RequestTask extends BasicTask {
-    private static final String JSON = "{" + "\"code\":0" + ",\"msg\":密码错误" + ",data:{"
-            + "\"memberId\":17" + ",\"age\":18" + ",\"email_address\":\"Wbj@qq.com\"" + "}" + "}";
+    /*private static final String JSON = "{" + "\"code\":0" + ",\"msg\":密码错误" + ",data:{"
+            + "\"memberId\":17" + ",\"age\":18" + ",\"email_address\":\"Wbj@qq.com\"" + "}" + "}";*/
     private static final int MSG_ON_RESPONSE = 1;
     private UIHandler mUIHandler;
     private OnResponseListener mOnResponseListener;
@@ -29,7 +29,7 @@ public abstract class RequestTask extends BasicTask {
     @Override
     protected void parseResponseBody(@NotNull ResponseBody responseBody) throws Exception {
         String result = responseBody.string();
-        result = JSON;
+        //result = JSON;
         this.parseResponseResult(result);
         Log.d(getLogTag(), "onResponse: " + result);
     }

@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import com.google.gson.annotations.SerializedName;
 
 public class UserInfo {
+    @SerializedName("member_id")
     private long memberId;
     private int age;
     /*序列化时，"emailAddress"属性被映射成json串的"email_address"字段；反序列化时，json串中

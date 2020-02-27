@@ -102,7 +102,8 @@ public class MVCLoginActivity extends BasicActivity {
                 Log.e(loginTask.getLogTag(), "onFailure: " + error);
 
                 dismissProgressDialog();
-                loginFail(error);
+                //loginFail(error);
+                showToast(error);
             }
         });
         loginTask.setOnResponseListener(new OnResponseListener() {

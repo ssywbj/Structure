@@ -2,6 +2,7 @@ package com.suheng.structure.module3.net.request;
 
 import android.util.Log;
 
+import com.suheng.structure.common.net.URLConstants;
 import com.suheng.structure.net.request.basic.BasicTask;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +28,7 @@ public class LoginTask4 extends BasicTask {
 
     @Override
     protected String getURL() {
-        return "https://www.baidu.com";
+        return URLConstants.URL_USER_INFO;
     }
 
     @Override

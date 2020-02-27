@@ -2,6 +2,7 @@ package com.suheng.structure.module3.net.request;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.suheng.structure.common.net.URLConstants;
 import com.suheng.structure.module3.net.bean.UserInfo;
 import com.suheng.structure.net.request.normal.OkHttpTask;
 import com.suheng.structure.net.response.Result;
@@ -15,7 +16,7 @@ public class LoginTask extends OkHttpTask<UserInfo> {
 
     @Override
     protected String getURL() {
-        return "https://www.baidu.com/index.jsp";
+        return URLConstants.URL_USER_INFO;
     }
 
     @Override
