@@ -1,5 +1,6 @@
 package com.suheng.structure.gson.bean;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
@@ -20,6 +21,9 @@ public class User {
 
     @Override
     public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (obj instanceof User) {
             User user = (User) obj;
             return (this.memberId == user.memberId) && (this.age == user.age) && this.emailAddress.equals(user.emailAddress);
@@ -32,6 +36,7 @@ public class User {
         return ((int) this.memberId) * this.age * this.emailAddress.hashCode();
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "User{" +
