@@ -20,10 +20,16 @@ import com.suheng.structure.module3.net.request.LoginTask4;
 import com.suheng.structure.net.callback.OnFailureListener;
 import com.suheng.structure.net.callback.OnResponseListener;
 import com.suheng.structure.ui.architecture.basic.PresenterFragment;
+import com.suheng.structure.ui.architecture.presenter.BasicPresenter;
 
 public class MVPLoginFragment extends PresenterFragment<LoginPresenter> implements LoginView {
 
     private LoginPresenter mPresenter = new LoginPresenter(this);
+
+    /*@Override
+    public LoginPresenter getPresenter() {
+        return mPresenter;
+    }*/
 
     @Override
     public LoginPresenter getPresenter() {

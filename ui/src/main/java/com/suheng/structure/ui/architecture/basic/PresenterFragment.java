@@ -18,6 +18,14 @@ public abstract class PresenterFragment<Presenter extends BasicPresenter> extend
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (getPresenter() != null) {
+            getPresenter().onActivityCreated(savedInstanceState);
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         if (getPresenter() != null) {
@@ -46,6 +54,14 @@ public abstract class PresenterFragment<Presenter extends BasicPresenter> extend
         super.onStop();
         if (getPresenter() != null) {
             getPresenter().onStop();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (getPresenter() != null) {
+            getPresenter().onDestroyView();
         }
     }
 

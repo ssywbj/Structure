@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion 19
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
     }
@@ -18,8 +18,8 @@ android {
         }
     }
 
-    /*如果支持了Java8并在module中运用Lambda表达式等新特性，而其它引用的module没有支持Java8就会
-    报"java.lang.BootstrapMethodError: Exception from call site #4 bootstrap method"错误*/
+    /*如果ui module支持Java8并且在代码中运用Lambda表达式等新特性，而其它引用ui module的module如果没有声明支持Java8，
+    module就会报"java.lang.BootstrapMethodError: Exception from call site #4 bootstrap method"异常*/
     /*compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

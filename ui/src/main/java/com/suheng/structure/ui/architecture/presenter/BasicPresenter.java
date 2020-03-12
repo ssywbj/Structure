@@ -1,6 +1,9 @@
 package com.suheng.structure.ui.architecture.presenter;
 
 import android.content.Context;
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
 
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 import com.suheng.structure.ui.architecture.view.MvpView;
@@ -50,7 +53,16 @@ public abstract class BasicPresenter<View extends MvpView> implements IPresenter
     public void onStop() {
     }
 
+    public void onRestart() {
+    }
+
     public void onDestroy() {
         mView = null;
+    }
+
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    }
+
+    public void onDestroyView() {
     }
 }

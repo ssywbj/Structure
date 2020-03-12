@@ -26,6 +26,14 @@ public abstract class PresenterActivity<Presenter extends BasicPresenter> extend
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        if (getPresenter() != null) {
+            getPresenter().onRestart();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if (getPresenter() != null) {

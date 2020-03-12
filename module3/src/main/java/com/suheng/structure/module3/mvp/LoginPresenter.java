@@ -1,8 +1,10 @@
 package com.suheng.structure.module3.mvp;
 
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -56,9 +58,24 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
     }
 
     @Override
+    public void onRestart() {
+        Log.d(mTag, mTag + ", onRestart");
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         Log.d(mTag, mTag + ", onDestroy");
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        Log.d(mTag, mTag + ", onActivityCreated");
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d(mTag, mTag + ", onDestroyView");
     }
 
     public void login(@NonNull final String name, @NonNull final String pwd) {
