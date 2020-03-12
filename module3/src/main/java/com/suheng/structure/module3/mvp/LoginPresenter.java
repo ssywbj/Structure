@@ -6,15 +6,14 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.suheng.structure.common.arouter.RouteTable;
-import com.suheng.structure.common.data.PrefsManager;
 import com.suheng.structure.common.event.LoginEvent;
+import com.suheng.structure.data.net.bean.UserInfo;
+import com.suheng.structure.data.net.request.LoginTask2;
 import com.suheng.structure.module3.BuildConfig;
 import com.suheng.structure.module3.R;
-import com.suheng.structure.module3.net.bean.UserInfo;
-import com.suheng.structure.module3.net.request.LoginTask2;
+
 import com.suheng.structure.net.callback.OnFailureListener;
 import com.suheng.structure.net.callback.OnResultListener;
 import com.suheng.structure.ui.architecture.presenter.BasicPresenter;
@@ -22,9 +21,6 @@ import com.suheng.structure.ui.architecture.presenter.BasicPresenter;
 import org.greenrobot.eventbus.EventBus;
 
 public class LoginPresenter extends BasicPresenter<LoginView> {
-
-    @Autowired
-    PrefsManager mPrefsManager;
 
     public LoginPresenter(LoginView loginView) {
         super(loginView);
@@ -89,6 +85,7 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
         }
 
         getView().showProgressDialog(getContext().getString(R.string.module3_login_progress), true);
+
         final LoginTask2 loginTask2 = new LoginTask2(name, pwd);
         loginTask2.doPostRequest(this);
         loginTask2.setOnFailureListener(new OnFailureListener() {
@@ -104,7 +101,7 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
                 Log.d(loginTask2.getLogTag(), "onRightResult: " + data);
 
                 getView().dismissProgressDialog();
-                mPrefsManager.putLoginStatus(true);
+                //mPrefsManager.putLoginStatus(true);
 
                 if (BuildConfig.IS_LIBRARY) {
                     EventBus.getDefault().post(new LoginEvent());
@@ -119,7 +116,7 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
                 Log.e(loginTask2.getLogTag(), "onErrorResult, code:" + code + ", msg: " + msg + ", onErrorResult: " + data);
 
                 getView().dismissProgressDialog();
-                mPrefsManager.putLoginStatus(false);
+                //mPrefsManager.putLoginStatus(false);
                 getView().loginFail(msg);
             }
         });

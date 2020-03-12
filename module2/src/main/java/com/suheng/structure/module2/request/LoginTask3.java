@@ -1,6 +1,6 @@
 package com.suheng.structure.module2.request;
 
-import com.suheng.structure.common.net.URLConstants;
+import com.suheng.structure.data.net.URLConstants;
 import com.suheng.structure.net.request.normal.RequestTask;
 
 public class LoginTask3 extends RequestTask {

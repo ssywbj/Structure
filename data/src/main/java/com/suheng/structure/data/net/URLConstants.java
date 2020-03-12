@@ -1,4 +1,4 @@
-package com.suheng.structure.common.net;
+package com.suheng.structure.data.net;
 
 public class URLConstants {
     private static final String URL_SERVER = "http://192.168.1.103:8080/TestJSP";

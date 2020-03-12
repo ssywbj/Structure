@@ -80,8 +80,7 @@ dependencies {
 
     //ARouter配置3(共5步)：配置ARouter注解
     annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
-    implementation 'com.google.code.gson:gson:2.8.6'
     implementation project(path: ':common')
     implementation project(path: ':ui')
-    implementation project(path: ':okhttp')
+    implementation project(path: ':data')
 }

@@ -1,8 +1,8 @@
-package com.suheng.structure.module3.net.request;
+package com.suheng.structure.data.net.request;
 
 import android.util.Log;
 
-import com.suheng.structure.common.net.URLConstants;
+import com.suheng.structure.data.net.URLConstants;
 import com.suheng.structure.net.request.basic.BasicTask;
 
 import org.jetbrains.annotations.NotNull;

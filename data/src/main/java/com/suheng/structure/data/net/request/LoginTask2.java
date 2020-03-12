@@ -1,9 +1,9 @@
-package com.suheng.structure.module3.net.request;
+package com.suheng.structure.data.net.request;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.suheng.structure.common.net.URLConstants;
-import com.suheng.structure.module3.net.bean.UserInfo;
+import com.suheng.structure.data.net.URLConstants;
+import com.suheng.structure.data.net.bean.UserInfo;
 import com.suheng.structure.net.request.normal.CodeMsgTask;
 import com.suheng.structure.net.response.Result;
 

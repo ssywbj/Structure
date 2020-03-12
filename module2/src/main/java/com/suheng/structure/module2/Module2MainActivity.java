@@ -6,12 +6,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.suheng.structure.common.arouter.RouteTable;
-import com.suheng.structure.common.data.PrefsManager;
-import com.suheng.structure.common.data.net.RequestManager;
 import com.suheng.structure.common.event.ExitLoginEvent;
 import com.suheng.structure.module2.request.BeautyTask;
 import com.suheng.structure.module2.request.LoginTask3;
@@ -30,10 +27,6 @@ import java.io.File;
 public class Module2MainActivity extends BasicActivity {
 
     private Button mBtnLoginStatus;
-    @Autowired
-    PrefsManager mPrefsManager;
-    @Autowired
-    RequestManager mRequestManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,15 +37,15 @@ public class Module2MainActivity extends BasicActivity {
         EventBus.getDefault().register(this);
 
         mBtnLoginStatus = findViewById(R.id.btn_login_status);
-        mBtnLoginStatus.setText(mPrefsManager.getLoginStatus() ? "退出" : "登录");
+        //mBtnLoginStatus.setText(mPrefsManager.getLoginStatus() ? "退出" : "登录");
 
         mBtnLoginStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showProgressDialog("");
-                if (mPrefsManager.getLoginStatus()) {
+                /*if (mPrefsManager.getLoginStatus()) {
                     mRequestManager.doExitRequest();
-                } else {
+                } else {*/
                     final LoginTask3 loginTask3 = new LoginTask3("Wbj", "wbj89");
                     loginTask3.doRequest();
                     loginTask3.setOnFailureListener(new OnFailureListener() {
@@ -68,11 +61,11 @@ public class Module2MainActivity extends BasicActivity {
                         public void onResponse(String result) {
                             Log.d(loginTask3.getLogTag(), "onResponse: " + result);
                             dismissProgressDialog();
-                            mPrefsManager.putLoginStatus(true);
+                            //mPrefsManager.putLoginStatus(true);
                             mBtnLoginStatus.setText("退出");
                         }
                     });
-                }
+                //}
             }
         });
 
@@ -101,7 +94,7 @@ public class Module2MainActivity extends BasicActivity {
     public void onEvent(ExitLoginEvent event) {
         dismissProgressDialog();
         if (event.isSuccess()) {
-            mPrefsManager.putLoginStatus(false);
+            //mPrefsManager.putLoginStatus(false);
             mBtnLoginStatus.setText("登录");
         } else {
             showToast("退出登录失败！");

@@ -74,7 +74,7 @@ dependencies {
 
     implementation project(path: ':common')
     implementation project(path: ':ui')
-    implementation project(path: ':okhttp')
+    implementation project(path: ':data')
     //ARouter配置3(共5步)：配置ARouter的"annotationProcessor"
     annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
 }

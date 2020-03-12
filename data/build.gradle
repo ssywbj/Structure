@@ -11,6 +11,12 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [moduleName: project.getName()/*ARouter配置1(共5步)*/]
+            }
+        }
     }
 
     buildTypes {
@@ -29,4 +35,13 @@ dependencies {
     testImplementation "junit:junit:$rootProject.junitVersion"
     androidTestImplementation "androidx.test:runner:$rootProject.runnerVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoCoreVersion"
+
+    api project(path: ':okhttp')
+    implementation 'com.google.code.gson:gson:2.8.6'
+    //ARouter配置2(共5步)：api集成方式
+    api("com.alibaba:arouter-api:$rootProject.arouterApiVersion") {
+        exclude group: 'com.android.support'
+    }
+    //ARouter配置3(共5步)：配置ARouter注解
+    annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
 }

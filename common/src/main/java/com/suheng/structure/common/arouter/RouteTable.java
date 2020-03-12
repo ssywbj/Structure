@@ -1,10 +1,6 @@
 package com.suheng.structure.common.arouter;
 
 public class RouteTable {//命名规范：/模块/组件(aty、frg等)/业务
-    //#common module
-    public static final String COMMON_PROVIDER_PREFS_MANAGER = "/common/provider/prefs_manager";
-    public static final String COMMON_PROVIDER_REQUEST_MANAGER = "/common/provider/request_manager";
-
     //#module1 module
     public static final String MODULE1_ATY_MODULE1_MAIN = "/module1/aty/module1_main";
     public static final String MODULE1_PROVIDER_MODULE1_CONFIG = "/module1/provider/module1_config";

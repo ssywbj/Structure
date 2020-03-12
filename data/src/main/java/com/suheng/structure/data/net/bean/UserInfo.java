@@ -1,4 +1,4 @@
-package com.suheng.structure.module3.net.bean;
+package com.suheng.structure.data.net.bean;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

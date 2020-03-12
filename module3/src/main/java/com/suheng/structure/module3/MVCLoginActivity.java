@@ -7,14 +7,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.suheng.structure.common.arouter.RouteTable;
-import com.suheng.structure.common.data.PrefsManager;
 import com.suheng.structure.common.event.LoginEvent;
-import com.suheng.structure.module3.net.bean.UserInfo;
-import com.suheng.structure.module3.net.request.LoginTask;
+
+import com.suheng.structure.data.net.bean.UserInfo;
+import com.suheng.structure.data.net.request.LoginTask;
 import com.suheng.structure.net.callback.OnFailureListener;
 import com.suheng.structure.net.callback.OnResponseListener;
 import com.suheng.structure.net.callback.OnResultListener;
@@ -24,9 +23,6 @@ import org.greenrobot.eventbus.EventBus;
 
 @Route(path = RouteTable.MODULE3_ATY_MVC_LOGIN)
 public class MVCLoginActivity extends BasicActivity {
-
-    @Autowired
-    PrefsManager mPrefsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +116,7 @@ public class MVCLoginActivity extends BasicActivity {
                 Log.d(loginTask.getLogTag(), "onRightResult: " + data);
 
                 dismissProgressDialog();
-                mPrefsManager.putLoginStatus(true);
+                //mPrefsManager.putLoginStatus(true);
 
                 if (BuildConfig.IS_LIBRARY) {
                     EventBus.getDefault().post(new LoginEvent());
@@ -135,7 +131,7 @@ public class MVCLoginActivity extends BasicActivity {
                 Log.e(loginTask.getLogTag(), "onErrorResult, code: " + code + ", msg: " + msg + ", onErrorResult: " + data);
 
                 dismissProgressDialog();
-                mPrefsManager.putLoginStatus(false);
+                //mPrefsManager.putLoginStatus(false);
                 loginFail(msg);
             }
         });

@@ -13,14 +13,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.suheng.structure.data.net.request.LoginTask3;
+import com.suheng.structure.data.net.request.LoginTask4;
 import com.suheng.structure.module3.mvp.LoginPresenter;
 import com.suheng.structure.module3.mvp.LoginView;
-import com.suheng.structure.module3.net.request.LoginTask3;
-import com.suheng.structure.module3.net.request.LoginTask4;
 import com.suheng.structure.net.callback.OnFailureListener;
 import com.suheng.structure.net.callback.OnResponseListener;
 import com.suheng.structure.ui.architecture.basic.PresenterFragment;
-import com.suheng.structure.ui.architecture.presenter.BasicPresenter;
 
 public class MVPLoginFragment extends PresenterFragment<LoginPresenter> implements LoginView {
 
