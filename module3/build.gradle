@@ -80,7 +80,6 @@ dependencies {
 
     //ARouter配置3(共5步)：配置ARouter注解
     annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
-    implementation project(path: ':common')
     implementation project(path: ':ui')
     implementation project(path: ':data')
 }

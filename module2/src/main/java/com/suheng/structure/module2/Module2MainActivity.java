@@ -6,26 +6,26 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.common.arouter.RouteTable;
-import com.suheng.structure.common.event.ExitLoginEvent;
+import com.suheng.structure.arouter.RouteTable;
+import com.suheng.structure.data.DataManager;
+import com.suheng.structure.data.net.bean.UserInfo;
+import com.suheng.structure.data.net.request.LoginTask;
 import com.suheng.structure.module2.request.BeautyTask;
-import com.suheng.structure.module2.request.LoginTask3;
 import com.suheng.structure.net.callback.OnDownloadListener;
 import com.suheng.structure.net.callback.OnFailureListener;
-import com.suheng.structure.net.callback.OnResponseListener;
+import com.suheng.structure.net.callback.OnResultListener;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 
 @Route(path = RouteTable.MODULE2_ATY_MODULE2_MAIN)
 public class Module2MainActivity extends BasicActivity {
 
+    @Autowired
+    DataManager mDataManager;
     private Button mBtnLoginStatus;
 
     @Override
@@ -34,19 +34,58 @@ public class Module2MainActivity extends BasicActivity {
         setContentView(R.layout.module2_aty_module2_main);
 
         ARouter.getInstance().inject(this);
-        EventBus.getDefault().register(this);
 
         mBtnLoginStatus = findViewById(R.id.btn_login_status);
-        //mBtnLoginStatus.setText(mPrefsManager.getLoginStatus() ? "退出" : "登录");
+        mBtnLoginStatus.setText(mDataManager.isLoginSuccessful() ? "退出" : "登录");
 
         mBtnLoginStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showProgressDialog("");
-                /*if (mPrefsManager.getLoginStatus()) {
-                    mRequestManager.doExitRequest();
-                } else {*/
-                    final LoginTask3 loginTask3 = new LoginTask3("Wbj", "wbj89");
+                if (mDataManager.isLoginSuccessful()) {
+                    mDataManager.doExitLoginRequest().setOnResultListener(new OnResultListener<UserInfo, String>() {
+                        @Override
+                        public void onRightResult(UserInfo data) {
+                            dismissProgressDialog();
+                            mDataManager.setLoginSuccessful(false);
+                            mBtnLoginStatus.setText("登录");
+                        }
+
+                        @Override
+                        public void onErrorResult(int code, String msg, String data) {
+                            dismissProgressDialog();
+                            showToast("退出登录失败！");
+                        }
+                    });
+                } else {
+                    final LoginTask loginTask = mDataManager.doLoginRequest("Wbj", "wbj89");
+                    loginTask.setOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(String error) {
+                            Log.e(loginTask.getLogTag(), "onFailure: " + error);
+
+                            dismissProgressDialog();
+                        }
+                    });
+                    loginTask.setOnResultListener(new OnResultListener<UserInfo, String>() {
+                        @Override
+                        public void onRightResult(UserInfo data) {
+                            Log.d(loginTask.getLogTag(), "onRightResult: " + data);
+
+                            dismissProgressDialog();
+                            mDataManager.setLoginSuccessful(true);
+                            mBtnLoginStatus.setText("退出");
+                        }
+
+                        @Override
+                        public void onErrorResult(int code, String msg, String data) {
+                            Log.e(loginTask.getLogTag(), "onErrorResult, code:" + code + ", msg: " + msg + ", onErrorResult: " + data);
+
+                            dismissProgressDialog();
+                        }
+                    });
+
+                    /*final LoginTask3 loginTask3 = new LoginTask3("Wbj", "wbj89");
                     loginTask3.doRequest();
                     loginTask3.setOnFailureListener(new OnFailureListener() {
                         @Override
@@ -61,11 +100,11 @@ public class Module2MainActivity extends BasicActivity {
                         public void onResponse(String result) {
                             Log.d(loginTask3.getLogTag(), "onResponse: " + result);
                             dismissProgressDialog();
-                            //mPrefsManager.putLoginStatus(true);
+                            mDataManager.setLoginSuccessful(true);
                             mBtnLoginStatus.setText("退出");
                         }
-                    });
-                //}
+                    });*/
+                }
             }
         });
 
@@ -82,23 +121,6 @@ public class Module2MainActivity extends BasicActivity {
                 requestExternalStoragePermission(R.id.btn_upload);
             }
         });
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        EventBus.getDefault().unregister(this);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ExitLoginEvent event) {
-        dismissProgressDialog();
-        if (event.isSuccess()) {
-            //mPrefsManager.putLoginStatus(false);
-            mBtnLoginStatus.setText("登录");
-        } else {
-            showToast("退出登录失败！");
-        }
     }
 
     @Override

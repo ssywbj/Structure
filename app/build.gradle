@@ -70,10 +70,10 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$rootProject.runnerVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoCoreVersion"
 
-    //ARouter配置3(共5步)：配置ARouter的"annotationProcessor"
+    //ARouter配置3(共5步)：配置ARouter注解
     annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
-    implementation project(path: ':common')
     implementation project(path: ':ui')
+    implementation project(path: ':data')
     if (isModule1Library.toBoolean()) {
         implementation project(path: ':module1')
     }

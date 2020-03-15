@@ -1,4 +1,4 @@
-package com.suheng.structure.common.arouter;
+package com.suheng.structure.arouter;
 
 public class RouteTable {//命名规范：/模块/组件(aty、frg等)/业务
     //#module1 module
@@ -12,4 +12,7 @@ public class RouteTable {//命名规范：/模块/组件(aty、frg等)/业务
     public static final String MODULE3_ATY_MVP_LOGIN = "/module3/aty/mvp_login";
     public static final String MODULE3_ATY_MVC_LOGIN = "/module3/aty/mvc_login";
     public static final String MODULE3_ATY_MODULE3_MAIN = "/module3/aty/module3_main";
+
+    //#data module
+    public static final String data_data_manager = "/data/data_manager";
 }

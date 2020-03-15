@@ -2,12 +2,15 @@ package com.suheng.structure.data;
 
 import android.content.Context;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.facade.template.IProvider;
+import com.suheng.structure.arouter.RouteTable;
 import com.suheng.structure.data.db.DatabaseManager;
 import com.suheng.structure.data.net.NetworkManager;
 import com.suheng.structure.data.net.request.LoginTask;
 import com.suheng.structure.data.prefs.PrefsManager;
 
+@Route(path = RouteTable.data_data_manager)
 public class DataManager implements IProvider {
     private PrefsManager mPrefsManager;
     private DatabaseManager mDatabaseManager;
@@ -30,5 +33,9 @@ public class DataManager implements IProvider {
 
     public LoginTask doLoginRequest(String name, String pwd) {
         return mNetworkManager.doLoginRequest(name, pwd);
+    }
+
+    public LoginTask doExitLoginRequest() {
+        return mNetworkManager.doExitLoginRequest();
     }
 }

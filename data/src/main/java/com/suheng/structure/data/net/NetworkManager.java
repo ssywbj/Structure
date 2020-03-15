@@ -9,4 +9,10 @@ public class NetworkManager {
         loginTask.doRequest();
         return loginTask;
     }
+
+    public LoginTask doExitLoginRequest() {
+        final LoginTask loginTask = new LoginTask("name", "pwd");
+        loginTask.doRequest();
+        return loginTask;
+    }
 }

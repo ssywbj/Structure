@@ -9,11 +9,10 @@ import android.widget.EditText;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.common.arouter.RouteTable;
-import com.suheng.structure.common.event.LoginEvent;
-
+import com.suheng.structure.arouter.RouteTable;
 import com.suheng.structure.data.net.bean.UserInfo;
 import com.suheng.structure.data.net.request.LoginTask;
+import com.suheng.structure.eventbus.LoginEvent;
 import com.suheng.structure.net.callback.OnFailureListener;
 import com.suheng.structure.net.callback.OnResponseListener;
 import com.suheng.structure.net.callback.OnResultListener;

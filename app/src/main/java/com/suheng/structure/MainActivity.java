@@ -5,10 +5,12 @@ import android.util.Log;
 import android.view.View;
 
 import com.alibaba.android.arouter.facade.Postcard;
+import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.callback.NavCallback;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.common.arouter.RouteTable;
-import com.suheng.structure.common.event.LoginEvent;
+import com.suheng.structure.arouter.RouteTable;
+import com.suheng.structure.data.DataManager;
+import com.suheng.structure.eventbus.LoginEvent;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
 import org.greenrobot.eventbus.EventBus;
@@ -16,6 +18,9 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 public class MainActivity extends BasicActivity {
+
+    @Autowired
+    DataManager mDataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,11 +33,11 @@ public class MainActivity extends BasicActivity {
         findViewById(R.id.item_module1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*if (mPrefsManager.getLoginStatus()) {
+                if (mDataManager.isLoginSuccessful()) {
                     ARouter.getInstance().build(RouteTable.MODULE1_ATY_MODULE1_MAIN).navigation();
-                } else {*/
+                } else {
                     ARouter.getInstance().build(RouteTable.MODULE3_ATY_MVP_LOGIN).navigation();
-                //}
+                }
             }
         });
 

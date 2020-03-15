@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.common.arouter.RouteTable;
+import com.suheng.structure.arouter.RouteTable;
 import com.suheng.structure.ui.architecture.basic.BasicFragment;
 
 import java.util.Random;

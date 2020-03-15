@@ -6,14 +6,15 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.common.arouter.RouteTable;
-import com.suheng.structure.common.event.LoginEvent;
+import com.suheng.structure.arouter.RouteTable;
+import com.suheng.structure.data.DataManager;
 import com.suheng.structure.data.net.bean.UserInfo;
-import com.suheng.structure.data.net.request.LoginTask2;
+import com.suheng.structure.data.net.request.LoginTask;
+import com.suheng.structure.eventbus.LoginEvent;
 import com.suheng.structure.module3.BuildConfig;
 import com.suheng.structure.module3.R;
-
 import com.suheng.structure.net.callback.OnFailureListener;
 import com.suheng.structure.net.callback.OnResultListener;
 import com.suheng.structure.ui.architecture.presenter.BasicPresenter;
@@ -21,6 +22,9 @@ import com.suheng.structure.ui.architecture.presenter.BasicPresenter;
 import org.greenrobot.eventbus.EventBus;
 
 public class LoginPresenter extends BasicPresenter<LoginView> {
+
+    @Autowired
+    DataManager mDataManager;
 
     public LoginPresenter(LoginView loginView) {
         super(loginView);
@@ -86,7 +90,7 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
 
         getView().showProgressDialog(getContext().getString(R.string.module3_login_progress), true);
 
-        final LoginTask2 loginTask2 = new LoginTask2(name, pwd);
+        /*final LoginTask2 loginTask2 = new LoginTask2(name, pwd);
         loginTask2.doPostRequest(this);
         loginTask2.setOnFailureListener(new OnFailureListener() {
             @Override
@@ -101,7 +105,7 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
                 Log.d(loginTask2.getLogTag(), "onRightResult: " + data);
 
                 getView().dismissProgressDialog();
-                //mPrefsManager.putLoginStatus(true);
+                mDataManager.setLoginSuccessful(true);
 
                 if (BuildConfig.IS_LIBRARY) {
                     EventBus.getDefault().post(new LoginEvent());
@@ -116,7 +120,42 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
                 Log.e(loginTask2.getLogTag(), "onErrorResult, code:" + code + ", msg: " + msg + ", onErrorResult: " + data);
 
                 getView().dismissProgressDialog();
-                //mPrefsManager.putLoginStatus(false);
+                mDataManager.setLoginSuccessful(false);
+                getView().loginFail(msg);
+            }
+        });*/
+
+        final LoginTask loginTask = mDataManager.doLoginRequest(name, pwd);
+        loginTask.setOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(String error) {
+                Log.e(loginTask.getLogTag(), "onFailure: " + error);
+                getView().dismissProgressDialog();
+                getView().showToast("登录失败");
+            }
+        });
+        loginTask.setOnResultListener(new OnResultListener<UserInfo, String>() {
+            @Override
+            public void onRightResult(UserInfo data) {
+                Log.d(loginTask.getLogTag(), "onRightResult: " + data);
+
+                getView().dismissProgressDialog();
+                mDataManager.setLoginSuccessful(true);
+
+                if (BuildConfig.IS_LIBRARY) {
+                    EventBus.getDefault().post(new LoginEvent());
+                    getActivity().finish();
+                } else {
+                    ARouter.getInstance().build(RouteTable.MODULE3_ATY_MODULE3_MAIN).navigation();
+                }
+            }
+
+            @Override
+            public void onErrorResult(int code, String msg, String data) {
+                Log.e(loginTask.getLogTag(), "onErrorResult, code:" + code + ", msg: " + msg + ", onErrorResult: " + data);
+
+                getView().dismissProgressDialog();
+                mDataManager.setLoginSuccessful(false);
                 getView().loginFail(msg);
             }
         });

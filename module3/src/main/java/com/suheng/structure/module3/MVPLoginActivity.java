@@ -10,7 +10,7 @@ import android.widget.EditText;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.common.arouter.RouteTable;
+import com.suheng.structure.arouter.RouteTable;
 import com.suheng.structure.module3.mvp.LoginPresenter;
 import com.suheng.structure.module3.mvp.LoginView;
 import com.suheng.structure.ui.architecture.basic.PresenterActivity;

@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.facade.template.IProvider;
-import com.suheng.structure.common.arouter.RouteTable;
+import com.suheng.structure.arouter.RouteTable;
 
 @Route(path = RouteTable.MODULE1_PROVIDER_MODULE1_CONFIG)
 public class Module1Config implements IProvider {

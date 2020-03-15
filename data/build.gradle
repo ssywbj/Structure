@@ -39,9 +39,9 @@ dependencies {
     api project(path: ':okhttp')
     implementation 'com.google.code.gson:gson:2.8.6'
     //ARouter配置2(共5步)：api集成方式
-    api("com.alibaba:arouter-api:$rootProject.arouterApiVersion") {
-        exclude group: 'com.android.support'
-    }
+    api "com.alibaba:arouter-api:$rootProject.arouterApiVersion"
     //ARouter配置3(共5步)：配置ARouter注解
     annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
+    //implementation project(path: ':common')
+    api "org.greenrobot:eventbus:$rootProject.eventBusVersion"
 }
