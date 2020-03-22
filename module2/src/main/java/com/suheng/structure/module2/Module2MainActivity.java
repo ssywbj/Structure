@@ -177,7 +177,9 @@ public class Module2MainActivity extends BasicActivity {
         });
     }
 
-    String sdcardFilePath = "/storage/14CB-D108/支付风险/payRisks3.apk";
+    //String sdcardFilePath = "/storage/5285-8EF6/apks/15.apk";//Gionee M100
+    //String sdcardFilePath = "/storage/sdcard1/apks/10.apk";//台电T98
+    String sdcardFilePath = "/storage/otg/sdb/apks/10.apk";//vivo Xplay
 
     @Override
     public void openedExternalStoragePermission(int businessId) {
@@ -210,49 +212,62 @@ public class Module2MainActivity extends BasicActivity {
                 }
             });
         } else if (businessId == R.id.btn_upload) {
-            File file = new File(sdcardFilePath);
-            Intent intent = null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                StorageManager storageManager = getSystemService(StorageManager.class);
-                StorageVolume volume = null;
-                if (storageManager != null) {
-                    volume = storageManager.getStorageVolume(file);
-                }
-                if (volume != null) {
-                    intent = volume.createAccessIntent(null);
-                }
-            }
-            if (intent == null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                }
-            }
-            if (intent == null) {
-                intent = new Intent(Intent.ACTION_VIEW);
-                startActivityForResult(intent, 2);
-            }
+            String sdcardPath = DocumentsUtils.getStoragePath(this, true);
+            String internalPath = DocumentsUtils.getStoragePath(this, false);
+            String[] sdcardExtPath = DocumentsUtils.getExtSdCardPaths(this);
+            Log.d(mTag, "internalPath: " + internalPath + ", sdcard path: " + sdcardPath + ", " + sdcardExtPath[0]);
 
-            /*if (file.exists()) {
+            File file = new File(sdcardFilePath);
+            if (file.exists()) {
                 Log.d(mTag, file + ", canRead: " + file.canRead() + ", canWrite: " + file.canWrite()
                         + ", canExecute: " + file.canExecute());
 
-                boolean delete = file.delete();
-                if (delete) {
-                    Log.d(mTag, file + ", delete successful.");
-                } else {
-                    Log.w(mTag, file + ", delete fail!");
+                Intent intent = null;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    StorageManager storageManager = getSystemService(StorageManager.class);
+                    StorageVolume volume = null;
+                    if (storageManager != null) {
+                        volume = storageManager.getStorageVolume(file);
+                    }
+                    if (volume != null) {
+                        intent = volume.createAccessIntent(null);
+                    }
                 }
-
-                delete = DocumentFile.fromFile(file).delete();
-                if (delete) {
-                    Log.d(mTag, file + ", delete successful.");
+                if (intent == null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                    }
+                }
+                if (intent != null) {
+                    startActivityForResult(intent, 2);
                 } else {
-                    Log.w(mTag, file + ", delete fail!");
+                    boolean delete = file.delete();
+                    if (delete) {
+                        Log.d(mTag, file + ", delete successful.");
+                    } else {
+                        Log.w(mTag, file + ", delete fail!");
+                    }
+
+                    delete = DocumentFile.fromFile(file).delete();
+                    if (delete) {
+                        Log.d(mTag, file + ", delete successful.");
+                    } else {
+                        Log.w(mTag, file + ", delete fail!");
+                    }
+
+                    Uri uri = DocumentFile.fromFile(file).getUri();
+                    delete = DocumentsUtils.delete(this, file, uri);
+                    if (delete) {
+                        Log.d(mTag, file + ", delete successful.");
+                    } else {
+                        Log.w(mTag, file + ", delete fail!");
+                    }
+
                 }
             } else {
                 Log.d(mTag, file + " is not exists.");
-            }*/
-
+            }
+            /*//能正常删除内置存储空间上的文件
             file = new File(Environment.getExternalStorageDirectory(), "otherRisks2.apk");
             if (file.exists()) {
                 boolean delete = file.delete();
@@ -263,7 +278,7 @@ public class Module2MainActivity extends BasicActivity {
                 }
             } else {
                 Log.d(mTag, file + " is not exists.");
-            }
+            }*/
         }
     }
 
@@ -281,9 +296,6 @@ public class Module2MainActivity extends BasicActivity {
                     Log.d(mTag, "uri: " + uri + ", getUri: " + DocumentFile.fromFile(file).getUri());
 
                     if (file.exists()) {
-                        Log.d(mTag, file + ", canRead: " + file.canRead() + ", canWrite: " + file.canWrite()
-                                + ", canExecute: " + file.canExecute());
-
                         boolean delete = file.delete();
                         if (delete) {
                             Log.d(mTag, file + ", delete successful.");
@@ -291,14 +303,15 @@ public class Module2MainActivity extends BasicActivity {
                             Log.w(mTag, file + ", delete fail!");
                         }
 
-                        /*delete = DocumentFile.fromFile(file).delete();
+                        delete = DocumentFile.fromFile(file).delete();
                         if (delete) {
                             Log.d(mTag, file + ", delete successful.");
                         } else {
                             Log.w(mTag, file + ", delete fail!");
                         }
-*/
-                        delete = DocumentsUtils.delete(this, file);
+
+                        //delete = DocumentsUtils.delete(this, file);
+                        delete = DocumentsUtils.delete(this, file, uri);
                         if (delete) {
                             Log.d(mTag, file + ", delete successful.");
                         } else {

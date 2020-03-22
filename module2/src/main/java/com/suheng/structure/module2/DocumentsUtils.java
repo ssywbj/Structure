@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.os.storage.StorageManager;
 import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.util.Log;
@@ -18,6 +19,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,24 +45,25 @@ public class DocumentsUtils {
      *
      * @return A list of external SD card paths.
      */
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    private static String[] getExtSdCardPaths(Context context) {
+    public static String[] getExtSdCardPaths(Context context) {
         if (sExtSdCardPaths.size() > 0) {
             return sExtSdCardPaths.toArray(new String[0]);
         }
-        for (File file : context.getExternalFilesDirs("external")) {
-            if (file != null && !file.equals(context.getExternalFilesDir("external"))) {
-                int index = file.getAbsolutePath().lastIndexOf("/Android/data");
-                if (index < 0) {
-                    Log.w(TAG, "Unexpected external file dir: " + file.getAbsolutePath());
-                } else {
-                    String path = file.getAbsolutePath().substring(0, index);
-                    try {
-                        path = new File(path).getCanonicalPath();
-                    } catch (IOException e) {
-                        // Keep non-canonical path.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            for (File file : context.getExternalFilesDirs("external")) {
+                if (file != null && !file.equals(context.getExternalFilesDir("external"))) {
+                    int index = file.getAbsolutePath().lastIndexOf("/Android/data");
+                    if (index < 0) {
+                        Log.w(TAG, "Unexpected external file dir: " + file.getAbsolutePath());
+                    } else {
+                        String path = file.getAbsolutePath().substring(0, index);
+                        try {
+                            path = new File(path).getCanonicalPath();
+                        } catch (IOException e) {
+                            // Keep non-canonical path.
+                        }
+                        sExtSdCardPaths.add(path);
                     }
-                    sExtSdCardPaths.add(path);
                 }
             }
         }
@@ -137,17 +141,62 @@ public class DocumentsUtils {
             originalDirectory = true;
             //continue
         }
-        String as = PreferenceManager.getDefaultSharedPreferences(context).getString(baseFolder, "null");
+        String as = PreferenceManager.getDefaultSharedPreferences(context).getString(baseFolder, "");
 
         Uri treeUri = null;
-        //if (as != null) treeUri = Uri.parse(as);
-        if (as != null) treeUri = sUri;
+        if (as != null) treeUri = Uri.parse(as);
         if (treeUri == null) {
             return null;
         }
 
         // start with root of SD card and then parse through document tree.
         DocumentFile document = DocumentFile.fromTreeUri(context, treeUri);
+        if (originalDirectory) return document;
+        String[] parts = relativePath.split("/");
+        for (int i = 0; i < parts.length; i++) {
+            DocumentFile nextDocument = document.findFile(parts[i]);
+
+            if (nextDocument == null) {
+                if ((i < parts.length - 1) || isDirectory) {
+                    nextDocument = document.createDirectory(parts[i]);
+                } else {
+                    nextDocument = document.createFile("image", parts[i]);
+                }
+            }
+            document = nextDocument;
+        }
+
+        return document;
+    }
+
+    public static DocumentFile getDocumentFile(final File file, final boolean isDirectory, Context context, Uri uri) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+            return DocumentFile.fromFile(file);
+        }
+
+        String baseFolder = getExtSdCardFolder(file, context);
+        boolean originalDirectory = false;
+        if (baseFolder == null) {
+            return null;
+        }
+
+        String relativePath = null;
+        try {
+            String fullPath = file.getCanonicalPath();
+            if (!baseFolder.equals(fullPath)) {
+                relativePath = fullPath.substring(baseFolder.length() + 1);
+            } else {
+                originalDirectory = true;
+            }
+        } catch (IOException e) {
+            return null;
+        } catch (Exception f) {
+            originalDirectory = true;
+            //continue
+        }
+
+        // start with root of SD card and then parse through document tree.
+        DocumentFile document = DocumentFile.fromTreeUri(context, uri);
         if (originalDirectory) return document;
         String[] parts = relativePath.split("/");
         for (int i = 0; i < parts.length; i++) {
@@ -189,15 +238,11 @@ public class DocumentsUtils {
         return ret;
     }
 
-    private static Uri sUri;
-
     public static boolean delete(Context context, File file, Uri uri) {
-        sUri = uri;
-
         boolean ret = file.delete();
 
         if (!ret && DocumentsUtils.isOnExtSdCard(file, context)) {
-            DocumentFile f = DocumentsUtils.getDocumentFile(file, false, context);
+            DocumentFile f = DocumentsUtils.getDocumentFile(file, false, context, uri);
             if (f != null) {
                 ret = f.delete();
             }
@@ -332,5 +377,44 @@ public class DocumentsUtils {
         }
         return false;
 
+    }
+
+    /**
+     * 通过反射调用获取内置存储和外置sd卡根路径(通用)
+     *
+     * @param isCanRemove 是否可移除，false返回内部存储路径，true返回外置SD卡路径
+     */
+    public static String getStoragePath(Context context, boolean isCanRemove) {
+        String path = "";
+        try {
+            StorageManager storageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
+            if (storageManager == null) {
+                return path;
+            }
+
+            Class<?> cls = Class.forName("android.os.storage.StorageVolume");
+            Method getVolumeList = storageManager.getClass().getMethod("getVolumeList");
+            Method getPath = cls.getMethod("getPath");
+            Method isRemovable = cls.getMethod("isRemovable");
+            Object result = getVolumeList.invoke(storageManager);
+            if (result == null) {
+                return path;
+            }
+
+            for (int i = 0; i < Array.getLength(result); i++) {
+                Object storageVolumeElement = Array.get(result, i);
+                path = (String) getPath.invoke(storageVolumeElement);
+                Object invoke = isRemovable.invoke(storageVolumeElement);
+                if (invoke != null) {
+                    boolean removable = (Boolean) invoke;
+                    if (isCanRemove == removable) {
+                        return path;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return path;
     }
 }
