@@ -125,11 +125,15 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
             }
         });*/
 
+        /*new Thread(new Runnable() {
+            @Override
+            public void run() {*/
+
+
         final LoginTask loginTask = mDataManager.doLoginRequest(name, pwd);
         loginTask.setOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(String error) {
-                Log.e(loginTask.getLogTag(), "onFailure: " + error);
                 getView().dismissProgressDialog();
                 getView().showToast("登录失败");
             }
@@ -159,5 +163,8 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
                 getView().loginFail(msg);
             }
         });
+
+            /*}
+        }).start();*/
     }
 }

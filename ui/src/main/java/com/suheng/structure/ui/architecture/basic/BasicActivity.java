@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.widget.Toast;
@@ -84,7 +85,12 @@ public abstract class BasicActivity extends AppCompatActivity implements IView {
 
     @Override
     public boolean isUnsafe() {
-        return (isDestroyed() || isFinishing());
+        boolean finishing = isFinishing();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            return (isDestroyed() || finishing);
+        } else {
+            return finishing;
+        }
     }
 
     @Override//PermissionsDispatcher权限框架配置5（共5步）

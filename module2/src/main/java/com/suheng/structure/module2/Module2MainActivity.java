@@ -1,16 +1,25 @@
 package com.suheng.structure.module2;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.suheng.structure.arouter.RouteTable;
 import com.suheng.structure.data.DataManager;
+import com.suheng.structure.data.net.URLConstants;
 import com.suheng.structure.data.net.bean.UserInfo;
 import com.suheng.structure.data.net.request.LoginTask;
 import com.suheng.structure.module2.request.BeautyTask;
@@ -20,6 +29,15 @@ import com.suheng.structure.net.callback.OnResultListener;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.ConnectionSpec;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 @Route(path = RouteTable.MODULE2_ATY_MODULE2_MAIN)
 public class Module2MainActivity extends BasicActivity {
@@ -43,7 +61,7 @@ public class Module2MainActivity extends BasicActivity {
             public void onClick(View v) {
                 showProgressDialog("");
                 if (mDataManager.isLoginSuccessful()) {
-                    mDataManager.doExitLoginRequest().setOnResultListener(new OnResultListener<UserInfo, String>() {
+                    /*mDataManager.doExitLoginRequest().setOnResultListener(new OnResultListener<UserInfo, String>() {
                         @Override
                         public void onRightResult(UserInfo data) {
                             dismissProgressDialog();
@@ -56,7 +74,42 @@ public class Module2MainActivity extends BasicActivity {
                             dismissProgressDialog();
                             showToast("退出登录失败！");
                         }
-                    });
+                    });*/
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            OkHttpClient httpClient = new OkHttpClient.Builder().connectionSpecs(Collections.singletonList(new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                                    .allEnabledTlsVersions().build())).build();
+                            Request request = new Request.Builder().url(URLConstants.URL_USER_INFO).build();
+                            httpClient.newCall(request).enqueue(new Callback() {
+                                @Override
+                                public void onFailure( Call call,  IOException e) {
+                                    new Handler(getMainLooper()).post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            dismissProgressDialog();
+                                            showToast("退出登录失败！");
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onResponse( Call call,  Response response) throws IOException {
+                                    new Handler(getMainLooper()).post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            dismissProgressDialog();
+                                            mDataManager.setLoginSuccessful(false);
+                                            mBtnLoginStatus.setText("登录");
+                                        }
+                                    });
+                                }
+                            });
+
+                        }
+                    }).start();
                 } else {
                     final LoginTask loginTask = mDataManager.doLoginRequest("Wbj", "wbj89");
                     loginTask.setOnFailureListener(new OnFailureListener() {
@@ -119,9 +172,12 @@ public class Module2MainActivity extends BasicActivity {
             @Override
             public void onClick(View v) {
                 requestExternalStoragePermission(R.id.btn_upload);
+                //startService(new Intent(Module2MainActivity.this, Module2Service.class));
             }
         });
     }
+
+    String sdcardFilePath = "/storage/14CB-D108/支付风险/payRisks3.apk";
 
     @Override
     public void openedExternalStoragePermission(int businessId) {
@@ -153,6 +209,110 @@ public class Module2MainActivity extends BasicActivity {
                     Log.d(beautyTask.getLogTag(), "file: " + file + ", take time: " + takeTime + "s");
                 }
             });
+        } else if (businessId == R.id.btn_upload) {
+            File file = new File(sdcardFilePath);
+            Intent intent = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                StorageManager storageManager = getSystemService(StorageManager.class);
+                StorageVolume volume = null;
+                if (storageManager != null) {
+                    volume = storageManager.getStorageVolume(file);
+                }
+                if (volume != null) {
+                    intent = volume.createAccessIntent(null);
+                }
+            }
+            if (intent == null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                }
+            }
+            if (intent == null) {
+                intent = new Intent(Intent.ACTION_VIEW);
+                startActivityForResult(intent, 2);
+            }
+
+            /*if (file.exists()) {
+                Log.d(mTag, file + ", canRead: " + file.canRead() + ", canWrite: " + file.canWrite()
+                        + ", canExecute: " + file.canExecute());
+
+                boolean delete = file.delete();
+                if (delete) {
+                    Log.d(mTag, file + ", delete successful.");
+                } else {
+                    Log.w(mTag, file + ", delete fail!");
+                }
+
+                delete = DocumentFile.fromFile(file).delete();
+                if (delete) {
+                    Log.d(mTag, file + ", delete successful.");
+                } else {
+                    Log.w(mTag, file + ", delete fail!");
+                }
+            } else {
+                Log.d(mTag, file + " is not exists.");
+            }*/
+
+            file = new File(Environment.getExternalStorageDirectory(), "otherRisks2.apk");
+            if (file.exists()) {
+                boolean delete = file.delete();
+                if (delete) {
+                    Log.d(mTag, file + ", delete successful.");
+                } else {
+                    Log.w(mTag, file + ", delete fail!");
+                }
+            } else {
+                Log.d(mTag, file + " is not exists.");
+            }
         }
     }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 2:
+                if (data != null && data.getData() != null) {
+                    Uri uri = data.getData();
+                    //DocumentsUtils.saveTreeUri(this, sdcardFilePath, uri);
+                    File file = new File(sdcardFilePath);
+                    //uri = DocumentFile.fromFile(file).getUri();
+                    Log.d(mTag, "uri: " + uri + ", getUri: " + DocumentFile.fromFile(file).getUri());
+
+                    if (file.exists()) {
+                        Log.d(mTag, file + ", canRead: " + file.canRead() + ", canWrite: " + file.canWrite()
+                                + ", canExecute: " + file.canExecute());
+
+                        boolean delete = file.delete();
+                        if (delete) {
+                            Log.d(mTag, file + ", delete successful.");
+                        } else {
+                            Log.w(mTag, file + ", delete fail!");
+                        }
+
+                        /*delete = DocumentFile.fromFile(file).delete();
+                        if (delete) {
+                            Log.d(mTag, file + ", delete successful.");
+                        } else {
+                            Log.w(mTag, file + ", delete fail!");
+                        }
+*/
+                        delete = DocumentsUtils.delete(this, file);
+                        if (delete) {
+                            Log.d(mTag, file + ", delete successful.");
+                        } else {
+                            Log.w(mTag, file + ", delete fail!");
+                        }
+                    } else {
+                        Log.d(mTag, file + " is not exists.");
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+
+    }
+
 }

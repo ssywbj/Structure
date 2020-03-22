@@ -1,1 +1,21 @@
-<manifest package="com.suheng.structure.data" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.suheng.structure.data">
+
+    <!--<application>
+        <receiver
+            android:name="com.suheng.structure.receiver.InstallApkReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_CHANGED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.PACKAGE_RESTARTED" />
+                <action android:name="android.intent.action.PACKAGE_INSTALL" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+    </application>-->
+
+</manifest>

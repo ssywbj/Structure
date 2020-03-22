@@ -1,5 +1,7 @@
 package com.suheng.structure;
 
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,6 +13,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.suheng.structure.arouter.RouteTable;
 import com.suheng.structure.data.DataManager;
 import com.suheng.structure.eventbus.LoginEvent;
+import com.suheng.structure.receiver.InstallApkReceiver;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
 import org.greenrobot.eventbus.EventBus;
@@ -72,12 +75,24 @@ public class MainActivity extends BasicActivity {
                                 });
             }
         });
+
+        mInstallApkReceiver = new InstallApkReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        intentFilter.addAction(Intent.ACTION_PACKAGE_REPLACED);
+        registerReceiver(mInstallApkReceiver, intentFilter);
     }
+
+    private InstallApkReceiver mInstallApkReceiver;
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+        if (mInstallApkReceiver != null) {
+            unregisterReceiver(mInstallApkReceiver);
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
