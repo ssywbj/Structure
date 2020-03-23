@@ -31,3 +31,10 @@
     <init>(java.lang.Throwable);
 }
 ###EventBus:end
+
+###ARouter:start
+-keep public class com.alibaba.android.arouter.routes.**{*;}
+-keep class * implements com.alibaba.android.arouter.facade.template.ISyringe{*;}
+#-keep interface * implements com.alibaba.android.arouter.facade.template.IProvider
+-keep class * implements com.alibaba.android.arouter.facade.template.IProvider
+###ARouter:end

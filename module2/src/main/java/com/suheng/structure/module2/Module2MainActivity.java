@@ -177,9 +177,13 @@ public class Module2MainActivity extends BasicActivity {
         });
     }
 
-    //String sdcardFilePath = "/storage/5285-8EF6/apks/15.apk";//Gionee M100
+    //String sdcardFilePath = "/storage/5285-8EF6/stealAccountRisks1.apk";//Gionee M100
+    //String sdcardFilePath = "/storage/14CB-D108/11.apk";//Gionee M100
+    String sdcardFilePath = "/storage/14CB-D108/virus/支付风险/伪淘宝.apk";//Gionee M100
     //String sdcardFilePath = "/storage/sdcard1/apks/10.apk";//台电T98
-    String sdcardFilePath = "/storage/otg/sdb/apks/10.apk";//vivo Xplay
+    //String sdcardFilePath = "/storage/otg/sdb/apks/10.apk";//vivo Xplay
+
+    private Uri mSDCardUri;
 
     @Override
     public void openedExternalStoragePermission(int businessId) {
@@ -267,6 +271,7 @@ public class Module2MainActivity extends BasicActivity {
             } else {
                 Log.d(mTag, file + " is not exists.");
             }
+
             /*//能正常删除内置存储空间上的文件
             file = new File(Environment.getExternalStorageDirectory(), "otherRisks2.apk");
             if (file.exists()) {
@@ -289,13 +294,17 @@ public class Module2MainActivity extends BasicActivity {
         switch (requestCode) {
             case 2:
                 if (data != null && data.getData() != null) {
-                    Uri uri = data.getData();
+                    mSDCardUri = data.getData();
                     //DocumentsUtils.saveTreeUri(this, sdcardFilePath, uri);
                     File file = new File(sdcardFilePath);
-                    //uri = DocumentFile.fromFile(file).getUri();
-                    Log.d(mTag, "uri: " + uri + ", getUri: " + DocumentFile.fromFile(file).getUri());
 
-                    if (file.exists()) {
+                    //stealAccountRisks1.apk URI: SDCardUri: content://com.android.externalstorage.documents/tree/14CB-D108%3A, DocumentFile.fromFile(File).getUri(): file:///storage/14CB-D108/stealAccountRisks1.apk, Uri.fromFile(file): file:///storage/14CB-D108/stealAccountRisks1.apk
+                    //stealAccountRisks2.apk URI: SDCardUri: content://com.android.externalstorage.documents/tree/14CB-D108%3A, DocumentFile.fromFile(File).getUri(): file:///storage/14CB-D108/stealAccountRisks2.apk, Uri.fromFile(file): file:///storage/14CB-D108/stealAccountRisks2.apk
+                    //stealAccountRisks3.apk URI: SDCardUri: content://com.android.externalstorage.documents/tree/14CB-D108%3A, DocumentFile.fromFile(File).getUri(): file:///storage/14CB-D108/stealAccountRisks3.apk, Uri.fromFile(file): file:///storage/14CB-D108/stealAccountRisks3.apk
+                    Log.d(mTag, "SDCardUri: " + mSDCardUri + ", DocumentFile.fromFile(File).getUri(): " +
+                            DocumentFile.fromFile(file).getUri() + ", Uri.fromFile(file): " + Uri.fromFile(file));
+
+                    /*if (file.exists()) {
                         boolean delete = file.delete();
                         if (delete) {
                             Log.d(mTag, file + ", delete successful.");
@@ -319,7 +328,7 @@ public class Module2MainActivity extends BasicActivity {
                         }
                     } else {
                         Log.d(mTag, file + " is not exists.");
-                    }
+                    }*/
                 }
                 break;
             default:

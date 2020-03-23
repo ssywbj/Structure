@@ -38,13 +38,14 @@ android {
         }
 
         release {
+            signingConfig signingConfigs.release
+            buildConfigField "boolean", "MODULE1_IS_LIBRARY", "${isModule1Library}"
+
             minifyEnabled true //代码混淆
             shrinkResources true //资源压缩
             useProguard true //代码压缩
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro',
                     '../data/proguard-rules.pro' //合并混淆文件
-            buildConfigField "boolean", "MODULE1_IS_LIBRARY", "${isModule1Library}"
-            signingConfig signingConfigs.release
         }
     }
 

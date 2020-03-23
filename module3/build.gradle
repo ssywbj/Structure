@@ -39,14 +39,14 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField "boolean", "IS_LIBRARY", "${isModule3Library}"
             signingConfig signingConfigs.release
+            buildConfigField "boolean", "IS_LIBRARY", "${isModule3Library}"
         }
 
         release {
-            buildConfigField "boolean", "IS_LIBRARY", "${isModule3Library}"
             signingConfig signingConfigs.release
-            minifyEnabled false //代码混淆：true开启，false不开启
+            buildConfigField "boolean", "IS_LIBRARY", "${isModule3Library}"
+            minifyEnabled true //代码混淆：true开启，false不开启
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
