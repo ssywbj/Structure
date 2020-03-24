@@ -93,7 +93,7 @@ public class MVCLoginActivity extends BasicActivity {
         loginTask.doRequest();
         loginTask.setOnFailureListener(new OnFailureListener() {
             @Override
-            public void onFailure(String error) {
+            public void onFailure(int code, String error) {
                 Log.e(loginTask.getLogTag(), "onFailure: " + error);
 
                 dismissProgressDialog();

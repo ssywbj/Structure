@@ -29,6 +29,11 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public abstract class BasicTask {
+    private static final int ERROR_CODE_ON_FEATURE = -0x10;
+    private static final int ERROR_CODE_RESPONSE_BODY_NULL = -0x11;
+    private static final int ERROR_CODE_RESPONSE_BODY_PARSE_EXCEPTION = -0x12;
+    public static final int ERROR_CODE_DOWNLOAD_EXCEPTION = -0x13;
+
     private static final int MSG_ON_FAILURE = 0;
     private String mLogTag;
     private Map<String, String> mArguments = new HashMap<>();
@@ -36,6 +41,9 @@ public abstract class BasicTask {
     private OnFailureListener mOnFailureListener;
     private OkHttpClient mOkHttpClient = new OkHttpClient();
     private Call mCall;
+
+    private int code;
+    private String mErrorMsg;
 
     protected BasicTask() {
         mLogTag = getClass().getSimpleName();
@@ -115,31 +123,35 @@ public abstract class BasicTask {
         mCall.enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Log.e(getLogTag(), "onFailure, exception: " + e.toString() + ", call: " + call);
-                sendFailureMessage(e.toString());
+                setErrorCodeAndMsg(ERROR_CODE_ON_FEATURE, "onFailure exception: " + e.toString());
+                sendFailureMessage();
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) {
-                Log.d(getLogTag(), "onResponse code: " + response.code() + ", msg: " + response.message() +
-                        ", response: " + response);
                 if (response.isSuccessful()) {
                     ResponseBody responseBody = response.body();
                     if (responseBody == null) {
-                        Log.e(getLogTag(), "onResponse, ResponseBody is null");
+                        setErrorCodeAndMsg(ERROR_CODE_RESPONSE_BODY_NULL, "onResponse ResponseBody is null");
+                        sendFailureMessage();
                         return;
                     }
 
                     try {
                         parseResponseBody(responseBody);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.e(getLogTag(), "onResponse, parse ResponseBody cause exception: " + e.toString());
-                        sendFailureMessage(e.toString());
+                        setErrorCodeAndMsg(ERROR_CODE_RESPONSE_BODY_PARSE_EXCEPTION
+                                , "onResponse parse ResponseBody cause exception: " + e.toString());
+                        sendFailureMessage();
                     } finally {
                         responseBody.close();
                     }
+                } else {
+                    setErrorCodeAndMsg(response.code(), "onResponse msg:  " + response.message());
+                    sendFailureMessage();
                 }
+
+                response.close();
             }
         });
     }
@@ -147,16 +159,24 @@ public abstract class BasicTask {
     protected void cancelTask() {
         if (mCall != null) {
             mCall.cancel();
+            mUIHandler.removeMessages(MSG_ON_FAILURE);
         }
     }
 
-    protected void sendFailureMessage(@NotNull String exception) {
+    protected void sendFailureMessage() {
         if (mOnFailureListener != null) {
-            Message msg = new Message();
-            msg.what = MSG_ON_FAILURE;
-            msg.obj = exception;
-            mUIHandler.sendMessage(msg);
+            mUIHandler.sendEmptyMessage(MSG_ON_FAILURE);
         }
+    }
+
+    protected void setErrorCodeAndMsg(int code, String errorMsg) {
+        this.code = code;
+        mErrorMsg = errorMsg;
+        Log.e(getLogTag(), "code: " + code + ", " + mErrorMsg);
+    }
+
+    private void onTaskFailure() {
+        mOnFailureListener.onFailure(code, mErrorMsg);
     }
 
     protected void addArgument(String key, String value) {
@@ -210,9 +230,7 @@ public abstract class BasicTask {
             }
 
             if (msg.what == MSG_ON_FAILURE) {
-                if (msg.obj instanceof String) {
-                    task.mOnFailureListener.onFailure((String) msg.obj);
-                }
+                task.onTaskFailure();
             }
         }
     }

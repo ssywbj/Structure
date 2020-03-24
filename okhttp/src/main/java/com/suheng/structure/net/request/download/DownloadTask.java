@@ -83,8 +83,8 @@ public abstract class DownloadTask extends BasicTask {
                 mUIHandler.sendEmptyMessage(MSG_DOWNLOAD_FINISH);
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            sendFailureMessage(e.toString());
+            setErrorCodeAndMsg(ERROR_CODE_DOWNLOAD_EXCEPTION, "onResponse download exception: " + e.toString());
+            sendFailureMessage();
         } finally {
             if (outputStream != null) {
                 try {

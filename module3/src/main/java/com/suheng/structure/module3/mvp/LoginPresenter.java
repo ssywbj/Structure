@@ -133,7 +133,7 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
         final LoginTask loginTask = mDataManager.doLoginRequest(name, pwd);
         loginTask.setOnFailureListener(new OnFailureListener() {
             @Override
-            public void onFailure(String error) {
+            public void onFailure(int code, String error) {
                 getView().dismissProgressDialog();
                 getView().showToast("登录失败");
             }

@@ -77,7 +77,7 @@ public class MVPLoginFragment extends PresenterFragment<LoginPresenter> implemen
                 loginTask3.doRequest(MVPLoginFragment.this);
                 loginTask3.setOnFailureListener(new OnFailureListener() {
                     @Override
-                    public void onFailure(String error) {
+                    public void onFailure(int code, String error) {
                         Log.e(loginTask3.getLogTag(), "onFailure: " + error);
                     }
                 });
@@ -92,7 +92,7 @@ public class MVPLoginFragment extends PresenterFragment<LoginPresenter> implemen
                 loginTask4.doPostRequest();
                 loginTask4.setOnFailureListener(new OnFailureListener() {
                     @Override
-                    public void onFailure(String error) {
+                    public void onFailure(int code, String error) {
                         Log.e(loginTask4.getLogTag(), "onFailure: " + error);
                     }
                 });

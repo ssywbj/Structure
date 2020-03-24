@@ -1,5 +1,5 @@
 package com.suheng.structure.net.callback;
 
 public interface OnFailureListener {
-    void onFailure(String error);
+    void onFailure(int code, String errorMsg);
 }

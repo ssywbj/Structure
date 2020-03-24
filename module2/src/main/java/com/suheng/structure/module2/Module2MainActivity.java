@@ -114,7 +114,7 @@ public class Module2MainActivity extends BasicActivity {
                     final LoginTask loginTask = mDataManager.doLoginRequest("Wbj", "wbj89");
                     loginTask.setOnFailureListener(new OnFailureListener() {
                         @Override
-                        public void onFailure(String error) {
+                        public void onFailure(int code, String error) {
                             Log.e(loginTask.getLogTag(), "onFailure: " + error);
 
                             dismissProgressDialog();
@@ -197,7 +197,7 @@ public class Module2MainActivity extends BasicActivity {
             beautyTask.doPostRequest();
             beautyTask.setOnFailureListener(new OnFailureListener() {
                 @Override
-                public void onFailure(String error) {
+                public void onFailure(int code, String error) {
                     Log.e(beautyTask.getLogTag(), "download fail: " + error);
                     showToast("下载失败");
                 }
