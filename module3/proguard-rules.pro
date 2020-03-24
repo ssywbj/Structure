@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file userName.
 #-renamesourcefileattribute SourceFile
+
+########################################Custom Proguard####################################
+# -keep class com.suheng.structure.module3.**{*;}

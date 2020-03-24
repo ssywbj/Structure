@@ -117,7 +117,7 @@ public class MVCLoginActivity extends BasicActivity {
                 dismissProgressDialog();
                 //mPrefsManager.putLoginStatus(true);
 
-                if (BuildConfig.IS_LIBRARY) {
+                if (BuildConfig.MODULE3_IS_LIBRARY) {
                     EventBus.getDefault().post(new LoginEvent());
                     finish();
                 } else {

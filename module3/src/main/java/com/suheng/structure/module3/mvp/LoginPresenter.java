@@ -146,7 +146,7 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
                 getView().dismissProgressDialog();
                 mDataManager.setLoginSuccessful(true);
 
-                if (BuildConfig.IS_LIBRARY) {
+                if (BuildConfig.MODULE3_IS_LIBRARY) {
                     EventBus.getDefault().post(new LoginEvent());
                     getActivity().finish();
                 } else {

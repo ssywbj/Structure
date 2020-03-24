@@ -39,15 +39,22 @@ android {
 
     buildTypes {
         debug {
-            signingConfig signingConfigs.release
-            buildConfigField "boolean", "IS_LIBRARY", "${isModule3Library}"
+            buildConfigField "boolean", "MODULE3_IS_LIBRARY", "${isModule3Library}"
+            if (!isModule3Library.toBoolean()) {
+                signingConfig signingConfigs.release
+            }
         }
 
         release {
-            signingConfig signingConfigs.release
-            buildConfigField "boolean", "IS_LIBRARY", "${isModule3Library}"
-            minifyEnabled true //代码混淆：true开启，false不开启
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "boolean", "MODULE3_IS_LIBRARY", "${isModule3Library}"
+            if (!isModule3Library.toBoolean()) {
+                signingConfig signingConfigs.release
+                minifyEnabled true //代码混淆：true开启，false不开启
+                shrinkResources true //资源压缩
+                useProguard true //代码压缩
+                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro',
+                        '../data/proguard-rules.pro', '../ui/proguard-rules.pro'//合并混淆文件
+            }
         }
     }
 

@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+########################################Custom Proguard####################################
+-keep public class * implements com.suheng.structure.ui.architecture.presenter.IPresenter
+-keep public class * extends com.suheng.structure.ui.architecture.presenter.BasicPresenter
