@@ -4,10 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.suheng.structure.data.net.URLConstants;
 import com.suheng.structure.data.net.bean.UserInfo;
-import com.suheng.structure.net.request.normal.CodeMsgTask;
+import com.suheng.structure.net.request.normal.JsonTask;
 import com.suheng.structure.net.response.Result;
 
-public class LoginTask2 extends CodeMsgTask<UserInfo, UserInfo> {
+public class LoginTask2 extends JsonTask<UserInfo, UserInfo> {
     private Gson mGson = new Gson();
 
     public LoginTask2(String name, String pwd) {

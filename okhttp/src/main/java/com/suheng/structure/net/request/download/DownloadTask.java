@@ -20,7 +20,7 @@ import java.lang.ref.WeakReference;
 
 import okhttp3.ResponseBody;
 
-public abstract class DownloadTask extends BasicTask {
+public abstract class DownloadTask extends BasicTask<File> {
     private static final int MSG_DOWNLOADING = 0;
     private static final int MSG_DOWNLOAD_FINISH = 1;
 
@@ -63,7 +63,7 @@ public abstract class DownloadTask extends BasicTask {
 
             outputStream = new FileOutputStream(mFile);
 
-            byte[] buffer = new byte[100 * 1024];
+            byte[] buffer = new byte[1024 * 1024];
             int len;
             long currentTimeMillis = System.currentTimeMillis();
             while ((len = inputStream.read(buffer)) != -1) {
@@ -84,7 +84,6 @@ public abstract class DownloadTask extends BasicTask {
             }
         } catch (IOException e) {
             setErrorCodeAndMsg(ERROR_CODE_DOWNLOAD_EXCEPTION, "onResponse download exception: " + e.toString());
-            sendFailureMessage();
         } finally {
             if (outputStream != null) {
                 try {

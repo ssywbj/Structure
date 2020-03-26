@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.suheng.structure.net.callback.OnFailureListener;
+import com.suheng.structure.net.callback.OnFinishListener;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +29,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public abstract class BasicTask {
+public abstract class BasicTask<T> {
     private static final int ERROR_CODE_ON_FEATURE = -0x10;
     private static final int ERROR_CODE_RESPONSE_BODY_NULL = -0x11;
     private static final int ERROR_CODE_RESPONSE_BODY_PARSE_EXCEPTION = -0x12;
@@ -38,12 +39,16 @@ public abstract class BasicTask {
     private String mLogTag;
     private Map<String, String> mArguments = new HashMap<>();
     private UIHandler mUIHandler;
+
     private OnFailureListener mOnFailureListener;
+    private OnFinishListener<T> mOnFinishListener;
+
     private OkHttpClient mOkHttpClient = new OkHttpClient();
     private Call mCall;
 
     private int code;
     private String mErrorMsg;
+    private T mData;
 
     protected BasicTask() {
         mLogTag = getClass().getSimpleName();
@@ -124,7 +129,6 @@ public abstract class BasicTask {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 setErrorCodeAndMsg(ERROR_CODE_ON_FEATURE, "onFailure exception: " + e.toString());
-                sendFailureMessage();
             }
 
             @Override
@@ -133,22 +137,19 @@ public abstract class BasicTask {
                     ResponseBody responseBody = response.body();
                     if (responseBody == null) {
                         setErrorCodeAndMsg(ERROR_CODE_RESPONSE_BODY_NULL, "onResponse ResponseBody is null");
-                        sendFailureMessage();
                         return;
                     }
 
                     try {
-                        parseResponseBody(responseBody);
+                        mData = parseResponseBody(responseBody);
                     } catch (Exception e) {
                         setErrorCodeAndMsg(ERROR_CODE_RESPONSE_BODY_PARSE_EXCEPTION
                                 , "onResponse parse ResponseBody cause exception: " + e.toString());
-                        sendFailureMessage();
                     } finally {
                         responseBody.close();
                     }
                 } else {
                     setErrorCodeAndMsg(response.code(), "onResponse msg:  " + response.message());
-                    sendFailureMessage();
                 }
 
                 response.close();
@@ -156,23 +157,23 @@ public abstract class BasicTask {
         });
     }
 
-    protected void cancelTask() {
-        if (mCall != null) {
-            mCall.cancel();
-            mUIHandler.removeMessages(MSG_ON_FAILURE);
-        }
+    protected void setErrorCodeAndMsg(int code, String errorMsg) {
+        this.code = code;
+        mErrorMsg = errorMsg;
+        Log.e(getLogTag(), "code: " + code + ", " + mErrorMsg);
+        sendFailureMessage();
     }
 
-    protected void sendFailureMessage() {
+    private void sendFailureMessage() {
         if (mOnFailureListener != null) {
             mUIHandler.sendEmptyMessage(MSG_ON_FAILURE);
         }
     }
 
-    protected void setErrorCodeAndMsg(int code, String errorMsg) {
-        this.code = code;
-        mErrorMsg = errorMsg;
-        Log.e(getLogTag(), "code: " + code + ", " + mErrorMsg);
+    private void sendFinishMessage() {
+        if (mOnFinishListener != null && mData != null) {
+            mOnFinishListener.onFinish(mData);
+        }
     }
 
     private void onTaskFailure() {
@@ -184,6 +185,13 @@ public abstract class BasicTask {
             return;
         }
         mArguments.put(key, String.valueOf(value));
+    }
+
+    protected void cancelTask() {
+        if (mCall != null) {
+            mCall.cancel();
+            mUIHandler.removeMessages(MSG_ON_FAILURE);
+        }
     }
 
     protected void addArgument(String key, int value) {
@@ -214,6 +222,10 @@ public abstract class BasicTask {
         mOnFailureListener = onFailureListener;
     }
 
+    public void setOnFinishListener(OnFinishListener<T> onFinishListener) {
+        mOnFinishListener = onFinishListener;
+    }
+
     private static class UIHandler extends Handler {
         private WeakReference<BasicTask> mTaskReference;
 
@@ -237,5 +249,6 @@ public abstract class BasicTask {
 
     protected abstract String getURL();
 
-    protected abstract void parseResponseBody(@NotNull ResponseBody responseBody) throws Exception;
+    //protected abstract void parseResponseBody(@NotNull ResponseBody responseBody) throws Exception;
+    protected abstract T parseResponseBody(@NotNull ResponseBody responseBody) throws Exception;
 }

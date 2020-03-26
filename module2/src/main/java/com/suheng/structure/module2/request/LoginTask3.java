@@ -1,9 +1,9 @@
 package com.suheng.structure.module2.request;
 
 import com.suheng.structure.data.net.URLConstants;
-import com.suheng.structure.net.request.normal.RequestTask;
+import com.suheng.structure.net.request.normal.StringTask;
 
-public class LoginTask3 extends RequestTask {
+public class LoginTask3 extends StringTask {
 
     public LoginTask3(String name, String pwd) {
         addArgument("user_name", name);

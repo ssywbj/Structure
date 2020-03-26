@@ -2,7 +2,7 @@ package com.suheng.structure.net.request.normal;
 
 import org.json.JSONObject;
 
-public abstract class OkHttpTask<RightResult> extends CodeMsgTask<RightResult, String> {
+public abstract class OkHttpTask<RightResult> extends JsonTask<RightResult, String> {
     private static final String FIELD_DATA = "data";
 
     @Override

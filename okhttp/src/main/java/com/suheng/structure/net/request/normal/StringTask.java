@@ -2,7 +2,6 @@ package com.suheng.structure.net.request.normal;
 
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -15,23 +14,30 @@ import java.lang.ref.WeakReference;
 
 import okhttp3.ResponseBody;
 
-public abstract class RequestTask extends BasicTask {
+public abstract class StringTask extends BasicTask<String> {
     private static final String JSON = "{" + "\"code\":0" + ",\"msg\":密码错误" + ",data:{"
             + "\"memberId\":17" + ",\"age\":18" + ",\"email_address\":\"Wbj@qq.com\"" + "}" + "}";
     private static final int MSG_ON_RESPONSE = 1;
     private UIHandler mUIHandler;
     private OnResponseListener mOnResponseListener;
 
-    protected RequestTask() {
+    protected StringTask() {
         mUIHandler = new UIHandler(this);
     }
 
-    @Override
+    /*@Override
     protected void parseResponseBody(@NotNull ResponseBody responseBody) throws Exception {
         String result = responseBody.string();
         result = JSON;
         this.parseResponseResult(result);
         Log.d(getLogTag(), "onResponse: " + result);
+    }*/
+
+    @Override
+    protected String parseResponseBody(@NotNull ResponseBody responseBody) throws Exception {
+        String result = responseBody.string();
+        result = JSON;
+        return result;
     }
 
     protected void parseResponseResult(String result) {
@@ -48,16 +54,16 @@ public abstract class RequestTask extends BasicTask {
     }
 
     private static class UIHandler extends Handler {
-        private WeakReference<RequestTask> mTaskReference;
+        private WeakReference<StringTask> mTaskReference;
 
-        private UIHandler(RequestTask task) {
+        private UIHandler(StringTask task) {
             mTaskReference = new WeakReference<>(task);
         }
 
         @Override
         public void dispatchMessage(@NonNull Message msg) {
             super.dispatchMessage(msg);
-            RequestTask task = mTaskReference.get();
+            StringTask task = mTaskReference.get();
             if (task == null) {
                 return;
             }

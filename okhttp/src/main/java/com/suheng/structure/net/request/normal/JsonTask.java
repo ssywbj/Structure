@@ -11,7 +11,7 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 
-public abstract class CodeMsgTask<RightResult, ErrorResult> extends RequestTask {
+public abstract class JsonTask<RightResult, ErrorResult> extends StringTask {
     private static final int MSG_ERROR_RESULT = 0;
     private static final int MSG_RIGHT_RESULT = 1;
     private static final int ERROR_EXCEPTION = -9716;
@@ -27,7 +27,7 @@ public abstract class CodeMsgTask<RightResult, ErrorResult> extends RequestTask 
     private UIHandler mUIHandler;
     private OnResultListener<RightResult, ErrorResult> mOnResultListener;
 
-    protected CodeMsgTask() {
+    protected JsonTask() {
         mUIHandler = new UIHandler(this);
     }
 
@@ -77,16 +77,16 @@ public abstract class CodeMsgTask<RightResult, ErrorResult> extends RequestTask 
     }
 
     private static class UIHandler extends Handler {
-        private WeakReference<CodeMsgTask> mTaskReference;
+        private WeakReference<JsonTask> mTaskReference;
 
-        private UIHandler(CodeMsgTask task) {
+        private UIHandler(JsonTask task) {
             mTaskReference = new WeakReference<>(task);
         }
 
         @Override
         public void dispatchMessage(@NonNull Message msg) {
             super.dispatchMessage(msg);
-            CodeMsgTask task = mTaskReference.get();
+            JsonTask task = mTaskReference.get();
             if (task == null) {
                 return;
             }
