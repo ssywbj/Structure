@@ -14,8 +14,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.AppCompatActivity;
 
+import com.suheng.structure.common.CommonActivity;
 import com.suheng.structure.ui.R;
 import com.suheng.structure.ui.architecture.view.IView;
 
@@ -27,16 +27,9 @@ import permissions.dispatcher.PermissionRequest;
 import permissions.dispatcher.RuntimePermissions;
 
 @RuntimePermissions//PermissionsDispatcher权限框架配置3（共5步）
-public abstract class BasicActivity extends AppCompatActivity implements IView {
+public abstract class BasicActivity extends CommonActivity implements IView {
 
     private ProgressDialog mProgressDialog;
-    protected String mTag;
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mTag = getClass().getSimpleName();
-    }
 
     @Override
     public void showProgressDialog(CharSequence title, CharSequence message, boolean cancelable) {

@@ -1,9 +1,10 @@
 package com.suheng.structure;
 
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.arouter.RouteTable;
+import com.suheng.structure.common.CommonApplication;
+import com.suheng.structure.common.arouter.RouteTable;
 
-public class MainApp extends DataApplication {
+public class MainApp extends CommonApplication {
 
     @Override
     public void onCreate() {

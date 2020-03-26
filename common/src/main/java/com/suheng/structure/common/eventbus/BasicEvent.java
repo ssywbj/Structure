@@ -1,4 +1,4 @@
-package com.suheng.structure.eventbus;
+package com.suheng.structure.common.eventbus;
 
 public class BasicEvent {
     private static final int CODE_SUCCESS = 0;

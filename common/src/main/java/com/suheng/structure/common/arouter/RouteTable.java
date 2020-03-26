@@ -1,4 +1,4 @@
-package com.suheng.structure.arouter;
+package com.suheng.structure.common.arouter;
 
 public class RouteTable {//命名规范：/模块/组件(aty、frg等)/业务
     //#module1 module

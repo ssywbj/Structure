@@ -11,6 +11,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -31,14 +32,15 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
-    testImplementation "junit:junit:$rootProject.junitVersion"
-    androidTestImplementation "androidx.test:runner:$rootProject.runnerVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoCoreVersion"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    //ARouter配置2(共5步)：api集成方式
+    api "com.alibaba:arouter-api:$rootProject.arouterApiVersion"
     //ARouter配置3(共5步)：配置ARouter注解
     annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
-    api project(path: ':common')
-    api project(path: ':okhttp')
-    implementation 'com.google.code.gson:gson:2.8.6'
+
+    api "org.greenrobot:eventbus:$rootProject.eventBusVersion"
 }

@@ -33,4 +33,5 @@ dependencies {
     api 'com.github.hotchemi:permissionsdispatcher:3.1.0'
     //PermissionsDispatcher权限框架配置2（共5步）
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.1.0'
+    api project(path: ':common')
 }

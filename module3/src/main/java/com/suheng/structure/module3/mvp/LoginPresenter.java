@@ -8,11 +8,11 @@ import androidx.annotation.Nullable;
 
 import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.arouter.RouteTable;
+import com.suheng.structure.common.arouter.RouteTable;
+import com.suheng.structure.common.eventbus.LoginEvent;
 import com.suheng.structure.data.DataManager;
 import com.suheng.structure.data.net.bean.UserInfo;
 import com.suheng.structure.data.net.request.LoginTask;
-import com.suheng.structure.eventbus.LoginEvent;
 import com.suheng.structure.module3.BuildConfig;
 import com.suheng.structure.module3.R;
 import com.suheng.structure.net.callback.OnFailureListener;

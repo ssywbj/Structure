@@ -10,10 +10,10 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.callback.NavCallback;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.arouter.RouteTable;
+import com.suheng.structure.common.arouter.RouteTable;
+import com.suheng.structure.common.eventbus.LoginEvent;
+import com.suheng.structure.common.receiver.InstallApkReceiver;
 import com.suheng.structure.data.DataManager;
-import com.suheng.structure.eventbus.LoginEvent;
-import com.suheng.structure.receiver.InstallApkReceiver;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
 import org.greenrobot.eventbus.EventBus;

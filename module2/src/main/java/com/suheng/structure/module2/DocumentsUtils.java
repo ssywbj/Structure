@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.util.Log;
 
+import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
@@ -416,5 +417,16 @@ public class DocumentsUtils {
             e.printStackTrace();
         }
         return path;
+    }
+
+    /**
+     * 获取图片uri
+     */
+    public static Uri getFileUri(Context context, File file) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            return Uri.fromFile(file);
+        } else {
+            return FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", file);
+        }
     }
 }

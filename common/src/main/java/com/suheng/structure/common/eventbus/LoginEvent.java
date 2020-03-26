@@ -1,4 +1,4 @@
-package com.suheng.structure.eventbus;
+package com.suheng.structure.common.eventbus;
 
 public class LoginEvent extends BasicEvent {
 }

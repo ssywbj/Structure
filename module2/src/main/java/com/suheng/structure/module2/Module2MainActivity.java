@@ -17,7 +17,7 @@ import androidx.documentfile.provider.DocumentFile;
 import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.arouter.RouteTable;
+import com.suheng.structure.common.arouter.RouteTable;
 import com.suheng.structure.data.DataManager;
 import com.suheng.structure.data.net.URLConstants;
 import com.suheng.structure.data.net.bean.UserInfo;
@@ -178,10 +178,12 @@ public class Module2MainActivity extends BasicActivity {
     }
 
     //String sdcardFilePath = "/storage/5285-8EF6/stealAccountRisks1.apk";//Gionee M100
-    //String sdcardFilePath = "/storage/14CB-D108/11.apk";//Gionee M100
-    String sdcardFilePath = "/storage/14CB-D108/virus/支付风险/伪淘宝.apk";//Gionee M100
-    //String sdcardFilePath = "/storage/sdcard1/apks/10.apk";//台电T98
-    //String sdcardFilePath = "/storage/otg/sdb/apks/10.apk";//vivo Xplay
+    //String sdcardFilePath = "/storage/14CB-D108/11.apk";//Gionee M100 android9
+    String sdcardFilePath = "/sdcard/virus/病毒/商友网.apk";//Gionee M100 android9
+    //String sdcardFilePath = "/storage/14CB-D108/virus/支付风险/伪淘宝.apk";//Gionee M100
+    //String sdcardFilePath = "/storage/sdcard1/apks/10.apk";//台电T98 android 4.4.2
+    //String sdcardFilePath = "/storage/otg/sdb/apks/10.apk";//vivo Xplay android 4.2.2
+    //String sdcardFilePath = "/storage/sdcard1/360.apk";//vivo Y51A android5.0.2
 
     private Uri mSDCardUri;
 
@@ -238,9 +240,19 @@ public class Module2MainActivity extends BasicActivity {
                     }
                 }
                 if (intent == null) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                    }
+                    }*/
+
+                    //获取到指定文件夹，这里为：/storage/emulated/0/Android/data/你的包	名/files/Download
+                    intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    //7.0以上跳转系统文件需用FileProvider，参考链接：https://blog.csdn.net/growing_tree/article/details/71190741
+                    Uri uri = DocumentsUtils.getFileUri(this, file);
+                    intent.setData(uri);
+                    //intent.setDataAndType(uri,"file/*.apk");
+                    //intent.setDataAndType(uri,"application/vnd.ms-powerpoint");
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    startActivityForResult(intent, 2);
                 }
                 if (intent != null) {
                     startActivityForResult(intent, 2);

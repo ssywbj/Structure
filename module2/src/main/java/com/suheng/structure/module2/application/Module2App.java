@@ -1,6 +1,6 @@
 package com.suheng.structure.module2.application;
 
-import com.suheng.structure.DataApplication;
+import com.suheng.structure.common.CommonApplication;
 
-public class Module2App extends DataApplication {
+public class Module2App extends CommonApplication {
 }

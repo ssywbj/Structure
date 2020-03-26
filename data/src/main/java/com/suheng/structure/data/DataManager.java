@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.facade.template.IProvider;
-import com.suheng.structure.arouter.RouteTable;
+import com.suheng.structure.common.arouter.RouteTable;
 import com.suheng.structure.data.db.DatabaseManager;
 import com.suheng.structure.data.net.NetworkManager;
 import com.suheng.structure.data.net.request.LoginTask;

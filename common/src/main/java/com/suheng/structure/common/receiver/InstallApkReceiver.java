@@ -1,4 +1,4 @@
-package com.suheng.structure.receiver;
+package com.suheng.structure.common.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
