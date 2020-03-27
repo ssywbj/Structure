@@ -32,8 +32,9 @@ public class LoginTask4 extends BasicTask {
     }
 
     @Override
-    protected void parseResponseBody(@NotNull ResponseBody responseBody) throws Exception {
+    protected Object parseResponseBody(@NotNull ResponseBody responseBody) throws Exception {
         Log.e(getLogTag(), "parseResponseBody: " + responseBody.string() + ", thread: " + Thread.currentThread().getName());
+        return null;
     }
 
     @Override

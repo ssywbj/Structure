@@ -50,8 +50,7 @@ android {
                 minifyEnabled true //代码混淆：true开启，false不开启
                 shrinkResources true //资源压缩
                 useProguard true //代码压缩
-                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro',
-                        '../common/proguard-rules.pro', '../ui/proguard-rules.pro'//合并混淆文件
+                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             }
         }
     }

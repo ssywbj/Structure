@@ -35,7 +35,7 @@ public abstract class StringTask<T> extends BasicTask {
     }
 
     @Override
-    protected void parseResponseBody(@NotNull ResponseBody responseBody) throws Exception {
+    protected T parseResponseBody(@NotNull ResponseBody responseBody) throws Exception {
         String result = responseBody.string();
         result = JSON;
         Log.d(getLogTag(), "onResponse: " + result);
@@ -44,7 +44,7 @@ public abstract class StringTask<T> extends BasicTask {
             JSONObject jsonObject = new JSONObject(result);
             if (jsonObject.has(FIELD_CODE) && jsonObject.has(FIELD_MSG)) {
                 if (mOnFinishListener == null) {
-                    return;
+                    return null;
                 }
 
                 int code = jsonObject.optInt(FIELD_CODE);
@@ -60,6 +60,8 @@ public abstract class StringTask<T> extends BasicTask {
         } catch (JSONException e) {
             setErrorCodeAndMsg(-3333, "don't have " + FIELD_CODE + " and " + FIELD_MSG + " field");
         }
+
+        return null;
     }
 
     private void onTaskFinish() {

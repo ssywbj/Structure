@@ -44,7 +44,7 @@ public abstract class DownloadTask extends BasicTask<File> {
     }
 
     @Override
-    protected void parseResponseBody(@NotNull ResponseBody responseBody) {
+    protected File parseResponseBody(@NotNull ResponseBody responseBody) {
         InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
@@ -103,6 +103,8 @@ public abstract class DownloadTask extends BasicTask<File> {
 
             responseBody.close();
         }
+
+        return null;
     }
 
     @NotNull
