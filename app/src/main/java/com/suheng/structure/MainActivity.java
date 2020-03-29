@@ -54,6 +54,12 @@ public class MainActivity extends BasicActivity {
                                     public void onFound(Postcard postcard) {
                                         super.onFound(postcard);
                                         Log.d(mTag, "onFound, " + postcard);
+                                        Log.i(mTag, "onFound, " + postcard);
+                                        Log.w(mTag, "onFound, " + postcard);
+                                        Log.e(mTag, "onFound, " + postcard);
+                                        Log.v(mTag, "onFound, " + postcard);
+                                        System.out.println(mTag + ", onFound, " + postcard);
+                                        System.out.print(mTag + ", onFound, " + postcard);
                                     }
 
                                     @Override
