@@ -30,12 +30,15 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public abstract class BasicTask<T> {
-    private static final int ERROR_CODE_ON_FEATURE = -0x10;
-    private static final int ERROR_CODE_RESPONSE_BODY_NULL = -0x11;
-    private static final int ERROR_CODE_RESPONSE_BODY_PARSE_EXCEPTION = -0x12;
-    public static final int ERROR_CODE_DOWNLOAD_EXCEPTION = -0x13;
+    private static final int ERROR_CODE_ON_FEATURE = -100;
+    private static final int ERROR_CODE_RESPONSE_BODY_NULL = -101;
+    private static final int ERROR_CODE_DATA_NULL = -102;
+    private static final int ERROR_CODE_RESPONSE_BODY_PARSE_EXCEPTION = -103;
+    public static final int ERROR_CODE_DOWNLOAD_EXCEPTION = -104;
 
     private static final int MSG_ON_FAILURE = 0;
+    private static final int MSG_ON_FINISH = 1;
+
     private String mLogTag;
     private Map<String, String> mArguments = new HashMap<>();
     private UIHandler mUIHandler;
@@ -49,6 +52,38 @@ public abstract class BasicTask<T> {
     private int code;
     private String mErrorMsg;
     private T mData;
+
+    protected abstract String getURL();
+
+    protected abstract T parseResponseBody(@NotNull ResponseBody responseBody) throws Exception;
+
+    private static class UIHandler extends Handler {
+        private WeakReference<BasicTask> mTaskReference;
+
+        private UIHandler(BasicTask task) {
+            mTaskReference = new WeakReference<>(task);
+        }
+
+        @Override
+        public void dispatchMessage(@NonNull Message msg) {
+            super.dispatchMessage(msg);
+            BasicTask task = mTaskReference.get();
+            if (task == null) {
+                return;
+            }
+
+            switch (msg.what) {
+                case MSG_ON_FAILURE:
+                    task.onTaskFailure();
+                    break;
+                case MSG_ON_FINISH:
+                    task.onTaskFinish();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
     protected BasicTask() {
         mLogTag = getClass().getSimpleName();
@@ -142,6 +177,13 @@ public abstract class BasicTask<T> {
 
                     try {
                         mData = parseResponseBody(responseBody);
+                        if (mData == null) {
+                            setErrorCodeAndMsg(ERROR_CODE_DATA_NULL, "data is null");
+                        } else {
+                            if (mOnFinishListener != null) {
+                                mUIHandler.sendEmptyMessage(MSG_ON_FINISH);
+                            }
+                        }
                     } catch (Exception e) {
                         setErrorCodeAndMsg(ERROR_CODE_RESPONSE_BODY_PARSE_EXCEPTION
                                 , "onResponse parse ResponseBody cause exception: " + e.toString());
@@ -161,19 +203,14 @@ public abstract class BasicTask<T> {
         this.code = code;
         mErrorMsg = errorMsg;
         Log.e(getLogTag(), "code: " + code + ", " + mErrorMsg);
-        sendFailureMessage();
-    }
 
-    private void sendFailureMessage() {
         if (mOnFailureListener != null) {
             mUIHandler.sendEmptyMessage(MSG_ON_FAILURE);
         }
     }
 
-    private void sendFinishMessage() {
-        if (mOnFinishListener != null && mData != null) {
-            mOnFinishListener.onFinish(mData);
-        }
+    private void onTaskFinish() {
+        mOnFinishListener.onFinish(mData);
     }
 
     private void onTaskFailure() {
@@ -191,6 +228,7 @@ public abstract class BasicTask<T> {
         if (mCall != null) {
             mCall.cancel();
             mUIHandler.removeMessages(MSG_ON_FAILURE);
+            mUIHandler.removeMessages(MSG_ON_FINISH);
         }
     }
 
@@ -225,30 +263,4 @@ public abstract class BasicTask<T> {
     public void setOnFinishListener(OnFinishListener<T> onFinishListener) {
         mOnFinishListener = onFinishListener;
     }
-
-    private static class UIHandler extends Handler {
-        private WeakReference<BasicTask> mTaskReference;
-
-        private UIHandler(BasicTask task) {
-            mTaskReference = new WeakReference<>(task);
-        }
-
-        @Override
-        public void dispatchMessage(@NonNull Message msg) {
-            super.dispatchMessage(msg);
-            BasicTask task = mTaskReference.get();
-            if (task == null) {
-                return;
-            }
-
-            if (msg.what == MSG_ON_FAILURE) {
-                task.onTaskFailure();
-            }
-        }
-    }
-
-    protected abstract String getURL();
-
-    //protected abstract void parseResponseBody(@NotNull ResponseBody responseBody) throws Exception;
-    protected abstract T parseResponseBody(@NotNull ResponseBody responseBody) throws Exception;
 }

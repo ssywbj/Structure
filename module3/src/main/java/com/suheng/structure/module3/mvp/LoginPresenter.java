@@ -16,7 +16,7 @@ import com.suheng.structure.data.net.request.LoginTask;
 import com.suheng.structure.module3.BuildConfig;
 import com.suheng.structure.module3.R;
 import com.suheng.structure.net.callback.OnFailureListener;
-import com.suheng.structure.net.callback.OnResultListener;
+import com.suheng.structure.net.callback.OnFinishListener;
 import com.suheng.structure.ui.architecture.presenter.BasicPresenter;
 
 import org.greenrobot.eventbus.EventBus;
@@ -90,57 +90,23 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
 
         getView().showProgressDialog(getContext().getString(R.string.module3_login_progress), true);
 
-        /*final LoginTask2 loginTask2 = new LoginTask2(name, pwd);
-        loginTask2.doPostRequest(this);
-        loginTask2.setOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(String error) {
-                Log.e(loginTask2.getLogTag(), "onFailure: " + error);
-                getView().dismissProgressDialog();
-            }
-        });
-        loginTask2.setOnResultListener(new OnResultListener<UserInfo, UserInfo>() {
-            @Override
-            public void onRightResult(UserInfo data) {
-                Log.d(loginTask2.getLogTag(), "onRightResult: " + data);
-
-                getView().dismissProgressDialog();
-                mDataManager.setLoginSuccessful(true);
-
-                if (BuildConfig.IS_LIBRARY) {
-                    EventBus.getDefault().post(new LoginEvent());
-                    getActivity().finish();
-                } else {
-                    ARouter.getInstance().build(RouteTable.MODULE3_ATY_MODULE3_MAIN).navigation();
-                }
-            }
-
-            @Override
-            public void onErrorResult(int code, String msg, UserInfo data) {
-                Log.e(loginTask2.getLogTag(), "onErrorResult, code:" + code + ", msg: " + msg + ", onErrorResult: " + data);
-
-                getView().dismissProgressDialog();
-                mDataManager.setLoginSuccessful(false);
-                getView().loginFail(msg);
-            }
-        });*/
-
         /*new Thread(new Runnable() {
             @Override
             public void run() {*/
-
-
         final LoginTask loginTask = mDataManager.doLoginRequest(name, pwd);
         loginTask.setOnFailureListener(new OnFailureListener() {
             @Override
-            public void onFailure(int code, String error) {
+            public void onFailure(int code, String errorMsg) {
+                Log.e(loginTask.getLogTag(), "onErrorResult, code:" + code + ", errorMsg: " + errorMsg);
+
                 getView().dismissProgressDialog();
-                getView().showToast("登录失败");
+                mDataManager.setLoginSuccessful(false);
+                getView().loginFail(errorMsg);
             }
         });
-        loginTask.setOnResultListener(new OnResultListener<UserInfo, String>() {
+        loginTask.setOnFinishListener(new OnFinishListener<UserInfo>() {
             @Override
-            public void onRightResult(UserInfo data) {
+            public void onFinish(UserInfo data) {
                 Log.d(loginTask.getLogTag(), "onRightResult: " + data);
 
                 getView().dismissProgressDialog();
@@ -153,17 +119,7 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
                     ARouter.getInstance().build(RouteTable.MODULE3_ATY_MODULE3_MAIN).navigation();
                 }
             }
-
-            @Override
-            public void onErrorResult(int code, String msg, String data) {
-                Log.e(loginTask.getLogTag(), "onErrorResult, code:" + code + ", msg: " + msg + ", onErrorResult: " + data);
-
-                getView().dismissProgressDialog();
-                mDataManager.setLoginSuccessful(false);
-                getView().loginFail(msg);
-            }
         });
-
             /*}
         }).start();*/
     }

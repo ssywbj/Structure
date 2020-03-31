@@ -14,8 +14,7 @@ import com.suheng.structure.common.eventbus.LoginEvent;
 import com.suheng.structure.data.net.bean.UserInfo;
 import com.suheng.structure.data.net.request.LoginTask;
 import com.suheng.structure.net.callback.OnFailureListener;
-import com.suheng.structure.net.callback.OnResponseListener;
-import com.suheng.structure.net.callback.OnResultListener;
+import com.suheng.structure.net.callback.OnFinishListener;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
 import org.greenrobot.eventbus.EventBus;
@@ -93,25 +92,17 @@ public class MVCLoginActivity extends BasicActivity {
         loginTask.doRequest();
         loginTask.setOnFailureListener(new OnFailureListener() {
             @Override
-            public void onFailure(int code, String error) {
-                Log.e(loginTask.getLogTag(), "onFailure: " + error);
+            public void onFailure(int code, String errorMsg) {
+                Log.e(loginTask.getLogTag(), "onErrorResult, code: " + code + ", errorMsg: " + errorMsg);
 
                 dismissProgressDialog();
-                //loginFail(error);
-                showToast(error);
+                //mPrefsManager.putLoginStatus(false);
+                loginFail(errorMsg);
             }
         });
-        loginTask.setOnResponseListener(new OnResponseListener() {
+        loginTask.setOnFinishListener(new OnFinishListener<UserInfo>() {
             @Override
-            public void onResponse(String result) {
-                Log.d(loginTask.getLogTag(), "onResponse: " + result);
-
-                dismissProgressDialog();
-            }
-        });
-        loginTask.setOnResultListener(new OnResultListener<UserInfo, String>() {
-            @Override
-            public void onRightResult(UserInfo data) {
+            public void onFinish(UserInfo data) {
                 Log.d(loginTask.getLogTag(), "onRightResult: " + data);
 
                 dismissProgressDialog();
@@ -123,15 +114,6 @@ public class MVCLoginActivity extends BasicActivity {
                 } else {
                     ARouter.getInstance().build(RouteTable.MODULE3_ATY_MODULE3_MAIN).navigation();
                 }
-            }
-
-            @Override
-            public void onErrorResult(int code, String msg, String data) {
-                Log.e(loginTask.getLogTag(), "onErrorResult, code: " + code + ", msg: " + msg + ", onErrorResult: " + data);
-
-                dismissProgressDialog();
-                //mPrefsManager.putLoginStatus(false);
-                loginFail(msg);
             }
         });
     }

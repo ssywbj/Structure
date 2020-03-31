@@ -1,14 +1,14 @@
 package com.suheng.structure.data.net.request;
 
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.suheng.structure.data.net.URLConstants;
 import com.suheng.structure.data.net.bean.UserInfo;
-import com.suheng.structure.net.request.normal.JsonTask;
+import com.suheng.structure.net.request.normal.FormatJsonTask;
 import com.suheng.structure.net.response.Result;
 
-public class LoginTask2 extends JsonTask<UserInfo, UserInfo> {
-    private Gson mGson = new Gson();
+public class LoginTask2 extends FormatJsonTask<UserInfo> {
 
     public LoginTask2(String name, String pwd) {
         addArgument("user_name", name);
@@ -21,15 +21,9 @@ public class LoginTask2 extends JsonTask<UserInfo, UserInfo> {
     }
 
     @Override
-    protected UserInfo getRightResult(String result) {
-        Result<UserInfo> response = mGson.fromJson(result, new TypeToken<Result<UserInfo>>() {
-        }.getType());
-        return response.getData();
-    }
-
-    @Override
-    protected UserInfo getErrorResult(String result) {
-        Result<UserInfo> response = mGson.fromJson(result, new TypeToken<Result<UserInfo>>() {
+    protected UserInfo parseResult(String result) {
+        Gson gson = new Gson();
+        Result<UserInfo> response = gson.fromJson(result, new TypeToken<Result<UserInfo>>() {
         }.getType());
         return response.getData();
     }

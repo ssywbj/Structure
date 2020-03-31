@@ -13,7 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.suheng.structure.data.net.request.LoginTask3;
+import com.suheng.structure.data.net.request.LoginTask;
 import com.suheng.structure.data.net.request.LoginTask4;
 import com.suheng.structure.module3.mvp.LoginPresenter;
 import com.suheng.structure.module3.mvp.LoginView;
@@ -73,18 +73,12 @@ public class MVPLoginFragment extends PresenterFragment<LoginPresenter> implemen
         view.findViewById(R.id.btn_permission_write).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final LoginTask3 loginTask3 = new LoginTask3("Wbj", "wbj89");
+                final LoginTask loginTask3 = new LoginTask("Wbj", "wbj89");
                 loginTask3.doRequest(MVPLoginFragment.this);
                 loginTask3.setOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(int code, String error) {
                         Log.e(loginTask3.getLogTag(), "onFailure: " + error);
-                    }
-                });
-                loginTask3.setOnResponseListener(new OnResponseListener() {
-                    @Override
-                    public void onResponse(String result) {
-                        Log.d(loginTask3.getLogTag(), "onResponse: " + result);
                     }
                 });
 

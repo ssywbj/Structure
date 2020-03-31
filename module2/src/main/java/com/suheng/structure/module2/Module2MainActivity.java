@@ -22,10 +22,11 @@ import com.suheng.structure.data.DataManager;
 import com.suheng.structure.data.net.URLConstants;
 import com.suheng.structure.data.net.bean.UserInfo;
 import com.suheng.structure.data.net.request.LoginTask;
+import com.suheng.structure.data.net.request.LoginTask2;
 import com.suheng.structure.module2.request.BeautyTask;
 import com.suheng.structure.net.callback.OnDownloadListener;
 import com.suheng.structure.net.callback.OnFailureListener;
-import com.suheng.structure.net.callback.OnResultListener;
+import com.suheng.structure.net.callback.OnFinishListener;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
 import java.io.File;
@@ -111,52 +112,45 @@ public class Module2MainActivity extends BasicActivity {
                         }
                     }).start();
                 } else {
-                    final LoginTask loginTask = mDataManager.doLoginRequest("Wbj", "wbj89");
+                    /*final LoginTask loginTask = mDataManager.doLoginRequest("Wbj", "wbj89");
                     loginTask.setOnFailureListener(new OnFailureListener() {
                         @Override
-                        public void onFailure(int code, String error) {
-                            Log.e(loginTask.getLogTag(), "onFailure: " + error);
-
+                        public void onFailure(int code, String errorMsg) {
                             dismissProgressDialog();
                         }
                     });
-                    loginTask.setOnResultListener(new OnResultListener<UserInfo, String>() {
+                    loginTask.setOnFinishListener(new OnFinishListener<UserInfo>() {
                         @Override
-                        public void onRightResult(UserInfo data) {
+                        public void onFinish(UserInfo data) {
                             Log.d(loginTask.getLogTag(), "onRightResult: " + data);
-
                             dismissProgressDialog();
-                            mDataManager.setLoginSuccessful(true);
-                            mBtnLoginStatus.setText("退出");
-                        }
 
-                        @Override
-                        public void onErrorResult(int code, String msg, String data) {
-                            Log.e(loginTask.getLogTag(), "onErrorResult, code:" + code + ", msg: " + msg + ", onErrorResult: " + data);
-
-                            dismissProgressDialog();
-                        }
-                    });
-
-                    /*final LoginTask3 loginTask3 = new LoginTask3("Wbj", "wbj89");
-                    loginTask3.doRequest();
-                    loginTask3.setOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(String error) {
-                            Log.e(loginTask3.getLogTag(), "onFailure: " + error);
-                            dismissProgressDialog();
-                            showToast(error);
-                        }
-                    });
-                    loginTask3.setOnResponseListener(new OnResponseListener() {
-                        @Override
-                        public void onResponse(String result) {
-                            Log.d(loginTask3.getLogTag(), "onResponse: " + result);
-                            dismissProgressDialog();
                             mDataManager.setLoginSuccessful(true);
                             mBtnLoginStatus.setText("退出");
                         }
                     });*/
+
+                    final LoginTask2 loginTask = new LoginTask2("Wbj", "wbj89");
+                    loginTask.doRequest();
+                    loginTask.setOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(int code, String errorMsg) {
+                            dismissProgressDialog();
+                            if (code == 1) {
+                                showToast(errorMsg);
+                            }
+                        }
+                    });
+                    loginTask.setOnFinishListener(new OnFinishListener<UserInfo>() {
+                        @Override
+                        public void onFinish(UserInfo data) {
+                            Log.d(loginTask.getLogTag(), "onRightResult: " + data);
+                            dismissProgressDialog();
+
+                            mDataManager.setLoginSuccessful(true);
+                            mBtnLoginStatus.setText("退出");
+                        }
+                    });
                 }
             }
         });
