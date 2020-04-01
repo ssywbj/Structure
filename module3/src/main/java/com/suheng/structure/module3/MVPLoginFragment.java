@@ -18,7 +18,6 @@ import com.suheng.structure.data.net.request.LoginTask4;
 import com.suheng.structure.module3.mvp.LoginPresenter;
 import com.suheng.structure.module3.mvp.LoginView;
 import com.suheng.structure.net.callback.OnFailureListener;
-import com.suheng.structure.net.callback.OnResponseListener;
 import com.suheng.structure.ui.architecture.basic.PresenterFragment;
 
 public class MVPLoginFragment extends PresenterFragment<LoginPresenter> implements LoginView {
@@ -74,20 +73,16 @@ public class MVPLoginFragment extends PresenterFragment<LoginPresenter> implemen
             @Override
             public void onClick(View v) {
                 final LoginTask loginTask3 = new LoginTask("Wbj", "wbj89");
-                loginTask3.doRequest(MVPLoginFragment.this);
-                loginTask3.setOnFailureListener(new OnFailureListener() {
+                loginTask3.doRequest(MVPLoginFragment.this).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(int code, String error) {
-                        Log.e(loginTask3.getLogTag(), "onFailure: " + error);
                     }
                 });
 
                 final LoginTask4 loginTask4 = new LoginTask4("Wbj", "wbj89");
-                loginTask4.doPostRequest();
-                loginTask4.setOnFailureListener(new OnFailureListener() {
+                loginTask4.doPostRequest().addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(int code, String error) {
-                        Log.e(loginTask4.getLogTag(), "onFailure: " + error);
                     }
                 });
             }

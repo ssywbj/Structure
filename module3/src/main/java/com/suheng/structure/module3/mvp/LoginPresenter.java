@@ -12,7 +12,6 @@ import com.suheng.structure.common.arouter.RouteTable;
 import com.suheng.structure.common.eventbus.LoginEvent;
 import com.suheng.structure.data.DataManager;
 import com.suheng.structure.data.net.bean.UserInfo;
-import com.suheng.structure.data.net.request.LoginTask;
 import com.suheng.structure.module3.BuildConfig;
 import com.suheng.structure.module3.R;
 import com.suheng.structure.net.callback.OnFailureListener;
@@ -93,22 +92,17 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
         /*new Thread(new Runnable() {
             @Override
             public void run() {*/
-        final LoginTask loginTask = mDataManager.doLoginRequest(name, pwd);
-        loginTask.setOnFailureListener(new OnFailureListener() {
+        mDataManager.doLoginRequest(name, pwd).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(int code, String errorMsg) {
-                Log.e(loginTask.getLogTag(), "onErrorResult, code:" + code + ", errorMsg: " + errorMsg);
-
                 getView().dismissProgressDialog();
                 mDataManager.setLoginSuccessful(false);
+
                 getView().loginFail(errorMsg);
             }
-        });
-        loginTask.setOnFinishListener(new OnFinishListener<UserInfo>() {
+        }).addOnFinishListener(new OnFinishListener<UserInfo>() {
             @Override
             public void onFinish(UserInfo data) {
-                Log.d(loginTask.getLogTag(), "onRightResult: " + data);
-
                 getView().dismissProgressDialog();
                 mDataManager.setLoginSuccessful(true);
 

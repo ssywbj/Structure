@@ -3,7 +3,7 @@ package com.suheng.structure.data.net.request;
 import android.util.Log;
 
 import com.suheng.structure.data.net.URLConstants;
-import com.suheng.structure.net.request.basic.BasicTask;
+import com.suheng.structure.net.request.basic.OkHttpTask;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -14,7 +14,7 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
-public class LoginTask4 extends BasicTask {
+public class LoginTask4 extends OkHttpTask {
     private JSONObject mJSONObject = new JSONObject();
 
     public LoginTask4(String name, String pwd) {
@@ -32,9 +32,8 @@ public class LoginTask4 extends BasicTask {
     }
 
     @Override
-    protected Object parseResponseBody(@NotNull ResponseBody responseBody) throws Exception {
+    protected void parseResponseBody(@NotNull ResponseBody responseBody) throws Exception {
         Log.e(getLogTag(), "parseResponseBody: " + responseBody.string() + ", thread: " + Thread.currentThread().getName());
-        return null;
     }
 
     @Override

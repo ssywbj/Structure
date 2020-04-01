@@ -21,12 +21,10 @@ import com.suheng.structure.common.arouter.RouteTable;
 import com.suheng.structure.data.DataManager;
 import com.suheng.structure.data.net.URLConstants;
 import com.suheng.structure.data.net.bean.UserInfo;
-import com.suheng.structure.data.net.request.LoginTask;
-import com.suheng.structure.data.net.request.LoginTask2;
 import com.suheng.structure.module2.request.BeautyTask;
-import com.suheng.structure.net.callback.OnDownloadListener;
 import com.suheng.structure.net.callback.OnFailureListener;
 import com.suheng.structure.net.callback.OnFinishListener;
+import com.suheng.structure.net.callback.OnProgressListener;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
 import java.io.File;
@@ -112,27 +110,31 @@ public class Module2MainActivity extends BasicActivity {
                         }
                     }).start();
                 } else {
-                    /*final LoginTask loginTask = mDataManager.doLoginRequest("Wbj", "wbj89");
-                    loginTask.setOnFailureListener(new OnFailureListener() {
+                    mDataManager.doLoginRequest("Wbj", "wbj89").addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(int code, String errorMsg) {
                             dismissProgressDialog();
                         }
-                    });
-                    loginTask.setOnFinishListener(new OnFinishListener<UserInfo>() {
+                    }).addOnFinishListener(new OnFinishListener<UserInfo>() {
                         @Override
                         public void onFinish(UserInfo data) {
-                            Log.d(loginTask.getLogTag(), "onRightResult: " + data);
                             dismissProgressDialog();
 
                             mDataManager.setLoginSuccessful(true);
                             mBtnLoginStatus.setText("退出");
                         }
-                    });*/
+                    });
 
-                    final LoginTask2 loginTask = new LoginTask2("Wbj", "wbj89");
-                    loginTask.doRequest();
-                    loginTask.setOnFailureListener(new OnFailureListener() {
+                    /*final LoginTask2 loginTask = new LoginTask2("Wbj", "wbj89");
+                    loginTask.doRequest().addOnFinishListener(new OnFinishListener<UserInfo>() {
+                        @Override
+                        public void onFinish(UserInfo data) {
+                            dismissProgressDialog();
+
+                            mDataManager.setLoginSuccessful(true);
+                            mBtnLoginStatus.setText("退出");
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(int code, String errorMsg) {
                             dismissProgressDialog();
@@ -140,17 +142,7 @@ public class Module2MainActivity extends BasicActivity {
                                 showToast(errorMsg);
                             }
                         }
-                    });
-                    loginTask.setOnFinishListener(new OnFinishListener<UserInfo>() {
-                        @Override
-                        public void onFinish(UserInfo data) {
-                            Log.d(loginTask.getLogTag(), "onRightResult: " + data);
-                            dismissProgressDialog();
-
-                            mDataManager.setLoginSuccessful(true);
-                            mBtnLoginStatus.setText("退出");
-                        }
-                    });
+                    });*/
                 }
             }
         });
@@ -190,25 +182,19 @@ public class Module2MainActivity extends BasicActivity {
                     (Environment.DIRECTORY_PICTURES).getPath());*/
             final BeautyTask beautyTask = new BeautyTask(Environment.getExternalStoragePublicDirectory
                     (Environment.DIRECTORY_DOWNLOADS).getPath(), System.currentTimeMillis() + ".jpg");
-            beautyTask.doPostRequest();
-            beautyTask.setOnFailureListener(new OnFailureListener() {
+            beautyTask.doPostRequest().addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(int code, String error) {
-                    Log.e(beautyTask.getLogTag(), "download fail: " + error);
                     showToast("下载失败");
                 }
-            });
-            beautyTask.setOnDownloadListener(new OnDownloadListener() {
+            }).addOnProgressListener(new OnProgressListener() {
                 @Override
-                public void onDownloading(double percentage, long progress, long total) {
-                    Log.d(beautyTask.getLogTag(), "percentage: " + percentage + ", progress: "
-                            + progress + ", total: " + total + ", thread: " + Thread.currentThread().getName());
+                public void onProgress(double percentage, long progress, long total) {
                 }
-
+            }).addOnFinishListener(new OnFinishListener<File>() {
                 @Override
-                public void onDownloadFinish(File file, double takeTime) {
+                public void onFinish(File data) {
                     showToast("下载完成");
-                    Log.d(beautyTask.getLogTag(), "file: " + file + ", take time: " + takeTime + "s");
                 }
             });
         } else if (businessId == R.id.btn_upload) {

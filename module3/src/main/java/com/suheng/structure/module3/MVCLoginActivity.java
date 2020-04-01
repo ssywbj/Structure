@@ -3,7 +3,6 @@ package com.suheng.structure.module3;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -88,23 +87,16 @@ public class MVCLoginActivity extends BasicActivity {
 
         showProgressDialog(getString(R.string.module3_login_progress), true);
 
-        final LoginTask loginTask = new LoginTask(name, pwd);
-        loginTask.doRequest();
-        loginTask.setOnFailureListener(new OnFailureListener() {
+        new LoginTask(name, pwd).doRequest().addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(int code, String errorMsg) {
-                Log.e(loginTask.getLogTag(), "onErrorResult, code: " + code + ", errorMsg: " + errorMsg);
-
                 dismissProgressDialog();
                 //mPrefsManager.putLoginStatus(false);
                 loginFail(errorMsg);
             }
-        });
-        loginTask.setOnFinishListener(new OnFinishListener<UserInfo>() {
+        }).addOnFinishListener(new OnFinishListener<UserInfo>() {
             @Override
             public void onFinish(UserInfo data) {
-                Log.d(loginTask.getLogTag(), "onRightResult: " + data);
-
                 dismissProgressDialog();
                 //mPrefsManager.putLoginStatus(true);
 

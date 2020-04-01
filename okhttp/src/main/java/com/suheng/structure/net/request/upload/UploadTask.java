@@ -5,7 +5,7 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.suheng.structure.net.request.basic.BasicTask;
+import com.suheng.structure.net.request.basic.OkHttpTask;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -15,7 +15,7 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-public abstract class UploadTask extends BasicTask {
+public abstract class UploadTask extends OkHttpTask {
     private UIHandler mUIHandler = new UIHandler(this);
 
     protected void onUpload(String fileName, String path) {

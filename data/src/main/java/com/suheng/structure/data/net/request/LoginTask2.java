@@ -5,10 +5,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.suheng.structure.data.net.URLConstants;
 import com.suheng.structure.data.net.bean.UserInfo;
-import com.suheng.structure.net.request.normal.FormatJsonTask;
+import com.suheng.structure.net.request.normal.JsonTask;
 import com.suheng.structure.net.response.Result;
 
-public class LoginTask2 extends FormatJsonTask<UserInfo> {
+public class LoginTask2 extends JsonTask<UserInfo> {
 
     public LoginTask2(String name, String pwd) {
         addArgument("user_name", name);
