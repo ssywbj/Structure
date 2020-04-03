@@ -17,7 +17,7 @@ public class LoginTask extends StringTask<UserInfo> {
 
     @Override
     protected String getURL() {
-        return URLConstants.URL_USER_INFO;
+        return URLConstants.URL_LOGIN_REQUEST;
     }
 
     @Override

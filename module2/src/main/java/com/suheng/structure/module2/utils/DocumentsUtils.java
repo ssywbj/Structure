@@ -1,4 +1,4 @@
-package com.suheng.structure.module2;
+package com.suheng.structure.module2.utils;
 
 import android.annotation.TargetApi;
 import android.content.Context;

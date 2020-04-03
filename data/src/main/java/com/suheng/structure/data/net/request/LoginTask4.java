@@ -28,7 +28,7 @@ public class LoginTask4 extends OkHttpTask {
 
     @Override
     protected String getURL() {
-        return URLConstants.URL_USER_INFO;
+        return URLConstants.URL_LOGIN_REQUEST;
     }
 
     @Override

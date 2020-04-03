@@ -22,6 +22,8 @@ import com.suheng.structure.data.DataManager;
 import com.suheng.structure.data.net.URLConstants;
 import com.suheng.structure.data.net.bean.UserInfo;
 import com.suheng.structure.module2.request.BeautyTask;
+import com.suheng.structure.module2.utils.DocumentsUtils;
+import com.suheng.structure.module2.utils.NetWorkUtil;
 import com.suheng.structure.net.callback.OnFailureListener;
 import com.suheng.structure.net.callback.OnFinishListener;
 import com.suheng.structure.net.callback.OnProgressListener;
@@ -29,11 +31,9 @@ import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -79,9 +79,10 @@ public class Module2MainActivity extends BasicActivity {
                         @Override
                         public void run() {
 
-                            OkHttpClient httpClient = new OkHttpClient.Builder().connectionSpecs(Collections.singletonList(new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-                                    .allEnabledTlsVersions().build())).build();
-                            Request request = new Request.Builder().url(URLConstants.URL_USER_INFO).build();
+                            /*OkHttpClient httpClient = new OkHttpClient.Builder().connectionSpecs(Collections.singletonList(new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                                    .allEnabledTlsVersions().build())).build();*/
+                            OkHttpClient httpClient = new OkHttpClient();
+                            Request request = new Request.Builder().url(URLConstants.URL_LOGIN_REQUEST).build();
                             httpClient.newCall(request).enqueue(new Callback() {
                                 @Override
                                 public void onFailure( Call call,  IOException e) {
@@ -110,7 +111,7 @@ public class Module2MainActivity extends BasicActivity {
                         }
                     }).start();
                 } else {
-                    mDataManager.doLoginRequest("Wbj", "wbj89").addOnFailureListener(new OnFailureListener() {
+                    mDataManager.doLoginRequest("Wbj韦帮杰", "wbj89").addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(int code, String errorMsg) {
                             dismissProgressDialog();
@@ -161,6 +162,13 @@ public class Module2MainActivity extends BasicActivity {
                 //startService(new Intent(Module2MainActivity.this, Module2Service.class));
             }
         });
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("LoginTask", "--hostIp-->" + NetWorkUtil.getHostIp());
+            }
+        }).start();
     }
 
     //String sdcardFilePath = "/storage/5285-8EF6/stealAccountRisks1.apk";//Gionee M100

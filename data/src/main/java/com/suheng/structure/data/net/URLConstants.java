@@ -1,8 +1,10 @@
 package com.suheng.structure.data.net;
 
 public class URLConstants {
-    private static final String URL_SERVER = "http://192.168.1.103:8080/TestJSP";
-    //public static final String URL_USER_INFO = URL_SERVER + "/ServletUserInfo";
-    public static final String URL_USER_INFO = "https://www.baidu.com/";
-    public static final String URL_PICTURE = URL_SERVER + "/pictures";
+    //http://192.168.121.34:8080/SturctureServlet/Login?user_name=Wbj%E9%9F%A6%E5%B8%AE%E6%9D%B0&login_pwd=abc123
+    private static final String URL_SERVER = "http://192.168.121.34:8080";
+    private static final String URL_STRUCTURE_SERVER = URL_SERVER + "/SturctureServlet";
+    public static final String URL_LOGIN_REQUEST = URL_STRUCTURE_SERVER + "/Login";
+    //public static final String URL_LOGIN_REQUEST = "https://www.baidu.com/";
+    public static final String URL_GET_PICTURES_REQUEST = URL_STRUCTURE_SERVER + "/pictures";
 }

@@ -17,7 +17,7 @@ public class LoginTask2 extends JsonTask<UserInfo> {
 
     @Override
     protected String getURL() {
-        return URLConstants.URL_USER_INFO;
+        return URLConstants.URL_LOGIN_REQUEST;
     }
 
     @Override

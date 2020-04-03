@@ -35,8 +35,6 @@ public abstract class DownloadTask extends OkHttpTask<File> {
         InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
-            long currentTimeMillis = System.currentTimeMillis();
-
             inputStream = responseBody.byteStream();
             mTotal = responseBody.contentLength();
 
@@ -62,8 +60,6 @@ public abstract class DownloadTask extends OkHttpTask<File> {
             }
 
             outputStream.flush();
-
-            mTakeTime = 1.0 * (System.currentTimeMillis() - currentTimeMillis) / 1000;
 
             setFinishCallback(mFile);
         } catch (IOException e) {

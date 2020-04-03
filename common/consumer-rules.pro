@@ -31,6 +31,7 @@
     public static *** w(...);
     public static *** e(...);
 }
+
 -assumenosideeffects class java.io.PrintStream {
       public *** println(...);
       public *** print(...);

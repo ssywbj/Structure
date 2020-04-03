@@ -7,8 +7,6 @@ import org.json.JSONObject;
 import okhttp3.ResponseBody;
 
 public abstract class JsonTask<T> extends StringTask<T> {
-    private static final String JSON = "{" + "\"code\":1" + ",\"msg\":密码错误" + ",data:{"
-            + "\"memberId\":17" + ",\"age\":18" + ",\"email_address\":\"Wbj@qq.com\"" + "}" + "}";
     private static final int ERROR_JSON_NO_FIELDS = -9715;
     private static final int ERROR_JSON_FORMAT_EXCEPTION = -9716;
     private static final String FIELD_CODE = "code";
@@ -17,7 +15,7 @@ public abstract class JsonTask<T> extends StringTask<T> {
     @Override
     protected void parseResponseBody(@NotNull ResponseBody responseBody) throws Exception {
         String result = responseBody.string();
-        result = JSON;
+        //result = JSON;
         try {
             JSONObject jsonObject = new JSONObject(result);
             if (jsonObject.has(FIELD_CODE) && jsonObject.has(FIELD_MSG)) {

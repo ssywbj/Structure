@@ -50,7 +50,9 @@ public abstract class OkHttpTask<T> {
 
     private OnProgressListener mOnProgressListener;
     protected long mTotal, mProgress;
-    protected double mPercentage, mTakeTime;
+    protected double mPercentage;
+    private double mTakeTime;
+    private long mCurrentTimeMillis;
 
     private OkHttpClient mOkHttpClient = new OkHttpClient();
     private Call mCall;
@@ -167,6 +169,8 @@ public abstract class OkHttpTask<T> {
     }
 
     protected void enqueue(final Request request) {
+        mCurrentTimeMillis = System.currentTimeMillis();
+
         mCall = mOkHttpClient.newCall(request);
         mCall.enqueue(new Callback() {
             @Override
@@ -201,9 +205,10 @@ public abstract class OkHttpTask<T> {
     }
 
     protected void setFailureCallback(int code, String errorMsg) {
+        mTakeTime = 1.0 * (System.currentTimeMillis() - mCurrentTimeMillis) / 1000;
         this.code = code;
         mErrorMsg = errorMsg;
-        Log.e(getLogTag(), "failure-->code: " + code + ", " + mErrorMsg);
+        Log.e(getLogTag(), "failure-->code: " + code + ", " + mErrorMsg + ", take time: " + mTakeTime);
 
         if (mOnFailureListener != null) {
             mUIHandler.sendEmptyMessage(MSG_ON_FAILURE);
@@ -215,8 +220,9 @@ public abstract class OkHttpTask<T> {
     }
 
     protected void setFinishCallback(T data) {
+        mTakeTime = 1.0 * (System.currentTimeMillis() - mCurrentTimeMillis) / 1000;
         mData = data;
-        Log.d(getLogTag(), "finish-->data: " + mData + ", take time: " + this.getTakeTime());
+        Log.d(getLogTag(), "finish-->data: " + mData + ", take time: " + mTakeTime);
 
         if (mOnFinishListener != null) {
             mUIHandler.sendEmptyMessage(MSG_ON_FINISH);
