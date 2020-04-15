@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.suheng.structure.module1">
 
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
     <application
         android:name=".application.Module1App"
         android:allowBackup="true"
@@ -22,9 +24,20 @@
         </activity>
 
         <service
-            android:name=".Module1Service"
+            android:name=".LiveWallpaperService"
             android:enabled="true"
-            android:exported="true" />
+            android:label="A韦"
+            android:icon="@drawable/bg"
+            android:permission="android.permission.BIND_WALLPAPER">
+
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/wallpaperanalogdigitalclock"/>
+        </service>
     </application>
 
 </manifest>
