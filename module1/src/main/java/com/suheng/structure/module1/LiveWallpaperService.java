@@ -10,10 +10,13 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.service.wallpaper.WallpaperService;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
@@ -21,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class LiveWallpaperService extends WallpaperService {
     public static final String TAG = LiveWallpaperService.class.getSimpleName();
@@ -36,10 +40,7 @@ public class LiveWallpaperService extends WallpaperService {
         private final double RADIANS = Math.toRadians(1.0f * 360 / POINTS);//弧度值，Math.toRadians：度换算成弧度
 
         //Digital clock color in interactive mode
-        private int color = Color.GREEN;
-        private Paint paint = new Paint();
         private boolean mVisible = false;
-        private static final String TIME_FORMAT_12_HOUR = "hh:mm a";
         private boolean mRegisteredTimeTickReceiver = false;
 
         private float mCenterX;//圆心X坐标
@@ -47,19 +48,39 @@ public class LiveWallpaperService extends WallpaperService {
         private float mMaxRadius;
         private Rect mRect = new Rect();
 
+        private boolean mAmbientMode;
+        private Paint mPaintText, mPaintPointer, mPaintPoint;
+
+        private Context mContext;
+
         private final Handler mHandler = new Handler() {
             @Override
             public void dispatchMessage(@NonNull Message msg) {
                 super.dispatchMessage(msg);
-                draw(color);
+                invalidate();
             }
         };
 
-        private Context mContext;
+        private boolean mRegisteredBatteryReceiver = false;
+        private String mTextBattery;
+        private final BroadcastReceiver mBatteryReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
+                    int level = intent.getIntExtra("level", 0);//当前电量
+                    int total = intent.getIntExtra("scale", 100);//总电量
+                    int percentage = (level * 100) / total;
+                    mTextBattery = "Battery:" + percentage + "%";
+                    Log.d(TAG, "battery, level = " + level + ", total = " + total + ", percentage = " + percentage);
+                }
+            }
+        };
 
         @Override
         public void onCreate(SurfaceHolder surfaceHolder) {
             super.onCreate(surfaceHolder);
+            Log.i(TAG, "onCreate, surfaceHolder = " + surfaceHolder);
+
             mContext = LiveWallpaperService.this;
 
             mPaintText = new Paint();
@@ -77,7 +98,7 @@ public class LiveWallpaperService extends WallpaperService {
             mPaintPointer.setDither(true);
         }
 
-        private void draw(int color) {
+        private void invalidate() {
             SurfaceHolder surfaceHolder = getSurfaceHolder();
             Canvas canvas = null;
             try {
@@ -95,8 +116,6 @@ public class LiveWallpaperService extends WallpaperService {
             mHandler.sendEmptyMessageDelayed(111, 1000);
         }
 
-        private Paint mPaintText, mPaintPointer, mPaintPoint;
-
         private void onDraw(Canvas canvas) {
             int width = canvas.getWidth();
             int height = canvas.getHeight();
@@ -109,7 +128,7 @@ public class LiveWallpaperService extends WallpaperService {
 
             String text = "zhipu";
             float textPaintHeight;
-            /*if (mInAmbientMode) {
+            if (mAmbientMode) {
                 canvas.drawColor(ContextCompat.getColor(mContext, R.color.zhipu_watchface_ambient_mode));//画面背景
 
                 mPaintText.setTextSize(64f);
@@ -128,21 +147,29 @@ public class LiveWallpaperService extends WallpaperService {
                 //textPaintHeight = 1.0f * height / 2 + 1.0f * mRect.height() / 4;//文字垂直居中
                 textPaintHeight = (height + 1.0f * mRect.height()) / 2 + 12;
                 canvas.drawText(text, (width - mPaintText.measureText(text)) / 2, textPaintHeight, mPaintText);
-            } else {*/
-            canvas.drawColor(ContextCompat.getColor(mContext, R.color.zhipu_watchface_interactive_mode));//画面背景
+            } else {
+                canvas.drawColor(ContextCompat.getColor(mContext, R.color.zhipu_watchface_interactive_mode));//画面背景
 
-            textPaintHeight = (height - mPaintText.getTextSize() + 16);//文字到屏幕底部有一定间距
+                //textPaintHeight = (height - mPaintText.getTextSize() + 16);//文字到屏幕底部有一定间距
+                textPaintHeight = (mCenterY + mMaxRadius + 40);//文字到屏幕底部有一定间距
 
-            this.paintPointer(canvas, hour, minute, second);
-            this.paintScaleNumber(canvas);
+                this.paintPointer(canvas, hour, minute, second);
+                this.paintScaleNumber(canvas);
 
-            mPaintText.setTextSize(50f);
-            mPaintText.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
-            canvas.drawText(text, (width - mPaintText.measureText(text)) / 2, textPaintHeight, mPaintText);
+                mPaintText.setTextSize(50f);
+                mPaintText.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
+                canvas.drawText(text, (width - mPaintText.measureText(text)) / 2, textPaintHeight, mPaintText);
 
-            //this.drawComplications(canvas, System.currentTimeMillis());
-            //this.drawUnreadNotificationIcon(canvas);
-            //}
+                if (!TextUtils.isEmpty(mTextBattery)) {
+                    mPaintText.setTextSize(30f);
+                    mPaintText.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                    float dimen = mPaintText.measureText(mTextBattery);
+                    canvas.drawText(mTextBattery, (width - dimen) / 2, mCenterY + dimen / 2 - 10, mPaintText);
+                }
+
+                //this.drawComplications(canvas, System.currentTimeMillis());
+                //this.drawUnreadNotificationIcon(canvas);
+            }
         }
 
         private void paintScaleNumber(Canvas canvas) {
@@ -180,6 +207,14 @@ public class LiveWallpaperService extends WallpaperService {
             }
 
             canvas.restore();
+        }
+
+        private String addZero(int number) {
+            StringBuilder sBuilder = new StringBuilder(String.valueOf(number));
+            if (sBuilder.length() < 2) {
+                sBuilder.insert(0, "0");
+            }
+            return sBuilder.toString();
         }
 
         private float mHourPointWidth = 4;//时针宽度
@@ -251,14 +286,9 @@ public class LiveWallpaperService extends WallpaperService {
             sendBroadcast(intent);
 
             if (visible) {
-                /**
-                 * Register a broadcast receiver to receive time ticks
-                 * every minute
-                 */
                 registerReceivers();
-                draw(color);
+                invalidate();
             } else {
-                //Unregister when it's no more visible
                 unregisterReceivers();
                 mHandler.removeMessages(111);
             }
@@ -267,12 +297,12 @@ public class LiveWallpaperService extends WallpaperService {
         @Override
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             super.onSurfaceChanged(holder, format, width, height);
-            Log.i(TAG, "onSurfaceChanged");
+            Log.d(TAG, "onSurfaceChanged, format = " + format + ", width = " + width + ", height = " + height);
             mCenterX = 1.0f * width / 2;//圆心X坐标
             mCenterY = 1.0f * height / 2 - 28;//圆心Y坐标
             mMaxRadius = Math.min(mCenterX, mCenterY);
 
-            draw(color);
+            invalidate();
         }
 
         @Override
@@ -294,24 +324,24 @@ public class LiveWallpaperService extends WallpaperService {
         @Override
         public Bundle onCommand(String action, int x, int y, int z, Bundle extras, boolean resultRequested) {
             super.onCommand(action, x, y, z, extras, resultRequested);
-            Log.i(TAG, "onCommand, action = " + action + ", x = " + x + ", y = " + y);
             if (action.matches("com.google.android.wearable.action.BACKGROUND_ACTION")) {
-                boolean ambientMode = extras.getBoolean("ambient_mode", false);
+                mAmbientMode = extras.getBoolean("ambient_mode", false);
+
                 //Redraw digital clock in black and white during ambient mode
-                if (ambientMode) {
-                    color = Color.WHITE;
-                    draw(color);
+                if (mAmbientMode) {
+                    invalidate();
                     unregisterReceivers();
                 } else if (mVisible) {//Redraw digital clock in green during non-ambient mode
                     registerReceivers();
-                    color = Color.GREEN;
-                    draw(color);
+                    invalidate();
                 }
             }
             //Update and redraw digital clock every minute
             else if (action.matches("com.google.android.wearable.action.AMBIENT_UPDATE")) {
-                draw(color);
+                invalidate();
             }
+            Log.i(TAG, "onCommand, action = " + action + ", x = " + x + ", y = "
+                    + y + ", ambient_mode = " + mAmbientMode);
             return extras;
         }
 
@@ -319,7 +349,7 @@ public class LiveWallpaperService extends WallpaperService {
         private BroadcastReceiver mClockTimeReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context c, Intent i) {
-                //draw(color);
+                invalidate();
             }
         };
 
@@ -335,6 +365,8 @@ public class LiveWallpaperService extends WallpaperService {
             intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
             intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
             registerReceiver(mClockTimeReceiver, intentFilter);
+
+            this.registerBatteryReceiver();
         }
 
         //Unregister broadcast receiver
@@ -344,6 +376,25 @@ public class LiveWallpaperService extends WallpaperService {
             }
             mRegisteredTimeTickReceiver = false;
             unregisterReceiver(mClockTimeReceiver);
+
+            this.unregisterBatteryReceiver();
+        }
+
+        private void registerBatteryReceiver() {
+            if (mRegisteredBatteryReceiver) {
+                return;
+            }
+            mRegisteredBatteryReceiver = true;
+            IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            LiveWallpaperService.this.registerReceiver(mBatteryReceiver, filter);
+        }
+
+        private void unregisterBatteryReceiver() {
+            if (!mRegisteredBatteryReceiver) {
+                return;
+            }
+            mRegisteredBatteryReceiver = false;
+            LiveWallpaperService.this.unregisterReceiver(mBatteryReceiver);
         }
     }
 
