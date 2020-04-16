@@ -15,4 +15,8 @@ public class RouteTable {//命名规范：/模块/组件(aty、frg等)/业务
 
     //#data module
     public static final String data_data_manager = "/data/data_manager";
+
+    //public static final String SOCKET_HOST = "localhost";
+    public static final String SOCKET_HOST = "192.168.121.161";
+    public static final int SOCKET_PORT = 8096;
 }

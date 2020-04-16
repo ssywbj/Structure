@@ -31,6 +31,10 @@ import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -169,6 +173,27 @@ public class Module2MainActivity extends BasicActivity {
                 Log.d("LoginTask", "--hostIp-->" + NetWorkUtil.getHostIp());
             }
         }).start();
+
+        //this.openSocketServer();//为什么如果不通过服务启动ServerSocket，客户端连接上服务端后会报错？
+        startService(new Intent(this, EchoService.class));
+    }
+
+    private void openSocketServer() {
+        try {
+            ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+            ServerSocket serverSocket = new ServerSocket(RouteTable.SOCKET_PORT);
+            while (true) {
+                Log.d(SocketServer.TAG, "服务器正在运行，等待客户端连接......");
+                Socket socket = serverSocket.accept();
+                /*
+                 多线程处理机制：每一个客户端连接之后都启动一个线程，以保证服务器可以同时与多个客户端通信。如果是单线程
+                 处理机制，那么服务器每次只能与一个客户端连接，其他客户端无法同时连接服务器，要等待服务器出现空闲才可以连接。
+                 */
+                cachedThreadPool.execute(new SocketServer(socket));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //String sdcardFilePath = "/storage/5285-8EF6/stealAccountRisks1.apk";//Gionee M100

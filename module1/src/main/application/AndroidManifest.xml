@@ -3,6 +3,7 @@
     package="com.suheng.structure.module1">
 
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".application.Module1App"
