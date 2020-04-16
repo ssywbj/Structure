@@ -9,4 +9,19 @@
         <activity android:name=".Module1MainActivity" />
     </application>
 
+    <service
+        android:name=".LiveWallpaperService"
+        android:enabled="true"
+        android:label="A韦"
+        android:icon="@drawable/bg"
+        android:permission="android.permission.BIND_WALLPAPER">
+
+        <intent-filter>
+            <action android:name="android.service.wallpaper.WallpaperService" />
+        </intent-filter>
+
+        <meta-data
+            android:name="android.service.wallpaper"
+            android:resource="@xml/wallpaperanalogdigitalclock"/>
+    </service>
 </manifest>
