@@ -10,8 +10,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -24,7 +22,6 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import java.util.Calendar;
-import java.util.List;
 
 public class LiveWallpaperService extends WallpaperService {
     public static final String TAG = LiveWallpaperService.class.getSimpleName();
