@@ -3,63 +3,52 @@ package com.suheng.structure.bluetooth.activity;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.suheng.structure.bluetooth.R;
-import com.suheng.structure.bluetooth.connect.BluetoothCommService;
+import com.suheng.structure.ui.architecture.adapter.RecyclerAdapter;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
+import com.suheng.structure.ui.architecture.widget.RecyclerItemDecoration;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
-import java.util.UUID;
+import java.util.concurrent.Executors;
 
 public class BluetoothListActivity extends BasicActivity {
+    private static final int REQUEST_ENABLE_BLUETOOTH = 0;
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothListAdapter mBluetoothListAdapter;
+    private List<BluetoothDevice> mBluetoothList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_bluetooth_list_aty);
-
-
-        findViewById(R.id.item_module1).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendMessage("Hello World!");
-            }
-        });
-
-        findViewById(R.id.item_module2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Get the device MAC address
-                String address = "E0:DD:C0:7B:B6:F1";
-                // Get the BluetoothDevice object
-                BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-                Log.d(mTag, "address: " + address + ", device: " + device);
-                // Attempt to connect to the device
-                mCommService.connect(device, false);
-            }
-        });
+        this.initRecyclerView();
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (this.isSupportBluetooth()) {
             if (mBluetoothAdapter.isEnabled()) {
-                this.doDiscovery();
                 this.getPairedDevice();
             } else {
                 Log.d(mTag, "bluetooth isn't enabled, request action enable!");
-                //请求用户开启
-                Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableIntent, REQUEST_ENABLE_BLUETOOTH);
+                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE); //请求用户开启
+                startActivityForResult(intent, REQUEST_ENABLE_BLUETOOTH);
             }
         } else {
             Log.w(mTag, "this device isn't support bluetooth!");
@@ -75,9 +64,26 @@ public class BluetoothListActivity extends BasicActivity {
         registerReceiver(mFindBlueToothReceiver, actionFound);
         registerReceiver(mFindBlueToothReceiver, actionBondStateChanged);
         registerReceiver(mFindBlueToothReceiver, actionPairingRequest);
+    }
 
-        // Initialize the BluetoothCommService to perform bluetooth connections
-        mCommService = new BluetoothCommService(this, null);
+    private void initRecyclerView() {
+        mBluetoothListAdapter = new BluetoothListAdapter(mBluetoothList);
+        mBluetoothListAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener<BluetoothDevice>() {
+            @Override
+            public void onItemClick(View view, BluetoothDevice data, int position) {
+                BluetoothConnectActivity.openPage(BluetoothListActivity.this, data.getAddress());
+            }
+        });
+
+        RecyclerView recyclerView = findViewById(R.id.bluetooth_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());//设置Item增加、移除动画
+        recyclerView.addItemDecoration(new RecyclerItemDecoration(this, true));//设置Item分隔线
+        recyclerView.setAdapter(mBluetoothListAdapter);
+    }
+
+    public boolean isSupportBluetooth() {
+        return (mBluetoothAdapter != null);
     }
 
     private final BroadcastReceiver mFindBlueToothReceiver = new BroadcastReceiver() {
@@ -101,14 +107,14 @@ public class BluetoothListActivity extends BasicActivity {
                         Log.d(mTag, "found device, but BluetoothDevice is null");
                     } else {
                         String address = bluetoothDevice.getAddress();
-                        Log.d(mTag, "found device, address: " + address + ", name: " + bluetoothDevice.getName()
+                        String name = bluetoothDevice.getName();
+                        Log.d(mTag, "found device, address: " + address + ", name: " + name
                                 + ", bond state: " + bluetoothDevice.getBondState());
+                        mBluetoothList.add(bluetoothDevice);
+                        mBluetoothListAdapter.notifyDataSetChanged();
+
                         /*if ("E0:DD:C0:7B:B6:F1".equals(address)) {
-                            //pinTargetDevice(bluetoothDevice);
-                            // Get the BluetoothDevice object
-                            BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-                            // Attempt to connect to the device
-                            mCommService.connect(device, false);
+                            bondTargetDevice(bluetoothDevice);
                         }*/
                     }
                     break;
@@ -129,12 +135,6 @@ public class BluetoothListActivity extends BasicActivity {
                                 break;
                             case BluetoothDevice.BOND_BONDED:
                                 msg += ", bonded finish";
-                                //mBluetoothConnectTask.execute(bluetoothDevice);
-
-                                // Get the BluetoothDevice object
-                                /*BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(bluetoothDevice.getAddress());
-                                // Attempt to connect to the device
-                                mCommService.connect(device, false);*/
                                 break;
                             case BluetoothDevice.BOND_NONE:
                                 msg += ", bond cancel";
@@ -150,41 +150,11 @@ public class BluetoothListActivity extends BasicActivity {
         }
     };
 
-    //private static final String UUID_NAME = "00001101-0000-1000-8000-00805F9B34FB";
-    //private static final String UUID_NAME = "8CE255C0-200A-11E0-AC64-0800200C9A66";
-    private static final String UUID_NAME = "00001105-0000-1000-8000-00805f9b34fb";
-    private static final int REQUEST_ENABLE_BLUETOOTH = 0;
-    private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothConnectTask mBluetoothConnectTask = new BluetoothConnectTask();
-
-    public boolean isSupportBluetooth() {
-        return (mBluetoothAdapter != null);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Performing this check in onResume() covers the case in which BT was
-        // not enabled during onStart(), so we were paused to enable it...
-        // onResume() will be called when ACTION_REQUEST_ENABLE activity returns.
-        if (mCommService != null) {
-            // Only if the state is STATE_NONE, do we know that we haven't started already
-            if (mCommService.getState() == BluetoothCommService.STATE_NONE) {
-                // Start the Bluetooth comm services
-                mCommService.start();
-            }
-        }
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mFindBlueToothReceiver);
-        mBluetoothConnectTask.disconnect();
-        if (mCommService != null) {
-            mCommService.stop();
-        }
+        mBluetoothList.clear();
     }
 
     @Override
@@ -194,7 +164,6 @@ public class BluetoothListActivity extends BasicActivity {
             if (resultCode == Activity.RESULT_OK) {//bluetooth is opened
                 //可以获取列表操作等
                 this.getPairedDevice();
-                this.doDiscovery();
             } else {
                 Log.d(mTag, "bluetooth isn't enabled after request action enable!");
             }
@@ -212,16 +181,15 @@ public class BluetoothListActivity extends BasicActivity {
             for (BluetoothDevice bondedDevice : bondedDevices) {
                 Log.d(mTag, "paired device address: " + bondedDevice.getAddress() + ", name: "
                         + bondedDevice.getName() + ", bond state: " + bondedDevice.getBondState());
-                if ("E0:DD:C0:7B:B6:F1".equals(bondedDevice.getAddress())) {
-                    mBluetoothConnectTask.execute(bondedDevice);
-                    break;
-                }
+                mBluetoothList.add(bondedDevice);
             }
         }
+
+        this.doDiscovery();
     }
 
     private void doDiscovery() {
-        new Thread(new Runnable() {
+        Executors.newCachedThreadPool().execute(new Runnable() {
             @Override
             public void run() {
                 if (mBluetoothAdapter.isDiscovering()) {
@@ -229,13 +197,13 @@ public class BluetoothListActivity extends BasicActivity {
                 }
                 mBluetoothAdapter.startDiscovery();
             }
-        }).start();
+        });
     }
 
     /**
      * 配对蓝牙设备
      */
-    private void pinTargetDevice(BluetoothDevice bluetoothDevice) {
+    private void bondTargetDevice(BluetoothDevice bluetoothDevice) {
         mBluetoothAdapter.cancelDiscovery(); //配对之前，停止搜索
         if (bluetoothDevice == null) {
             return;
@@ -250,78 +218,38 @@ public class BluetoothListActivity extends BasicActivity {
         }
     }
 
-    private final class BluetoothConnectTask extends AsyncTask<BluetoothDevice, Integer, BluetoothSocket> {
-        private BluetoothSocket mBluetoothSocket;
+    private static final class BluetoothListAdapter extends RecyclerAdapter<BluetoothDevice> {
 
-        @Override
-        protected BluetoothSocket doInBackground(BluetoothDevice... bluetoothDevices) {
-            try {
-                Log.d(mTag, "start connect bluetooth, uuid: " + UUID_NAME);
-                //mBluetoothSocket = bluetoothDevices[0].createRfcommSocketToServiceRecord(UUID.fromString(UUID_NAME));
-                mBluetoothSocket = bluetoothDevices[0].createInsecureRfcommSocketToServiceRecord(UUID.fromString(UUID_NAME));
-            } catch (Exception e) {
-                try {
-                    mBluetoothSocket.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-                Log.e(mTag, "connect bluetooth error: " + e.toString());
-            }
-            return mBluetoothSocket;
+        BluetoothListAdapter(List<BluetoothDevice> dataList) {
+            super(dataList);
         }
 
         @Override
-        protected void onPostExecute(BluetoothSocket bluetoothSocket) {
-            super.onPostExecute(bluetoothSocket);
-            if (bluetoothSocket == null) {
-                return;
-            }
-
-            //BluetoothClient.getInstance().init(mBluetoothSocket);
-        }
-
-        /**
-         * 断开连接
-         */
-        public void disconnect() {
-            if (mBluetoothSocket != null) {
-                if (mBluetoothSocket.isConnected()) {
-                    try {
-                        mBluetoothSocket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        protected void bindView(RecyclerView.ViewHolder viewHolder, int position, BluetoothDevice data) {
+            if (viewHolder instanceof ContentHolder) {
+                ContentHolder contentHolder = (ContentHolder) viewHolder;
+                if (TextUtils.isEmpty(data.getName())) {
+                    contentHolder.textName.setText(data.getAddress());
+                } else {
+                    contentHolder.textName.setText(data.getName());
                 }
-
-                mBluetoothSocket = null;
             }
+        }
 
+        @NonNull
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new ContentHolder(getItemLayout(parent.getContext(), R.layout.bluetooth_bluetooth_list_aty_adt));
+        }
+
+        static class ContentHolder extends RecyclerView.ViewHolder {
+            TextView textName;
+
+            ContentHolder(View view) {
+                super(view);
+                textName = view.findViewById(R.id.text_bluetooth_name);
+            }
         }
     }
 
-    private BluetoothCommService mCommService = null;
-
-    /**
-     * Sends a message.
-     *
-     * @param message A string of text to send.
-     */
-    private void sendMessage(String message) {
-        // Check that we're actually connected before trying anything
-        if (mCommService.getState() != BluetoothCommService.STATE_CONNECTED) {
-            Toast.makeText(this, "not_connected", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Check that there's actually something to send
-        if (message.length() > 0) {
-            // Get the message bytes and tell the BluetoothCommService to write
-            byte[] send = message.getBytes();
-            mCommService.write(send);
-
-            // Reset out string buffer to zero and clear the edit text field
-            /*mOutStringBuffer.setLength(0);
-            mOutEditText.setText(mOutStringBuffer);*/
-        }
-    }
 }

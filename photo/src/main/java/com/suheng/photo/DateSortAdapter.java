@@ -6,6 +6,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -27,7 +28,7 @@ public class DateSortAdapter extends PictureAdapter<ImageInfo> {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_CONTENT) {
             return new ContentHolder(getItemLayout(parent.getContext(), R.layout.compress_aty_adapter_content));
         } else if (viewType == VIEW_TYPE_TITLE) {
@@ -102,7 +103,7 @@ public class DateSortAdapter extends PictureAdapter<ImageInfo> {
         }
     }
 
-    class FooterHolder extends RecyclerView.ViewHolder {
+    static class FooterHolder extends RecyclerView.ViewHolder {
         TextView tvShowNumber;
 
          FooterHolder(View view) {
@@ -111,7 +112,7 @@ public class DateSortAdapter extends PictureAdapter<ImageInfo> {
         }
     }
 
-    class TitleHolder extends RecyclerView.ViewHolder {
+    static class TitleHolder extends RecyclerView.ViewHolder {
         TextView tvTitle;
         CheckBox checkBox;
 

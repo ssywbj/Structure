@@ -14,13 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.suheng.photo.model.ImageInfo;
 import com.suheng.photo.presenter.PhotoPresenter;
-import com.suheng.photo.view.DividerDecoration;
 import com.suheng.photo.view.PhotoView;
+import com.suheng.structure.ui.architecture.adapter.RecyclerAdapter;
 import com.suheng.structure.ui.architecture.basic.PresenterActivity;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.suheng.structure.ui.architecture.widget.RecyclerItemDecoration;
 
 public class PhotoActivity extends PresenterActivity<PhotoPresenter> implements PhotoView {
     private static final int NUM_COLUMNS = 4;
@@ -54,7 +51,7 @@ public class PhotoActivity extends PresenterActivity<PhotoPresenter> implements 
         mRecyclerView = findViewById(R.id.main_picture_rv);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, NUM_COLUMNS, GridLayoutManager.VERTICAL, false));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());//设置Item增加、移除动画
-        mRecyclerView.addItemDecoration(new DividerDecoration(this, true));//设置Item分隔线
+        mRecyclerView.addItemDecoration(new RecyclerItemDecoration(this, true));//设置Item分隔线
         mPictureAdapter = new DateSortAdapter(this, mPhotoPresenter.getDataList());
         mPictureAdapter.setHasStableIds(true);//解决adapter闪烁问题
         mRecyclerView.setAdapter(mPictureAdapter);
@@ -105,7 +102,7 @@ public class PhotoActivity extends PresenterActivity<PhotoPresenter> implements 
                 if (windowManager != null) {
                     windowManager.getDefaultDisplay().getRealMetrics(realMetrics);
                     mItemWidth = (realMetrics.widthPixels - mRecyclerView.getPaddingLeft() - mRecyclerView.getPaddingRight() -
-                            (NUM_COLUMNS - 1) * DividerDecoration.LIST_DIVIDER_DIMEN) / NUM_COLUMNS;
+                            (NUM_COLUMNS - 1) * RecyclerItemDecoration.LIST_DIVIDER_DIMEN) / NUM_COLUMNS;
                     Log.i(mTag, " mItemWidth: " + mItemWidth);
                 }
 
@@ -116,6 +113,13 @@ public class PhotoActivity extends PresenterActivity<PhotoPresenter> implements 
 
         mPictureAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
             @Override
+            public void onItemClick(View view, Object data, int position) {
+
+            }
+        });
+
+        /*mPictureAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
+            @Override
             public void onItemClick(View view, int position, long id) {
                 ImageInfo imageInfo = (ImageInfo) mPictureAdapter.getItem(position);
                 if (mIsEditMode) {
@@ -123,9 +127,9 @@ public class PhotoActivity extends PresenterActivity<PhotoPresenter> implements 
                         setSelectedItem(imageInfo);
                     } else if (imageInfo.getItemType() == PictureAdapter.VIEW_TYPE_TITLE) {
                         final String infoTitle = imageInfo.getTitle();
-                        /*if (mMapDateImage.containsKey(infoTitle)) {
+                        *//*if (mMapDateImage.containsKey(infoTitle)) {
                             setSelectedTitle(imageInfo);
-                        }*/
+                        }*//*
                     }
                 } else {
                     if (imageInfo.getItemType() == PictureAdapter.VIEW_TYPE_CONTENT) {
@@ -142,7 +146,7 @@ public class PhotoActivity extends PresenterActivity<PhotoPresenter> implements 
                 enterEditMode(position);
                 return true;
             }
-        });
+        });*/
     }
 
     private void enterEditMode(int pst) {

@@ -36,4 +36,6 @@ dependencies {
     //PermissionsDispatcher权限框架配置2（共5步）
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.1.0'
     api project(path: ':common')
+
+    api 'androidx.recyclerview:recyclerview:1.1.0'
 }

@@ -34,7 +34,8 @@ public abstract class BasicActivity extends AppCompatActivity implements IView {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTag = getClass().getSimpleName();
+        //mTag = getClass().getSimpleName();
+        mTag = "BluetoothCommService";
     }
 
     @Override

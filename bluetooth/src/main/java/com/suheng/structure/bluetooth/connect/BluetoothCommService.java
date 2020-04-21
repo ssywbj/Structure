@@ -21,7 +21,7 @@ import java.util.UUID;
  */
 public class BluetoothCommService {
     // Debugging
-    private static final String TAG = "SocketWatch";
+    private static final String TAG = "BluetoothCommService";
 
     // Name for the SDP record when creating server socket
     private static final String NAME_SECURE = "BluetoothCommSecure";

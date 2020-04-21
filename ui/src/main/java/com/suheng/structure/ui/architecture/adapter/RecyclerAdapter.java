@@ -1,13 +1,17 @@
-package com.suheng.photo;
+package com.suheng.structure.ui.architecture.adapter;
 
 import android.content.Context;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
 public abstract class RecyclerAdapter<T> extends RecyclerView.Adapter {
+
+    private OnItemClickListener<T> mOnItemClickListener;
+    private OnItemLongClickListener<T> mOnItemLongClickListener;
     private List<T> mDataList;
 
     public RecyclerAdapter(List<T> dataList) {
@@ -29,9 +33,9 @@ public abstract class RecyclerAdapter<T> extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
-        T data = this.getItem(position);
-        if (data == null || holder == null || holder.itemView == null) {
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
+        final T data = this.getItem(position);
+        if (data == null) {
             return;
         }
 
@@ -39,7 +43,7 @@ public abstract class RecyclerAdapter<T> extends RecyclerView.Adapter {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mOnItemClickListener.onItemClick(holder.itemView, position, getItemId(position));
+                    mOnItemClickListener.onItemClick(holder.itemView, data, position);
                 }
             });
         }
@@ -49,13 +53,12 @@ public abstract class RecyclerAdapter<T> extends RecyclerView.Adapter {
                 @Override
                 public boolean onLongClick(View v) {
                     //false表示继续往下执行(如触发onLongClick后，还会触发onClick)，true表示中断向下的执行
-                    return mOnItemLongClickListener.onItemLongClick(holder.itemView, position, getItemId(position));
+                    return mOnItemLongClickListener.onItemLongClick(holder.itemView, data, position, getItemId(position));
                 }
             });
         }
 
         this.bindView(holder, position, data);
-        //this.bindView(holder, position);
     }
 
     protected View getItemLayout(Context context, int layoutId) {
@@ -69,24 +72,20 @@ public abstract class RecyclerAdapter<T> extends RecyclerView.Adapter {
 
     protected abstract void bindView(RecyclerView.ViewHolder viewHolder, int position, T data);
 
-    private OnItemClickListener mOnItemClickListener;
-
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+    public void setOnItemClickListener(OnItemClickListener<T> onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
     }
 
-    private OnItemLongClickListener mOnItemLongClickListener;
-
-    public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
+    public void setOnItemLongClickListener(OnItemLongClickListener<T> onItemLongClickListener) {
         mOnItemLongClickListener = onItemLongClickListener;
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(View view, int position, long id);
+    public interface OnItemClickListener<T> {
+        void onItemClick(View view, T data, int position);
     }
 
-    public interface OnItemLongClickListener {
-        boolean onItemLongClick(View view, int position, long id);
+    public interface OnItemLongClickListener<T> {
+        boolean onItemLongClick(View view, T data, int position, long id);
     }
 
 }

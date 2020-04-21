@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.suheng.structure.bluetooth">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -33,7 +34,8 @@
             android:name=".connect.BluetoothService"
             android:exported="true"
             android:permission="TODO"
-            android:process=":socket" />
+            android:process=":socket"
+            tools:ignore="ExportedService" />
     </application>
 
 </manifest>

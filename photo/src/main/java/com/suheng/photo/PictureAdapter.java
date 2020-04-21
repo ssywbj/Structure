@@ -1,5 +1,7 @@
 package com.suheng.photo;
 
+import com.suheng.structure.ui.architecture.adapter.RecyclerAdapter;
+
 import java.util.List;
 
 public abstract class PictureAdapter<T> extends RecyclerAdapter<T> {
