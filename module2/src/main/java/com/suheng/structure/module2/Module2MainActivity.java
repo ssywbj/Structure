@@ -175,7 +175,7 @@ public class Module2MainActivity extends BasicActivity {
         }).start();
 
         //this.openSocketServer();//为什么如果不通过服务启动ServerSocket，客户端连接上服务端后会报错？
-        startService(new Intent(this, EchoService.class));
+        //startService(new Intent(this, EchoService.class));
     }
 
     private void openSocketServer() {
