@@ -8,11 +8,6 @@
 
     <application android:usesCleartextTraffic="true">
         <activity android:name=".Module2MainActivity" />
-
-        <service
-            android:name=".EchoService"
-            android:exported="true"
-            android:process=":socket" />
     </application>
 
 </manifest>

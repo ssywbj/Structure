@@ -1,4 +1,4 @@
-package com.suheng.structure.module2;
+package com.suheng.structure.socket;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -14,9 +14,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class EchoService extends IntentService {
-
     public static final String TAG = "SocketWatch";
-    private boolean mIsClosed;
+    private boolean mIsNotExceptionInterrupted = true;
 
     //需注意，必须传入参数
     public EchoService() {
@@ -29,7 +28,7 @@ public class EchoService extends IntentService {
             ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 
             ServerSocket serverSocket = new ServerSocket(RouteTable.SOCKET_PORT);
-            while (!mIsClosed) {
+            while (mIsNotExceptionInterrupted) {
                 Log.d(TAG, "TCPEcho, 服务器正在运行，等待客户端连接......");
                 Socket socket = serverSocket.accept();//accept()方法会阻塞线程
                 /*
@@ -39,17 +38,11 @@ public class EchoService extends IntentService {
                 cachedThreadPool.execute(new SocketServer(socket));
             }
 
-            /*serverSocket.close();
-            Log.d(TAG, "TCPEcho服务器端关闭");*/
+            serverSocket.close();
         } catch (Exception e) {
             e.printStackTrace();
+            mIsNotExceptionInterrupted = false;
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        //mIsClosed = true;
-        Log.d(TAG, "onDestroy: ");
-    }
 }
