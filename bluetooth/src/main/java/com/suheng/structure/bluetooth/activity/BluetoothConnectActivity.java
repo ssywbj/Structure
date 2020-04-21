@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.suheng.structure.bluetooth.R;
+import com.suheng.structure.bluetooth.connect.BLEHelper;
 import com.suheng.structure.bluetooth.connect.BluetoothCommService;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
@@ -26,6 +27,7 @@ public class BluetoothConnectActivity extends BasicActivity {
     private static final String EXTRA_BLUETOOTH_ADDRESS = "data_bluetooth_address";
     private BluetoothCommService mCommService = null;
     private BluetoothConnectTask mBluetoothConnectTask = new BluetoothConnectTask();
+    private BLEHelper mBLEHelper = new BLEHelper(this);
 
     public static void openPage(Context context, String address) {
         Intent intent = new Intent(context, BluetoothConnectActivity.class);
@@ -43,6 +45,10 @@ public class BluetoothConnectActivity extends BasicActivity {
         final BluetoothDevice bluetoothDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(bluetoothAddress);
         Log.d(mTag, "address: " + bluetoothAddress + ", bluetooth device: " + bluetoothDevice);
         mCommService.connect(bluetoothDevice, false);
+
+        /*mBLEHelper.scan();
+        boolean connect = mBLEHelper.connect(bluetoothAddress);
+        Log.d(mTag, "connect: " + connect);*/
 
         findViewById(R.id.item_data_int).setOnClickListener(new View.OnClickListener() {
             @Override

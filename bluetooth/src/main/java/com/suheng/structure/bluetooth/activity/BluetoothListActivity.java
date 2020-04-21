@@ -3,6 +3,8 @@ package com.suheng.structure.bluetooth.activity;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.suheng.structure.bluetooth.R;
+import com.suheng.structure.bluetooth.connect.BLEHelper;
 import com.suheng.structure.ui.architecture.adapter.RecyclerAdapter;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 import com.suheng.structure.ui.architecture.widget.RecyclerItemDecoration;
@@ -34,6 +37,8 @@ public class BluetoothListActivity extends BasicActivity {
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothListAdapter mBluetoothListAdapter;
     private List<BluetoothDevice> mBluetoothList = new ArrayList<>();
+
+    private BLEHelper mBLEHelper = new BLEHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +77,7 @@ public class BluetoothListActivity extends BasicActivity {
             @Override
             public void onItemClick(View view, BluetoothDevice data, int position) {
                 BluetoothConnectActivity.openPage(BluetoothListActivity.this, data.getAddress());
+                //bondTargetDevice(data);
             }
         });
 
@@ -155,6 +161,7 @@ public class BluetoothListActivity extends BasicActivity {
         super.onDestroy();
         unregisterReceiver(mFindBlueToothReceiver);
         mBluetoothList.clear();
+        mBLEHelper.destroy();
     }
 
     @Override
@@ -186,6 +193,8 @@ public class BluetoothListActivity extends BasicActivity {
         }
 
         this.doDiscovery();
+
+        //mBLEHelper.scan();
     }
 
     private void doDiscovery() {
@@ -217,6 +226,22 @@ public class BluetoothListActivity extends BasicActivity {
             }
         }
     }
+
+    private BluetoothGattCallback mBluetoothGattCallback = new BluetoothGattCallback() {
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            super.onConnectionStateChange(gatt, status, newState);
+            String address = gatt.getDevice().getAddress();
+            Log.d(mTag, "onConnectionStateChange, status: " + status + ", newState: " + newState
+                    + ", address:" + address);
+        }
+    };
+
+    private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+        @Override
+        public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+        }
+    };
 
     private static final class BluetoothListAdapter extends RecyclerAdapter<BluetoothDevice> {
 

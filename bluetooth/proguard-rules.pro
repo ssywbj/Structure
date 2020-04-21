@@ -22,4 +22,11 @@
 
 #https://www.jianshu.com/p/9e89176bfc73
 #https://blog.csdn.net/u010356768/article/details/91493622
+
+#https://blog.csdn.net/android_jiangjun/article/details/77113883
+#https://blog.csdn.net/joylihaiyong/article/details/72708049
+#https://blog.csdn.net/zhejfl/article/details/86743641
+#https://www.jianshu.com/p/d5e65cbb6b73
+#https://www.jianshu.com/p/2dba7f067372
+#https://www.cnblogs.com/hzl6255/p/4141505.html
 #https://www.jianshu.com/p/15b8b877fd21
