@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 public class MiddleGroundService extends Service {
 
     private static final String TAG = MiddleGroundService.class.getSimpleName();
+    private BluetoothConnectHelper mBluetoothConnectHelper = new BluetoothConnectHelper();
 
     @Override
     public void onCreate() {
@@ -27,6 +28,9 @@ public class MiddleGroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, TAG + ", onStartCommand");
+        if (mBluetoothConnectHelper.getState() == BluetoothConnectHelper.STATE_NONE) {
+            mBluetoothConnectHelper.start();
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -34,5 +38,6 @@ public class MiddleGroundService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, TAG + ", onDestroy");
+        mBluetoothConnectHelper.stop();
     }
 }

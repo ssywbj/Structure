@@ -10,11 +10,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.suheng.structure.bluetooth.R;
 import com.suheng.structure.bluetooth.connect.BLEHelper;
-import com.suheng.structure.bluetooth.connect.BluetoothCommService;
+import com.suheng.structure.bluetooth.connect.BluetoothConnectHelper;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ public class BluetoothConnectActivity extends BasicActivity {
     //private static final String UUID_NAME = "8CE255C0-200A-11E0-AC64-0800200C9A66";
     private static final String UUID_NAME = "00001105-0000-1000-8000-00805f9b34fb";
     private static final String EXTRA_BLUETOOTH_ADDRESS = "data_bluetooth_address";
-    private BluetoothCommService mCommService = null;
+    private BluetoothConnectHelper mBluetoothConnectHelper = new BluetoothConnectHelper();
     private BluetoothConnectTask mBluetoothConnectTask = new BluetoothConnectTask();
     private BLEHelper mBLEHelper = new BLEHelper(this);
 
@@ -40,11 +39,10 @@ public class BluetoothConnectActivity extends BasicActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_bluetooth_connect_aty);
 
-        mCommService = new BluetoothCommService(this, null);
         String bluetoothAddress = getIntent().getStringExtra(EXTRA_BLUETOOTH_ADDRESS);
         final BluetoothDevice bluetoothDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(bluetoothAddress);
         Log.d(mTag, "address: " + bluetoothAddress + ", bluetooth device: " + bluetoothDevice);
-        mCommService.connect(bluetoothDevice, false);
+        mBluetoothConnectHelper.connect(bluetoothDevice, false);
 
         /*mBLEHelper.scan();
         boolean connect = mBLEHelper.connect(bluetoothAddress);
@@ -82,15 +80,8 @@ public class BluetoothConnectActivity extends BasicActivity {
     @Override
     public void onResume() {
         super.onResume();
-        // Performing this check in onResume() covers the case in which BT was
-        // not enabled during onStart(), so we were paused to enable it...
-        // onResume() will be called when ACTION_REQUEST_ENABLE activity returns.
-        if (mCommService != null) {
-            // Only if the state is STATE_NONE, do we know that we haven't started already
-            if (mCommService.getState() == BluetoothCommService.STATE_NONE) {
-                // Start the Bluetooth comm services
-                mCommService.start();
-            }
+        if (mBluetoothConnectHelper.getState() == BluetoothConnectHelper.STATE_NONE) {
+            mBluetoothConnectHelper.start();
         }
     }
 
@@ -98,32 +89,19 @@ public class BluetoothConnectActivity extends BasicActivity {
     protected void onDestroy() {
         super.onDestroy();
         mBluetoothConnectTask.disconnect();
-        if (mCommService != null) {
-            mCommService.stop();
+        if (mBluetoothConnectHelper != null) {
+            mBluetoothConnectHelper.stop();
         }
     }
 
-    /**
-     * Sends a message.
-     *
-     * @param message A string of text to send.
-     */
     private void sendMessage(String message) {
-        // Check that we're actually connected before trying anything
-        if (mCommService.getState() != BluetoothCommService.STATE_CONNECTED) {
-            Toast.makeText(this, "not_connected", Toast.LENGTH_SHORT).show();
+        if (mBluetoothConnectHelper.getState() != BluetoothConnectHelper.STATE_COMMUNICATE) {
+            showToast("未连接");
             return;
         }
 
-        // Check that there's actually something to send
         if (message.length() > 0) {
-            // Get the message bytes and tell the BluetoothCommService to write
-            byte[] send = message.getBytes();
-            mCommService.write(send);
-
-            // Reset out string buffer to zero and clear the edit text field
-            /*mOutStringBuffer.setLength(0);
-            mOutEditText.setText(mOutStringBuffer);*/
+            mBluetoothConnectHelper.write(message.getBytes());
         }
     }
 
