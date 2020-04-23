@@ -21,10 +21,8 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.suheng.structure.bluetooth.R;
-import com.suheng.structure.bluetooth.connect.BluetoothConnectHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +49,8 @@ public class DeviceControlActivity extends Activity {
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics = new ArrayList<>();
     private boolean mConnected = false;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
-    private BluetoothConnectHelper mBluetoothConnectHelper = new BluetoothConnectHelper();
+
+    //private BluetoothConnectHelper mBluetoothConnectHelper = new BluetoothConnectHelper();
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -122,6 +121,7 @@ public class DeviceControlActivity extends Activity {
                             }
                             mBluetoothLeService.readCharacteristic(characteristic);
                         }
+
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mNotifyCharacteristic = characteristic;
                             mBluetoothLeService.setCharacteristicNotification(characteristic, true);
@@ -154,7 +154,7 @@ public class DeviceControlActivity extends Activity {
 
         final BluetoothDevice bluetoothDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(mDeviceAddress);
         Log.d(TAG, "address: " + mDeviceAddress + ", bluetooth device: " + bluetoothDevice);
-        mBluetoothConnectHelper.connect(bluetoothDevice, false);
+        //mBluetoothConnectHelper.connect(bluetoothDevice, false);
 
         // Sets up UI references.
         final TextView textAddress = findViewById(R.id.device_address);
@@ -195,9 +195,9 @@ public class DeviceControlActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mBluetoothConnectHelper.getState() == BluetoothConnectHelper.STATE_NONE) {
+        /*if (mBluetoothConnectHelper.getState() == BluetoothConnectHelper.STATE_NONE) {
             mBluetoothConnectHelper.start();
-        }
+        }*/
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(mDeviceAddress);
@@ -216,7 +216,7 @@ public class DeviceControlActivity extends Activity {
         super.onDestroy();
         unbindService(mServiceConnection);
         mBluetoothLeService = null;
-        mBluetoothConnectHelper.stop();
+        //mBluetoothConnectHelper.stop();
         mGattCharacteristics.clear();
     }
 
@@ -250,14 +250,14 @@ public class DeviceControlActivity extends Activity {
     }
 
     private void sendMessage(String message) {
-        if (mBluetoothConnectHelper.getState() != BluetoothConnectHelper.STATE_COMMUNICATE) {
+        /*if (mBluetoothConnectHelper.getState() != BluetoothConnectHelper.STATE_COMMUNICATE) {
             Toast.makeText(this, "未连接", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (message.length() > 0) {
             mBluetoothConnectHelper.write(message.getBytes());
-        }
+        }*/
     }
 
     private void updateConnectionState(final int resourceId) {

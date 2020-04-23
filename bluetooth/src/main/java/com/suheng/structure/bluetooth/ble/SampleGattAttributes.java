@@ -26,13 +26,23 @@ public class SampleGattAttributes {
     public static String HEART_RATE_MEASUREMENT = "00002a37-0000-1000-8000-00805f9b34fb";
     public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
 
+    public static String key = "0000180d-0000-1000-8000-00805f9b34fb";
+    public static String key1 = "0000180a-0000-1000-8000-00805f9b34fb";
+    public static String key2 = "00002a29-0000-1000-8000-00805f9b34fb";
+
+    public final static String UUID_SERVER = "0000ffe0-0000-1000-8000-00805f9b34fb";
+    public final static String UUID_NOTIFY = "0000ffe1-0000-1000-8000-00805f9b34fb";
+
     static {
         // Sample Services.
-        attributes.put("0000180d-0000-1000-8000-00805f9b34fb", "Heart Rate Service");
-        attributes.put("0000180a-0000-1000-8000-00805f9b34fb", "Device Information Service");
+        attributes.put(key, "Heart Rate Service");
+        attributes.put(key1, "Device Information Service");
         // Sample Characteristics.
         attributes.put(HEART_RATE_MEASUREMENT, "Heart Rate Measurement");
-        attributes.put("00002a29-0000-1000-8000-00805f9b34fb", "Manufacturer Name String");
+        attributes.put(key2, "Manufacturer Name String");
+
+        attributes.put(UUID_SERVER, "UUID_SERVER");
+        attributes.put(UUID_NOTIFY, "UUID_NOTIFY");
     }
 
     public static String lookup(String uuid, String defaultName) {

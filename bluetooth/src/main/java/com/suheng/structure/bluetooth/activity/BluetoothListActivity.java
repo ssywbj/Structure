@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -73,6 +74,8 @@ public class BluetoothListActivity extends BasicActivity {
         }
     }
 
+    private BluetoothLECommunicator mBluetoothLECommunicator;
+
     private void initRecyclerView() {
         mBluetoothListAdapter = new BluetoothListAdapter(mBluetoothList);
         mBluetoothListAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener<BluetoothDevice>() {
@@ -81,6 +84,11 @@ public class BluetoothListActivity extends BasicActivity {
                 //BluetoothConnectActivity.openPage(BluetoothListActivity.this, data.getAddress());
                 //bondTargetDevice(data);
                 DeviceControlActivity.openPage(BluetoothListActivity.this, data.getName(), data.getAddress());
+                /*if (mBluetoothLECommunicator.isConnected()) {
+                    mBluetoothLECommunicator.writeBuffer("WWDSDSDS");
+                } else {
+                    mBluetoothLECommunicator.connect(data);
+                }*/
             }
         });
 
@@ -89,6 +97,38 @@ public class BluetoothListActivity extends BasicActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());//设置Item增加、移除动画
         recyclerView.addItemDecoration(new RecyclerItemDecoration(this, true));//设置Item分隔线
         recyclerView.setAdapter(mBluetoothListAdapter);
+
+        mBluetoothLECommunicator = new BluetoothLECommunicator(BluetoothListActivity.this) {
+            @Override
+            public void onDeviceConnectionStateChanged(BluetoothDevice device, BluetoothBLEConnectionState state) {
+                Log.w(BluetoothLECommunicator.TAG, "onDeviceConnectionStateChanged, device: " + device + ", state: " + state);
+            }
+
+            @Override
+            public void onBleServicesDiscovered(List<BluetoothGattService> services, BluetoothDevice device) {
+                Log.w(BluetoothLECommunicator.TAG, "onBleServicesDiscovered: " + device + ", device: " + device);
+            }
+
+            @Override
+            public void onConnectFailed(BluetoothDevice device) {
+                Log.w(BluetoothLECommunicator.TAG, "onConnectFailed: " + device);
+            }
+
+            @Override
+            public void onDeviceEventMessage(BluetoothDevice device, EventMessage message) {
+                Log.w(BluetoothLECommunicator.TAG, "onDeviceEventMessage: " + device + ", message: " + message);
+            }
+
+            @Override
+            public void onDeviceEventMessage(BluetoothDevice device, String message) {
+                Log.w(BluetoothLECommunicator.TAG, "onDeviceEventMessage: " + device + ", message: " + message);
+            }
+
+            @Override
+            public void onDeviceEchoCommandValid(byte command) {
+                Log.w(BluetoothLECommunicator.TAG, "onDeviceEchoCommandValid: " + command);
+            }
+        };
     }
 
     public boolean isSupportBluetooth() {
@@ -122,9 +162,9 @@ public class BluetoothListActivity extends BasicActivity {
                         mBluetoothList.add(bluetoothDevice);
                         mBluetoothListAdapter.notifyDataSetChanged();
 
-                        if ("80:1D:00:FA:D1:E0".equals(address)) {
+                        /*if ("BE:FC:46:00:00:02".equals(address)) {//Android Bluedroid
                             bondTargetDevice(bluetoothDevice);
-                        }
+                        }*/
                     }
                     break;
                 case BluetoothDevice.ACTION_PAIRING_REQUEST:
@@ -166,6 +206,10 @@ public class BluetoothListActivity extends BasicActivity {
         unregisterReceiver(mFindBlueToothReceiver);
         mBluetoothList.clear();
         mBLEHelper.destroy();
+
+        /*if (mBluetoothLECommunicator != null) {
+            mBluetoothLECommunicator.disconnect();
+        }*/
     }
 
     @Override
