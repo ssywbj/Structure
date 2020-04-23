@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.suheng.structure.bluetooth.R;
+import com.suheng.structure.bluetooth.ble.DeviceControlActivity;
 import com.suheng.structure.bluetooth.connect.BLEHelper;
 import com.suheng.structure.ui.architecture.adapter.RecyclerAdapter;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
@@ -55,20 +56,21 @@ public class BluetoothListActivity extends BasicActivity {
                 Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE); //请求用户开启
                 startActivityForResult(intent, REQUEST_ENABLE_BLUETOOTH);
             }
+
+            IntentFilter actionDiscoveryStarted = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);//搜索开始
+            IntentFilter actionDiscoveryFinished = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);//搜索结束
+            IntentFilter actionFound = new IntentFilter(BluetoothDevice.ACTION_FOUND);//寻找到设备
+            IntentFilter actionPairingRequest = new IntentFilter(BluetoothDevice.ACTION_PAIRING_REQUEST);//配对请求
+            IntentFilter actionBondStateChanged = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);//配对状态改变
+            registerReceiver(mFindBlueToothReceiver, actionDiscoveryStarted);
+            registerReceiver(mFindBlueToothReceiver, actionDiscoveryFinished);
+            registerReceiver(mFindBlueToothReceiver, actionFound);
+            registerReceiver(mFindBlueToothReceiver, actionBondStateChanged);
+            registerReceiver(mFindBlueToothReceiver, actionPairingRequest);
         } else {
             Log.w(mTag, "this device isn't support bluetooth!");
+            finish();
         }
-
-        IntentFilter actionDiscoveryStarted = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);//搜索开始
-        IntentFilter actionDiscoveryFinished = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);//搜索结束
-        IntentFilter actionFound = new IntentFilter(BluetoothDevice.ACTION_FOUND);//寻找到设备
-        IntentFilter actionPairingRequest = new IntentFilter(BluetoothDevice.ACTION_PAIRING_REQUEST);//配对请求
-        IntentFilter actionBondStateChanged = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);//配对状态改变
-        registerReceiver(mFindBlueToothReceiver, actionDiscoveryStarted);
-        registerReceiver(mFindBlueToothReceiver, actionDiscoveryFinished);
-        registerReceiver(mFindBlueToothReceiver, actionFound);
-        registerReceiver(mFindBlueToothReceiver, actionBondStateChanged);
-        registerReceiver(mFindBlueToothReceiver, actionPairingRequest);
     }
 
     private void initRecyclerView() {
@@ -76,8 +78,9 @@ public class BluetoothListActivity extends BasicActivity {
         mBluetoothListAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener<BluetoothDevice>() {
             @Override
             public void onItemClick(View view, BluetoothDevice data, int position) {
-                BluetoothConnectActivity.openPage(BluetoothListActivity.this, data.getAddress());
+                //BluetoothConnectActivity.openPage(BluetoothListActivity.this, data.getAddress());
                 //bondTargetDevice(data);
+                DeviceControlActivity.openPage(BluetoothListActivity.this, data.getName(), data.getAddress());
             }
         });
 
@@ -119,9 +122,9 @@ public class BluetoothListActivity extends BasicActivity {
                         mBluetoothList.add(bluetoothDevice);
                         mBluetoothListAdapter.notifyDataSetChanged();
 
-                        /*if ("E0:DD:C0:7B:B6:F1".equals(address)) {
+                        if ("80:1D:00:FA:D1:E0".equals(address)) {
                             bondTargetDevice(bluetoothDevice);
-                        }*/
+                        }
                     }
                     break;
                 case BluetoothDevice.ACTION_PAIRING_REQUEST:
@@ -141,6 +144,7 @@ public class BluetoothListActivity extends BasicActivity {
                                 break;
                             case BluetoothDevice.BOND_BONDED:
                                 msg += ", bonded finish";
+                                //BluetoothConnectActivity.openPage(BluetoothListActivity.this, bluetoothDevice.getAddress());
                                 break;
                             case BluetoothDevice.BOND_NONE:
                                 msg += ", bond cancel";

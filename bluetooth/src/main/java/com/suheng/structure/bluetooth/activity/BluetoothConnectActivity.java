@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.suheng.structure.bluetooth.R;
-import com.suheng.structure.bluetooth.connect.BLEHelper;
 import com.suheng.structure.bluetooth.connect.BluetoothConnectHelper;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
@@ -26,7 +25,7 @@ public class BluetoothConnectActivity extends BasicActivity {
     private static final String EXTRA_BLUETOOTH_ADDRESS = "data_bluetooth_address";
     private BluetoothConnectHelper mBluetoothConnectHelper = new BluetoothConnectHelper();
     private BluetoothConnectTask mBluetoothConnectTask = new BluetoothConnectTask();
-    private BLEHelper mBLEHelper = new BLEHelper(this);
+    //private BLEHelper mBLEHelper = new BLEHelper(this);
 
     public static void openPage(Context context, String address) {
         Intent intent = new Intent(context, BluetoothConnectActivity.class);
@@ -92,6 +91,7 @@ public class BluetoothConnectActivity extends BasicActivity {
         if (mBluetoothConnectHelper != null) {
             mBluetoothConnectHelper.stop();
         }
+        //mBLEHelper.destroy();
     }
 
     private void sendMessage(String message) {

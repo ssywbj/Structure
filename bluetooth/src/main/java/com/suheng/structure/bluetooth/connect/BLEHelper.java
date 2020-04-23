@@ -17,7 +17,8 @@ import android.util.Log;
 import java.util.List;
 
 public class BLEHelper {
-    private static final String TAG = "BLEHelper";
+    //private static final String TAG = BluetoothConnectHelper.class.getSimpleName();
+    private static final String TAG = BLEHelper.class.getSimpleName();
     private Context mContext;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
@@ -45,7 +46,7 @@ public class BLEHelper {
                     + ", bluetooth device: " + bluetoothDevice + ", name: " + bluetoothDevice.getName());
             if ("80:1D:00:FA:D1:E0".equals(bluetoothDevice.getAddress())) {
                 destroy();
-                //bluetoothDevice.connectGatt(mContext, true, mBluetoothGattCallback);
+                bluetoothDevice.connectGatt(mContext, true, mBluetoothGattCallback);
             }
         }
 
@@ -72,10 +73,15 @@ public class BLEHelper {
             super.onConnectionStateChange(gatt, status, newState);
             String address = gatt.getDevice().getAddress();
             Log.d(TAG, "onConnectionStateChange, status: " + status + ", newState: " + newState
-                    + ", address:" + address);
-            if (newState == BluetoothProfile.STATE_CONNECTED) {//连上设备
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {//设备断开
-                gatt.close();
+                    + ", address: " + address);
+            if (status == BluetoothGatt.GATT_SUCCESS) {///操作成功的情况下
+                if (newState == BluetoothProfile.STATE_CONNECTED) {//连上设备
+                    boolean connect = gatt.connect();
+                    Log.d(TAG, "gatt, connect: " + connect);
+                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {//设备断开
+                    gatt.close();
+                    Log.d(TAG, "gatt, close");
+                }
             }
         }
 
@@ -118,7 +124,7 @@ public class BLEHelper {
                 //mBluetoothAdapter.startLeScan(mLeScanCallback);
 
                 mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
-                //mBluetoothLeScanner.startScan(mScanCallback);
+                mBluetoothLeScanner.startScan(mScanCallback);
             }
         } else {
             Log.w(TAG, "this device isn't support bluetooth le!");
