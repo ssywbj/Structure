@@ -222,7 +222,7 @@ public class BluetoothLeService extends Service {
         }
         mBluetoothGatt.disconnect();
 
-        //mBluetoothGatt = null;
+        mBluetoothGatt = null;
     }
 
     /**
