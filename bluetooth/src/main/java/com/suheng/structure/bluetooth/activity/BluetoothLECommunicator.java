@@ -37,10 +37,10 @@ public abstract class BluetoothLECommunicator implements BleCallback {
     public static final UUID UUID_WRITE = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
     public static final UUID UUID_NOTIFY_DESCRIPTOR = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");*/
 
-    public static final UUID UUID_SERVICE = UUID.fromString(SampleGattAttributes.key);
+    public static final UUID UUID_SERVICE = UUID.fromString(SampleGattAttributes.SERVICE_HEART_RATE);
     public static final UUID UUID_NOTIFY = UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
-    public static final UUID UUID_WRITE = UUID.fromString(SampleGattAttributes.key2);
-    public static final UUID UUID_NOTIFY_DESCRIPTOR = UUID.fromString(SampleGattAttributes.key1);
+    public static final UUID UUID_WRITE = UUID.fromString(SampleGattAttributes.CHAR_MANUFACTURER_NAME);
+    public static final UUID UUID_NOTIFY_DESCRIPTOR = UUID.fromString(SampleGattAttributes.SERVICE_DEVICE_INFO);
 
 
     public static final byte HEATING_TEMP_LEVEL_INVALID = 0x7F;

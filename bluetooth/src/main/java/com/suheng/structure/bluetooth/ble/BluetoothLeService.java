@@ -41,22 +41,25 @@ public class BluetoothLeService extends Service {
     public final static String ACTION_DATA_AVAILABLE = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
     public final static String EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA";
 
-    public final static UUID UUID_HEART_RATE_MEASUREMENT =
+    private final static UUID UUID_HEART_RATE_MEASUREMENT =
             UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
+    private final static UUID UUID_CLIENT_CHARACTERISTIC_CONFIG =
+            UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG);
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            BluetoothDevice device = gatt.getDevice();
             Log.d(TAG, "onConnectionStateChange, status: " + status + ", newState: " + newState
-                    + ", address: " + gatt.getDevice().getAddress());
+                    + ", device name: " + device.getName() + ", address: " + device.getAddress());
             if (status == BluetoothGatt.GATT_SUCCESS) {///操作成功的情况下
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     mConnectionState = STATE_CONNECTED;
                     broadcastUpdate(ACTION_GATT_CONNECTED);
                     // Attempts to discover services after successful connection.
-                    Log.d(TAG, "Attempting to start service discovery:" + mBluetoothGatt.discoverServices());
+                    Log.d(TAG, "Attempting to start service discovery: " + mBluetoothGatt.discoverServices());
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     mConnectionState = STATE_DISCONNECTED;
                     Log.d(TAG, "Disconnected from GATT server.");
@@ -67,7 +70,7 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            Log.d(TAG, "onServicesDiscovered received: " + status);
+            Log.d(TAG, "onServicesDiscovered, status: " + status + ", getServices: " + gatt.getServices().size());
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
             }
@@ -75,7 +78,9 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            Log.d(TAG, "onCharacteristicRead received: " + characteristic + ", status: " + status);
+            BluetoothDevice device = gatt.getDevice();
+            Log.d(TAG, "onCharacteristicRead status: " + status + ", device name: "
+                    + device.getName() + ", address: " + device.getAddress());
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(characteristic);
             }
@@ -301,8 +306,7 @@ public class BluetoothLeService extends Service {
 
         // This is specific to Heart Rate Measurement.
         if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
-            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-                    UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
+            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID_CLIENT_CHARACTERISTIC_CONFIG);
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor);
         }

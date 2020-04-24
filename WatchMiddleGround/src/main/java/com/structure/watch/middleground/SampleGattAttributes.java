@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.suheng.structure.bluetooth.ble;
+package com.structure.watch.middleground;
 
 import java.util.HashMap;
 
