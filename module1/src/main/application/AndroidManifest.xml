@@ -3,12 +3,6 @@
     package="com.suheng.structure.module1">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.SET_WALLPAPER_COMPONENT" />
-    <uses-permission android:name="android.permission.SET_WALLPAPER" />
-    <uses-feature
-        android:name="android.software.live_wallpaper"
-        android:required="true" />
 
     <application
         android:name=".application.Module1App"
@@ -29,21 +23,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".LiveWallpaperService"
-            android:enabled="true"
-            android:label="A韦"
-            android:icon="@drawable/bg"
-            android:permission="android.permission.BIND_WALLPAPER">
-
-            <intent-filter>
-                <action android:name="android.service.wallpaper.WallpaperService" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.service.wallpaper"
-                android:resource="@xml/wallpaperanalogdigitalclock"/>
-        </service>
     </application>
 
 </manifest>

@@ -8,12 +8,10 @@
     tools:context=".Module1MainActivity">
 
     <TextView
-        android:id="@+id/text_main_page"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="sendString"
         android:padding="6dp"
-        android:text="SendString"
+        android:text="@string/app_name"
         android:textSize="16sp" />
 
 </LinearLayout>
