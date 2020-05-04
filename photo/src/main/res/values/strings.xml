@@ -1,4 +1,0 @@
-<resources>
-    <string name="app_name">Photo</string>
-    <string name="picture_bottom_number">共 %d 张图片</string>
-</resources>
