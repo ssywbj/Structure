@@ -15,4 +15,27 @@
         android:text="StringTaskImpl"
         android:textSize="16sp" />
 
+    <TextView
+        android:id="@+id/text_test_string_task2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:text="StringTaskImpl2"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/text_test_json_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:text="JsonTaskImpl"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/text_test_json_task2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:text="JsonTaskImpl2"
+        android:textSize="16sp" />
 </LinearLayout>

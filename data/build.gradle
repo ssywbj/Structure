@@ -40,5 +40,5 @@ dependencies {
     annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
     api project(path: ':common')
     api project(path: ':okhttp')
-    implementation 'com.google.code.gson:gson:2.8.6'
+    api 'com.google.code.gson:gson:2.8.6'
 }

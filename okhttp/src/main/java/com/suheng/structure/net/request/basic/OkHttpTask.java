@@ -93,7 +93,7 @@ public abstract class OkHttpTask<T> {
     }
 
     protected OkHttpTask() {
-        mLogTag = getClass().getSimpleName();
+        mLogTag = OkHttpTask.class.getSimpleName();
         mUIHandler = new UIHandler(this);
 
         /*ConnectionSpec connectionSpec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
@@ -208,7 +208,7 @@ public abstract class OkHttpTask<T> {
         mTakeTime = 1.0 * (System.currentTimeMillis() - mCurrentTimeMillis) / 1000;
         this.code = code;
         mErrorMsg = errorMsg;
-        Log.e(getLogTag(), "failure-->code: " + code + ", " + mErrorMsg + ", take time: " + mTakeTime);
+        Log.e(getLogTag(), "failure-->code: " + code + ", error msg: " + mErrorMsg + ", take time: " + mTakeTime);
 
         if (mOnFailureListener != null) {
             mUIHandler.sendEmptyMessage(MSG_ON_FAILURE);
