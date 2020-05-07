@@ -20,6 +20,8 @@ import androidx.annotation.Nullable;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.google.gson.Gson;
 import com.suheng.structure.common.arouter.RouteTable;
+import com.suheng.structure.module1.request.DownloadTaskImpl;
+import com.suheng.structure.module1.request.DownloadTaskImpl2;
 import com.suheng.structure.module1.request.JsonTaskImpl;
 import com.suheng.structure.module1.request.JsonTaskImpl2;
 import com.suheng.structure.module1.request.StringTaskImpl;
@@ -30,8 +32,12 @@ import com.suheng.structure.net.callback.OnFailureListener;
 import com.suheng.structure.net.callback.OnFinishListener;
 import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
+import java.io.File;
+
 @Route(path = RouteTable.MODULE1_ATY_MODULE1_MAIN)
 public class Module1MainActivity extends BasicActivity {
+
+    private DownloadTaskImpl2 mDownloadTaskImpl2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +134,66 @@ public class Module1MainActivity extends BasicActivity {
                 }).doPostRequest();
             }
         });
+
+        findViewById(R.id.text_test_download_task).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestExternalStoragePermission(v.getId());
+            }
+        });
+
+        findViewById(R.id.text_test_download_task2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestExternalStoragePermission(v.getId());
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mDownloadTaskImpl2 != null) {
+            mDownloadTaskImpl2.cancelTask();
+        }
+    }
+
+    @Override
+    public void openedExternalStoragePermission(int businessId) {
+        super.openedExternalStoragePermission(businessId);
+        if (businessId == R.id.text_test_download_task) {
+            if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+                final DownloadTaskImpl downloadTask = new DownloadTaskImpl(Environment.getExternalStoragePublicDirectory
+                        (Environment.DIRECTORY_DOWNLOADS).getPath(), System.currentTimeMillis() + ".jpg");
+                downloadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(int code, String error) {
+                        showToast("下载失败");
+                    }
+                }).addOnFinishListener(new OnFinishListener<File>() {
+                    @Override
+                    public void onFinish(File data) {
+                        showToast("下载完成，路径：" + data.getPath());
+                    }
+                }).doRequest();
+            }
+        } else if (businessId == R.id.text_test_download_task2) {
+            if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+                mDownloadTaskImpl2 = new DownloadTaskImpl2(Environment.getExternalStoragePublicDirectory
+                        (Environment.DIRECTORY_DOWNLOADS).getPath(), System.currentTimeMillis() + ".apk");
+                mDownloadTaskImpl2.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(int code, String error) {
+                        showToast("下载失败");
+                    }
+                }).addOnFinishListener(new OnFinishListener<File>() {
+                    @Override
+                    public void onFinish(File data) {
+                        showToast("下载完成，路径：" + data.getPath());
+                    }
+                }).doRequest();
+            }
+        }
     }
 
     @Override

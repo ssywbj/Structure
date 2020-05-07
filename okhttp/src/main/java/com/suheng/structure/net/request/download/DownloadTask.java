@@ -32,11 +32,16 @@ public abstract class DownloadTask extends OkHttpTask<File> {
 
     @Override
     protected void parseResponseBody(@NotNull ResponseBody responseBody) {
+        mTotal = responseBody.contentLength();
+        if (mTotal < 0) {
+            setFailureCallback(ERROR_CODE_DOWNLOAD_EXCEPTION, "content length smaller than 0, total = " + mTotal);
+            return;
+        }
+
         InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
             inputStream = responseBody.byteStream();
-            mTotal = responseBody.contentLength();
 
             if (mFile == null) {
                 if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {

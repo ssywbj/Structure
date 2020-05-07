@@ -245,7 +245,7 @@ public abstract class OkHttpTask<T> {
         mOnProgressListener.onProgress(mPercentage, mProgress, mTotal);
     }
 
-    protected void cancelTask() {
+    public void cancelTask() {
         if (mCall != null) {
             mCall.cancel();
             mUIHandler.removeMessages(MSG_ON_FAILURE);

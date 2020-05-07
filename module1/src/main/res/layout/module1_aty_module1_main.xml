@@ -38,4 +38,20 @@
         android:padding="6dp"
         android:text="JsonTaskImpl2"
         android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/text_test_download_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:text="DownloadTaskImpl"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/text_test_download_task2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:text="DownloadTaskImpl2"
+        android:textSize="16sp" />
 </LinearLayout>
