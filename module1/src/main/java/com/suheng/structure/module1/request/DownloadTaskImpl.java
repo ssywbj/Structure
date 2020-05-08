@@ -21,7 +21,7 @@ public class DownloadTaskImpl extends DownloadTask {
 
     @Override
     protected String getURL() {
-        return URLConstants.URL_PICTURE + "/sj15hgvj30sg15hkbw.jpg";
+        return URLConstants.URL_FILE+ "/ic_launcher_round.png";
         //return "http://ww1.sinaimg.cn/large/0065oQSqgy1ftt7g8ntdyj30j60op7dq.jpg";
     }
 

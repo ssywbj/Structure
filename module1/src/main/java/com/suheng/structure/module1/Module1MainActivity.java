@@ -164,7 +164,7 @@ public class Module1MainActivity extends BasicActivity {
         if (businessId == R.id.text_test_download_task) {
             if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
                 final DownloadTaskImpl downloadTask = new DownloadTaskImpl(Environment.getExternalStoragePublicDirectory
-                        (Environment.DIRECTORY_DOWNLOADS).getPath(), System.currentTimeMillis() + ".jpg");
+                        (Environment.DIRECTORY_DOWNLOADS).getPath(), System.currentTimeMillis() + ".png");
                 downloadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(int code, String error) {
@@ -180,7 +180,7 @@ public class Module1MainActivity extends BasicActivity {
         } else if (businessId == R.id.text_test_download_task2) {
             if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
                 mDownloadTaskImpl2 = new DownloadTaskImpl2(Environment.getExternalStoragePublicDirectory
-                        (Environment.DIRECTORY_DOWNLOADS).getPath(), System.currentTimeMillis() + ".apk");
+                        (Environment.DIRECTORY_DOWNLOADS).getPath(), System.currentTimeMillis() + ".png");
                 mDownloadTaskImpl2.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(int code, String error) {

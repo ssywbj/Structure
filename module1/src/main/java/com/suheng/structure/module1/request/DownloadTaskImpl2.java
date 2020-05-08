@@ -21,7 +21,7 @@ public class DownloadTaskImpl2 extends DownloadTask {
 
     @Override
     protected String getURL() {
-        return URLConstants.URL_FILE + "/com.tencent.mobileqq_1346.apk";
+        return URLConstants.URL_FILE + "/ic_launcher.png";
     }
 
 }
