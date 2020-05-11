@@ -34,12 +34,11 @@ public class ExampleUnitTest {
     private String jsonUser = "{" + "\"code\":-1" + ",\"msg\":ok" + ",data:{" + "\"memberId\":17" + ",\"age\":18" + ",\"email_address\":\"Wbj@qq.com\"" + "}" + "}";
     private String jsonList = "{" + "\"code\":-1" + ",\"msg\":ok" + ",data:[" + "\"JAVA\"" + ",\"PHP\"" + ",\"C++\"" + "]" + "}";
 
-    private Gson mGson;
+    private Gson mGson = new Gson();
 
     @Before
     public void before() {
-        System.out.println("-------------------开始测试-------------------, = " + (27800 + 29288.83 + 19034.65 + 27862.9 + 10768.62 + 15678.37 + 14932.9 + 22309.2 + 13670.23 + 2232.2 + 56986.19 + 21294.5 + 20680.92 + 10208.63 + 30796.03 + 2186.84 + 33708.47));
-        mGson = new Gson();
+        System.out.println("-------------------开始测试-------------------, = " + (72090.94 + 30113.53 + 18570.5 + 26979.28 + 14585.78 + 16324.88 + 2426.13 + 34103.31 + 13670.23 + 2996.28 + 20592.19 + 40603.98 + 20163.5 + 10983.48 + 26809.78 + 2186.84 + 32835.92));
     }
 
     @After
@@ -196,136 +195,6 @@ public class ExampleUnitTest {
         }.getType());
         assertEquals(userExpected.getData(), userActual.getData());//因为我们重写了User的equals()，当id、age和emailAddress的值都一样时，我们就认为他们的内容一样
         System.out.println("userExpected: " + userExpected + "\n  userActual: " + userActual);
-    }
-
-    byte head = 0x02;
-    byte tail = 0x03;
-
-    private byte[] makeCmd() {
-        byte b = 48;
-        byte[] data = new byte[2];
-        data[0] = b;
-        data[1] = 33;
-        System.out.println("head: " + head + ", tail = " + tail + ", b = " + b + ", a = " + new String(data));
-
-        byte[] bytes = int2Bytes(203232);
-        for (byte aByte : bytes) {
-            System.out.println("aByte: " + aByte);
-        }
-
-        byte[] d = "韦帮杰".getBytes();
-        for (byte b1 : d) {
-            System.out.println("b1 = " + b1);
-        }
-
-        //头尾各占1字节、命令和类型各1字节、包类型1字节、长度4字节、错误码1字节、校验和4字节，共14字节
-        byte[] buffer = new byte[maxBuffer];
-
-        int offset = 0;
-        buffer[offset++] = head;
-        byte cmd = 0x31;
-        buffer[offset++] = cmd;
-
-        data = "韦帮杰".getBytes();
-        byte[] dataLen = int2Bytes(data.length);
-        System.arraycopy(dataLen, 0, buffer, offset, dataLen.length);
-        offset += dataLen.length;
-        System.arraycopy(data, 0, buffer, offset, data.length);
-        offset += data.length;
-
-        data = "adgagagagadgakaekgla;mgdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddakdmgamdadsfmlkgfssafafadfafadfafadfafdadfafsmfgmgadfafakflafalfalfa".getBytes();
-        dataLen = int2Bytes(data.length);
-        System.arraycopy(dataLen, 0, buffer, offset, dataLen.length);
-        offset += dataLen.length;
-        System.arraycopy(data, 0, buffer, offset, data.length);
-        offset += data.length;
-
-        buffer[offset++] = tail;
-
-        byte[] protocol = new byte[offset];
-        System.arraycopy(buffer, 0, protocol, 0, protocol.length);
-
-        //byte[] dataLen = int2Bytes(data.length);
-        System.out.println("protocol send= " + new String(protocol) + ", dataLen:" + bytes2Int(dataLen));
-        return protocol;
-    }
-
-    private byte[] int2Bytes(int integer) {
-        byte[] bytes = new byte[4];
-        bytes[3] = (byte) (integer >> 24);
-        bytes[2] = (byte) (integer >> 16);
-        bytes[1] = (byte) (integer >> 8);
-        bytes[0] = (byte) integer;
-        return bytes;
-    }
-
-    private static int bytes2Int(byte[] bytes) {
-        //如果不与0xff进行按位与操作，转换结果将出错，有兴趣的同学可以试一下。
-        int int1 = bytes[0] & 0xff;
-        int int2 = (bytes[1] & 0xff) << 8;
-        int int3 = (bytes[2] & 0xff) << 16;
-        int int4 = (bytes[3] & 0xff) << 24;
-        return int1 | int2 | int3 | int4;
-    }
-
-    private byte[] receive;
-    private int offset = 0, maxBuffer = 1024;
-
-    @Test
-    public void testMakeCmd() {
-        byte[] buffer = this.makeCmd();
-        int index = 0;
-        final int length = buffer.length;
-        while (index < length) {
-            if (buffer[index] == head) {
-                receive = new byte[maxBuffer];
-                offset = 0;
-            }
-
-            receive[offset++] = buffer[index];
-
-            if (buffer[index] == tail) {
-                byte[] protocol = new byte[offset];
-                System.arraycopy(receive, 0, protocol, 0, offset);
-                parseProtocol(protocol);
-            }
-
-            index++;
-        }
-    }
-
-    private void parseProtocol(byte[] protocol) {
-        if (protocol == null || protocol.length < 2) {
-            return;
-        }
-        if ((protocol[0] != this.head) && (protocol[protocol.length - 1] != tail)) {
-            return;
-        }
-        System.out.println("protocol receive: " + new String(protocol));
-
-        int offset = 1;
-        byte cmd = protocol[offset++];
-        if (cmd == 0x31) {
-            byte[] dataLen = new byte[4];
-            System.arraycopy(protocol, offset, dataLen, 0, dataLen.length);
-            offset += dataLen.length;
-            int len = bytes2Int(dataLen);
-            byte[] data = new byte[len];
-            System.arraycopy(protocol, offset, data, 0, data.length);
-            offset += data.length;
-            String name = new String(data);
-            System.out.println("dataLen = " + len + ", name: " + name);
-
-            dataLen = new byte[4];
-            System.arraycopy(protocol, offset, dataLen, 0, dataLen.length);
-            offset += dataLen.length;
-            len = bytes2Int(dataLen);
-            data = new byte[len];
-            System.arraycopy(protocol, offset, data, 0, data.length);
-            offset += data.length;
-            name = new String(data);
-            System.out.println("dataLen = " + len + ", name: " + name);
-        }
     }
 
 }
