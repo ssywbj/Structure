@@ -1,4 +1,4 @@
-package com.suheng.structure.module1;
+package com.suheng.structure.wallpaper;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,8 +23,8 @@ import androidx.core.content.ContextCompat;
 
 import java.util.Calendar;
 
-public class LiveWallpaperService extends WallpaperService {
-    public static final String TAG = LiveWallpaperService.class.getSimpleName();
+public class ZhipuWallpaperService extends WallpaperService {
+    public static final String TAG = ZhipuWallpaperService.class.getSimpleName();
 
     @Override
     public Engine onCreateEngine() {
@@ -67,7 +67,7 @@ public class LiveWallpaperService extends WallpaperService {
                     int level = intent.getIntExtra("level", 0);//当前电量
                     int total = intent.getIntExtra("scale", 100);//总电量
                     int percentage = (level * 100) / total;
-                    mTextBattery = "Battery:" + percentage + "%";
+                    mTextBattery = "电量:" + percentage + "%";
                     Log.d(TAG, "battery, level = " + level + ", total = " + total + ", percentage = " + percentage);
                 }
             }
@@ -78,7 +78,7 @@ public class LiveWallpaperService extends WallpaperService {
             super.onCreate(surfaceHolder);
             Log.i(TAG, "onCreate, surfaceHolder = " + surfaceHolder);
 
-            mContext = LiveWallpaperService.this;
+            mContext = ZhipuWallpaperService.this;
 
             mPaintText = new Paint();
             mPaintText.setColor(Color.WHITE);
@@ -158,10 +158,10 @@ public class LiveWallpaperService extends WallpaperService {
                 canvas.drawText(text, (width - mPaintText.measureText(text)) / 2, textPaintHeight, mPaintText);
 
                 if (!TextUtils.isEmpty(mTextBattery)) {
-                    mPaintText.setTextSize(30f);
+                    mPaintText.setTextSize(24f);
                     mPaintText.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
                     float dimen = mPaintText.measureText(mTextBattery);
-                    canvas.drawText(mTextBattery, (width - dimen) / 2, mCenterY + dimen / 2 - 10, mPaintText);
+                    canvas.drawText(mTextBattery, (width - dimen) / 2, mCenterY + dimen / 2, mPaintText);
                 }
 
                 //this.drawComplications(canvas, System.currentTimeMillis());
@@ -383,7 +383,7 @@ public class LiveWallpaperService extends WallpaperService {
             }
             mRegisteredBatteryReceiver = true;
             IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-            LiveWallpaperService.this.registerReceiver(mBatteryReceiver, filter);
+            ZhipuWallpaperService.this.registerReceiver(mBatteryReceiver, filter);
         }
 
         private void unregisterBatteryReceiver() {
@@ -391,7 +391,7 @@ public class LiveWallpaperService extends WallpaperService {
                 return;
             }
             mRegisteredBatteryReceiver = false;
-            LiveWallpaperService.this.unregisterReceiver(mBatteryReceiver);
+            ZhipuWallpaperService.this.unregisterReceiver(mBatteryReceiver);
         }
     }
 

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">WbjWallpaper</string>
+    <string name="wallpaper_zhipu_wallpaper">质朴之韵</string>
+    <string name="wallpaper_zhipu_wallpaper_description">显示电量、步数等信息的表盘</string>
+</resources>
