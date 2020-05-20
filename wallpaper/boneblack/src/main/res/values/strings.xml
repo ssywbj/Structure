@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">BoneBlack</string>
+    <string name="bone_black_wallpaper">骨炭表盘</string>
+    <string name="bone_black_wallpaper_config_aty">骨炭表盘配置</string>
+    <string name="bone_black_wallpaper_description">时钟表盘，显示电量、天气、日期信息</string>
+</resources>

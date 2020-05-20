@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wallpaper xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="com.suheng.structure.wallpaper.parisblack.ParisBlackWallpaperConfigActivity"
+    android:description="@string/paris_black_wallpaper_description"
+    android:thumbnail="@drawable/paris_black_wallpaper_preview"/>

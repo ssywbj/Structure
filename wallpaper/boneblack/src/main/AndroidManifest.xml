@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.suheng.structure.wallpaper.boneblack">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".BoneBlackWallpaperConfigActivity"
+            android:exported="true"
+            android:label="@string/bone_black_wallpaper_config_aty" />
+
+        <service
+            android:name=".BoneBlackWallpaperService"
+            android:enabled="true"
+            android:label="@string/bone_black_wallpaper"
+            android:permission="android.permission.BIND_WALLPAPER">
+
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/bone_black_wallpaper_config" />
+        </service>
+
+    </application>
+
+</manifest>

@@ -245,9 +245,13 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     contentHolder.textSetting.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent intent = new Intent();
-                            intent.setClassName(data.getPackageName(), settingsActivity);
-                            startActivity(intent);
+                            try {
+                                Intent intent = new Intent();
+                                intent.setClassName(data.getPackageName(), settingsActivity);
+                                startActivity(intent);
+                            } catch (Exception e) {
+                                Log.e(mTag, "open " + settingsActivity + " fail", e);
+                            }
                         }
                     });
                 }
