@@ -21,6 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +35,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
     private String mTag = "Wbj";
     private List<WallpaperInfo> mWallpaperInfoList = new ArrayList<>();
+    private LivePaperAdapter mLivePaperAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,17 +127,21 @@ public class WallpaperPickActivity extends AppCompatActivity {
     }
 
     private void initRecyclerView() {
-        LivePaperAdapter livePaperAdapter = new LivePaperAdapter(mWallpaperInfoList);
-        livePaperAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener<WallpaperInfo>() {
+        mLivePaperAdapter = new LivePaperAdapter(mWallpaperInfoList);
+        mLivePaperAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener<WallpaperInfo>() {
             @Override
             public void onItemClick(View view, WallpaperInfo data, int position) {
                 setLiveWallPaper(data.getPackageName(), data.getServiceName());
             }
         });
+        //https://blog.csdn.net/u010687392/article/details/47950199?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
         RecyclerView recyclerView = findViewById(R.id.recycler_view_wallpaper);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(livePaperAdapter);
+        recyclerView.setAdapter(mLivePaperAdapter);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(mCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     @Override
@@ -175,10 +181,47 @@ public class WallpaperPickActivity extends AppCompatActivity {
             Toast.makeText(this, "表盘设置成功", Toast.LENGTH_SHORT).show();
             finish();
         } catch (Exception e) {
-            Log.e(mTag, "set live wall paper fail", e);
+            Log.e(mTag, "set live wallpaper fail", e);
             Toast.makeText(this, "表盘设置失败", Toast.LENGTH_SHORT).show();
         }
     }
+
+    ItemTouchHelper.Callback mCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP, ItemTouchHelper.UP) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder
+                , @NonNull RecyclerView.ViewHolder target) {
+            /*int fromPst = viewHolder.getAdapterPosition();//得到拖动ViewHolder的position
+            int toPosition = target.getAdapterPosition();//得到目标ViewHolder的position
+            if (fromPst < toPosition) {
+                //分别把中间所有的item的位置重新交换
+                for (int i = fromPst; i < toPosition; i++) {
+                    Collections.swap(mWallpaperInfoList, i, i + 1);
+                }
+            } else {
+                for (int i = fromPst; i > toPosition; i--) {
+                    Collections.swap(mWallpaperInfoList, i, i - 1);
+                }
+            }
+            mLivePaperAdapter.notifyItemMoved(fromPst, toPosition);*/
+
+            int fromPst = viewHolder.getAdapterPosition();
+            mWallpaperInfoList.remove(mWallpaperInfoList.get(fromPst));
+            mLivePaperAdapter.notifyDataSetChanged();
+            Log.d(mTag, "onMove, from pst: " + fromPst);
+            return true;//true表示执行拖动
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            int pst = viewHolder.getAdapterPosition();
+            mWallpaperInfoList.remove(mWallpaperInfoList.get(pst));
+            mLivePaperAdapter.notifyDataSetChanged();
+            Log.d(mTag, "onSwiped");
+            if (mWallpaperInfoList.size() == 0) {
+                Toast.makeText(WallpaperPickActivity.this, "表盘列表为空", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
     private final class LivePaperAdapter extends RecyclerAdapter<WallpaperInfo> {
 

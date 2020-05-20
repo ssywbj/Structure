@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -50,6 +51,8 @@ public class ZhipuWallpaperService extends WallpaperService {
 
         private Context mContext;
 
+        private SharedPreferences mPrefs;
+
         private final Handler mHandler = new Handler() {
             @Override
             public void dispatchMessage(@NonNull Message msg) {
@@ -93,6 +96,8 @@ public class ZhipuWallpaperService extends WallpaperService {
             mPaintPointer = new Paint();
             mPaintPointer.setAntiAlias(true);
             mPaintPointer.setDither(true);
+
+            mPrefs = getSharedPreferences(ZhipuWallpaperConfigActivity.PREFS_FILE, MODE_PRIVATE);
         }
 
         private void invalidate() {
@@ -145,7 +150,8 @@ public class ZhipuWallpaperService extends WallpaperService {
                 textPaintHeight = (height + 1.0f * mRect.height()) / 2 + 12;
                 canvas.drawText(text, (width - mPaintText.measureText(text)) / 2, textPaintHeight, mPaintText);
             } else {
-                canvas.drawColor(ContextCompat.getColor(mContext, R.color.zhipu_watchface_interactive_mode));//画面背景
+                canvas.drawColor(ContextCompat.getColor(mContext, mPrefs.getInt(
+                        ZhipuWallpaperConfigActivity.PREFS_KEY_BG_COLOR, R.color.zhipu_watchface_interactive_mode)));//画面背景
 
                 //textPaintHeight = (height - mPaintText.getTextSize() + 16);//文字到屏幕底部有一定间距
                 textPaintHeight = (mCenterY + mMaxRadius + 40);//文字到屏幕底部有一定间距
