@@ -3,16 +3,14 @@ package com.suheng.structure.wallpaper.basic.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
-import android.util.Log;
 
 import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
-
-import com.suheng.structure.wallpaper.basic.R;
 
 public class BitmapUtil {
 
@@ -58,6 +56,16 @@ public class BitmapUtil {
         } else {
             throw new IllegalArgumentException("unsupported drawable type");
         }
+    }
+
+    public static Bitmap rotate(Bitmap src, float degrees) {
+        Matrix matrix = new Matrix();
+        matrix.setRotate(degrees);
+        Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, false);
+        if (dst.equals(src)) {
+            return dst;
+        }
+        return dst;
     }
 
 }

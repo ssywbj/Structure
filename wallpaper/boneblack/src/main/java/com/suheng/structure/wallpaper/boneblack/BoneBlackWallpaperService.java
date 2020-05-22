@@ -6,13 +6,13 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.SurfaceHolder;
 
 import androidx.annotation.NonNull;
@@ -30,24 +30,18 @@ public class BoneBlackWallpaperService extends WallpaperService {
     }
 
     private final class LiveWallpaperEngine extends Engine {
-        private static final float POINT_RADIUS = 5.0f;//圆点半径
         private static final int SCALES = 12;//12个刻度
         private final double RADIANS = Math.toRadians(1.0f * 360 / SCALES);//弧度值，Math.toRadians：度换算成弧度
 
-        private boolean mVisible = false;
+        private PointF mPointScreenCenter = new PointF();//屏幕中心点
+        private float mRadiusPaint;//绘制的半径长度
 
-        private float mCenterX;//圆心X坐标
-        private float mCenterY;//圆心Y坐标
-        private float mCanvasWidth, mCanvasHeight;//屏幕宽高
-        private float mMaxRadius;
-        private Rect mRect = new Rect();
-
-        private boolean mAmbientMode;
-        private Paint mPaintText, mPaintPoint;
-        private Context mContext;
         private Paint mPaintScale;
-        private Bitmap mBitmapScale12, mBitmapScale3, mBitmapScale6, mBitmapScale9, mBitmapScalePaperclip;
-        private int mMargin;
+        private SparseArray<Bitmap> mArrayBitmapScale = new SparseArray<>();
+
+        private Context mContext;
+        private boolean mVisible;
+        private boolean mAmbientMode;
 
         @Override
         public void onCreate(SurfaceHolder surfaceHolder) {
@@ -56,36 +50,24 @@ public class BoneBlackWallpaperService extends WallpaperService {
 
             mContext = BoneBlackWallpaperService.this;
 
-            mPaintText = new Paint();
-            mPaintText.setColor(Color.WHITE);
-            mPaintText.setAntiAlias(true);
-            mPaintText.setTextSize(50f);
-            mPaintText.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
-
-            mPaintPoint = new Paint();
-            mPaintPoint.setColor(Color.WHITE);
-            mPaintPoint.setAntiAlias(true);
-
-            mMargin = DimenUtil.dip2px(mContext, 6);
+            this.initBitmap();
 
             mPaintScale = new Paint();
-            mBitmapScale12 = BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_sacle_number_12);
-            mBitmapScale3 = BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_icon_battary);
-            mBitmapScale6 = BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_scale_number_6);
-            mBitmapScale9 = BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_icon_weather_day_duoyun);
-            mBitmapScalePaperclip = BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_scale_paperclip);
+            mPaintScale.setAntiAlias(true);
+            mPaintScale.setColor(Color.RED);
+            mPaintScale.setStyle(Paint.Style.STROKE);
         }
 
         @Override
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             super.onSurfaceChanged(holder, format, width, height);
             Log.d(TAG, "onSurfaceChanged, format = " + format + ", width = " + width + ", height = " + height);
-            mCanvasWidth = width;
-            mCanvasHeight = height;
-            mCenterX = mCanvasWidth / 2;//圆心X坐标
-            mCenterY = mCanvasWidth / 2;//圆心Y坐标
-            mMaxRadius = Math.min(mCenterX, mCenterY);
+            mPointScreenCenter.x = 1.0f * width / 2;//屏幕中心X坐标
+            mPointScreenCenter.y = 1.0f * height / 2;//屏幕中心Y坐标
+            float screenRadius = Math.min(mPointScreenCenter.x, mPointScreenCenter.y);//屏幕半径
 
+            int margin = DimenUtil.dip2px(mContext, 6);//屏幕边缘到绘制半径的留白
+            mRadiusPaint = screenRadius - margin;
             this.invalidate();
         }
 
@@ -108,7 +90,8 @@ public class BoneBlackWallpaperService extends WallpaperService {
             super.onSurfaceDestroyed(holder);
             Log.i(TAG, "onSurfaceDestroyed");
             mVisible = false;
-            mHandler.removeMessages(111);
+
+            this.releaseBitmap();
         }
 
         @Override
@@ -117,6 +100,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
             Log.i(TAG, "onDestroy");
             mVisible = false;
             mHandler.removeMessages(111);
+            this.releaseBitmap();
         }
 
         @Override
@@ -136,62 +120,86 @@ public class BoneBlackWallpaperService extends WallpaperService {
             return extras;
         }
 
-        private void onDraw(Canvas canvas) {
-            int width = canvas.getWidth();
-            int height = canvas.getHeight();
-            //Log.d(TAG, "onDraw, draw watch face, width = " + width + ", height = " + height);
+        private void initBitmap() {
+            Bitmap scalePaperclip = BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_scale_paperclip);
+            if (scalePaperclip == null) {
+                return;
+            }
 
+            for (int index = 0; index < SCALES; index++) {
+                if (index == 0) {
+                    mArrayBitmapScale.put(index, BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_sacle_number_12));
+                } else if (index == 3) {
+                    mArrayBitmapScale.put(index, BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_icon_battary));
+                } else if (index == 6) {
+                    mArrayBitmapScale.put(index, BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_scale_number_6));
+                } else if (index == 9) {
+                    mArrayBitmapScale.put(index, BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_icon_weather_day_duoyun));
+                } else {
+                    mArrayBitmapScale.put(index, BitmapUtil.rotate(scalePaperclip, (float) Math.toDegrees(RADIANS * index)));
+                }
+            }
+
+            scalePaperclip.recycle();
+        }
+
+        private void releaseBitmap() {
+            for (int index = 0; index < mArrayBitmapScale.size(); index++) {
+                Bitmap bitmap = mArrayBitmapScale.get(index);
+                if (bitmap != null && !bitmap.isRecycled()) {
+                    bitmap.recycle();
+                }
+            }
+            mArrayBitmapScale.clear();
+        }
+
+        private void onDraw(Canvas canvas) {
+            //Log.d(TAG, "onDraw, draw watch face, width = " + mScreenWidth + ", height = " + mScreenHeight);
             canvas.save();
 
             canvas.drawColor(ContextCompat.getColor(mContext, R.color.boneblack_wallpaper_bg_black));//画面背景
-            canvas.drawBitmap(mBitmapScalePaperclip, 1.0f * (width - mBitmapScalePaperclip.getWidth()) / 2,
-                    1.0f * (height - mBitmapScalePaperclip.getHeight()) / 2, mPaintScale);
-
+            /*canvas.drawBitmap(mBitmapScalePaperclip, (mCanvasWidth - mBitmapScalePaperclip.getWidth()) / 2,
+                    (mCanvasHeight - mBitmapScalePaperclip.getHeight()) / 2, mPaintScale);
+            canvas.drawCircle(mPointScreenCenter.x, mPointScreenCenter.y, mRadiusPaint, mPaintScale);*/
             this.paintScale(canvas);
 
             canvas.restore();
         }
 
         private void paintScale(Canvas canvas) {
-            mPaintText.setTextSize(26f);
-            mPaintText.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-            String digit = "0";
-            mPaintText.getTextBounds(digit, 0, digit.length(), mRect);
-
-            mPaintText.setStyle(Paint.Style.STROKE);
-            float radius = mMaxRadius - mMargin;
-            float radiusText = radius - mRect.height() - 4;
-
-            mPaintText.setStyle(Paint.Style.FILL);
-            float cxPoint, cyPoint, cxText, cyText;
-            double sinValue, cosValue;
+            Bitmap bitmap;
+            float radiusScale, leftPst, rightPst, sinValue, cosValue;
             for (int index = 0; index < SCALES; index++) {
-                sinValue = Math.sin(RADIANS * index);
-                cosValue = Math.cos(RADIANS * index);
-                cxPoint = (float) (mCenterX + radius * sinValue);
-                cyPoint = (float) (mCenterY - radius * cosValue);
-                cxText = (float) (mCenterX - radiusText * sinValue);
-                cyText = (float) (mCenterY - radiusText * cosValue);
+                sinValue = (float) Math.sin(RADIANS * index);
+                cosValue = (float) Math.cos(RADIANS * index);
 
-                if (index == 0) {
-                    canvas.drawBitmap(mBitmapScale12, (mCanvasWidth - mBitmapScale12.getWidth()) / 2
-                            , mMargin, mPaintScale);
-                } else if (index == 3) {
-                    canvas.drawBitmap(mBitmapScale3, mCanvasWidth - mBitmapScale3.getWidth() - mMargin
-                            , (mCanvasHeight - mBitmapScale3.getHeight()) / 2, mPaintScale);
-                } else if (index == 6) {
-                    canvas.drawBitmap(mBitmapScale6, (mCanvasWidth - mBitmapScale6.getWidth()) / 2,
-                            mCanvasHeight - mBitmapScale6.getHeight() - mMargin, mPaintScale);
-                } else if (index == 9) {
-                    canvas.drawBitmap(mBitmapScale9, mMargin, (mCanvasHeight - mBitmapScale9.getHeight()) / 2, mPaintScale);
-                } else {
-                    canvas.drawCircle(cxPoint, cyPoint, POINT_RADIUS, mPaintPoint);
-                    digit = String.valueOf(12 - index);
-                    mRect.setEmpty();
-                    mPaintText.getTextBounds(digit, 0, digit.length(), mRect);
-                    canvas.drawText(digit, cxText - 1.0f * mRect.width() / 2, cyText + 1.0f * mRect.height() / 2, mPaintText);
+                /*canvas.drawLine(mPointScreenCenter.x, mPointScreenCenter.y, mPointScreenCenter.x + mRadiusPaint * sinValue
+                        , mPointScreenCenter.y - mRadiusPaint * cosValue, mPaintScale);*/
+
+                bitmap = mArrayBitmapScale.get(index);
+                if (bitmap == null) {
+                    return;
                 }
+
+                switch (index) {
+                    case 0:
+                    case 3:
+                    case 6:
+                    case 9:
+                        radiusScale = mRadiusPaint - 1.0f * bitmap.getHeight() / 2;
+                        break;
+                    default:
+                        radiusScale = mRadiusPaint - 1.0f * bitmap.getHeight() / 2.7f;
+                        break;
+                }
+                leftPst = mPointScreenCenter.x + radiusScale * sinValue;
+                rightPst = mPointScreenCenter.y - radiusScale * cosValue;
+                canvas.drawBitmap(bitmap, leftPst - 1.0f * bitmap.getWidth() / 2
+                        , rightPst - 1.0f * bitmap.getHeight() / 2, mPaintScale);
             }
+
+            /*canvas.drawCircle(mPointScreenCenter.x, mPointScreenCenter.y
+                    , mRadiusPaint - 1.0f * mArrayBitmapScale.get(6).getHeight(), mPaintScale);*/
         }
 
         private void invalidate() {
