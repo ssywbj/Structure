@@ -200,14 +200,15 @@ public class BoneBlackWallpaperService extends WallpaperService {
                 switch (index) {
                     case 3:
                         bitmap = BitmapUtil.rotate(mArrayBitmapScale.get(R.drawable.boneblack_icon_battary), -degrees);
-                        left = mPointScreenCenter.x - 1.0f * bitmap.getHeight() - mMarginIconText;
+                        left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() - mMarginIconText;
                         top = mMarginRadiusOuter + mMarginRadiusOuter * 3.5f;
                         break;
                     case 6:
                         bitmap = BitmapUtil.rotate(mArrayBitmapScale.get(R.drawable.boneblack_scale_number_6), -degrees);
-                        mRadiusInner = mRadiusOuter - 1.0f * bitmap.getHeight();
                         left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
                         top = mMarginRadiusOuter;
+
+                        mRadiusInner = mRadiusOuter - 1.0f * bitmap.getHeight();
                         break;
                     case 9:
                         bitmap = BitmapUtil.rotate(mArrayBitmapScale.get(R.drawable.boneblack_icon_weather_day_duoyun), -degrees);
