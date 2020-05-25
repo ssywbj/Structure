@@ -12,6 +12,10 @@ import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
+import com.suheng.structure.wallpaper.basic.R;
+
+import java.util.Calendar;
+
 public class BitmapUtil {
 
     /*public static Bitmap getBitmap(Context context, int vectorDrawableId) {
@@ -55,6 +59,28 @@ public class BitmapUtil {
             return bitmap;
         } else {
             throw new IllegalArgumentException("unsupported drawable type");
+        }
+    }
+
+    public static Bitmap getWeekBitmap(Context context) {
+        Calendar instance = Calendar.getInstance();
+        switch (instance.get(Calendar.DAY_OF_WEEK)) {
+            case 1:
+                return getFromDrawable(context, R.drawable.basic_text_day);
+            case 2:
+                return getFromDrawable(context, R.drawable.basic_text_1);
+            case 3:
+                return getFromDrawable(context, R.drawable.basic_text_2);
+            case 4:
+                return getFromDrawable(context, R.drawable.basic_text_3);
+            case 5:
+                return getFromDrawable(context, R.drawable.basic_text_4);
+            case 6:
+                return getFromDrawable(context, R.drawable.basic_text_5);
+            case 7:
+                return getFromDrawable(context, R.drawable.basic_text_6);
+            default:
+                return getFromDrawable(context, R.drawable.basic_text_day);
         }
     }
 

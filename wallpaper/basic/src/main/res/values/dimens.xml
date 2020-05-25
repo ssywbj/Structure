@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="basic_number_width">15.45dp</dimen>
+    <dimen name="basic_number_height">27.27dp</dimen>
+    <dimen name="basic_text_width">27dp</dimen>
+    <dimen name="basic_text_height">@dimen/basic_number_height</dimen>
+</resources>

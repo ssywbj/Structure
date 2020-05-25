@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="454"
+    android:viewportHeight="454">
+    <path
+        android:fillColor="@color/boneblack_hand_hour"
+        android:fillType="evenOdd"
+        android:pathData="M227,82c-3.9,0 -7,3.1 -7,7v113c0,3.9 3.1,7 7,7s7,-3.1 7,-7V89C234,85.1 230.9,82 227,82zM230,171c0,1.7 -1.3,3 -3,3s-3,-1.3 -3,-3V91c0,-1.7 1.3,-3 3,-3s3,1.3 3,3V171z" />
+</vector>

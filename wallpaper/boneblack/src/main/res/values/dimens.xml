@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="boneblack_scale_number">40dp</dimen>
-    <dimen name="boneblack_scale_paperclip">40dp</dimen>
-    <dimen name="boneblack_scale_info_icon">50dp</dimen>
+    <dimen name="boneblack_scale_number">36.36dp</dimen>
+    <dimen name="boneblack_scale_paperclip">@dimen/boneblack_scale_number</dimen>
+    <dimen name="boneblack_scale_info_icon">45.45dp</dimen>
 </resources>
