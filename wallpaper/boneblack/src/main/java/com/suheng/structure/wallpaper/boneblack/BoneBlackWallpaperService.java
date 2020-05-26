@@ -7,19 +7,19 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.SurfaceHolder;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.suheng.structure.wallpaper.basic.DimenUtil;
-import com.suheng.structure.wallpaper.basic.utils.BitmapUtil;
+import com.suheng.structure.wallpaper.basic.utils.BitmapManager;
 
 import java.util.Calendar;
 
@@ -40,12 +40,13 @@ public class BoneBlackWallpaperService extends WallpaperService {
         private int mMarginRadiusOuter;//屏幕边缘到刻度外半径的留白
         private int mMarginIconText;//信息图标与其下方文案的留白
 
-        private Paint mPaintScale;
-        private SparseArray<Bitmap> mArrayBitmapScale = new SparseArray<>();
+        private Paint mPaintBitmap;
 
         private Context mContext;
         private boolean mVisible;
         private boolean mAmbientMode;
+
+        private BitmapManager mBitmapManager;
 
         @Override
         public void onCreate(SurfaceHolder surfaceHolder) {
@@ -54,12 +55,11 @@ public class BoneBlackWallpaperService extends WallpaperService {
 
             mContext = BoneBlackWallpaperService.this;
 
-            this.initBitmap();
+            mBitmapManager = new BitmapManager(mContext);
 
-            mPaintScale = new Paint();
-            mPaintScale.setAntiAlias(true);
-            mPaintScale.setColor(Color.RED);
-            mPaintScale.setStyle(Paint.Style.STROKE);
+            mPaintBitmap = new Paint();
+            mPaintBitmap.setAntiAlias(true);
+            mPaintBitmap.setColor(Color.RED);
         }
 
         @Override
@@ -95,8 +95,9 @@ public class BoneBlackWallpaperService extends WallpaperService {
             super.onSurfaceDestroyed(holder);
             Log.i(TAG, "onSurfaceDestroyed");
             mVisible = false;
+            mHandler.removeMessages(111);
 
-            this.releaseBitmap();
+            mBitmapManager.clear();
         }
 
         @Override
@@ -105,7 +106,8 @@ public class BoneBlackWallpaperService extends WallpaperService {
             Log.i(TAG, "onDestroy");
             mVisible = false;
             mHandler.removeMessages(111);
-            this.releaseBitmap();
+
+            mBitmapManager.clear();
         }
 
         @Override
@@ -123,40 +125,6 @@ public class BoneBlackWallpaperService extends WallpaperService {
             }
             Log.i(TAG, "onCommand, action = " + action + ", x = " + x + ", y = " + y + ", ambient_mode = " + mAmbientMode);
             return extras;
-        }
-
-        private void initBitmap() {
-            mArrayBitmapScale.put(R.drawable.boneblack_sacle_number_12
-                    , BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_sacle_number_12));
-            mArrayBitmapScale.put(R.drawable.boneblack_icon_battary
-                    , BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_icon_battary));
-            mArrayBitmapScale.put(R.drawable.boneblack_scale_number_6
-                    , BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_scale_number_6));
-            mArrayBitmapScale.put(R.drawable.boneblack_icon_weather_day_duoyun
-                    , BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_icon_weather_day_duoyun));
-            mArrayBitmapScale.put(R.drawable.boneblack_scale_paperclip
-                    , BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_scale_paperclip));
-
-            mArrayBitmapScale.put(R.drawable.basic_percentage_sign
-                    , BitmapUtil.getFromDrawable(mContext, R.drawable.basic_percentage_sign));
-            mArrayBitmapScale.put(R.drawable.basic_temperature_unit
-                    , BitmapUtil.getFromDrawable(mContext, R.drawable.basic_temperature_unit));
-            mArrayBitmapScale.put(R.drawable.boneblack_hand_hour
-                    , BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_hand_hour));
-            mArrayBitmapScale.put(R.drawable.boneblack_hand_minute
-                    , BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_hand_minute));
-            mArrayBitmapScale.put(R.drawable.boneblack_hand_second
-                    , BitmapUtil.getFromDrawable(mContext, R.drawable.boneblack_hand_second));
-        }
-
-        private void releaseBitmap() {
-            for (int index = 0; index < mArrayBitmapScale.size(); index++) {
-                Bitmap bitmap = mArrayBitmapScale.get(index);
-                if (bitmap != null && !bitmap.isRecycled()) {
-                    bitmap.recycle();
-                }
-            }
-            mArrayBitmapScale.clear();
         }
 
         private void invalidate() {
@@ -184,6 +152,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
             this.paintScale(canvas);
             this.paintIconInfo(canvas);
             this.paintDate(canvas);
+            this.paintPointer(canvas);
         }
 
         private void paintScale(Canvas canvas) {
@@ -199,63 +168,66 @@ public class BoneBlackWallpaperService extends WallpaperService {
 
                 switch (index) {
                     case 3:
-                        bitmap = BitmapUtil.rotate(mArrayBitmapScale.get(R.drawable.boneblack_icon_battary), -degrees);
+                        bitmap = BitmapManager.rotate(mBitmapManager.get(R.drawable.boneblack_icon_battary), -degrees);
                         left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() - mMarginIconText;
                         top = mMarginRadiusOuter + mMarginRadiusOuter * 3.5f;
                         break;
                     case 6:
-                        bitmap = BitmapUtil.rotate(mArrayBitmapScale.get(R.drawable.boneblack_scale_number_6), -degrees);
+                        bitmap = BitmapManager.rotate(mBitmapManager.get(R.drawable.boneblack_scale_number_6), -degrees);
                         left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
                         top = mMarginRadiusOuter;
 
                         mRadiusInner = mRadiusOuter - 1.0f * bitmap.getHeight();
                         break;
                     case 9:
-                        bitmap = BitmapUtil.rotate(mArrayBitmapScale.get(R.drawable.boneblack_icon_weather_day_duoyun), -degrees);
+                        bitmap = BitmapManager.rotate(mBitmapManager.get(R.drawable.boneblack_icon_weather_day_duoyun), -degrees);
                         left = mPointScreenCenter.x + mMarginIconText;
                         top = mMarginRadiusOuter + mMarginRadiusOuter * 3.5f;
                         break;
                     default:
                         if (index == 0) {
-                            bitmap = mArrayBitmapScale.get(R.drawable.boneblack_sacle_number_12);
+                            bitmap = mBitmapManager.get(R.drawable.boneblack_sacle_number_12);
                         } else {
-                            bitmap = mArrayBitmapScale.get(R.drawable.boneblack_scale_paperclip);
+                            bitmap = mBitmapManager.get(R.drawable.boneblack_scale_paperclip);
                         }
                         left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
                         top = mMarginRadiusOuter;
                         break;
                 }
 
-                canvas.drawBitmap(bitmap, left, top, mPaintScale);
+                canvas.drawBitmap(bitmap, left, top, mPaintBitmap);
                 //canvas.drawLine(mPointScreenCenter.x, mPointScreenCenter.y, mPointScreenCenter.x, mMarginRadiusOuter, mPaintScale);
                 canvas.restore();
             }
 
             //canvas.drawCircle(mPointScreenCenter.x, mPointScreenCenter.y, mRadiusInner, mPaintScale);
+
+            //bitmap = mArrayBitmapScale.get(R.drawable.boneblack_hand_second);
+            //canvas.drawBitmap(bitmap, mMarginRadiusOuter, mPointScreenCenter.y, mPaintScale);
         }
 
         private void paintIconInfo(Canvas canvas) {
             int offset = mMarginRadiusOuter * 3;
             float top = mPointScreenCenter.y + mMarginIconText;
 
-            Bitmap bitmap = BitmapUtil.getFromDrawable(mContext, R.drawable.basic_number_2);
-            canvas.drawBitmap(bitmap, offset, top, mPaintScale);
+            Bitmap bitmap = mBitmapManager.get(R.drawable.basic_number_2);
+            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
             offset += bitmap.getWidth();
-            bitmap = BitmapUtil.getFromDrawable(mContext, R.drawable.basic_number_5);
-            canvas.drawBitmap(bitmap, offset, top, mPaintScale);
+            bitmap = mBitmapManager.get(R.drawable.basic_number_5);
+            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
             offset += bitmap.getWidth();
-            bitmap = mArrayBitmapScale.get(R.drawable.basic_temperature_unit);
-            canvas.drawBitmap(bitmap, offset, top, mPaintScale);
+            bitmap = mBitmapManager.get(R.drawable.basic_temperature_unit);
+            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
 
-            bitmap = mArrayBitmapScale.get(R.drawable.basic_percentage_sign);
+            bitmap = mBitmapManager.get(R.drawable.basic_percentage_sign);
             offset = bitmap.getWidth() + mMarginRadiusOuter * 3;
-            canvas.drawBitmap(bitmap, 2 * mPointScreenCenter.x - offset, top, mPaintScale);
-            bitmap = BitmapUtil.getFromDrawable(mContext, R.drawable.basic_number_0);
+            canvas.drawBitmap(bitmap, 2 * mPointScreenCenter.x - offset, top, mPaintBitmap);
+            bitmap = mBitmapManager.get(R.drawable.basic_number_0);
             offset += bitmap.getWidth();
-            canvas.drawBitmap(bitmap, 2 * mPointScreenCenter.x - offset, top, mPaintScale);
-            bitmap = BitmapUtil.getFromDrawable(mContext, R.drawable.basic_number_7);
+            canvas.drawBitmap(bitmap, 2 * mPointScreenCenter.x - offset, top, mPaintBitmap);
+            bitmap = mBitmapManager.get(R.drawable.basic_number_7);
             offset += bitmap.getWidth();
-            canvas.drawBitmap(bitmap, 2 * mPointScreenCenter.x - offset, top, mPaintScale);
+            canvas.drawBitmap(bitmap, 2 * mPointScreenCenter.x - offset, top, mPaintBitmap);
         }
 
         private void paintDate(Canvas canvas) {
@@ -263,33 +235,127 @@ public class BoneBlackWallpaperService extends WallpaperService {
             int month = instance.get(Calendar.MONTH) + 1;
             int day = instance.get(Calendar.DAY_OF_MONTH);
             int week = instance.get(Calendar.DAY_OF_WEEK);
-            Log.i(TAG, "date, month = " + month + ", day = " + day + ", week = " + week);
 
             float offset = mPointScreenCenter.x;
-            Bitmap bitmap = BitmapUtil.getFromDrawable(mContext, R.drawable.basic_text_day);
+            Bitmap bitmap = mBitmapManager.get(R.drawable.basic_text_day);
             float top = mPointScreenCenter.y + (mRadiusInner - bitmap.getHeight()) / 2 + 8;
-            canvas.drawBitmap(bitmap, offset, top, mPaintScale);
+            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
 
-            bitmap = BitmapUtil.getFromDrawable(mContext, R.drawable.basic_text_week);
+            //星期
+            bitmap = mBitmapManager.get(R.drawable.basic_text_week);//星期
             offset += bitmap.getWidth() + DimenUtil.dip2px(mContext, 4);
-            canvas.drawBitmap(bitmap, offset, top, mPaintScale);
-
-            bitmap = BitmapUtil.getWeekBitmap(mContext);
+            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
+            bitmap = mBitmapManager.getWeekBitmap();
             offset += bitmap.getWidth();
-            canvas.drawBitmap(bitmap, offset, top, mPaintScale);
+            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
 
+            //号数
+            int units = day % 10;//个位
+            int tens = day / 10;//十位
             offset = mPointScreenCenter.x;
-            bitmap = BitmapUtil.getFromDrawable(mContext, R.drawable.basic_number_9);
+            bitmap = mBitmapManager.getNumberBitmap(units);
             offset -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap, offset, top, mPaintScale);
+            if (tens > 0) {
+                canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
+                bitmap = mBitmapManager.getNumberBitmap(tens);
+                offset -= bitmap.getWidth();
+                canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
+            }
 
-            bitmap = BitmapUtil.getFromDrawable(mContext, R.drawable.basic_text_month);
+            //月份
+            bitmap = mBitmapManager.get(R.drawable.basic_text_month);
             offset -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap, offset, top, mPaintScale);
+            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
+            units = month % 10;//个位
+            tens = month / 10;//十位
+            bitmap = mBitmapManager.getNumberBitmap(units);
+            offset -= bitmap.getWidth();
+            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
+            if (tens > 0) {
+                bitmap = mBitmapManager.getNumberBitmap(tens);
+                offset -= bitmap.getWidth();
+                canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
+            }
 
-            bitmap = BitmapUtil.getFromDrawable(mContext, R.drawable.basic_number_5);
-            offset -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap, offset, top, mPaintScale);
+            Log.d(TAG, "date, month = " + month + ", day = " + day + ", week = " + week
+                    + ", tens = " + tens + ", units = " + units);
+        }
+
+        private void paintPointer(Canvas canvas) {
+            int hour = Calendar.getInstance().get(Calendar.HOUR);
+            int minute = Calendar.getInstance().get(Calendar.MINUTE);
+            int second = Calendar.getInstance().get(Calendar.SECOND);
+            //Log.d(TAG, "time, hour = " + hour + ", minute = " + minute + ", second = " + second);
+
+            float degreesHour = (hour + 1.0f * minute / 60) * 360 / 12;
+            float degreesMinute = (minute + 1.0f * second / 60) * 360 / 60;
+            float degreesSecond = 1.0f * second * 360 / 60;
+
+            int margin = DimenUtil.dip2px(mContext, 12);
+            int bottomOffset = DimenUtil.dip2px(mContext, 20);
+            float bottom = mPointScreenCenter.y - bottomOffset;
+            int shadowColor = Color.parseColor("#2E42FF");
+
+            float pointerWidth = 8;//分针
+            float top = mMarginRadiusOuter + (mRadiusOuter - mRadiusInner) + margin;
+            canvas.save();
+            canvas.rotate(degreesMinute, mPointScreenCenter.x, mPointScreenCenter.y);
+            RectF rectF = new RectF(mPointScreenCenter.x - pointerWidth / 2, top,
+                    mPointScreenCenter.x + pointerWidth / 2, bottom);
+            mPaintBitmap.setShadowLayer(pointerWidth, 0, 0, shadowColor);//外围阴影效果
+
+            mPaintBitmap.setStrokeWidth(pointerWidth);
+            mPaintBitmap.setColor(Color.WHITE);
+            canvas.drawRoundRect(rectF, pointerWidth, pointerWidth, mPaintBitmap);
+
+            /*Bitmap bitmap = mArrayBitmapScale.get(R.drawable.boneblack_hand_minute);
+            rectF = new RectF(mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2, top,
+                    mPointScreenCenter.x + 1.0f * bitmap.getWidth() / 2, bottom);
+            Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+            canvas.drawBitmap(bitmap, rect, rectF, mPaintScale);*/
+
+            canvas.restore();
+
+            pointerWidth = 12;//时针
+            top += margin * 1.5;
+            canvas.save();
+            canvas.rotate(degreesHour, mPointScreenCenter.x, mPointScreenCenter.y);
+            rectF = new RectF(mPointScreenCenter.x - pointerWidth / 2, top,
+                    mPointScreenCenter.x + pointerWidth / 2, bottom);
+            mPaintBitmap.setShadowLayer(pointerWidth, 0, 0, shadowColor);//外围阴影效果
+
+            mPaintBitmap.setStrokeWidth(pointerWidth);
+            canvas.drawRoundRect(rectF, pointerWidth, pointerWidth, mPaintBitmap);
+            canvas.restore();
+
+            pointerWidth = 4;//秒针
+            top = mMarginRadiusOuter;
+            canvas.save();
+            canvas.rotate(degreesSecond, mPointScreenCenter.x, mPointScreenCenter.y);
+            rectF = new RectF(mPointScreenCenter.x - pointerWidth / 2, top,
+                    mPointScreenCenter.x + pointerWidth / 2, bottom);
+            mPaintBitmap.setShadowLayer(pointerWidth, 0, 0, Color.parseColor("#FF2E2E"));
+
+            mPaintBitmap.setStrokeWidth(pointerWidth);
+            mPaintBitmap.setColor(Color.parseColor("#FF3333"));
+            canvas.drawRoundRect(rectF, pointerWidth, pointerWidth, mPaintBitmap);
+
+            /*bitmap = mArrayBitmapScale.get(R.drawable.boneblack_hand_second);
+            rectF = new RectF(mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2, top,
+                    mPointScreenCenter.x + 1.0f * bitmap.getWidth() / 2, bottom);
+            rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+            canvas.drawBitmap(bitmap, rect, rectF, mPaintScale);*/
+
+            canvas.restore();
+
+            mPaintBitmap.clearShadowLayer();
+
+            /*canvas.save();//中心点
+            mPaintScale.setStrokeWidth(2);
+            mPaintScale.setColor(Color.RED);
+            mPaintScale.setStyle(Paint.Style.STROKE);
+            canvas.drawCircle(mPointScreenCenter.x, mPointScreenCenter.y, bottomOffset, mPaintScale);
+            canvas.restore();*/
         }
 
         private final Handler mHandler = new Handler() {
