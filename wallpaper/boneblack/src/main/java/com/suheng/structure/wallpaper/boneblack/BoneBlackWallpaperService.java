@@ -41,6 +41,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
         private int mMarginIconText;//信息图标与其下方文案的留白
 
         private Paint mPaintBitmap;
+        private RectF mRectF = new RectF();
 
         private Context mContext;
         private boolean mVisible;
@@ -59,7 +60,8 @@ public class BoneBlackWallpaperService extends WallpaperService {
 
             mPaintBitmap = new Paint();
             mPaintBitmap.setAntiAlias(true);
-            mPaintBitmap.setColor(Color.RED);
+            mPaintBitmap.setStyle(Paint.Style.FILL);
+            mPaintBitmap.setColor(Color.parseColor("#FF3333"));
         }
 
         @Override
@@ -73,6 +75,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
             mMarginIconText = DimenUtil.dip2px(mContext, 2);
             mMarginRadiusOuter = DimenUtil.dip2px(mContext, 4);
             mRadiusOuter = screenRadius - mMarginRadiusOuter;
+
             this.invalidate();
         }
 
@@ -146,7 +149,6 @@ public class BoneBlackWallpaperService extends WallpaperService {
         }
 
         private void onDraw(Canvas canvas) {
-            //Log.d(TAG, "onDraw, draw watch face, width = " + mScreenWidth + ", height = " + mScreenHeight);
             canvas.drawColor(ContextCompat.getColor(mContext, R.color.boneblack_wallpaper_bg_black));//画面背景
             //canvas.drawCircle(mPointScreenCenter.x, mPointScreenCenter.y, mRadiusOuter, mPaintScale);
             this.paintScale(canvas);
@@ -168,7 +170,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
 
                 switch (index) {
                     case 3:
-                        bitmap = BitmapManager.rotate(mBitmapManager.get(R.drawable.boneblack_icon_battary), -degrees);
+                        bitmap = BitmapManager.rotate(mBitmapManager.get(R.drawable.basic_icon_battary), -degrees);
                         left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() - mMarginIconText;
                         top = mMarginRadiusOuter + mMarginRadiusOuter * 3.5f;
                         break;
@@ -180,7 +182,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
                         mRadiusInner = mRadiusOuter - 1.0f * bitmap.getHeight();
                         break;
                     case 9:
-                        bitmap = BitmapManager.rotate(mBitmapManager.get(R.drawable.boneblack_icon_weather_day_duoyun), -degrees);
+                        bitmap = BitmapManager.rotate(mBitmapManager.get(R.drawable.basic_icon_weather_day_duoyun), -degrees);
                         left = mPointScreenCenter.x + mMarginIconText;
                         top = mMarginRadiusOuter + mMarginRadiusOuter * 3.5f;
                         break;
@@ -219,7 +221,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
             bitmap = mBitmapManager.get(R.drawable.basic_temperature_unit);
             canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
 
-            bitmap = mBitmapManager.get(R.drawable.basic_percentage_sign);
+            bitmap = mBitmapManager.get(R.drawable.basic_sign_percentage);
             offset = bitmap.getWidth() + mMarginRadiusOuter * 3;
             canvas.drawBitmap(bitmap, 2 * mPointScreenCenter.x - offset, top, mPaintBitmap);
             bitmap = mBitmapManager.get(R.drawable.basic_number_0);
@@ -296,56 +298,50 @@ public class BoneBlackWallpaperService extends WallpaperService {
             float bottom = mPointScreenCenter.y - bottomOffset;
             int shadowColor = Color.parseColor("#2E42FF");
 
-            float pointerWidth = 8;//分针
+            float pointerWidth = DimenUtil.dip2px(mContext, 5.6f);//分针宽度
             float top = mMarginRadiusOuter + (mRadiusOuter - mRadiusInner) + margin;
             canvas.save();
             canvas.rotate(degreesMinute, mPointScreenCenter.x, mPointScreenCenter.y);
-            RectF rectF = new RectF(mPointScreenCenter.x - pointerWidth / 2, top,
+            mRectF.set(mPointScreenCenter.x - pointerWidth / 2, top,
                     mPointScreenCenter.x + pointerWidth / 2, bottom);
             mPaintBitmap.setShadowLayer(pointerWidth, 0, 0, shadowColor);//外围阴影效果
-
-            mPaintBitmap.setStrokeWidth(pointerWidth);
             mPaintBitmap.setColor(Color.WHITE);
-            canvas.drawRoundRect(rectF, pointerWidth, pointerWidth, mPaintBitmap);
+            canvas.drawRoundRect(mRectF, pointerWidth, pointerWidth, mPaintBitmap);
 
-            /*Bitmap bitmap = mArrayBitmapScale.get(R.drawable.boneblack_hand_minute);
-            rectF = new RectF(mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2, top,
-                    mPointScreenCenter.x + 1.0f * bitmap.getWidth() / 2, bottom);
-            Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-            canvas.drawBitmap(bitmap, rect, rectF, mPaintScale);*/
-
+            mPaintBitmap.clearShadowLayer();//分针内部小黑棒
+            mRectF.set(mPointScreenCenter.x - pointerWidth / 5, top + bottomOffset * 0.2f,
+                    mPointScreenCenter.x + pointerWidth / 5, bottom - 1.4f * bottomOffset);
+            mPaintBitmap.setColor(ContextCompat.getColor(mContext, R.color.boneblack_wallpaper_bg_black));
+            canvas.drawRoundRect(mRectF, pointerWidth / 5, pointerWidth / 5, mPaintBitmap);
             canvas.restore();
 
-            pointerWidth = 12;//时针
+            pointerWidth = pointerWidth * 1.5f;//时针宽度
             top += margin * 1.5;
             canvas.save();
             canvas.rotate(degreesHour, mPointScreenCenter.x, mPointScreenCenter.y);
-            rectF = new RectF(mPointScreenCenter.x - pointerWidth / 2, top,
+            mRectF.set(mPointScreenCenter.x - pointerWidth / 2, top,
                     mPointScreenCenter.x + pointerWidth / 2, bottom);
-            mPaintBitmap.setShadowLayer(pointerWidth, 0, 0, shadowColor);//外围阴影效果
+            mPaintBitmap.setColor(Color.WHITE);
+            mPaintBitmap.setShadowLayer(pointerWidth, 0, 0, shadowColor);
+            canvas.drawRoundRect(mRectF, pointerWidth, pointerWidth, mPaintBitmap);
 
-            mPaintBitmap.setStrokeWidth(pointerWidth);
-            canvas.drawRoundRect(rectF, pointerWidth, pointerWidth, mPaintBitmap);
+            mPaintBitmap.clearShadowLayer();//时针内部小黑棒
+            mRectF.set(mPointScreenCenter.x - pointerWidth / 5, top + bottomOffset * 0.2f,
+                    mPointScreenCenter.x + pointerWidth / 5, bottom - 1.4f * bottomOffset);
+            mPaintBitmap.setColor(ContextCompat.getColor(mContext, R.color.boneblack_wallpaper_bg_black));
+            canvas.drawRoundRect(mRectF, pointerWidth / 5, pointerWidth / 5, mPaintBitmap);
             canvas.restore();
 
-            pointerWidth = 4;//秒针
+            pointerWidth = pointerWidth / 3f;//秒针宽度
             top = mMarginRadiusOuter;
             canvas.save();
             canvas.rotate(degreesSecond, mPointScreenCenter.x, mPointScreenCenter.y);
-            rectF = new RectF(mPointScreenCenter.x - pointerWidth / 2, top,
+            mRectF.set(mPointScreenCenter.x - pointerWidth / 2, top,
                     mPointScreenCenter.x + pointerWidth / 2, bottom);
             mPaintBitmap.setShadowLayer(pointerWidth, 0, 0, Color.parseColor("#FF2E2E"));
 
-            mPaintBitmap.setStrokeWidth(pointerWidth);
             mPaintBitmap.setColor(Color.parseColor("#FF3333"));
-            canvas.drawRoundRect(rectF, pointerWidth, pointerWidth, mPaintBitmap);
-
-            /*bitmap = mArrayBitmapScale.get(R.drawable.boneblack_hand_second);
-            rectF = new RectF(mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2, top,
-                    mPointScreenCenter.x + 1.0f * bitmap.getWidth() / 2, bottom);
-            rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-            canvas.drawBitmap(bitmap, rect, rectF, mPaintScale);*/
-
+            canvas.drawRoundRect(mRectF, pointerWidth, pointerWidth, mPaintBitmap);
             canvas.restore();
 
             mPaintBitmap.clearShadowLayer();

@@ -54,7 +54,7 @@ public class BitmapManager {
             return null;
         }
 
-        /*if (resId == R.drawable.boneblack_icon_weather_day_duoyun) {
+        /*if (resId == R.drawable.basic_icon_weather_day_duoyun) {
             drawable.setTint(getResources().getColor(R.color.colorPrimary));
         } else if (resId == R.drawable.notify) {
             drawable.setTint(getResources().getColor(R.color.colorPrimary));
