@@ -170,19 +170,19 @@ public class BoneBlackWallpaperService extends WallpaperService {
 
                 switch (index) {
                     case 3:
-                        bitmap = BitmapManager.rotate(mBitmapManager.get(R.drawable.basic_icon_battary), -degrees);
+                        bitmap = mBitmapManager.getRotate(R.drawable.basic_icon_battary, -degrees);
                         left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() - mMarginIconText;
                         top = mMarginRadiusOuter + mMarginRadiusOuter * 3.5f;
                         break;
                     case 6:
-                        bitmap = BitmapManager.rotate(mBitmapManager.get(R.drawable.boneblack_scale_number_6), -degrees);
+                        bitmap = mBitmapManager.getRotate(R.drawable.boneblack_scale_number_6, -degrees);
                         left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
                         top = mMarginRadiusOuter;
 
                         mRadiusInner = mRadiusOuter - 1.0f * bitmap.getHeight();
                         break;
                     case 9:
-                        bitmap = BitmapManager.rotate(mBitmapManager.get(R.drawable.basic_icon_weather_day_duoyun), -degrees);
+                        bitmap = mBitmapManager.getRotate(R.drawable.basic_icon_weather_day_duoyun, -degrees);
                         left = mPointScreenCenter.x + mMarginIconText;
                         top = mMarginRadiusOuter + mMarginRadiusOuter * 3.5f;
                         break;
@@ -190,7 +190,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
                         if (index == 0) {
                             bitmap = mBitmapManager.get(R.drawable.boneblack_sacle_number_12);
                         } else {
-                            bitmap = mBitmapManager.get(R.drawable.boneblack_scale_paperclip);
+                            bitmap = mBitmapManager.get(R.drawable.boneblack_scale_paperclip, R.color.boneblack_wallpaper_scale_paperclip);
                         }
                         left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
                         top = mMarginRadiusOuter;
@@ -245,10 +245,12 @@ public class BoneBlackWallpaperService extends WallpaperService {
 
             //星期
             bitmap = mBitmapManager.get(R.drawable.basic_text_week);//星期
-            offset += bitmap.getWidth() + DimenUtil.dip2px(mContext, 4);
+            int weekMarginLeft = bitmap.getWidth() + DimenUtil.dip2px(mContext, 4);
+            offset += weekMarginLeft;
             canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
-            bitmap = mBitmapManager.getWeekBitmap();
             offset += bitmap.getWidth();
+
+            bitmap = mBitmapManager.getWeekBitmap();
             canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
 
             //号数
