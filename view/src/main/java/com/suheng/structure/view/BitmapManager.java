@@ -1,4 +1,4 @@
-package com.suheng.structure.wallpaper.basic.utils;
+package com.suheng.structure.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,9 +13,6 @@ import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
-import com.suheng.structure.wallpaper.basic.R;
-
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +25,7 @@ public class BitmapManager {
         mContext = context;
     }
 
-    public Bitmap get(Context context, @DrawableRes int resId, int color) {
+    public static Bitmap get(Context context, @DrawableRes int resId, int color) {
         Drawable drawable = ContextCompat.getDrawable(context, resId);
         if (drawable == null) {
             return null;
@@ -63,10 +60,6 @@ public class BitmapManager {
         }
     }
 
-    public Bitmap get(@DrawableRes int resId) {
-        return get(resId, R.color.basic_number_color);
-    }
-
     public Bitmap getScale(@DrawableRes int resId, int color, float ratio) {
         if (mMapBitmap.containsKey(resId)) {
             return mMapBitmap.get(resId);
@@ -97,10 +90,6 @@ public class BitmapManager {
         }
     }
 
-    public Bitmap getRotate(@DrawableRes int resId, float degrees) {
-        return getRotate(resId, R.color.basic_number_color, degrees);
-    }
-
     public void clear() {
         for (Map.Entry<Integer, Bitmap> bitmapEntry : mMapBitmap.entrySet()) {
             Bitmap bitmap = bitmapEntry.getValue();
@@ -112,60 +101,6 @@ public class BitmapManager {
         mMapBitmap.clear();
     }
 
-    public Bitmap getWeekBitmap() {
-        return get(this.getWeekResId());
-    }
-
-    public int getWeekResId() {
-        Calendar instance = Calendar.getInstance();
-        switch (instance.get(Calendar.DAY_OF_WEEK)) {
-            case 1:
-                return R.drawable.basic_text_day;
-            case 2:
-                return R.drawable.basic_text_1;
-            case 3:
-                return R.drawable.basic_text_2;
-            case 4:
-                return R.drawable.basic_text_3;
-            case 5:
-                return R.drawable.basic_text_4;
-            case 6:
-                return R.drawable.basic_text_5;
-            case 7:
-                return R.drawable.basic_text_6;
-            default:
-                return R.drawable.basic_text_day;
-        }
-    }
-
-    public Bitmap getNumberBitmap(int number) {
-        return get(this.getNumberResId(number));
-    }
-
-    public int getNumberResId(int number) {
-        switch (number) {
-            case 1:
-                return R.drawable.basic_number_1;
-            case 2:
-                return R.drawable.basic_number_2;
-            case 3:
-                return R.drawable.basic_number_3;
-            case 4:
-                return R.drawable.basic_number_4;
-            case 5:
-                return R.drawable.basic_number_5;
-            case 6:
-                return R.drawable.basic_number_6;
-            case 7:
-                return R.drawable.basic_number_7;
-            case 8:
-                return R.drawable.basic_number_8;
-            case 9:
-                return R.drawable.basic_number_9;
-            default:
-                return R.drawable.basic_number_0;
-        }
-    }
 
     public static Bitmap rotate(Bitmap src, float degrees) {
         Matrix matrix = new Matrix();

@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,7 +39,7 @@ public class ParisBlackWallpaperService extends WallpaperService {
         private Paint mPaintBitmap;
         private int mCenterLineLen;
         private RectF mRectF = new RectF();
-        private Rect mRect = new Rect();
+        private Matrix mMatrix = new Matrix();
 
         private Context mContext;
         private boolean mVisible;
@@ -186,27 +185,11 @@ public class ParisBlackWallpaperService extends WallpaperService {
             mPaintBitmap.setStrokeWidth(DimenUtil.dip2px(mContext, 4));
             mPaintBitmap.setStyle(Paint.Style.STROKE);
             int margin = DimenUtil.dip2px(mContext, 8);
-            float percent = 1.0f * 51 / 360;
+            float percent = 1.0f * 298 / 360;
             int percentage = (int) (percent * 100);
             float sweepAngle = percent * 360;
             canvas.drawArc(margin, margin, 2 * mPointScreenCenter.x - margin, 2 * mPointScreenCenter.y - margin
                     , -90, sweepAngle, false, mPaintBitmap);//-90：最顶部，0：最右侧，90：最底部，180：最左侧
-
-            /*Bitmap leftBitmap = mBitmapManager.get(mContext, R.drawable.basic_number_5, R.color.basic_number_color);
-            Bitmap rightBitmap = mBitmapManager.get(mContext, R.drawable.basic_number_9, R.color.basic_number_color);
-            Bitmap dst = BitmapManager.mergeLeftRight(leftBitmap, rightBitmap);
-            if (dst != null) {
-                dst = BitmapManager.mergeLeftRight(dst, mBitmapManager.get(mContext, R.drawable.basic_sign_percentage, R.color.basic_number_color));
-                if (dst != null) {
-                    canvas.drawBitmap(dst, mPointScreenCenter.x - 1.0f * dst.getWidth() / 2,
-                            (mPointScreenCenter.y - 1.0f * dst.getHeight()) / 2, mPaintBitmap);
-                }
-            }*/
-
-            mPaintBitmap.setStyle(Paint.Style.FILL);
-            String text = percentage + "%";
-            mPaintBitmap.setTextSize(DimenUtil.dip2px(mContext, 28));
-            mPaintBitmap.getTextBounds(text, 0, text.length(), mRect);
 
             int units = percentage % 10;//个位
             int tens = percentage / 10;//十位
@@ -255,89 +238,138 @@ public class ParisBlackWallpaperService extends WallpaperService {
             int week = instance.get(Calendar.DAY_OF_WEEK);
 
             float ratio = 1.7f;
-            //mPaintBitmap.setShadowLayer(0.1f, 0, 0, Color.parseColor("#FF0000"));//外围阴影效果
 
-            float offset = mPointScreenCenter.x;
-            Bitmap bitmap = mBitmapManager.getScale(R.drawable.basic_text_day, ratio);
-            int marginTop = DimenUtil.dip2px(mContext, 14);
-            float top = mPointScreenCenter.y + marginTop;
-            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
+            Bitmap bitmap = mBitmapManager.get(R.drawable.basic_text_day);
+            final float marginTop = DimenUtil.dip2px(mContext, 22);
+            float pivotY = mPointScreenCenter.y + 1.0f * bitmap.getHeight() / 2 + marginTop;
+            float pivotX = mPointScreenCenter.x + 1.0f * bitmap.getWidth() / 2 + DimenUtil.dip2px(mContext, 4);
+            mMatrix.reset();
+            float dx = 1.0f * bitmap.getWidth() / 2, dy = 1.0f * bitmap.getHeight() / 2;
+            mMatrix.preTranslate(pivotX - dx, pivotY - dy);
+            mMatrix.preScale(ratio, ratio);
+            mMatrix.preTranslate(-dx, -dy);
+            mMatrix.postTranslate(dx, dy);
+            canvas.drawBitmap(bitmap, mMatrix, null);
+            //canvas.drawCircle(pivotX, pivotY, 6, mPaintBitmap);//点(pivotX, pivotY)
 
             //星期
-            bitmap = mBitmapManager.getScale(R.drawable.basic_text_week, ratio);//星期
-            int weekMarginLeft = bitmap.getWidth() + DimenUtil.dip2px(mContext, 10);
-            offset += weekMarginLeft;
-            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
-            offset += bitmap.getWidth();
-
-            bitmap = mBitmapManager.getScale(mBitmapManager.getWeekResId(), ratio - 0.2f);
-            canvas.drawBitmap(bitmap, offset, top + 2, mPaintBitmap);
+            bitmap = BitmapManager.mergeLeftRight(mBitmapManager.get(R.drawable.basic_text_week), mBitmapManager.get(mBitmapManager.getWeekResId()));
+            int weekMarginLeft = bitmap.getWidth() + DimenUtil.dip2px(mContext, 16);
+            pivotX += weekMarginLeft;
+            mMatrix.reset();
+            dx = 1.0f * bitmap.getWidth() / 2;
+            dy = 1.0f * bitmap.getHeight() / 2;
+            mMatrix.preTranslate(pivotX - dx, pivotY - dy);
+            mMatrix.preScale(ratio, ratio);
+            mMatrix.preTranslate(-dx, -dy);
+            mMatrix.postTranslate(dx, dy);
+            canvas.drawBitmap(bitmap, mMatrix, null);
+            //canvas.drawCircle(pivotX, pivotY, 6, mPaintBitmap);//点(pivotX, pivotY)
 
             //号数
             int units = day % 10;//个位
             int tens = day / 10;//十位
-            offset = mPointScreenCenter.x;
-            bitmap = mBitmapManager.getScale(mBitmapManager.getNumberResId(units), ratio);
-            offset -= bitmap.getWidth();
             if (tens > 0) {
-                canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
-                bitmap = mBitmapManager.getScale(mBitmapManager.getNumberResId(tens), ratio);
-                offset -= bitmap.getWidth();
-                canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
+                bitmap = BitmapManager.mergeLeftRight(mBitmapManager.get(mBitmapManager.getNumberResId(tens))
+                        , mBitmapManager.get(mBitmapManager.getNumberResId(units)));
+            } else {
+                bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units));
             }
+            mMatrix.reset();
+            pivotX = mPointScreenCenter.x - bitmap.getWidth();
+            dx = 1.0f * bitmap.getWidth() / 2;
+            dy = 1.0f * bitmap.getHeight() / 2;
+            mMatrix.preTranslate(pivotX - dx, pivotY - dy);
+            mMatrix.preScale(ratio, ratio);
+            mMatrix.preTranslate(-dx, -dy);
+            mMatrix.postTranslate(dx, dy);
+            canvas.drawBitmap(bitmap, mMatrix, null);
+            //canvas.drawCircle(pivotX, pivotY, 6, mPaintBitmap);//点(pivotX, pivotY)
 
+            //月
+            bitmap = mBitmapManager.get(R.drawable.basic_text_month);
+            mMatrix.reset();
+            pivotX -= bitmap.getWidth() * 2;
+            dx = 1.0f * bitmap.getWidth() / 2;
+            dy = 1.0f * bitmap.getHeight() / 2;
+            mMatrix.preTranslate(pivotX - dx, pivotY - dy);
+            mMatrix.preScale(ratio, ratio);
+            mMatrix.preTranslate(-dx, -dy);
+            mMatrix.postTranslate(dx, dy);
+            canvas.drawBitmap(bitmap, mMatrix, null);
+            //canvas.drawCircle(pivotX, pivotY, 6, mPaintBitmap);//点(pivotX, pivotY)
             //月份
-            bitmap = mBitmapManager.getScale(R.drawable.basic_text_month, ratio);
-            offset -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
             units = month % 10;//个位
             tens = month / 10;//十位
-            bitmap = mBitmapManager.getScale(mBitmapManager.getNumberResId(units), ratio);
-            offset -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
             if (tens > 0) {
-                mBitmapManager.getScale(mBitmapManager.getNumberResId(tens), ratio);
-                offset -= bitmap.getWidth();
-                canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
+                bitmap = BitmapManager.mergeLeftRight(mBitmapManager.get(mBitmapManager.getNumberResId(tens))
+                        , mBitmapManager.get(mBitmapManager.getNumberResId(units)));
+            } else {
+                bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units));
             }
+            mMatrix.reset();
+            dx = 1.0f * bitmap.getWidth() / 2;
+            dy = 1.0f * bitmap.getHeight() / 2;
+            pivotX -= bitmap.getWidth() * 2;
+            mMatrix.preTranslate(pivotX - dx, pivotY - dy);//缩小到以前的0.5倍
+            mMatrix.preScale(ratio, ratio);
+            mMatrix.preTranslate(-dx, -dy);
+            mMatrix.postTranslate(dx, dy);
+            canvas.drawBitmap(bitmap, mMatrix, null);
+            //canvas.drawCircle(pivotX, pivotY, 6, mPaintBitmap);//点(pivotX, pivotY)
 
-            /*Log.d(TAG, "date, month = " + month + ", day = " + day + ", week = " + week
-                    + ", tens = " + tens + ", units = " + units);*/
+            Log.d(TAG, "date, month = " + month + ", day = " + day + ", week = " + week
+                    + ", tens = " + tens + ", units = " + units);
 
             //冒号
-            float v = 1.0f * bitmap.getWidth() / 2;
-            offset = mPointScreenCenter.x - v;
+            ratio = 0.8f;
+            mMatrix.reset();
             bitmap = mBitmapManager.get(R.drawable.basic_sign_colon);
-            top = mPointScreenCenter.y - (bitmap.getHeight() + marginTop);
-            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
-
-            int hour = instance.get(Calendar.HOUR);
-            int minute = instance.get(Calendar.MINUTE);
-
-            offset = mPointScreenCenter.x + v;
+            pivotX = mPointScreenCenter.x - bitmap.getWidth() / 2;
+            pivotY = mPointScreenCenter.y - 1.0f * bitmap.getHeight() / 2 - marginTop / 2;
+            dx = 1.0f * bitmap.getWidth() / 2;
+            dy = 1.0f * bitmap.getHeight() / 2;
+            mMatrix.preTranslate(pivotX - dx, pivotY - dy);
+            mMatrix.preScale(ratio, ratio);
+            mMatrix.preTranslate(-dx, -dy);
+            mMatrix.postTranslate(dx, dy);
+            canvas.drawBitmap(bitmap, mMatrix, null);
+            //canvas.drawCircle(pivotX, pivotY, 6, mPaintBitmap);//点(pivotX, pivotY)
 
             //分钟
+            int minute = instance.get(Calendar.MINUTE);
             units = minute % 10;//个位
             tens = minute / 10;//十位
-            bitmap = mBitmapManager.getScale(mBitmapManager.getNumberResId(tens), ratio);
-            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
-            bitmap = mBitmapManager.getScale(mBitmapManager.getNumberResId(units), ratio);
-            offset += bitmap.getWidth();
-            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
-
-            offset = mPointScreenCenter.x - v - 2;
+            bitmap = BitmapManager.mergeLeftRight(mBitmapManager.get(mBitmapManager.getNumberResId(tens))
+                    , mBitmapManager.get(mBitmapManager.getNumberResId(units)));
+            ratio = 2.2f;
+            mMatrix.reset();
+            pivotX += bitmap.getWidth() + DimenUtil.dip2px(mContext, 10);
+            dx = 1.0f * bitmap.getWidth() / 2;
+            dy = 1.0f * bitmap.getHeight() / 2;
+            mMatrix.preTranslate(pivotX - dx, pivotY - dy);
+            mMatrix.preScale(ratio, ratio);
+            mMatrix.preTranslate(-dx, -dy);
+            mMatrix.postTranslate(dx, dy);
+            canvas.drawBitmap(bitmap, mMatrix, null);
+            //canvas.drawCircle(pivotX, pivotY, 6, mPaintBitmap);//点(pivotX, pivotY)
 
             //时钟
+            int hour = instance.get(Calendar.HOUR);
             units = hour % 10;//个位
             tens = hour / 10;//十位
-            bitmap = mBitmapManager.getScale(mBitmapManager.getNumberResId(units), ratio);
-            offset -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
-            bitmap = mBitmapManager.getScale(mBitmapManager.getNumberResId(tens), ratio);
-            offset -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap, offset, top, mPaintBitmap);
-
-            mPaintBitmap.clearShadowLayer();
+            bitmap = BitmapManager.mergeLeftRight(mBitmapManager.get(mBitmapManager.getNumberResId(tens))
+                    , mBitmapManager.get(mBitmapManager.getNumberResId(units)));
+            mMatrix.reset();
+            pivotX = mPointScreenCenter.x - bitmap.getWidth() - DimenUtil.dip2px(mContext, 20);
+            dx = 1.0f * bitmap.getWidth() / 2;
+            dy = 1.0f * bitmap.getHeight() / 2;
+            mMatrix.preTranslate(pivotX - dx, pivotY - dy);
+            mMatrix.preScale(ratio, ratio);
+            mMatrix.preTranslate(-dx, -dy);
+            mMatrix.postTranslate(dx, dy);
+            canvas.drawBitmap(bitmap, mMatrix, null);
+            //canvas.drawCircle(pivotX, pivotY, 6, mPaintBitmap);//点(pivotX, pivotY)
         }
 
         private final Handler mHandler = new Handler() {
