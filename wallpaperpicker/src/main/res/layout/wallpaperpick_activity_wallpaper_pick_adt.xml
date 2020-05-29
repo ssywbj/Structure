@@ -8,17 +8,18 @@
         android:id="@+id/text_wallpaper_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
         android:gravity="center"
         android:padding="4dp"
-        android:textColor="@android:color/white"
-        android:textSize="20sp" />
+        android:textColor="#8DCC3E"
+        android:textSize="22sp" />
 
     <ImageView
         android:id="@+id/image_wallpaper_thumb"
-        android:layout_width="210dp"
-        android:layout_height="210dp"
-        android:layout_marginStart="84dp"
-        android:layout_marginEnd="84dp"/>
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"/>
 
     <TextView
         android:id="@+id/text_wallpaper_setting"
@@ -28,6 +29,7 @@
         android:padding="8dp"
         android:text="设置"
         android:textColor="@android:color/white"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:visibility="gone" />
 
 </LinearLayout>

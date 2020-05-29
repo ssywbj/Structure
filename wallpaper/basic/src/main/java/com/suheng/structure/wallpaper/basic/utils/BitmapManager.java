@@ -22,7 +22,7 @@ import java.util.Map;
 public class BitmapManager {
 
     private Context mContext;
-    private Map<Integer, Bitmap> mMapBitmap = new HashMap<>();
+    private Map<String, Bitmap> mMapBitmap = new HashMap<>();
 
     public BitmapManager(Context context) {
         mContext = context;
@@ -54,11 +54,12 @@ public class BitmapManager {
     }
 
     public Bitmap get(@DrawableRes int resId, int color) {
-        if (mMapBitmap.containsKey(resId)) {
-            return mMapBitmap.get(resId);
+        String key = resId + "" + color;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
         } else {
             Bitmap bitmap = get(mContext, resId, color);
-            mMapBitmap.put(resId, bitmap);
+            mMapBitmap.put(key, bitmap);
             return bitmap;
         }
     }
@@ -68,14 +69,15 @@ public class BitmapManager {
     }
 
     public Bitmap getScale(@DrawableRes int resId, int color, float ratio) {
-        if (mMapBitmap.containsKey(resId)) {
-            return mMapBitmap.get(resId);
+        String key = "scale_" + resId + "" + color;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
         } else {
             Bitmap bitmap = get(mContext, resId, color);
             if (ratio > 0) {
                 bitmap = scale(bitmap, ratio);
             }
-            mMapBitmap.put(resId, bitmap);
+            mMapBitmap.put(key, bitmap);
             return bitmap;
         }
     }
@@ -85,14 +87,15 @@ public class BitmapManager {
     }
 
     public Bitmap getRotate(@DrawableRes int resId, int color, float degrees) {
-        if (mMapBitmap.containsKey(resId)) {
-            return mMapBitmap.get(resId);
+        String key = "rotate_" + resId + "" + color;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
         } else {
             Bitmap bitmap = get(mContext, resId, color);
             if (degrees != 0) {
                 bitmap = rotate(bitmap, degrees);
             }
-            mMapBitmap.put(resId, bitmap);
+            mMapBitmap.put(key, bitmap);
             return bitmap;
         }
     }
@@ -102,7 +105,7 @@ public class BitmapManager {
     }
 
     public void clear() {
-        for (Map.Entry<Integer, Bitmap> bitmapEntry : mMapBitmap.entrySet()) {
+        for (Map.Entry<String, Bitmap> bitmapEntry : mMapBitmap.entrySet()) {
             Bitmap bitmap = bitmapEntry.getValue();
             if (!bitmap.isRecycled()) {
                 bitmap.recycle();
@@ -216,6 +219,24 @@ public class BitmapManager {
         canvas.drawBitmap(left, leftRect, leftRect, null);
         canvas.drawBitmap(right, rightRect, rightRectT, null);
         return dst;
+    }
+
+    /**
+     * 两个等高的位图左右拼接
+     */
+    public Bitmap mergeLeftRight(@DrawableRes int leftId, int leftColor, @DrawableRes int rightId, int rightColor) {
+        String key = leftId + "" + leftColor + "" + rightId + "" + rightColor;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
+        } else {
+            Bitmap bitmap = mergeLeftRight(this.get(leftId, leftColor), this.get(rightId, rightColor));
+            mMapBitmap.put(key, bitmap);
+            return bitmap;
+        }
+    }
+
+    public Bitmap mergeLeftRight(@DrawableRes int leftId, @DrawableRes int rightId) {
+        return this.mergeLeftRight(leftId, R.color.basic_number_color, rightId, R.color.basic_number_color);
     }
 
 }

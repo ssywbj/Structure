@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--<dimen name="basic_number_width">34dp</dimen>
+    <dimen name="basic_number_height">60dp</dimen>
+    <dimen name="basic_text_width">54dp</dimen>
+    <dimen name="basic_text_height">@dimen/basic_number_height</dimen>
+    <dimen name="basic_info_icon">36.36dp</dimen>-->
+
     <dimen name="basic_number_width">12.36dp</dimen>
     <dimen name="basic_number_height">21.816dp</dimen>
     <dimen name="basic_text_width">19.64dp</dimen>

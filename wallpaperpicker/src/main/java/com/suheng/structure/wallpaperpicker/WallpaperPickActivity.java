@@ -9,6 +9,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
@@ -27,6 +28,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.suheng.structure.wallpaperpicker.adapter.RecyclerAdapter;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -114,14 +118,6 @@ public class WallpaperPickActivity extends AppCompatActivity {
         }
 
         mWallpaperInfoList.addAll(wallpaperInfos);
-        /*mWallpaperInfoList.addAll(wallpaperInfos);
-        mWallpaperInfoList.addAll(wallpaperInfos);
-        mWallpaperInfoList.addAll(wallpaperInfos);
-        mWallpaperInfoList.addAll(wallpaperInfos);
-        mWallpaperInfoList.addAll(wallpaperInfos);
-        mWallpaperInfoList.addAll(wallpaperInfos);
-        mWallpaperInfoList.addAll(wallpaperInfos);
-        mWallpaperInfoList.addAll(wallpaperInfos);*/
 
         this.initRecyclerView();
     }
@@ -165,25 +161,44 @@ public class WallpaperPickActivity extends AppCompatActivity {
      */
     public void setLiveWallPaper(String packageName, String service) {
         try {
-            WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
-            Method method = WallpaperManager.class.getMethod("getIWallpaperManager");
-            Object invoke = method.invoke(wallpaperManager);
-            Class[] param = new Class[1];
-            param[0] = ComponentName.class;
-            method = invoke.getClass().getMethod("setWallpaperComponent", param);
-
-            Intent intent = new Intent(WallpaperService.SERVICE_INTERFACE);
-            intent.setClassName(packageName, service);
-            method.invoke(invoke, intent.getComponent());
-
-            /*ComponentName componentName = new ComponentName(packageName, service);
-            method.invoke(invoke, componentName);*/
+            Method method = WallpaperManager.class.getMethod("setWallpaperComponent", ComponentName.class);
+            method.invoke(WallpaperManager.getInstance(this), new ComponentName(packageName, service));
             Toast.makeText(this, "表盘设置成功", Toast.LENGTH_SHORT).show();
             finish();
         } catch (Exception e) {
             Log.e(mTag, "set live wallpaper fail", e);
             Toast.makeText(this, "表盘设置失败", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    //deletePackage(@NonNull String packageName, @Nullable IPackageDeleteObserver observer, @DeleteFlags int flags);
+    public void deleteLiveWallPaper(String packageName) throws Exception {
+        Method method = PackageManager.class.getMethod("deletePackage", String.class, Object.class, int.class);
+        method.invoke(getPackageManager(), packageName, null, 0);
+    }
+
+    private String execCommand(String... command) {
+        String result;
+        try {
+            Process process = new ProcessBuilder().command(command).start();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            int read;
+            InputStream inputStream = process.getErrorStream();
+            while ((read = inputStream.read()) != -1) {
+                byteArrayOutputStream.write(read);
+            }
+            InputStream processInputStream = process.getInputStream();
+            while ((read = processInputStream.read()) != -1) {
+                byteArrayOutputStream.write(read);
+            }
+            result = new String(byteArrayOutputStream.toByteArray());
+            processInputStream.close();
+            inputStream.close();
+            process.destroy();
+        } catch (IOException e) {
+            result = e.getMessage();
+        }
+        return result;
     }
 
     ItemTouchHelper.Callback mCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP, ItemTouchHelper.UP) {
@@ -214,7 +229,37 @@ public class WallpaperPickActivity extends AppCompatActivity {
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             int pst = viewHolder.getAdapterPosition();
-            mWallpaperInfoList.remove(mWallpaperInfoList.get(pst));
+            WallpaperInfo wallpaper = mWallpaperInfoList.get(pst);
+
+            /*try {
+                deleteLiveWallPaper(wallpaper.getPackageName());
+
+                mWallpaperInfoList.remove(wallpaper);
+                mLivePaperAdapter.notifyDataSetChanged();
+                Toast.makeText(WallpaperPickActivity.this, "表盘删除成功", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Log.e(mTag, "delete live wallpaper fail", e);
+                Toast.makeText(WallpaperPickActivity.this, "表盘删除失败", Toast.LENGTH_SHORT).show();
+            }*/
+
+            /*try {
+                execCommand("pm", "uninstall", wallpaper.getPackageName());
+
+                mWallpaperInfoList.remove(wallpaper);
+                mLivePaperAdapter.notifyDataSetChanged();
+                Toast.makeText(WallpaperPickActivity.this, "表盘删除成功", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Log.e(mTag, "delete live wallpaper fail", e);
+                Toast.makeText(WallpaperPickActivity.this, "表盘删除失败", Toast.LENGTH_SHORT).show();
+            }*/
+
+            /*Uri uri = Uri.fromParts("package", wallpaper.getPackageName(), null);
+            Intent intent = new Intent(Intent.ACTION_DELETE, uri);
+            startActivity(intent);
+            mWallpaperInfoList.remove(wallpaper);
+            mLivePaperAdapter.notifyDataSetChanged();*/
+
+            mWallpaperInfoList.remove(wallpaper);
             mLivePaperAdapter.notifyDataSetChanged();
             Log.d(mTag, "onSwiped");
             if (mWallpaperInfoList.size() == 0) {
@@ -241,7 +286,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     contentHolder.textSetting.setVisibility(View.GONE);
                     contentHolder.textSetting.setOnClickListener(null);
                 } else {
-                    contentHolder.textSetting.setVisibility(View.VISIBLE);
+                    //contentHolder.textSetting.setVisibility(View.VISIBLE);
                     contentHolder.textSetting.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
