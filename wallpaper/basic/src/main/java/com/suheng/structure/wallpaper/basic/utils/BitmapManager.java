@@ -69,7 +69,7 @@ public class BitmapManager {
     }
 
     public Bitmap getScale(@DrawableRes int resId, int color, float ratio) {
-        String key = "scale_" + resId + "" + color;
+        String key = "scale_" + resId + "" + color + "_" + ratio;
         if (mMapBitmap.containsKey(key)) {
             return mMapBitmap.get(key);
         } else {
@@ -87,7 +87,7 @@ public class BitmapManager {
     }
 
     public Bitmap getRotate(@DrawableRes int resId, int color, float degrees) {
-        String key = "rotate_" + resId + "" + color;
+        String key = "rotate_" + resId + "" + color + "_" + degrees;
         if (mMapBitmap.containsKey(key)) {
             return mMapBitmap.get(key);
         } else {
@@ -177,7 +177,7 @@ public class BitmapManager {
         if (dst.equals(src)) {
             return dst;
         }
-        //src.recycle();
+        src.recycle();
         return dst;
     }
 
