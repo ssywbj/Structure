@@ -56,8 +56,8 @@ public class VectorView extends View {
 
         float centerX = getWidth() * 1.0f / 2, centerY = getHeight() * 1.0f / 2;
 
-        canvas.drawLine(centerX, 0, centerX, getHeight(), mPaint);
-        canvas.drawLine(0, centerY, getWidth(), centerY, mPaint);
+        //canvas.drawLine(centerX, 0, centerX, getHeight(), mPaint);
+        //canvas.drawLine(0, centerY, getWidth(), centerY, mPaint);
 
         //set：直接设置Matrix的值，每次set一次，整个Matrix的数组都会变掉
         mMatrix.reset();

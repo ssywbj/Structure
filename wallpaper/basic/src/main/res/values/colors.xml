@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="basic_number_color">#CCCCCC</color>
-    <color name="boneblack_wallpaper_bg_black">#000001</color>
+    <color name="basic_wallpaper_bg_black">#000001</color>
 </resources>

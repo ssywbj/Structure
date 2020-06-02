@@ -15,7 +15,6 @@ import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import com.suheng.structure.wallpaper.basic.R;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,6 +51,7 @@ public class BitmapManager {
             throw new IllegalArgumentException("unsupported drawable type");
         }
     }
+
 
     public Bitmap get(@DrawableRes int resId, int color) {
         String key = resId + "" + color;
@@ -120,7 +120,7 @@ public class BitmapManager {
     }
 
     public int getWeekResId() {
-        Calendar instance = Calendar.getInstance();
+        /*Calendar instance = Calendar.getInstance();
         switch (instance.get(Calendar.DAY_OF_WEEK)) {
             case 1:
                 return R.drawable.basic_text_day;
@@ -138,7 +138,9 @@ public class BitmapManager {
                 return R.drawable.basic_text_6;
             default:
                 return R.drawable.basic_text_day;
-        }
+        }*/
+
+        return 0;
     }
 
     public Bitmap getNumberBitmap(int number) {
@@ -146,7 +148,7 @@ public class BitmapManager {
     }
 
     public int getNumberResId(int number) {
-        switch (number) {
+        /*switch (number) {
             case 1:
                 return R.drawable.basic_number_1;
             case 2:
@@ -167,7 +169,9 @@ public class BitmapManager {
                 return R.drawable.basic_number_9;
             default:
                 return R.drawable.basic_number_0;
-        }
+        }*/
+
+        return 0;
     }
 
     public static Bitmap rotate(Bitmap src, float degrees) {
@@ -225,11 +229,21 @@ public class BitmapManager {
      * 两个等高的位图左右拼接
      */
     public Bitmap mergeLeftRight(@DrawableRes int leftId, int leftColor, @DrawableRes int rightId, int rightColor) {
-        String key = leftId + "" + leftColor + "" + rightId + "" + rightColor;
+        return mergeLeftRight(leftId, leftColor, rightId, rightColor, 0);
+    }
+
+    /**
+     * 两个等高的位图左右拼接
+     */
+    public Bitmap mergeLeftRight(@DrawableRes int leftId, int leftColor, @DrawableRes int rightId, int rightColor, float scale) {
+        String key = "mergeLR_" + leftId + "" + leftColor + "" + rightId + "" + rightColor + "_" + scale;
         if (mMapBitmap.containsKey(key)) {
             return mMapBitmap.get(key);
         } else {
             Bitmap bitmap = mergeLeftRight(this.get(leftId, leftColor), this.get(rightId, rightColor));
+            if (scale > 0) {
+                bitmap = scale(bitmap, scale);
+            }
             mMapBitmap.put(key, bitmap);
             return bitmap;
         }
@@ -239,4 +253,24 @@ public class BitmapManager {
         return this.mergeLeftRight(leftId, R.color.basic_number_color, rightId, R.color.basic_number_color);
     }
 
+    public Bitmap mergeLeftRight(@DrawableRes int leftId, int leftColor, @DrawableRes int centerId
+            , int centerColor, @DrawableRes int rightId, int rightColor, float scale) {
+        String key = "mergeLR_" + leftId + "" + leftColor + "" + centerId + "" + centerColor + "" + rightId + "" + rightColor;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
+        } else {
+            Bitmap bitmap = mergeLeftRight(this.get(leftId, leftColor), this.get(centerId, centerColor));
+            Bitmap dst = mergeLeftRight(bitmap, this.get(rightId, rightColor));
+            if (scale > 0) {
+                dst = scale(dst, scale);
+            }
+            mMapBitmap.put(key, dst);
+            return dst;
+        }
+    }
+
+    public Bitmap mergeLeftRight(@DrawableRes int leftId, @DrawableRes int centerId, @DrawableRes int rightId, float scale) {
+        return this.mergeLeftRight(leftId, R.color.basic_number_color, centerId
+                , R.color.basic_number_color, rightId, R.color.basic_number_color, scale);
+    }
 }

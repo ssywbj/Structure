@@ -19,7 +19,7 @@ import java.util.Map;
 public class BitmapManager {
 
     private Context mContext;
-    private Map<Integer, Bitmap> mMapBitmap = new HashMap<>();
+    private Map<String, Bitmap> mMapBitmap = new HashMap<>();
 
     public BitmapManager(Context context) {
         mContext = context;
@@ -51,47 +51,84 @@ public class BitmapManager {
     }
 
     public Bitmap get(@DrawableRes int resId, int color) {
-        if (mMapBitmap.containsKey(resId)) {
-            return mMapBitmap.get(resId);
+        String key = resId + "" + color;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
         } else {
             Bitmap bitmap = get(mContext, resId, color);
-            mMapBitmap.put(resId, bitmap);
+            mMapBitmap.put(key, bitmap);
+            return bitmap;
+        }
+    }
+
+    public Bitmap get(Context context, @DrawableRes int resId) {
+        Drawable drawable = ContextCompat.getDrawable(context, resId);
+        if (drawable == null) {
+            return null;
+        }
+
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        } else if (drawable instanceof VectorDrawable || drawable instanceof VectorDrawableCompat) {
+            int intrinsicWidth = drawable.getIntrinsicWidth();
+            int intrinsicHeight = drawable.getIntrinsicHeight();
+            Bitmap bitmap = Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            int width = canvas.getWidth();
+            int height = canvas.getHeight();
+            drawable.setBounds(0, 0, width, height);
+            drawable.draw(canvas);
+            return bitmap;
+        } else {
+            throw new IllegalArgumentException("unsupported drawable type");
+        }
+    }
+
+    public Bitmap get(@DrawableRes int resId) {
+        String key = resId + "";
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
+        } else {
+            Bitmap bitmap = get(mContext, resId);
+            mMapBitmap.put(key, bitmap);
             return bitmap;
         }
     }
 
     public Bitmap getScale(@DrawableRes int resId, int color, float ratio) {
-        if (mMapBitmap.containsKey(resId)) {
-            return mMapBitmap.get(resId);
+        String key = "scale_" + resId + "" + color + "_" + ratio;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
         } else {
             Bitmap bitmap = get(mContext, resId, color);
             if (ratio > 0) {
                 bitmap = scale(bitmap, ratio);
             }
-            mMapBitmap.put(resId, bitmap);
+            mMapBitmap.put(key, bitmap);
             return bitmap;
         }
     }
 
     public Bitmap getScale(@DrawableRes int resId, float ratio) {
-        return getScale(resId, android.R.color.holo_red_light, ratio);
+        return getScale(resId, android.R.color.white, ratio);
     }
 
     public Bitmap getRotate(@DrawableRes int resId, int color, float degrees) {
-        if (mMapBitmap.containsKey(resId)) {
-            return mMapBitmap.get(resId);
+        String key = "rotate_" + resId + "" + color + "_" + degrees;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
         } else {
             Bitmap bitmap = get(mContext, resId, color);
             if (degrees != 0) {
                 bitmap = rotate(bitmap, degrees);
             }
-            mMapBitmap.put(resId, bitmap);
+            mMapBitmap.put(key, bitmap);
             return bitmap;
         }
     }
 
     public void clear() {
-        for (Map.Entry<Integer, Bitmap> bitmapEntry : mMapBitmap.entrySet()) {
+        for (Map.Entry<String, Bitmap> bitmapEntry : mMapBitmap.entrySet()) {
             Bitmap bitmap = bitmapEntry.getValue();
             if (!bitmap.isRecycled()) {
                 bitmap.recycle();

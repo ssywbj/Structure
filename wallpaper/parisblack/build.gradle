@@ -15,8 +15,22 @@ android {
         vectorDrawables.useSupportLibrary = true//兼容不支持SVG的机型
     }
 
-    buildTypes {
+    signingConfigs {
         release {
+            storeFile file('../../zhipu-keystore.jks')
+            storePassword 'Zhipu@520'
+            keyAlias = 'modules_apply'
+            keyPassword 'Zhipu@520_'
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.release
+        }
+
+        release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources true
             zipAlignEnabled true
