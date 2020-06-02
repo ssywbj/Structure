@@ -173,19 +173,19 @@ public class BoneBlackWallpaperService extends WallpaperService {
                     case 3:
                         bitmap = mBitmapManager.getRotate(R.drawable.basic_icon_battary, -degrees);
                         left = mPointScreenCenter.x - bitmap.getWidth();
-                        top = mMarginRadiusOuter + bitmap.getHeight() + mMarginRadiusOuter * 2.5f;
+                        top = mPointScreenCenter.y - mRadiusOuter + mMarginRadiusOuter * 2.5f;
                         break;
                     case 6:
                         bitmap = mBitmapManager.getRotate(R.drawable.boneblack_scale_number_6, -degrees);
                         left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
-                        top = mMarginRadiusOuter + bitmap.getHeight();
+                        top = mPointScreenCenter.y - mRadiusOuter;
 
                         mRadiusInner = mRadiusOuter - 1.0f * bitmap.getHeight();
                         break;
                     case 9:
                         bitmap = mBitmapManager.getRotate(R.drawable.basic_icon_weather_day_duoyun, -degrees);
                         left = mPointScreenCenter.x;
-                        top = mMarginRadiusOuter + bitmap.getHeight() + mMarginRadiusOuter * 2.5f;
+                        top = mPointScreenCenter.y - mRadiusOuter + mMarginRadiusOuter * 2.5f;
                         break;
                     default:
                         if (index == 0) {
@@ -194,7 +194,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
                             bitmap = mBitmapManager.get(R.drawable.boneblack_scale_paperclip, R.color.boneblack_wallpaper_scale_paperclip);
                         }
                         left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
-                        top = mMarginRadiusOuter + bitmap.getHeight();
+                        top = mPointScreenCenter.y - mRadiusOuter;
                         break;
                 }
 
