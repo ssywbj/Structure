@@ -19,7 +19,6 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.suheng.structure.wallpaper.basic.DimenUtil;
-import com.suheng.structure.wallpaper.basic.utils.BitmapManager;
 
 import java.util.Calendar;
 
@@ -37,7 +36,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
         private PointF mPointScreenCenter = new PointF();//屏幕中心点
         private float mRadiusOuter;//刻度外半径长度
         private float mRadiusInner;//刻度内半径长度
-        private int mMarginRadiusOuter;//屏幕边缘到刻度外半径的留白
+        private float mMarginHorizontal, mMarginVertical;
         private int mMarginIconText;//信息图标与其下方文案的留白
 
         private Paint mPaint;
@@ -47,7 +46,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
         private boolean mVisible;
         private boolean mAmbientMode;
 
-        private BitmapManager mBitmapManager;
+        private BoneBitmapManager mBitmapManager;
 
         @Override
         public void onCreate(SurfaceHolder surfaceHolder) {
@@ -56,7 +55,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
 
             mContext = BoneBlackWallpaperService.this;
 
-            mBitmapManager = new BitmapManager(mContext);
+            mBitmapManager = new BoneBitmapManager(mContext);
 
             mPaint = new Paint();
             mPaint.setAntiAlias(true);
@@ -72,8 +71,9 @@ public class BoneBlackWallpaperService extends WallpaperService {
             float screenRadius = Math.min(mPointScreenCenter.x, mPointScreenCenter.y);//屏幕半径
 
             mMarginIconText = DimenUtil.dip2px(mContext, 2);
-            mMarginRadiusOuter = DimenUtil.dip2px(mContext, 3);
-            mRadiusOuter = screenRadius - mMarginRadiusOuter;
+            mMarginHorizontal = DimenUtil.dip2px(mContext, 3);
+            mRadiusOuter = screenRadius - mMarginHorizontal;
+            mMarginVertical = mPointScreenCenter.y - mRadiusOuter;
             Log.d(TAG, "onSurfaceChanged, format = " + format + ", width = " + width + ", height = " + height
                     + ", outer radius = " + mRadiusOuter);
 
@@ -160,6 +160,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
 
         private void paintScale(Canvas canvas) {
             Bitmap bitmap;
+            int color = R.color.scale_number;
             float left, top, degrees;
             final float scaleDegree = 1.0f * 360 / SCALES;//刻度角
 
@@ -171,30 +172,30 @@ public class BoneBlackWallpaperService extends WallpaperService {
 
                 switch (index) {
                     case 3:
-                        bitmap = mBitmapManager.getRotate(R.drawable.basic_icon_battary, -degrees);
+                        bitmap = mBitmapManager.getRotate(R.drawable.paint_battary, color, -degrees);
                         left = mPointScreenCenter.x - bitmap.getWidth();
-                        top = mPointScreenCenter.y - mRadiusOuter + mMarginRadiusOuter * 2.5f;
+                        top = mMarginVertical + mMarginHorizontal * 2.5f;
                         break;
                     case 6:
-                        bitmap = mBitmapManager.getRotate(R.drawable.boneblack_scale_number_6, -degrees);
+                        bitmap = mBitmapManager.getRotate(R.drawable.boneblack_scale_number_6, color, -degrees);
                         left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
-                        top = mPointScreenCenter.y - mRadiusOuter;
+                        top = mMarginVertical;
 
                         mRadiusInner = mRadiusOuter - 1.0f * bitmap.getHeight();
                         break;
                     case 9:
-                        bitmap = mBitmapManager.getRotate(R.drawable.basic_icon_weather_day_duoyun, -degrees);
+                        bitmap = mBitmapManager.getRotate(R.drawable.paint_weather_day_duoyun, color, -degrees);
                         left = mPointScreenCenter.x;
-                        top = mPointScreenCenter.y - mRadiusOuter + mMarginRadiusOuter * 2.5f;
+                        top = mMarginVertical + mMarginHorizontal * 2.5f;
                         break;
                     default:
                         if (index == 0) {
-                            bitmap = mBitmapManager.get(R.drawable.boneblack_sacle_number_12);
+                            bitmap = mBitmapManager.get(R.drawable.boneblack_sacle_number_12, color);
                         } else {
-                            bitmap = mBitmapManager.get(R.drawable.boneblack_scale_paperclip, R.color.boneblack_wallpaper_scale_paperclip);
+                            bitmap = mBitmapManager.get(R.drawable.boneblack_scale_paperclip, R.color.scale_paperclip);
                         }
                         left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
-                        top = mPointScreenCenter.y - mRadiusOuter;
+                        top = mMarginVertical;
                         break;
                 }
 
@@ -210,54 +211,54 @@ public class BoneBlackWallpaperService extends WallpaperService {
         }
 
         private void paintIconInfo(Canvas canvas) {
-            int offset = mMarginRadiusOuter * 3;
+            int color = R.color.scale_number;
+
+            float offset = mMarginHorizontal * 3;
             float top = mPointScreenCenter.y + mMarginIconText;
 
-            Bitmap bitmap = mBitmapManager.mergeLeftRight(R.drawable.basic_number_2, R.drawable.basic_number_5);
-            canvas.drawBitmap(bitmap, offset, top, null);
-            offset += bitmap.getWidth();
-            bitmap = mBitmapManager.get(R.drawable.basic_temperature_unit);
+            Bitmap bitmap = mBitmapManager.getMerge(
+                    R.drawable.paint_number_2, color, R.drawable.paint_number_5, color, R.drawable.paint_temperature_unit, color);
             canvas.drawBitmap(bitmap, offset, top, null);
 
-            bitmap = mBitmapManager.get(R.drawable.basic_sign_percentage);
-            offset = bitmap.getWidth() + mMarginRadiusOuter * 3;
-            canvas.drawBitmap(bitmap, 2 * mPointScreenCenter.x - offset, top, null);
-            bitmap = mBitmapManager.mergeLeftRight(R.drawable.basic_number_7, R.drawable.basic_number_0);
-            offset += bitmap.getWidth();
+            bitmap = mBitmapManager.getMerge(
+                    R.drawable.paint_number_7, color, R.drawable.paint_number_0, color, R.drawable.paint_sign_percentage, color);
+            offset = (bitmap.getWidth() + offset);
             canvas.drawBitmap(bitmap, 2 * mPointScreenCenter.x - offset, top, null);
         }
 
         private void paintDate(Canvas canvas) {
+            int color = R.color.scale_number;
+
             Calendar instance = Calendar.getInstance();
             int month = instance.get(Calendar.MONTH) + 1;
             int day = instance.get(Calendar.DAY_OF_MONTH);
             int week = instance.get(Calendar.DAY_OF_WEEK);
 
             float offset = mPointScreenCenter.x;
-            Bitmap bitmap = mBitmapManager.get(R.drawable.basic_text_day);
+            Bitmap bitmap = mBitmapManager.get(R.drawable.paint_text_day, color);
             float top = mPointScreenCenter.y + (mRadiusInner - bitmap.getHeight()) / 2 + 8;
             canvas.drawBitmap(bitmap, offset, top, null);
 
             //星期
             offset += (bitmap.getWidth() + DimenUtil.dip2px(mContext, 4));
-            bitmap = mBitmapManager.mergeLeftRight(R.drawable.basic_text_week, R.drawable.basic_text_2);//星期
+            bitmap = mBitmapManager.getMerge(R.drawable.paint_text_week, color, mBitmapManager.getWeekResId(), color);//星期
             canvas.drawBitmap(bitmap, offset, top, null);
 
             //号数
             int units = day % 10;//个位
             int tens = day / 10;//十位
             offset = mPointScreenCenter.x;
-            bitmap = mBitmapManager.mergeLeftRight(R.drawable.basic_number_1, R.drawable.basic_number_5);
+            bitmap = mBitmapManager.getMerge(mBitmapManager.getNumberResId(tens), color, mBitmapManager.getNumberResId(units), color);
             offset -= bitmap.getWidth();
             canvas.drawBitmap(bitmap, offset, top, null);
 
             //月份
-            bitmap = mBitmapManager.get(R.drawable.basic_text_month);
+            bitmap = mBitmapManager.get(R.drawable.paint_text_month, color);
             offset -= bitmap.getWidth();
             canvas.drawBitmap(bitmap, offset, top, null);
             units = month % 10;//个位
             tens = month / 10;//十位
-            bitmap = mBitmapManager.mergeLeftRight(R.drawable.basic_number_1, R.drawable.basic_number_0);
+            bitmap = mBitmapManager.getMerge(mBitmapManager.getNumberResId(tens), color, mBitmapManager.getNumberResId(units), color);
             offset -= bitmap.getWidth();
             canvas.drawBitmap(bitmap, offset, top, null);
 
@@ -280,8 +281,9 @@ public class BoneBlackWallpaperService extends WallpaperService {
             float bottom = mPointScreenCenter.y - bottomOffset;
             int shadowColor = Color.parseColor("#2E42FF");
 
+            float top = mMarginVertical;
+
             float pointerWidth = DimenUtil.dip2px(mContext, 5.6f);//分针宽度
-            float top = mPointScreenCenter.y - mRadiusOuter;
             top += (mRadiusOuter - mRadiusInner) + margin;
             canvas.save();
             canvas.rotate(degreesMinute, mPointScreenCenter.x, mPointScreenCenter.y);
@@ -316,7 +318,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
             canvas.restore();
 
             pointerWidth = pointerWidth / 3f;//秒针宽度
-            top = mPointScreenCenter.y - mRadiusOuter + DimenUtil.dip2px(mContext, 1);
+            top = mMarginVertical + DimenUtil.dip2px(mContext, 1);
             canvas.save();
             canvas.rotate(degreesSecond, mPointScreenCenter.x, mPointScreenCenter.y);
             mRectF.set(mPointScreenCenter.x - pointerWidth / 2, top,

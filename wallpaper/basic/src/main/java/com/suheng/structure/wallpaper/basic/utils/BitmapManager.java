@@ -27,7 +27,87 @@ public class BitmapManager {
         mContext = context;
     }
 
-    public Bitmap get(Context context, @DrawableRes int resId, int color) {
+    public void clear() {
+        for (Map.Entry<String, Bitmap> bitmapEntry : mMapBitmap.entrySet()) {
+            Bitmap bitmap = bitmapEntry.getValue();
+            if (!bitmap.isRecycled()) {
+                bitmap.recycle();
+            }
+        }
+
+        mMapBitmap.clear();
+    }
+
+    public Bitmap get(@DrawableRes int resId, int color) {
+        String key = resId + "" + color;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
+        } else {
+            Bitmap bitmap = get(mContext, resId, color);
+            mMapBitmap.put(key, bitmap);
+            return bitmap;
+        }
+    }
+
+    public Bitmap get(@DrawableRes int resId) {
+        return get(resId, R.color.basic_number_color);
+    }
+
+    public Bitmap getRotate(@DrawableRes int resId, int color, float degrees) {
+        String key = "rotate_" + resId + "" + color + "_" + degrees;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
+        } else {
+            Bitmap bitmap = get(mContext, resId, color);
+            if (degrees != 0) {
+                bitmap = rotate(bitmap, degrees);
+            }
+            mMapBitmap.put(key, bitmap);
+            return bitmap;
+        }
+    }
+
+    public Bitmap getRotate(@DrawableRes int resId, float degrees) {
+        return getRotate(resId, R.color.basic_number_color, degrees);
+    }
+
+    public Bitmap getMerge(@DrawableRes int leftId, int leftColor, @DrawableRes int rightId, int rightColor) {
+        String key = "mergeLR_" + leftId + "" + leftColor + "" + rightId + "" + rightColor;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
+        } else {
+            Bitmap bitmap = mergeLeftRight(this.get(leftId, leftColor), this.get(rightId, rightColor));
+            mMapBitmap.put(key, bitmap);
+            return bitmap;
+        }
+    }
+
+    public Bitmap getMerge(@DrawableRes int leftId, @DrawableRes int rightId) {
+        return this.getMerge(leftId, R.color.basic_number_color, rightId, R.color.basic_number_color);
+    }
+
+    public Bitmap getMerge(@DrawableRes int leftId, int leftColor, @DrawableRes int centerId
+            , int centerColor, @DrawableRes int rightId, int rightColor) {
+        String key = "mergeLR_" + leftId + "" + leftColor + "" + centerId + "" + centerColor + "" + rightId + "" + rightColor;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
+        } else {
+            Bitmap bitmap = mergeLeftRight(this.get(leftId, leftColor), this.get(centerId, centerColor));
+            Bitmap dst = mergeLeftRight(bitmap, this.get(rightId, rightColor));
+            mMapBitmap.put(key, dst);
+            return dst;
+        }
+    }
+
+    public Bitmap getMerge(@DrawableRes int leftId, @DrawableRes int centerId, @DrawableRes int rightId) {
+        return this.getMerge(leftId, R.color.basic_number_color, centerId
+                , R.color.basic_number_color, rightId, R.color.basic_number_color);
+    }
+
+    /**
+     * Drawable或SVG转Bitmap
+     */
+    public static Bitmap get(Context context, @DrawableRes int resId, int color) {
         Drawable drawable = ContextCompat.getDrawable(context, resId);
         if (drawable == null) {
             return null;
@@ -52,128 +132,9 @@ public class BitmapManager {
         }
     }
 
-
-    public Bitmap get(@DrawableRes int resId, int color) {
-        String key = resId + "" + color;
-        if (mMapBitmap.containsKey(key)) {
-            return mMapBitmap.get(key);
-        } else {
-            Bitmap bitmap = get(mContext, resId, color);
-            mMapBitmap.put(key, bitmap);
-            return bitmap;
-        }
-    }
-
-    public Bitmap get(@DrawableRes int resId) {
-        return get(resId, R.color.basic_number_color);
-    }
-
-    public Bitmap getScale(@DrawableRes int resId, int color, float ratio) {
-        String key = "scale_" + resId + "" + color + "_" + ratio;
-        if (mMapBitmap.containsKey(key)) {
-            return mMapBitmap.get(key);
-        } else {
-            Bitmap bitmap = get(mContext, resId, color);
-            if (ratio > 0) {
-                bitmap = scale(bitmap, ratio);
-            }
-            mMapBitmap.put(key, bitmap);
-            return bitmap;
-        }
-    }
-
-    public Bitmap getScale(@DrawableRes int resId, float ratio) {
-        return getScale(resId, android.R.color.holo_red_light, ratio);
-    }
-
-    public Bitmap getRotate(@DrawableRes int resId, int color, float degrees) {
-        String key = "rotate_" + resId + "" + color + "_" + degrees;
-        if (mMapBitmap.containsKey(key)) {
-            return mMapBitmap.get(key);
-        } else {
-            Bitmap bitmap = get(mContext, resId, color);
-            if (degrees != 0) {
-                bitmap = rotate(bitmap, degrees);
-            }
-            mMapBitmap.put(key, bitmap);
-            return bitmap;
-        }
-    }
-
-    public Bitmap getRotate(@DrawableRes int resId, float degrees) {
-        return getRotate(resId, R.color.basic_number_color, degrees);
-    }
-
-    public void clear() {
-        for (Map.Entry<String, Bitmap> bitmapEntry : mMapBitmap.entrySet()) {
-            Bitmap bitmap = bitmapEntry.getValue();
-            if (!bitmap.isRecycled()) {
-                bitmap.recycle();
-            }
-        }
-
-        mMapBitmap.clear();
-    }
-
-    public Bitmap getWeekBitmap() {
-        return get(this.getWeekResId());
-    }
-
-    public int getWeekResId() {
-        /*Calendar instance = Calendar.getInstance();
-        switch (instance.get(Calendar.DAY_OF_WEEK)) {
-            case 1:
-                return R.drawable.basic_text_day;
-            case 2:
-                return R.drawable.basic_text_1;
-            case 3:
-                return R.drawable.basic_text_2;
-            case 4:
-                return R.drawable.basic_text_3;
-            case 5:
-                return R.drawable.basic_text_4;
-            case 6:
-                return R.drawable.basic_text_5;
-            case 7:
-                return R.drawable.basic_text_6;
-            default:
-                return R.drawable.basic_text_day;
-        }*/
-
-        return 0;
-    }
-
-    public Bitmap getNumberBitmap(int number) {
-        return get(this.getNumberResId(number));
-    }
-
-    public int getNumberResId(int number) {
-        /*switch (number) {
-            case 1:
-                return R.drawable.basic_number_1;
-            case 2:
-                return R.drawable.basic_number_2;
-            case 3:
-                return R.drawable.basic_number_3;
-            case 4:
-                return R.drawable.basic_number_4;
-            case 5:
-                return R.drawable.basic_number_5;
-            case 6:
-                return R.drawable.basic_number_6;
-            case 7:
-                return R.drawable.basic_number_7;
-            case 8:
-                return R.drawable.basic_number_8;
-            case 9:
-                return R.drawable.basic_number_9;
-            default:
-                return R.drawable.basic_number_0;
-        }*/
-
-        return 0;
-    }
-
+    /**
+     * 图片旋转
+     */
     public static Bitmap rotate(Bitmap src, float degrees) {
         Matrix matrix = new Matrix();
         matrix.setRotate(degrees);
@@ -186,7 +147,7 @@ public class BitmapManager {
     }
 
     /**
-     * 按比例缩放图片
+     * 图片按比例缩放
      */
     public static Bitmap scale(Bitmap src, float ratio) {
         Matrix matrix = new Matrix();
@@ -200,7 +161,7 @@ public class BitmapManager {
     }
 
     /**
-     * 两个等高的位图左右拼接
+     * 图片左右拼接
      */
     public static Bitmap mergeLeftRight(Bitmap left, Bitmap right) {
         if (left.getHeight() != right.getHeight()) {
@@ -223,54 +184,5 @@ public class BitmapManager {
         canvas.drawBitmap(left, leftRect, leftRect, null);
         canvas.drawBitmap(right, rightRect, rightRectT, null);
         return dst;
-    }
-
-    /**
-     * 两个等高的位图左右拼接
-     */
-    public Bitmap mergeLeftRight(@DrawableRes int leftId, int leftColor, @DrawableRes int rightId, int rightColor) {
-        return mergeLeftRight(leftId, leftColor, rightId, rightColor, 0);
-    }
-
-    /**
-     * 两个等高的位图左右拼接
-     */
-    public Bitmap mergeLeftRight(@DrawableRes int leftId, int leftColor, @DrawableRes int rightId, int rightColor, float scale) {
-        String key = "mergeLR_" + leftId + "" + leftColor + "" + rightId + "" + rightColor + "_" + scale;
-        if (mMapBitmap.containsKey(key)) {
-            return mMapBitmap.get(key);
-        } else {
-            Bitmap bitmap = mergeLeftRight(this.get(leftId, leftColor), this.get(rightId, rightColor));
-            if (scale > 0) {
-                bitmap = scale(bitmap, scale);
-            }
-            mMapBitmap.put(key, bitmap);
-            return bitmap;
-        }
-    }
-
-    public Bitmap mergeLeftRight(@DrawableRes int leftId, @DrawableRes int rightId) {
-        return this.mergeLeftRight(leftId, R.color.basic_number_color, rightId, R.color.basic_number_color);
-    }
-
-    public Bitmap mergeLeftRight(@DrawableRes int leftId, int leftColor, @DrawableRes int centerId
-            , int centerColor, @DrawableRes int rightId, int rightColor, float scale) {
-        String key = "mergeLR_" + leftId + "" + leftColor + "" + centerId + "" + centerColor + "" + rightId + "" + rightColor;
-        if (mMapBitmap.containsKey(key)) {
-            return mMapBitmap.get(key);
-        } else {
-            Bitmap bitmap = mergeLeftRight(this.get(leftId, leftColor), this.get(centerId, centerColor));
-            Bitmap dst = mergeLeftRight(bitmap, this.get(rightId, rightColor));
-            if (scale > 0) {
-                dst = scale(dst, scale);
-            }
-            mMapBitmap.put(key, dst);
-            return dst;
-        }
-    }
-
-    public Bitmap mergeLeftRight(@DrawableRes int leftId, @DrawableRes int centerId, @DrawableRes int rightId, float scale) {
-        return this.mergeLeftRight(leftId, R.color.basic_number_color, centerId
-                , R.color.basic_number_color, rightId, R.color.basic_number_color, scale);
     }
 }

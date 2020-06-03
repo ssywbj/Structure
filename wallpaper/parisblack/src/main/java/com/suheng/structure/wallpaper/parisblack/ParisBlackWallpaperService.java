@@ -42,7 +42,7 @@ public class ParisBlackWallpaperService extends WallpaperService {
         private boolean mVisible;
         private boolean mAmbientMode;
 
-        private BitmapManager mBitmapManager;
+        private ParisBitmapManager mBitmapManager;
 
         @Override
         public void onCreate(SurfaceHolder surfaceHolder) {
@@ -51,7 +51,7 @@ public class ParisBlackWallpaperService extends WallpaperService {
 
             mContext = ParisBlackWallpaperService.this;
 
-            mBitmapManager = new BitmapManager(mContext);
+            mBitmapManager = new ParisBitmapManager(mContext);
 
             mPaint = new Paint();
             mPaint.setAntiAlias(true);
@@ -154,13 +154,16 @@ public class ParisBlackWallpaperService extends WallpaperService {
         }
 
         private void paintIconInfo(Canvas canvas) {
-            Bitmap bitmap = mBitmapManager.mergeLeftRight(
-                    R.drawable.basic_number_2_small, R.drawable.basic_number_5_small, R.drawable.basic_temperature_unit, 0f);
+            int temperature = 30;
+            int units = temperature % 10;//个位
+            int tens = temperature / 10;//十位
+            Bitmap bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallNumberResId(tens)
+                    , mBitmapManager.getSmallNumberResId(units), R.drawable.paint_temperature_unit);
             float left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
             float top = mPointScreenCenter.y + mRadiusScreen - bitmap.getHeight() - DimenUtil.dip2px(mContext, 30);
             canvas.drawBitmap(bitmap, left, top, null);
 
-            bitmap = mBitmapManager.get(R.drawable.basic_icon_weather_day_duoyun);
+            bitmap = mBitmapManager.get(R.drawable.paint_weather_day_duoyun);
             left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
             top -= (bitmap.getHeight() + DimenUtil.dip2px(mContext, 2));
             canvas.drawBitmap(bitmap, left, top, null);
@@ -181,13 +184,13 @@ public class ParisBlackWallpaperService extends WallpaperService {
             int units = percentage % 10;//个位
             int tens = percentage / 10;//十位
 
-            Bitmap dst = mBitmapManager.mergeLeftRight(R.drawable.basic_number_8, R.drawable.basic_number_2);
+            Bitmap dst = mBitmapManager.getMerge(R.drawable.paint_number_8, R.drawable.paint_number_2);
             if (dst != null) {
-                dst = BitmapManager.mergeLeftRight(dst, mBitmapManager.get(mContext, R.drawable.basic_sign_percentage, R.color.basic_number_color));
+                /*dst = BitmapManager.mergeLeftRight(dst, mBitmapManager.get(mContext, R.drawable.paint_sign_percentage, R.color.basic_number_color));
                 if (dst != null) {
-                    /*canvas.drawBitmap(dst, mPointScreenCenter.x - 1.0f * dst.getWidth() / 2,
-                            (mPointScreenCenter.y - 1.0f * dst.getHeight()) / 2, null);*/
-                }
+                    canvas.drawBitmap(dst, mPointScreenCenter.x - 1.0f * dst.getWidth() / 2,
+                            (mPointScreenCenter.y - 1.0f * dst.getHeight()) / 2, null);
+                }*/
             }
 
             if (dst == null) {
@@ -215,7 +218,7 @@ public class ParisBlackWallpaperService extends WallpaperService {
             int day = instance.get(Calendar.DAY_OF_MONTH);
             int week = instance.get(Calendar.DAY_OF_WEEK);
 
-            Bitmap bitmap = mBitmapManager.get(R.drawable.basic_text_day_middle, android.R.color.white);
+            Bitmap bitmap = mBitmapManager.get(R.drawable.paint_text_day_middle, color);
             final float marginTop = DimenUtil.dip2px(mContext, 10);
             float left = mPointScreenCenter.x;
             float top = mPointScreenCenter.y + marginTop;
@@ -223,27 +226,27 @@ public class ParisBlackWallpaperService extends WallpaperService {
             left += bitmap.getWidth();
 
             //星期
-            bitmap = mBitmapManager.mergeLeftRight(R.drawable.basic_text_week_middle, color, R.drawable.basic_text_2_middle, color);
+            bitmap = mBitmapManager.getMerge(R.drawable.paint_text_week_middle, color, mBitmapManager.getWeekResId(), color);
             left += DimenUtil.dip2px(mContext, 7);
             canvas.drawBitmap(bitmap, left, top, null);
 
             //号数
             int units = day % 10;//个位
             int tens = day / 10;//十位
-            bitmap = mBitmapManager.mergeLeftRight(R.drawable.basic_number_0_middle, color
-                    , R.drawable.basic_number_2_middle, color);
+            bitmap = mBitmapManager.getMerge(mBitmapManager.getMiddleNumberResId(tens), color
+                    , mBitmapManager.getMiddleNumberResId(units), color);
             left = mPointScreenCenter.x - bitmap.getWidth();
             canvas.drawBitmap(bitmap, left, top, null);
 
             //月
-            bitmap = mBitmapManager.get(R.drawable.basic_text_month_middle, color);
+            bitmap = mBitmapManager.get(R.drawable.paint_text_month_middle, color);
             left -= bitmap.getWidth();
             canvas.drawBitmap(bitmap, left, top, null);
             //月份
             units = month % 10;//个位
             tens = month / 10;//十位
-            bitmap = mBitmapManager.mergeLeftRight(R.drawable.basic_number_0_middle, color
-                    , R.drawable.basic_number_6_middle, color);
+            bitmap = mBitmapManager.getMerge(mBitmapManager.getMiddleNumberResId(tens), color
+                    , mBitmapManager.getMiddleNumberResId(units), color);
             left -= bitmap.getWidth();
             canvas.drawBitmap(bitmap, left, top, null);
 
@@ -251,7 +254,7 @@ public class ParisBlackWallpaperService extends WallpaperService {
                     + ", tens = " + tens + ", units = " + units);
 
             //冒号
-            bitmap = mBitmapManager.get(R.drawable.basic_sign_colon, color);
+            bitmap = mBitmapManager.get(R.drawable.paint_sign_colon, color);
             float colonWidth = 1.0f * bitmap.getWidth();
             top = mPointScreenCenter.y - bitmap.getHeight() - marginTop - marginTop / 2;
             canvas.drawBitmap(bitmap, mPointScreenCenter.x - colonWidth / 2, top, null);
@@ -261,7 +264,7 @@ public class ParisBlackWallpaperService extends WallpaperService {
             int minute = instance.get(Calendar.MINUTE);
             units = minute % 10;//个位
             tens = minute / 10;//十位
-            bitmap = mBitmapManager.mergeLeftRight(R.drawable.basic_number_4, color, R.drawable.basic_number_9, color);
+            bitmap = mBitmapManager.getMerge(mBitmapManager.getBigNumberResId(tens), color, mBitmapManager.getBigNumberResId(units), color);
             top = mPointScreenCenter.y - bitmap.getHeight() - marginTop - marginTop / 4;
             canvas.drawBitmap(bitmap, left, top, null);
 
@@ -269,7 +272,7 @@ public class ParisBlackWallpaperService extends WallpaperService {
             int hour = instance.get(Calendar.HOUR);
             units = hour % 10;//个位
             tens = hour / 10;//十位
-            bitmap = mBitmapManager.mergeLeftRight(R.drawable.basic_number_0, color, R.drawable.basic_number_7, color);
+            bitmap = mBitmapManager.getMerge(mBitmapManager.getBigNumberResId(tens), color, mBitmapManager.getBigNumberResId(units), color);
             left = mPointScreenCenter.x - colonWidth / 2 - bitmap.getWidth() - DimenUtil.dip2px(mContext, 3);
             canvas.drawBitmap(bitmap, left, top, null);
         }
