@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="basic_number_width">40.8dp</dimen>
-    <dimen name="basic_number_height">72dp</dimen><!--60, 34-->
-    <dimen name="basic_text_width">68.4dp</dimen>
-    <dimen name="basic_text_height">@dimen/basic_number_height</dimen><!--60, 54-->
+    <dimen name="number_big_width">44.2dp</dimen>
+    <dimen name="number_big_height">78dp</dimen><!--60, 34-->
 
     <dimen name="number_middle_width">18.36dp</dimen>
-    <dimen name="number_middle_height">32.4dp</dimen><!--60, 34-->
+    <dimen name="number_middle_height">32.4dp</dimen>
     <dimen name="text_middle_width">30.78dp</dimen>
-    <dimen name="text_middle_height">@dimen/number_middle_height</dimen><!--60, 54-->
+    <dimen name="text_middle_height">@dimen/number_middle_height</dimen>
 
-    <dimen name="number_small_width">12.24dp</dimen>
-    <dimen name="number_small_height">21.6dp</dimen><!--60, 34-->
-    <dimen name="text_small_width">20.52dp</dimen>
-    <dimen name="text_small_height">@dimen/number_small_height</dimen><!--60, 54-->
+    <dimen name="number_small_width">10.625dp</dimen>
+    <dimen name="number_small_height">18.75dp</dimen><!--60, 34-->
+    <dimen name="text_small_height">@dimen/number_small_height</dimen>
 </resources>

@@ -76,14 +76,10 @@ public class BitmapManager {
         if (mMapBitmap.containsKey(key)) {
             return mMapBitmap.get(key);
         } else {
-            Bitmap bitmap = mergeLeftRight(this.get(leftId, leftColor), this.get(rightId, rightColor));
+            Bitmap bitmap = mergeLeftRight(this.get(leftId, leftColor), this.get(rightId, rightColor), true);
             mMapBitmap.put(key, bitmap);
             return bitmap;
         }
-    }
-
-    public Bitmap getMerge(@DrawableRes int leftId, @DrawableRes int rightId) {
-        return this.getMerge(leftId, R.color.basic_number_color, rightId, R.color.basic_number_color);
     }
 
     public Bitmap getMerge(@DrawableRes int leftId, int leftColor, @DrawableRes int centerId
@@ -92,22 +88,18 @@ public class BitmapManager {
         if (mMapBitmap.containsKey(key)) {
             return mMapBitmap.get(key);
         } else {
-            Bitmap bitmap = mergeLeftRight(this.get(leftId, leftColor), this.get(centerId, centerColor));
-            Bitmap dst = mergeLeftRight(bitmap, this.get(rightId, rightColor));
+            Bitmap bitmap = mergeLeftRight(this.get(leftId, leftColor), this.get(centerId, centerColor), true);
+            Bitmap dst = mergeLeftRight(bitmap, this.get(rightId, rightColor), true);
             mMapBitmap.put(key, dst);
+            bitmap.recycle();
             return dst;
         }
-    }
-
-    public Bitmap getMerge(@DrawableRes int leftId, @DrawableRes int centerId, @DrawableRes int rightId) {
-        return this.getMerge(leftId, R.color.basic_number_color, centerId
-                , R.color.basic_number_color, rightId, R.color.basic_number_color);
     }
 
     /**
      * Drawable或SVG转Bitmap
      */
-    public static Bitmap get(Context context, @DrawableRes int resId, int color) {
+    public static Bitmap get(Context context, @DrawableRes int resId, int tintColor) {
         Drawable drawable = ContextCompat.getDrawable(context, resId);
         if (drawable == null) {
             return null;
@@ -116,7 +108,7 @@ public class BitmapManager {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable) drawable).getBitmap();
         } else if (drawable instanceof VectorDrawable || drawable instanceof VectorDrawableCompat) {
-            drawable.setTint(ContextCompat.getColor(context, color));
+            drawable.setTint(ContextCompat.getColor(context, tintColor));
 
             int intrinsicWidth = drawable.getIntrinsicWidth();
             int intrinsicHeight = drawable.getIntrinsicHeight();
@@ -163,26 +155,34 @@ public class BitmapManager {
     /**
      * 图片左右拼接
      */
-    public static Bitmap mergeLeftRight(Bitmap left, Bitmap right) {
-        if (left.getHeight() != right.getHeight()) {
-            return null;
+    public static Bitmap mergeLeftRight(Bitmap left, Bitmap right, boolean baseMax) {
+        int height;//拼接后的高度，按照参数取大或取小
+        if (baseMax) {
+            height = Math.max(left.getHeight(), right.getHeight());
+        } else {
+            height = Math.min(left.getHeight(), right.getHeight());
         }
 
-        int height = left.getHeight();//拼接后的高度
-        int width = left.getWidth() + right.getWidth();//拼接后的宽度
+        Bitmap tempLeft = left;//缩放后的bitmap
+        Bitmap tempRight = right;
+        if (left.getHeight() != height) {
+            tempLeft = Bitmap.createScaledBitmap(left, (int) (1.0f * left.getWidth() / left.getHeight() * height), height, false);
+        } else if (right.getHeight() != height) {
+            tempRight = Bitmap.createScaledBitmap(right, (int) (1.0f * right.getWidth() / right.getHeight() * height), height, false);
+        }
 
-        Bitmap dst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        int width = tempLeft.getWidth() + tempRight.getWidth();//拼接后的宽度
+        Bitmap dst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);//定义输出的bitmap
         Canvas canvas = new Canvas(dst);
 
         //缩放后两个bitmap需要绘制的参数
-        Rect leftRect = new Rect(0, 0, left.getWidth(), left.getHeight());
-        Rect rightRect = new Rect(0, 0, right.getWidth(), right.getHeight());
+        Rect leftRect = new Rect(0, 0, tempLeft.getWidth(), tempLeft.getHeight());
+        Rect rightRect = new Rect(0, 0, tempRight.getWidth(), tempRight.getHeight());
 
-        //右边图需要绘制的位置，往右边偏移左边图的宽度，高度是相同的
-        Rect rightRectT = new Rect(left.getWidth(), 0, width, height);
-
-        canvas.drawBitmap(left, leftRect, leftRect, null);
-        canvas.drawBitmap(right, rightRect, rightRectT, null);
+        //右边图需要绘制的位置，往右边偏移左边图的宽度，高度相同
+        Rect rightRectT = new Rect(tempLeft.getWidth(), 0, width, height);
+        canvas.drawBitmap(tempLeft, leftRect, leftRect, null);
+        canvas.drawBitmap(tempRight, rightRect, rightRectT, null);
         return dst;
     }
 }
