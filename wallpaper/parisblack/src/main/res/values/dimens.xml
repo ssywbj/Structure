@@ -5,10 +5,12 @@
 
     <dimen name="number_middle_width">18.36dp</dimen>
     <dimen name="number_middle_height">32.4dp</dimen>
-    <dimen name="text_middle_width">30.78dp</dimen>
-    <dimen name="text_middle_height">@dimen/number_middle_height</dimen>
+    <dimen name="text_middle_width">29.19dp</dimen>
+    <dimen name="text_middle_height">@dimen/number_middle_height</dimen><!--60, 54-->
 
     <dimen name="number_small_width">10.625dp</dimen>
     <dimen name="number_small_height">18.75dp</dimen><!--60, 34-->
     <dimen name="text_small_height">@dimen/number_small_height</dimen>
+
+    <dimen name="info_icon">36dp</dimen>
 </resources>

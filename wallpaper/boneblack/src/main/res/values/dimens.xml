@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="boneblack_scale_number">32.724dp</dimen>
-    <dimen name="boneblack_scale_paperclip">@dimen/boneblack_scale_number</dimen>
+    <dimen name="scale_number">32.724dp</dimen>
+    <dimen name="scale_paperclip">@dimen/scale_number</dimen>
 
-    <!--<dimen name="basic_number_width">37.4dp</dimen>
-    <dimen name="basic_number_height">66dp</dimen>&lt;!&ndash;60, 34&ndash;&gt;
-    <dimen name="basic_text_width">59.4dp</dimen>
-    <dimen name="basic_text_height">@dimen/basic_number_height</dimen>&lt;!&ndash;60, 54&ndash;&gt;
-    <dimen name="basic_info_icon">36.36dp</dimen>-->
-
-    <dimen name="basic_number_width">12.36dp</dimen>
-    <dimen name="basic_number_height">21.816dp</dimen>
-    <dimen name="basic_text_width">19.64dp</dimen>
-    <dimen name="basic_text_height">@dimen/basic_number_height</dimen>
-    <dimen name="basic_info_icon">36.36dp</dimen>
+    <dimen name="number_width">12.36dp</dimen>
+    <dimen name="number_height">21.816dp</dimen>
+    <dimen name="text_width">19.64dp</dimen>
+    <dimen name="text_height">@dimen/number_height</dimen>
+    <dimen name="info_icon">36dp</dimen>
 </resources>

@@ -210,7 +210,6 @@ public class ParisBlackWallpaperService extends WallpaperService {
             Calendar instance = Calendar.getInstance();
             int month = instance.get(Calendar.MONTH) + 1;
             int day = instance.get(Calendar.DAY_OF_MONTH);
-            int week = instance.get(Calendar.DAY_OF_WEEK);
 
             Bitmap bitmap = mBitmapManager.get(R.drawable.paint_text_day_middle, color);
             final float marginTop = DimenUtil.dip2px(mContext, 10);
@@ -245,9 +244,6 @@ public class ParisBlackWallpaperService extends WallpaperService {
             canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
 
             mPaint.clearShadowLayer();
-
-            Log.d(TAG, "date, month = " + month + ", day = " + day + ", week = " + week
-                    + ", tens = " + tens + ", units = " + units);
 
             mPaint.setShadowLayer(8, 0, 0, Color.parseColor("#2E42FF"));//外围阴影效果
 
