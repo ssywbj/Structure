@@ -3,4 +3,6 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="second_number">#666666</color>
+    <color name="my_health_little_triangle">#F7C744</color>
 </resources>

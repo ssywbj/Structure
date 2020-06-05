@@ -32,7 +32,7 @@ public class ParisBlackWallpaperService extends WallpaperService {
 
     private final class LiveWallpaperEngine extends Engine {
         private PointF mPointScreenCenter = new PointF();//屏幕中心点
-        private float mRadiusScreen;
+        private float mRadiusOuter;
 
         private Paint mPaint;
         private RectF mRectF = new RectF();
@@ -61,8 +61,8 @@ public class ParisBlackWallpaperService extends WallpaperService {
             Log.d(TAG, "onSurfaceChanged, format = " + format + ", width = " + width + ", height = " + height);
             mPointScreenCenter.x = 1.0f * width / 2;//屏幕中心X坐标
             mPointScreenCenter.y = 1.0f * height / 2;//屏幕中心Y坐标
-            mRadiusScreen = Math.min(mPointScreenCenter.x, mPointScreenCenter.y)
-                    - DimenUtil.dip2px(mContext, 3);//屏幕半径
+            mRadiusOuter = Math.min(mPointScreenCenter.x, mPointScreenCenter.y)
+                    - DimenUtil.dip2px(mContext, 3);//绘制半径
 
             this.invalidate();
         }
@@ -162,7 +162,7 @@ public class ParisBlackWallpaperService extends WallpaperService {
             Bitmap bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallNumberResId(tens), color
                     , mBitmapManager.getSmallNumberResId(units), color, R.drawable.paint_temperature_unit, color);
             float left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
-            float top = mPointScreenCenter.y + mRadiusScreen - bitmap.getHeight() - DimenUtil.dip2px(mContext, 30);
+            float top = mPointScreenCenter.y + mRadiusOuter - bitmap.getHeight() - DimenUtil.dip2px(mContext, 30);
             canvas.drawBitmap(bitmap, left, top, null);
 
             bitmap = mBitmapManager.get(R.drawable.paint_weather_day_duoyun);
@@ -198,10 +198,6 @@ public class ParisBlackWallpaperService extends WallpaperService {
         }
 
         private void paintDate(Canvas canvas) {
-            /*canvas.drawLine(mPointScreenCenter.x, 0, mPointScreenCenter.x, 2 * mPointScreenCenter.y, mPaint);
-            mPaint.setStyle(Paint.Style.STROKE);
-            canvas.drawCircle(mPointScreenCenter.x, mPointScreenCenter.y, mRadiusScreen, mPaint);*/
-
             mPaint.reset();
             int color = android.R.color.white;
             mPaint.setColor(getColor(color));

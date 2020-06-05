@@ -31,8 +31,10 @@ public class MyHealthWatchFace extends WallpaperService {
     }
 
     private final class LiveWallpaperEngine extends Engine {
+        private static final int SCALES = 6;
+        private static final float SCALE_DEGREES = 1.0f * 360 / SCALES;
         private PointF mPointScreenCenter = new PointF();//屏幕中心点
-        private float mRadiusScreen;
+        private float mRadiusOuter, mRadiusInner;
 
         private Paint mPaint;
         private RectF mRectF = new RectF();
@@ -53,6 +55,7 @@ public class MyHealthWatchFace extends WallpaperService {
             mBitmapManager = new MyHealthBitmapManager(mContext);
 
             mPaint = new Paint();
+            mPaint.setAntiAlias(true);
         }
 
         @Override
@@ -61,8 +64,9 @@ public class MyHealthWatchFace extends WallpaperService {
             Log.d(TAG, "onSurfaceChanged, format = " + format + ", width = " + width + ", height = " + height);
             mPointScreenCenter.x = 1.0f * width / 2;//屏幕中心X坐标
             mPointScreenCenter.y = 1.0f * height / 2;//屏幕中心Y坐标
-            mRadiusScreen = Math.min(mPointScreenCenter.x, mPointScreenCenter.y)
-                    - DimenUtil.dip2px(mContext, 3);//屏幕半径
+            mRadiusOuter = Math.min(mPointScreenCenter.x, mPointScreenCenter.y)
+                    - DimenUtil.dip2px(mContext, 1);
+            mRadiusInner = mRadiusOuter - DimenUtil.dip2px(mContext, 36);
 
             this.invalidate();
         }
@@ -138,103 +142,84 @@ public class MyHealthWatchFace extends WallpaperService {
 
         private void onDraw(Canvas canvas) {
             canvas.drawColor(ContextCompat.getColor(mContext, R.color.basic_wallpaper_bg_black));//画面背景
-
-            //屏幕中间红粗线
-            mPaint.setAntiAlias(true);
-            mPaint.setColor(Color.parseColor("#FF3333"));
-            mPaint.setStyle(Paint.Style.FILL);
-            float lineWidth = DimenUtil.dip2px(mContext, 6), lineLen = DimenUtil.dip2px(mContext, 196);
-            mRectF.set(mPointScreenCenter.x - lineLen / 2, mPointScreenCenter.y - lineWidth / 2,
-                    mPointScreenCenter.x + lineLen / 2, mPointScreenCenter.y + lineWidth / 2);
-            canvas.drawRoundRect(mRectF, lineWidth, lineWidth, mPaint);
-
-            this.paintDate(canvas);
-            this.paintIconInfo(canvas);
-            this.paintBattery(canvas);
-        }
-
-        private void paintIconInfo(Canvas canvas) {
-            int color = R.color.basic_number_color;
-            int temperature = 30;
-            int units = temperature % 10;//个位
-            int tens = temperature / 10;//十位
-        }
-
-        private void paintBattery(Canvas canvas) {
-            int color = android.R.color.white;
-            mPaint.setAntiAlias(true);
-            mPaint.setStyle(Paint.Style.FILL);
-            mPaint.setColor(ContextCompat.getColor(mContext, color));
-
-            float percent = 1.0f * 160 / 360;
-            int percentage = (int) (percent * 100);
-
-            int units = percentage % 10;//个位
-            int tens = percentage / 10;//十位
-
-            int marginBottom = DimenUtil.dip2px(mContext, 11);
-            float start = DimenUtil.dip2px(mContext, 45), maxLineLen = 2 * (mPointScreenCenter.x - start);
-            float lineHeight = DimenUtil.dip2px(mContext, 3), lineLen = maxLineLen * percent;
-            float right = start + lineLen;
-            mRectF.set(start, 2 * mPointScreenCenter.y - lineHeight / 2 - marginBottom,
-                    right, 2 * mPointScreenCenter.y + lineHeight / 2 - marginBottom);
-            canvas.drawRoundRect(mRectF, lineHeight, lineHeight, mPaint);
-        }
-
-        private void paintDate(Canvas canvas) {
-            /*canvas.drawLine(mPointScreenCenter.x, 0, mPointScreenCenter.x, 2 * mPointScreenCenter.y, mPaint);
             mPaint.setStyle(Paint.Style.STROKE);
-            canvas.drawCircle(mPointScreenCenter.x, mPointScreenCenter.y, mRadiusScreen, mPaint);*/
 
-            mPaint.reset();
-            int color = android.R.color.white;
-            mPaint.setColor(getColor(color));
-            mPaint.setShadowLayer(4, 0, 0, Color.parseColor("#2E42FF"));//外围阴影效果
+            float strokeWidth = 1f;
+            //-90：从矩形区域顶边中点开始(-110在它的左侧)；0：从矩形区域右边中点开始；90：从矩形区域底边中点开始；180：从矩形区域左边中点开始
+            float startAngle, sweepAngle;
+            for (int index = 0; index < SCALES; index++) {
+                canvas.save();
+                canvas.rotate(index * SCALE_DEGREES, mPointScreenCenter.x, mPointScreenCenter.y);
 
+                //外弧
+                mPaint.setStrokeWidth(strokeWidth * 1.5f);
+                mPaint.setColor(Color.parseColor("#1E1E1E"));
+                startAngle = -114;
+                sweepAngle = (Math.abs(startAngle) - Math.abs(-90)) * 2;
+                //在这个矩形区域里画弧
+                mRectF.set(mPointScreenCenter.x - mRadiusOuter, mPointScreenCenter.y - mRadiusOuter
+                        , mPointScreenCenter.x + mRadiusOuter, mPointScreenCenter.y + mRadiusOuter);
+                canvas.drawArc(mRectF, startAngle, sweepAngle, false, mPaint);
+
+                //内弧
+                if (index != 5) {
+                    mPaint.setStrokeWidth(strokeWidth * 2);
+                    mPaint.setColor(Color.parseColor("#656565"));
+                    startAngle = -112;
+                    sweepAngle = (Math.abs(startAngle) - Math.abs(-90)) * 2;
+                    mRectF.set(mPointScreenCenter.x - mRadiusInner, mPointScreenCenter.y - mRadiusInner
+                            , mPointScreenCenter.x + mRadiusInner, mPointScreenCenter.y + mRadiusInner);
+                    canvas.drawArc(mRectF, startAngle, sweepAngle, false, mPaint);
+                }
+                canvas.restore();
+            }
+
+            Bitmap bitmap = mBitmapManager.get(R.drawable.my_health_little_triangle, R.color.my_health_little_triangle);
+            float degrees;
+            for (int index = 0; index < SCALE_DEGREES * 2; index++) {
+                canvas.save();
+                degrees = index * SCALE_DEGREES / 2;
+                canvas.rotate(degrees, mPointScreenCenter.x, mPointScreenCenter.y);
+                if (degrees % 60 != 0) {
+                    canvas.drawBitmap(bitmap, mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2
+                            , mPointScreenCenter.y - mRadiusInner, null);
+                }
+                canvas.restore();
+            }
+
+            this.paintTime(canvas);
+        }
+
+        private void paintTime(Canvas canvas) {
             Calendar instance = Calendar.getInstance();
-            int month = instance.get(Calendar.MONTH) + 1;
-            int day = instance.get(Calendar.DAY_OF_MONTH);
-
-            final float marginTop = DimenUtil.dip2px(mContext, 10);
-            float top = mPointScreenCenter.y + marginTop;
-
-            //号数
-            int units = day % 10;//个位
-            int tens = day / 10;//十位
-            Bitmap bitmap = mBitmapManager.getMerge(mBitmapManager.getMiddleNumberResId(tens), color
-                    , mBitmapManager.getMiddleNumberResId(units), color);
-            float left = mPointScreenCenter.x + DimenUtil.dip2px(mContext, 1) - bitmap.getWidth();
-            canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
-
-            //月份
-            units = month % 10;//个位
-            tens = month / 10;//十位
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getMiddleNumberResId(tens), color
-                    , mBitmapManager.getMiddleNumberResId(units), color);
-            left -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
-
-            mPaint.clearShadowLayer();
-
-            mPaint.setShadowLayer(8, 0, 0, Color.parseColor("#2E42FF"));//外围阴影效果
-
             //分钟
+            int color = android.R.color.white;
             int minute = instance.get(Calendar.MINUTE);
-            units = minute % 10;//个位
-            tens = minute / 10;//十位
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getBigNumberResId(tens), color, mBitmapManager.getBigNumberResId(units), color);
-            top = mPointScreenCenter.y - bitmap.getHeight() - marginTop - marginTop / 4;
-            canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
+            int units = minute % 10;//个位
+            int tens = minute / 10;//十位
+            Bitmap bitmap = mBitmapManager.getMerge(mBitmapManager.getBigNumberResId(tens), color, mBitmapManager.getBigNumberResId(units), color);
+            float left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
+            float hourBitmapHeight = 1.0f * bitmap.getHeight() / 2;
+            float top = mPointScreenCenter.y - hourBitmapHeight;
+            canvas.drawBitmap(bitmap, left, top, null);
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(R.drawable.my_health_minute_flag, color);
+            canvas.drawBitmap(bitmap, left, top, null);
 
-            //时钟
-            int hour = instance.get(Calendar.HOUR);
-            units = hour % 10;//个位
-            tens = hour / 10;//十位
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getBigNumberResId(tens), color, mBitmapManager.getBigNumberResId(units), color);
-            left = mPointScreenCenter.x - bitmap.getWidth() - DimenUtil.dip2px(mContext, 3);
-            canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
-
-            mPaint.clearShadowLayer();
+            //秒钟
+            color = R.color.second_number;
+            int second = instance.get(Calendar.SECOND);
+            units = second % 10;//个位
+            tens = second / 10;//十位
+            left = mPointScreenCenter.x + mRadiusInner / 2;
+            top = mPointScreenCenter.y + hourBitmapHeight;
+            bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallNumberResId(tens), color, mBitmapManager.getSmallNumberResId(units), color);
+            left -= DimenUtil.dip2px(mContext, 9);
+            top -= (bitmap.getHeight() + 2);
+            canvas.drawBitmap(bitmap, left, top, null);
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(R.drawable.my_health_second_flag, color);
+            canvas.drawBitmap(bitmap, left, top, null);
         }
 
         private final Handler mHandler = new Handler() {
