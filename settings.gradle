@@ -1,3 +1,4 @@
+include ':wallpaper:myhealth'
 include ':app', ':module1', ':module2', ':module3', ':data', ':ui', ':okhttp', ':gson'
 rootProject.name='Structure'
 include ':photo'
