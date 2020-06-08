@@ -42,6 +42,7 @@ public class MyHealthWatchFace extends WallpaperService {
         private Context mContext;
         private boolean mVisible;
         private boolean mAmbientMode;
+        private int mLittleTriangleHeight;
 
         private MyHealthBitmapManager mBitmapManager;
 
@@ -175,6 +176,7 @@ public class MyHealthWatchFace extends WallpaperService {
             }
 
             Bitmap bitmap = mBitmapManager.get(R.drawable.my_health_little_triangle, R.color.my_health_little_triangle);
+            mLittleTriangleHeight = bitmap.getHeight();
             float degrees;
             for (int index = 0; index < SCALE_DEGREES * 2; index++) {
                 canvas.save();
@@ -183,6 +185,9 @@ public class MyHealthWatchFace extends WallpaperService {
                 if (degrees % 60 != 0) {
                     canvas.drawBitmap(bitmap, mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2
                             , mPointScreenCenter.y - mRadiusInner, null);
+
+                    /*canvas.drawLine(mPointScreenCenter.x, mPointScreenCenter.y
+                            , mPointScreenCenter.x, mPointScreenCenter.y - mRadiusOuter, mPaint);*/
                 }
                 canvas.restore();
             }
@@ -214,12 +219,56 @@ public class MyHealthWatchFace extends WallpaperService {
             left = mPointScreenCenter.x + mRadiusInner / 2;
             top = mPointScreenCenter.y + hourBitmapHeight;
             bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallNumberResId(tens), color, mBitmapManager.getSmallNumberResId(units), color);
-            left -= DimenUtil.dip2px(mContext, 9);
+            left -= DimenUtil.dip2px(mContext, 6);
             top -= (bitmap.getHeight() + 2);
             canvas.drawBitmap(bitmap, left, top, null);
             left += bitmap.getWidth();
             bitmap = mBitmapManager.get(R.drawable.my_health_second_flag, color);
             canvas.drawBitmap(bitmap, left, top, null);
+
+            //时钟
+            color = R.color.my_health_little_triangle;
+            int hour = instance.get(Calendar.HOUR_OF_DAY);
+            units = hour % 10;//个位
+            tens = hour / 10;//十位
+            bitmap = mBitmapManager.getMerge(mBitmapManager.getMiddleNumberResId(tens), color, mBitmapManager.getMiddleNumberResId(units), color);
+            left = mPointScreenCenter.x - mRadiusInner;
+            top = mPointScreenCenter.y - bitmap.getHeight() - mLittleTriangleHeight + DimenUtil.dip2px(mContext, 4);
+            canvas.drawBitmap(bitmap, left, top, null);
+
+            int marginBottom = DimenUtil.dip2px(mContext, 2);
+            float lineLeft = left + 1.0f * bitmap.getWidth() / 4;
+            int lineHeight = DimenUtil.dip2px(mContext, 4);
+            float lineTop = top - (marginBottom + lineHeight);
+            float lineLen = 1.0f * bitmap.getWidth() / 4;
+
+            //黄线上方的日期
+            color = android.R.color.white;
+            int month = instance.get(Calendar.MONTH) + 1;
+            units = month % 10;//个位
+            tens = month / 10;//十位
+            left += 1.0f * bitmap.getWidth() / 2;
+            bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallerNumberResId(tens), color
+                    , mBitmapManager.getSmallerNumberResId(units), color);
+            top -= (bitmap.getHeight() + marginBottom + 2.6f * lineHeight);
+            canvas.drawBitmap(bitmap, left, top, null);
+            lineLen += bitmap.getWidth();
+            int day = instance.get(Calendar.DAY_OF_MONTH);
+            units = day % 10;//个位
+            tens = day / 10;//十位
+            left += bitmap.getWidth();
+            //canvas.drawText("/", left, top, mPaint);
+            bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallerNumberResId(tens), color
+                    , mBitmapManager.getSmallerNumberResId(units), color);
+            canvas.drawBitmap(bitmap, left, top, null);
+            lineLen += bitmap.getWidth();
+
+            //时钟与时间之前的黄线
+            mPaint.setStyle(Paint.Style.FILL);
+            mPaint.setColor(ContextCompat.getColor(mContext, R.color.my_health_little_triangle));
+            mRectF.set(lineLeft, lineTop - 1.0f * lineHeight / 2
+                    , lineLeft + lineLen, lineTop + 1.0f * lineHeight / 2);
+            canvas.drawRoundRect(mRectF, 1.0f * lineHeight / 2, 1.0f * lineHeight / 2, mPaint);
         }
 
         private final Handler mHandler = new Handler() {

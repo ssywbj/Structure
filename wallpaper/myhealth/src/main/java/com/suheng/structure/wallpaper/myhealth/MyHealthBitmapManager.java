@@ -84,4 +84,29 @@ public class MyHealthBitmapManager extends BitmapManager {
                 return R.drawable.paint_number_0_small;
         }
     }
+
+    public int getSmallerNumberResId(int number) {
+        switch (number) {
+            case 1:
+                return R.drawable.paint_number_1_smaller;
+            case 2:
+                return R.drawable.paint_number_2_smaller;
+            case 3:
+                return R.drawable.paint_number_3_smaller;
+            case 4:
+                return R.drawable.paint_number_4_smaller;
+            case 5:
+                return R.drawable.paint_number_5_smaller;
+            case 6:
+                return R.drawable.paint_number_6_smaller;
+            case 7:
+                return R.drawable.paint_number_7_smaller;
+            case 8:
+                return R.drawable.paint_number_8_smaller;
+            case 9:
+                return R.drawable.paint_number_9_smaller;
+            default:
+                return R.drawable.paint_number_0_smaller;
+        }
+    }
 }
