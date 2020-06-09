@@ -40,7 +40,7 @@ public class VectorView extends View {
         mPointCenter.x = 1.0f * displayMetrics.widthPixels / 2;
         mPointCenter.y = 1.0f * displayMetrics.heightPixels / 2;
 
-        mBitmap = BitmapManager.get(getContext(), R.drawable.view_number_5, android.R.color.white);
+        mBitmap = BitmapManager.get(getContext(), R.drawable.number_5, android.R.color.white);
 
         mPaint.setAntiAlias(true);
         mPaint.setStrokeWidth(2f);

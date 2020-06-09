@@ -138,7 +138,6 @@ public class BitmapManager {
         mMapBitmap.clear();
     }
 
-
     public static Bitmap rotate(Bitmap src, float degrees) {
         Matrix matrix = new Matrix();
         matrix.setRotate(degrees);
@@ -146,7 +145,7 @@ public class BitmapManager {
         if (dst.equals(src)) {
             return dst;
         }
-        //src.recycle();
+        src.recycle();
         return dst;
     }
 

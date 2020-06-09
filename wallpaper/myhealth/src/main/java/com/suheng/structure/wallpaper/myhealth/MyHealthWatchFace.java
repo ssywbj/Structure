@@ -199,6 +199,7 @@ public class MyHealthWatchFace extends WallpaperService {
             }
 
             this.paintTime(canvas);
+            this.paintIconInfo(canvas);
         }
 
         private void paintTime(Canvas canvas) {
@@ -283,6 +284,46 @@ public class MyHealthWatchFace extends WallpaperService {
             mRectF.set(lineLeft, lineTop - 1.0f * lineHeight / 2
                     , lineLeft + lineLen, lineTop + 1.0f * lineHeight / 2);
             canvas.drawRoundRect(mRectF, 1.0f * lineHeight / 2, 1.0f * lineHeight / 2, mPaint);
+        }
+
+        private void paintIconInfo(Canvas canvas) {
+            mPaint.setStyle(Paint.Style.STROKE);
+            mPaint.setColor(Color.RED);
+            float radius = mRadiusInner + (mRadiusOuter - mRadiusInner) / 2;
+            //canvas.drawCircle(mPointScreenCenter.x, mPointScreenCenter.y, radius, mPaint);
+
+            final int scales = 100;
+            float scaleDegree = 1.0f * 360 / scales, rotateDegrees;
+            float stopY = mPointScreenCenter.y - radius;
+            Bitmap bitmap;
+            for (int index = 0; index < scales; index++) {
+                rotateDegrees = index * scaleDegree;
+
+                if (rotateDegrees > 254 && rotateDegrees < 340) {
+                    continue;
+                }
+
+                canvas.save();
+                canvas.rotate(rotateDegrees, mPointScreenCenter.x, mPointScreenCenter.y);//画布旋转后，在低分辨率手机上bitmap会有些锯齿现象，但能接受
+                //canvas.drawLine(mPointScreenCenter.x, mPointScreenCenter.y, mPointScreenCenter.x, stopY, mPaint);
+
+                if (rotateDegrees > 90 && rotateDegrees < 254) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_a + index % 26,
+                            R.color.colorPrimary);
+                } else {
+                    //旋转回相应的角度，目的是摆正图片。但再次旋转后，在低分辨率手机上锯齿现象会严重加剧，不能接受
+                    /*bitmap = mBitmapManager.getRotate(R.drawable.alphabet_uppercase_a + index % 26,
+                            R.color.alphabet_uppercase, -rotateDegrees);*/
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a + index % 26,
+                            R.color.alphabet_uppercase);
+                }
+
+                if (bitmap != null) {
+                    canvas.drawBitmap(bitmap, mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2
+                            , stopY - 1.0f * bitmap.getHeight() / 2, null);
+                }
+                canvas.restore();
+            }
         }
 
         private final Handler mHandler = new Handler() {

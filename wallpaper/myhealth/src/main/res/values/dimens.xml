@@ -13,4 +13,7 @@
     <dimen name="number_smaller_height">20.69dp</dimen><!--60, 34, /2.9-->
 
     <dimen name="info_icon">30dp</dimen>
+
+    <dimen name="alphabet_uppercase_small_width">8.305dp</dimen>
+    <dimen name="alphabet_uppercase_small_height">14.625dp</dimen><!--60, 34, /3.0-->
 </resources>
