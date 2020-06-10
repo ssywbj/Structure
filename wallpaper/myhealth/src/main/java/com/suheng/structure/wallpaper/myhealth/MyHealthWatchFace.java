@@ -309,15 +309,15 @@ public class MyHealthWatchFace extends WallpaperService {
                 canvas.rotate(rotateDegrees, mPointScreenCenter.x, mPointScreenCenter.y);//画布旋转后，在低分辨率手机上bitmap会有些锯齿现象，但能接受
                 //canvas.drawLine(mPointScreenCenter.x, mPointScreenCenter.y, mPointScreenCenter.x, stopY, mPaint);
 
-                if (index == 0) {//卡路里后半部分
+                if (index == 1) {//卡路里后半部分
                     bitmap = mBitmapManager.get(R.drawable.paint_number_2_smallest, color);
-                } else if (index == 2) {
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_k, color);
                 } else if (index == 3) {
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_c, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_k, color);
                 } else if (index == 4) {
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_c, color);
                 } else if (index == 5) {
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a, color);
+                } else if (index == 6) {
                     bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_l, color);
                 } else if (index == 13) {//心率
                     bitmap = mBitmapManager.get(R.drawable.paint_heart_rate, color);
@@ -345,16 +345,16 @@ public class MyHealthWatchFace extends WallpaperService {
                     bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_0, color);
                 } else if (index == 33) {
                     bitmap = mBitmapManager.get(R.drawable.reverse_paint_workout, color);
-                } else if (index == 35) {
-                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_n, color);
+                } else if (index == 35) {//sport
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_t, color);
                 } else if (index == 36) {
-                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_l, color);
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_r, color);
                 } else if (index == 37) {
-                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_w, color);
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_o, color);
                 } else if (index == 38) {
-                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_b, color);
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_p, color);
                 } else if (index == 39) {
-                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_h, color);
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_s, color);
                 } else if (index == 44) {//步数
                     bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_0, color);
                 } else if (index == 45) {
@@ -401,30 +401,27 @@ public class MyHealthWatchFace extends WallpaperService {
                     bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_n, color);
                 } else if (index == 73) {
                     bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_e, color);
-                } else if (index == 94) {//卡路里前半部分
+                } else if (index == 95) {//卡路里前半部分
                     bitmap = mBitmapManager.get(R.drawable.paint_calorie, color);
-                } else if (index == 96) {
-                    bitmap = mBitmapManager.get(R.drawable.paint_number_0_smallest, color);
+                    //bitmap = mBitmapManager.get(R.drawable.paint_calorie_bak, color);
+                    //bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.paint_calorie_bak);
                 } else if (index == 97) {
-                    bitmap = mBitmapManager.get(R.drawable.paint_number_5_smallest, color);
+                    bitmap = mBitmapManager.get(R.drawable.paint_number_0_smallest, color);
                 } else if (index == 98) {
-                    bitmap = mBitmapManager.get(R.drawable.paint_number_2_smallest, color);
+                    bitmap = mBitmapManager.get(R.drawable.paint_number_5_smallest, color);
                 } else if (index == 99) {
+                    bitmap = mBitmapManager.get(R.drawable.paint_number_2_smallest, color);
+                } else if (index == 0) {
                     bitmap = mBitmapManager.get(R.drawable.paint_number_9_smallest, color);//15926371198
-                } else {
-                    /*if (rotateDegrees > 90 && rotateDegrees < 254) {
-                        bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_a + index % 26,
-                                R.color.colorPrimary);
-                    } else {
-                        //旋转回相应的角度，目的是摆正图片。但再次旋转后，在低分辨率手机上锯齿现象会严重加剧，不能接受
-                    *//*bitmap = mBitmapManager.getRotate(R.drawable.alphabet_uppercase_a + index % 26,
-                            R.color.alphabet_uppercase, -rotateDegrees);*//*
-                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a + index % 26,
-                                R.color.alphabet_uppercase);
-                    }*/
                 }
 
                 if (bitmap != null) {
+                    /*mPaint.reset();
+                    mPaint.setAntiAlias(true);
+                    mPaint.setColor(Color.RED);
+                    canvas.drawBitmap(bitmap.extractAlpha(), mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2
+                            , stopY - 1.0f * bitmap.getHeight() / 2, mPaint);*/
+
                     canvas.drawBitmap(bitmap, mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2
                             , stopY - 1.0f * bitmap.getHeight() / 2, null);
                 }
