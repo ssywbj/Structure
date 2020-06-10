@@ -226,7 +226,7 @@ public class MyHealthWatchFace extends WallpaperService {
             left = mPointScreenCenter.x + mRadiusInner / 2;
             top = mPointScreenCenter.y + hourBitmapHeight;
             bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallNumberResId(tens), color, mBitmapManager.getSmallNumberResId(units), color);
-            left -= DimenUtil.dip2px(mContext, 6);
+            left -= DimenUtil.dip2px(mContext, 1);
             top -= (bitmap.getHeight() + 2);
             canvas.drawBitmap(bitmap, left, top, null);
             left += (bitmap.getWidth() + DimenUtil.dip2px(mContext, 2));
@@ -247,7 +247,7 @@ public class MyHealthWatchFace extends WallpaperService {
             canvas.drawBitmap(bitmap, left, top, null);
 
             int marginBottom = DimenUtil.dip2px(mContext, 2);
-            float lineLeft = left + 1.0f * bitmap.getWidth() / 4;
+            float lineLeft = left + 1.0f * bitmap.getWidth() / 5;
             int lineHeight = DimenUtil.dip2px(mContext, 4);
             float lineTop = top - (marginBottom + lineHeight);
             float lineLen = 1.0f * bitmap.getWidth() / 4;
@@ -257,7 +257,7 @@ public class MyHealthWatchFace extends WallpaperService {
             int month = instance.get(Calendar.MONTH) + 1;
             units = month % 10;//个位
             tens = month / 10;//十位
-            left += 1.0f * bitmap.getWidth() / 2;
+            left += 1.0f * bitmap.getWidth() / 3;
             bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallerNumberResId(tens), color
                     , mBitmapManager.getSmallerNumberResId(units), color);
             top -= (bitmap.getHeight() + marginBottom + 2.6f * lineHeight);
@@ -293,13 +293,15 @@ public class MyHealthWatchFace extends WallpaperService {
             //canvas.drawCircle(mPointScreenCenter.x, mPointScreenCenter.y, radius, mPaint);
 
             final int scales = 100;
-            float scaleDegree = 1.0f * 360 / scales, rotateDegrees;
-            float stopY = mPointScreenCenter.y - radius;
+            final float scaleDegree = 1.0f * 360 / scales;
+            float stopY = mPointScreenCenter.y - radius, rotateDegrees;
             Bitmap bitmap;
+            int color = R.color.alphabet_uppercase;
             for (int index = 0; index < scales; index++) {
                 rotateDegrees = index * scaleDegree;
+                bitmap = null;
 
-                if (rotateDegrees > 254 && rotateDegrees < 340) {
+                if (index > 73 && index < 94) {
                     continue;
                 }
 
@@ -307,21 +309,126 @@ public class MyHealthWatchFace extends WallpaperService {
                 canvas.rotate(rotateDegrees, mPointScreenCenter.x, mPointScreenCenter.y);//画布旋转后，在低分辨率手机上bitmap会有些锯齿现象，但能接受
                 //canvas.drawLine(mPointScreenCenter.x, mPointScreenCenter.y, mPointScreenCenter.x, stopY, mPaint);
 
-                if (rotateDegrees > 90 && rotateDegrees < 254) {
-                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_a + index % 26,
-                            R.color.colorPrimary);
+                if (index == 0) {//卡路里后半部分
+                    bitmap = mBitmapManager.get(R.drawable.paint_number_2_smallest, color);
+                } else if (index == 2) {
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_k, color);
+                } else if (index == 3) {
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_c, color);
+                } else if (index == 4) {
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a, color);
+                } else if (index == 5) {
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_l, color);
+                } else if (index == 13) {//心率
+                    bitmap = mBitmapManager.get(R.drawable.paint_heart_rate, color);
+                } else if (index == 15) {
+                    bitmap = mBitmapManager.get(R.drawable.paint_number_1_smallest, color);
+                } else if (index == 16) {
+                    bitmap = mBitmapManager.get(R.drawable.paint_number_0_smallest, color);
+                } else if (index == 17) {
+                    bitmap = mBitmapManager.get(R.drawable.paint_number_8_smallest, color);
+                } else if (index == 19) {
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_b, color);
+                } else if (index == 20) {
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_p, color);
+                } else if (index == 21) {
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_m, color);
+                } else if (index == 27) {//跑步
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_2, color);
+                } else if (index == 28) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_1, color);
+                } else if (index == 29) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_my_health_diagonal, color);
+                } else if (index == 30) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_8, color);
+                } else if (index == 31) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_0, color);
+                } else if (index == 33) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_workout, color);
+                } else if (index == 35) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_n, color);
+                } else if (index == 36) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_l, color);
+                } else if (index == 37) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_w, color);
+                } else if (index == 38) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_b, color);
+                } else if (index == 39) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_h, color);
+                } else if (index == 44) {//步数
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_0, color);
+                } else if (index == 45) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_4, color);
+                } else if (index == 46) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_9, color);
+                } else if (index == 47) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_1, color);
+                } else if (index == 48) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_4, color);
+                } else if (index == 49) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_7, color);
+                } else if (index == 51) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_steps, color);
+                } else if (index == 53) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_s, color);
+                } else if (index == 54) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_p, color);
+                } else if (index == 55) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_e, color);
+                } else if (index == 56) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_t, color);
+                } else if (index == 57) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_s, color);
+                } else if (index == 61) {//电量
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_sign_percentage, color);
+                } else if (index == 62) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_7, color);
+                } else if (index == 63) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_8, color);
+                } else if (index == 64) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_0, color);
+                } else if (index == 66) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_battary, color);
+                } else if (index == 68) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_y, color);
+                } else if (index == 69) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_g, color);
+                } else if (index == 70) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_r, color);
+                } else if (index == 71) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_e, color);
+                } else if (index == 72) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_n, color);
+                } else if (index == 73) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_e, color);
+                } else if (index == 94) {//卡路里前半部分
+                    bitmap = mBitmapManager.get(R.drawable.paint_calorie, color);
+                } else if (index == 96) {
+                    bitmap = mBitmapManager.get(R.drawable.paint_number_0_smallest, color);
+                } else if (index == 97) {
+                    bitmap = mBitmapManager.get(R.drawable.paint_number_5_smallest, color);
+                } else if (index == 98) {
+                    bitmap = mBitmapManager.get(R.drawable.paint_number_2_smallest, color);
+                } else if (index == 99) {
+                    bitmap = mBitmapManager.get(R.drawable.paint_number_9_smallest, color);//15926371198
                 } else {
-                    //旋转回相应的角度，目的是摆正图片。但再次旋转后，在低分辨率手机上锯齿现象会严重加剧，不能接受
-                    /*bitmap = mBitmapManager.getRotate(R.drawable.alphabet_uppercase_a + index % 26,
-                            R.color.alphabet_uppercase, -rotateDegrees);*/
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a + index % 26,
-                            R.color.alphabet_uppercase);
+                    /*if (rotateDegrees > 90 && rotateDegrees < 254) {
+                        bitmap = mBitmapManager.get(R.drawable.reverse_alphabet_uppercase_a + index % 26,
+                                R.color.colorPrimary);
+                    } else {
+                        //旋转回相应的角度，目的是摆正图片。但再次旋转后，在低分辨率手机上锯齿现象会严重加剧，不能接受
+                    *//*bitmap = mBitmapManager.getRotate(R.drawable.alphabet_uppercase_a + index % 26,
+                            R.color.alphabet_uppercase, -rotateDegrees);*//*
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a + index % 26,
+                                R.color.alphabet_uppercase);
+                    }*/
                 }
 
                 if (bitmap != null) {
                     canvas.drawBitmap(bitmap, mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2
                             , stopY - 1.0f * bitmap.getHeight() / 2, null);
                 }
+
                 canvas.restore();
             }
         }
