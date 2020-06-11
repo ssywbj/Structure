@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
@@ -150,7 +151,7 @@ public class BoneBlackWallpaperService extends WallpaperService {
         }
 
         private void onDraw(Canvas canvas) {
-            canvas.drawColor(ContextCompat.getColor(mContext, R.color.basic_wallpaper_bg_black));//画面背景
+            canvas.drawColor(ContextCompat.getColor(mContext, R.color.basic_wallpaper_bg_black), PorterDuff.Mode.CLEAR);//画面背景
             //canvas.drawCircle(mPointScreenCenter.x, mPointScreenCenter.y, mRadiusOuter, mPaint);
             this.paintScale(canvas);
             this.paintIconInfo(canvas);

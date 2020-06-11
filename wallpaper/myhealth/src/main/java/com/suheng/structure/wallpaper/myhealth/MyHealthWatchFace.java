@@ -382,11 +382,11 @@ public class MyHealthWatchFace extends WallpaperService {
                 } else if (index == 61) {//电量
                     bitmap = mBitmapManager.get(R.drawable.reverse_paint_sign_percentage, color);
                 } else if (index == 62) {
-                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_7, color);
-                } else if (index == 63) {
-                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_8, color);
-                } else if (index == 64) {
                     bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_0, color);
+                } else if (index == 63) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_0, color);
+                } else if (index == 64) {
+                    bitmap = mBitmapManager.get(R.drawable.reverse_paint_number_1, color);
                 } else if (index == 66) {
                     bitmap = mBitmapManager.get(R.drawable.reverse_paint_battary, color);
                 } else if (index == 68) {
