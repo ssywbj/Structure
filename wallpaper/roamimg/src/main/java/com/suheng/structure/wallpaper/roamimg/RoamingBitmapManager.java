@@ -5,6 +5,7 @@ import android.content.Context;
 import com.suheng.structure.wallpaper.basic.utils.BitmapManager;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 public class RoamingBitmapManager extends BitmapManager {
 
@@ -62,8 +63,8 @@ public class RoamingBitmapManager extends BitmapManager {
         }
     }
 
-    public int getWeekResId() {
-        Calendar instance = Calendar.getInstance();
+    public int getWeekResId(String timeZone) {
+        Calendar instance = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
         switch (instance.get(Calendar.DAY_OF_WEEK)) {
             case 2:
                 return R.drawable.paint_text_1_middle;

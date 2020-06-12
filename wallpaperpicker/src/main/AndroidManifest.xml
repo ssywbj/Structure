@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.suheng.structure.wallpaperpicker">
 
-    <uses-feature android:name="android.hardware.type.watch" />
+    <!--<uses-feature android:name="android.hardware.type.watch" />-->
 
     <uses-permission android:name="android.permission.SET_WALLPAPER_COMPONENT" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />

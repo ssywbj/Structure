@@ -9,7 +9,6 @@ import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
@@ -286,7 +285,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     contentHolder.textSetting.setVisibility(View.GONE);
                     contentHolder.textSetting.setOnClickListener(null);
                 } else {
-                    //contentHolder.textSetting.setVisibility(View.VISIBLE);
+                    contentHolder.textSetting.setVisibility(View.VISIBLE);
                     contentHolder.textSetting.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {

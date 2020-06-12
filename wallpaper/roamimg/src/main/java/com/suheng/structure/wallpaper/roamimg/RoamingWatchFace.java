@@ -2,6 +2,7 @@ package com.suheng.structure.wallpaper.roamimg;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -23,6 +24,7 @@ import androidx.core.content.ContextCompat;
 import com.suheng.structure.wallpaper.basic.DimenUtil;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 public class RoamingWatchFace extends WallpaperService {
     public static final String TAG = RoamingWatchFace.class.getSimpleName();
@@ -48,6 +50,7 @@ public class RoamingWatchFace extends WallpaperService {
         private boolean mAmbientMode;
 
         private RoamingBitmapManager mBitmapManager;
+        private SharedPreferences mPrefs;
 
         @Override
         public void onCreate(SurfaceHolder surfaceHolder) {
@@ -68,6 +71,8 @@ public class RoamingWatchFace extends WallpaperService {
             mPaintCity.setTypeface(Typeface.DEFAULT_BOLD);
             mPaintCity.setTextSize(DimenUtil.dip2px(mContext, 25));
             mPaintCity.setColor(ContextCompat.getColor(mContext, R.color.text_city));
+
+            mPrefs = getSharedPreferences(RoamingWatchFaceConfigActivity.PREFS_FILE, MODE_PRIVATE);
         }
 
         @Override
@@ -170,12 +175,17 @@ public class RoamingWatchFace extends WallpaperService {
         }
 
         private void paintCity1(Canvas canvas) {
-            String city = "伦敦";
+            //String city = "纽约";
+            String city = mPrefs.getString(RoamingWatchFaceConfigActivity.PREFS_KEY_CITY, "纽约");
             mPaintCity.getTextBounds(city, 0, city.length(), mRect);
             canvas.drawText(city, 2 * mPointScreenCenter.x - mRect.width() - mMarginHorizontal,
                     mPointScreenCenter.y + mRect.height(), mPaintCity);
 
-            Calendar instance = Calendar.getInstance();
+            //纽约，美国 GMT-4:00；伦敦，英国 GMT+1:00
+            //String timeZone = "GMT-4:00";
+            String timeZone = mPrefs.getString(RoamingWatchFaceConfigActivity.PREFS_KEY_GMT, "GMT-4:00");
+            Calendar instance = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+
             //分
             int color = android.R.color.white;
             int minute = instance.get(Calendar.MINUTE);
@@ -208,7 +218,7 @@ public class RoamingWatchFace extends WallpaperService {
             //星期
             color = R.color.text_city;
             top += (bitmap.getHeight() + mMarginTime);
-            bitmap = mBitmapManager.get(mBitmapManager.getWeekResId(), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getWeekResId(timeZone), color);
             left = 2 * mPointScreenCenter.x - 1.0f * bitmap.getWidth() - mMarginHorizontal - DimenUtil.dip2px(mContext, 3);
             canvas.drawBitmap(bitmap, left, top, null);
             bitmap = mBitmapManager.get(R.drawable.paint_text_week_middle, color);
@@ -251,8 +261,8 @@ public class RoamingWatchFace extends WallpaperService {
             canvas.drawText(city, mMarginHorizontal, top - DimenUtil.dip2px(mContext, 4), mPaintCity);
             top -= mRect.height();
 
-            Calendar instance = Calendar.getInstance();
-            //instance.setTimeZone();
+            String timeZone = "GMT+8:00";
+            Calendar instance = Calendar.getInstance(TimeZone.getTimeZone("GMT+8:00"));
 
             //时
             int color = android.R.color.white;
@@ -318,7 +328,7 @@ public class RoamingWatchFace extends WallpaperService {
             bitmap = mBitmapManager.get(R.drawable.paint_text_week_middle, color);
             canvas.drawBitmap(bitmap, left, top, null);
             left += bitmap.getWidth();
-            bitmap = mBitmapManager.get(mBitmapManager.getWeekResId(), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getWeekResId(timeZone), color);
             canvas.drawBitmap(bitmap, left, top, null);
         }
 

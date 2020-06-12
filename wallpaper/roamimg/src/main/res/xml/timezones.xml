@@ -1,0 +1,1318 @@
+<timezones>
+    <timezone
+        id="Africa/Abidjan"
+        pinyin="abirangketediwa">阿比让 , 科特迪瓦
+    </timezone>
+    <timezone
+        id="Australia/Adelaide"
+        pinyin="adelaideaodaliya">阿德莱德 , 澳大利亚
+    </timezone>
+    <timezone
+        id="America/Denver"
+        pinyin="aerbokejimeiguo">阿尔伯克基 , 美国
+    </timezone>
+    <timezone
+        id="Africa/Algiers"
+        pinyin="aerjieraerjiliya">阿尔及尔 , 阿尔及利亚
+    </timezone>
+    <timezone
+        id="Africa/Accra"
+        pinyin="akelajianagongheguo">阿克拉 , 加纳共和国
+    </timezone>
+    <timezone
+        id="Asia/Aqtau"
+        pinyin="aketaohasakesitan">阿克套 , 哈萨克斯坦
+    </timezone>
+    <timezone
+        id="Asia/Almaty"
+        pinyin="alamutuhasakesitan">阿拉木图 , 哈萨克斯坦
+    </timezone>
+    <timezone
+        id="Atlantic/Bermuda-1"
+        pinyin="alubahelan">阿鲁巴 , 荷兰
+    </timezone>
+    <timezone
+        id="Europe/Amsterdam-1"
+        pinyin="amusitedanhelan">阿姆斯特丹 , 荷兰
+    </timezone>
+    <timezone
+        id="Asia/Anadyr"
+        pinyin="anadeereluosi">阿纳德尔 , 俄罗斯
+    </timezone>
+    <timezone
+        id="America/Edmonton"
+        pinyin="aidemengdunjianada">埃德蒙顿 , 加拿大
+    </timezone>
+    <timezone
+        id="Asia/Yerevan"
+        pinyin="ailiwenyameiniya">埃里温 , 亚美尼亚
+    </timezone>
+    <timezone
+        id="America/New_York-9"
+        pinyin="anabomeiguo">安阿伯 , 美国
+    </timezone>
+    <timezone
+        id="Europe/Istanbul"
+        pinyin="ankalatuerqi">安卡拉 , 土耳其
+    </timezone>
+    <timezone
+        id="America/Anchorage"
+        pinyin="ankeleiqimeiguo">安克雷奇 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Amman"
+        pinyin="anmanyuedan">安曼 , 约旦
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Anshan"
+        pinyin="anshanzhongguo">鞍山 , 中国
+    </timezone>
+    <timezone
+        id="Pacific/Auckland"
+        pinyin="aokelanxinxilan">奥克兰 , 新西兰
+    </timezone>
+    <timezone
+        id="Europe/Bucharest-1"
+        pinyin="aolufenlan">奥卢 , 芬兰
+    </timezone>
+    <timezone
+        id="Europe/Oslo"
+        pinyin="aosilunuowei">奥斯陆 , 挪威
+    </timezone>
+    <timezone
+        id="CST6CDT-1"
+        pinyin="aositingmeiguo">奥斯汀 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Macau"
+        pinyin="aomenzhongguo">澳门 , 中国
+    </timezone>
+    <timezone
+        id="EST5EDT-1"
+        pinyin="baerdemomeiguo">巴尔的摩 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Baghdad"
+        pinyin="bagedayilake">巴格达 , 伊拉克
+    </timezone>
+    <timezone
+        id="Asia/Baku"
+        pinyin="bakuasaibaijiang">巴库 , 阿塞拜疆
+    </timezone>
+    <timezone
+        id="Europe/Paris"
+        pinyin="balifaguo">巴黎 , 法国
+    </timezone>
+    <timezone
+        id="Europe/Madrid-1"
+        pinyin="basailuonaxibanya">巴塞罗那 , 西班牙
+    </timezone>
+    <timezone
+        id="America/Sao_Paulo-1"
+        pinyin="baxiliyabaxi">巴西利亚 , 巴西
+    </timezone>
+    <timezone
+        id="Atlantic/Bermuda"
+        pinyin="baimudayingguo">百慕大 , 英国
+    </timezone>
+    <timezone
+        id="Europe/Berlin-1"
+        pinyin="bolindeguo">柏林 , 德国
+    </timezone>
+    <timezone
+        id="Asia/Kolkata-3"
+        pinyin="banjialuoeryindu">班加罗尔 , 印度
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Baotou"
+        pinyin="baotouzhongguo">包头 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Baoding"
+        pinyin="baodingzhongguo">保定 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai"
+        pinyin="beijingzhongguo">北京 , 中国
+    </timezone>
+    <timezone
+        id="Europe/Belfast"
+        pinyin="beierfasiteyingguo">贝尔法斯特 , 英国
+    </timezone>
+    <timezone
+        id="Europe/Belgrade"
+        pinyin="beiergelaidesaierweiya">贝尔格莱德 , 塞尔维亚
+    </timezone>
+    <timezone
+        id="Asia/Beirut"
+        pinyin="beilutelibanen">贝鲁特 , 黎巴嫩
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Benxi"
+        pinyin="benxizhongguo">本溪 , 中国
+    </timezone>
+    <timezone
+        id="America/Bogota"
+        pinyin="bogedagelunbiya">波哥大 , 哥伦比亚
+    </timezone>
+    <timezone
+        id="America/New_York-4"
+        pinyin="boshidunmeiguo">波士顿 , 美国
+    </timezone>
+    <timezone
+        id="PST8PDT"
+        pinyin="botelanmeiguo">波特兰 , 美国
+    </timezone>
+    <timezone
+        id="America/Denver-4"
+        pinyin="boerdemeiguo">博尔德 , 美国
+    </timezone>
+    <timezone
+        id="Europe/Budapest"
+        pinyin="budapeisixiongyali">布达佩斯 , 匈牙利
+    </timezone>
+    <timezone
+        id="Europe/Bucharest-2"
+        pinyin="bujialesiteluomaniya">布加勒斯特 , 罗马尼亚
+    </timezone>
+    <timezone
+        id="Africa/Brazzaville"
+        pinyin="bulachaiweiergangguo">布拉柴维尔 , 刚果
+    </timezone>
+    <timezone
+        id="Europe/Bratislava"
+        pinyin="buladisilafasiluofakegongheguo">布拉迪斯拉发 , 斯洛伐克共和国
+    </timezone>
+    <timezone
+        id="Europe/Prague"
+        pinyin="bulageqianjiekesiluofake">布拉格 , 前捷克斯洛伐克
+    </timezone>
+    <timezone
+        id="America/Barbados"
+        pinyin="buliqidunbabaduosi">布里奇顿 , 巴巴多斯
+    </timezone>
+    <timezone
+        id="Australia/Brisbane"
+        pinyin="bulisibanaodaliya">布里斯班 , 澳大利亚
+    </timezone>
+    <timezone
+        id="Europe/Brussels"
+        pinyin="bulusaierbilishi">布鲁塞尔 , 比利时
+    </timezone>
+    <timezone
+        id="America/Buenos_Aires"
+        pinyin="buyinuosiailisiagenting">布宜诺斯艾利斯 , 阿根廷
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Changchun"
+        pinyin="changchunzhongguo">长春 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Changsha"
+        pinyin="changshazhongguo">长沙 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Changzhou"
+        pinyin="changzhouzhongguo">常州 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Chengdu"
+        pinyin="chengduzhongguo">成都 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Chongqing"
+        pinyin="chongqingzhongguo">重庆 , 中国
+    </timezone>
+    <timezone
+        id="Australia/Darwin"
+        pinyin="daerwenaodaliya">达尔文 , 澳大利亚
+    </timezone>
+    <timezone
+        id="Africa/Dakar"
+        pinyin="dakaersaineijiaer">达喀尔 , 塞内加尔
+    </timezone>
+    <timezone
+        id="Asia/Dhaka"
+        pinyin="dakamengjiala">达卡 , 孟加拉
+    </timezone>
+    <timezone
+        id="America/Chicago-1"
+        pinyin="dalasimeiguo">达拉斯 , 美国
+    </timezone>
+    <timezone
+        id="Africa/Dar_es_Salaam"
+        pinyin="daleisisalamutansangniya">达累斯萨拉姆 , 坦桑尼亚
+    </timezone>
+    <timezone
+        id="Asia/Tokyo-2"
+        pinyin="dabanriben">大阪 , 日本
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Dalian"
+        pinyin="dalianzhongguo">大连 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Damascus"
+        pinyin="damashigexuliya">大马士革 , 叙利亚
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Daqing"
+        pinyin="daqingzhongguo">大庆 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Datong"
+        pinyin="datongzhongguo">大同 , 中国
+    </timezone>
+    <timezone
+        id="America/Denver-1"
+        pinyin="danfomeiguo">丹佛 , 美国
+    </timezone>
+    <timezone
+        id="America/Dawson_Creek-1"
+        pinyin="daosenkelikejianada">道森克里克 , 加拿大
+    </timezone>
+    <timezone
+        id="Asia/Tehran"
+        pinyin="deheilanyilang">德黑兰 , 伊朗
+    </timezone>
+    <timezone
+        id="Asia/Kolkata"
+        pinyin="deliyindu">德里 , 印度
+    </timezone>
+    <timezone
+        id="Asia/Damascus-1"
+        pinyin="delibolilibiya">的黎波里 , 利比亚
+    </timezone>
+    <timezone
+        id="Asia/Dubai"
+        pinyin="dibaialianqiu">迪拜 , 阿联酋
+    </timezone>
+    <timezone
+        id="America/Detroit-1"
+        pinyin="ditelvmeiguo">底特律 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Tbilisi"
+        pinyin="dibilisigelujiya">第比利斯 , 格鲁吉亚
+    </timezone>
+    <timezone
+        id="Asia/Tokyo"
+        pinyin="dongjingriben">东京 , 日本
+    </timezone>
+    <timezone
+        id="Europe/Dublin"
+        pinyin="dubailinaierlangongheguo">都柏林 , 爱尔兰共和国
+    </timezone>
+    <timezone
+        id="Asia/Qatar"
+        pinyin="duohakataer">多哈 , 卡塔尔
+    </timezone>
+    <timezone
+        id="America/Toronto"
+        pinyin="duolunduojianada">多伦多 , 加拿大
+    </timezone>
+    <timezone
+        id="America/Chicago-6"
+        pinyin="ekelahemachengmeiguo">俄克拉何马城 , 美国
+    </timezone>
+    <timezone
+        id="Europe/Berlin-3"
+        pinyin="falankefudeguo">法兰克福 , 德国
+    </timezone>
+    <timezone
+        id="Europe/Vatican"
+        pinyin="fandigangfandigang">梵蒂冈 , 梵蒂冈
+    </timezone>
+    <timezone
+        id="EST5EDT-2"
+        pinyin="feichengmeiguo">费城 , 美国
+    </timezone>
+    <timezone
+        id="America/Phoenix-1"
+        pinyin="fenghuangchengmeiguo">凤凰城 , 美国
+    </timezone>
+    <timezone
+        id="Africa/Freetown"
+        pinyin="fulidunsailaliang">弗里敦 , 塞拉利昂
+    </timezone>
+    <timezone
+        id="Europe/Warsaw-1"
+        pinyin="fuluociwafubolan">弗罗茨瓦夫 , 波兰
+    </timezone>
+    <timezone
+        id="Asia/Vladivostok"
+        pinyin="fuladiwosituokeeluosi">符拉迪沃斯托克 , 俄罗斯
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Fuzhou"
+        pinyin="fuzhouzhongguo">福州 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Fushun"
+        pinyin="fushunzhongguo">抚顺 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Fuxin"
+        pinyin="fuxinzhongguo">阜新 , 中国
+    </timezone>
+    <timezone
+        id="Chile/EasterIsland"
+        pinyin="fuhuojiedaozhili">复活节岛 , 智利
+    </timezone>
+    <timezone
+        id="Europe/Copenhagen"
+        pinyin="gebenhagendanmai">哥本哈根 , 丹麦
+    </timezone>
+    <timezone
+        id="America/New_York-5"
+        pinyin="gelunbumeiguo">哥伦布 , 美国
+    </timezone>
+    <timezone
+        id="Pacific/Guam"
+        pinyin="guandaoguandao">关岛 , 关岛
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Guangzhou"
+        pinyin="guangzhouzhongguo">广州 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Guiyang"
+        pinyin="guiyangzhongguo">贵阳 , 中国
+    </timezone>
+    <timezone
+        id="Africa/Gaborone"
+        pinyin="haboluoneibociwana">哈博罗内 , 博茨瓦纳
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Harbin"
+        pinyin="haerbinzhongguo">哈尔滨 , 中国
+    </timezone>
+    <timezone
+        id="Africa/Harare"
+        pinyin="halaleijinbabuwei">哈拉雷 , 津巴布韦
+    </timezone>
+    <timezone
+        id="America/Halifax"
+        pinyin="halifakesijianada">哈利法克斯 , 加拿大
+    </timezone>
+    <timezone
+        id="America/Havana"
+        pinyin="hawanaguba">哈瓦那 , 古巴
+    </timezone>
+    <timezone
+        id="Asia/Kolkata-4"
+        pinyin="haidelabayindu">海得拉巴 , 印度
+    </timezone>
+    <timezone
+        id="Asia/Jerusalem-2"
+        pinyin="haifayiselie">海法 , 以色列
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Haikou"
+        pinyin="haikouzhongguo">海口 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Handan"
+        pinyin="handanzhongguo">邯郸 , 中国
+    </timezone>
+    <timezone
+        id="Europe/Berlin-2"
+        pinyin="hanbaodeguo">汉堡 , 德国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Hangzhou"
+        pinyin="hangzhouzhongguo">杭州 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Hefei"
+        pinyin="hefeizhongguo">合肥 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Bangkok-2"
+        pinyin="heneiyuenan">河内 , 越南
+    </timezone>
+    <timezone
+        id="Europe/Helsinki"
+        pinyin="heerxinjifenlan">赫尔辛基 , 芬兰
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Hohhot"
+        pinyin="huhehaotezhongguo">呼和浩特 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Ho_Chi_Minh"
+        pinyin="huzhimingshiyuenan">胡志明市 , 越南
+    </timezone>
+    <timezone
+        id="Europe/Warsaw"
+        pinyin="huashabolan">华沙 , 波兰
+    </timezone>
+    <timezone
+        id="America/Detroit-2"
+        pinyin="huashengduntequmeiguo">华盛顿特区 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Huai'an"
+        pinyin="huaianzhongguo">淮安 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Huainan"
+        pinyin="huainanzhongguo">淮南 , 中国
+    </timezone>
+    <timezone
+        id="Pacific/Honolulu"
+        pinyin="huonululumeiguo">火奴鲁鲁 , 美国
+    </timezone>
+    <timezone
+        id="Australia/Hobart"
+        pinyin="huobateaodaliya">霍巴特 , 澳大利亚
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Jixi"
+        pinyin="jixizhongguo">鸡西 , 中国
+    </timezone>
+    <timezone
+        id="America/Guayaquil"
+        pinyin="jiduoeguaduoer">基多 , 厄瓜多尔
+    </timezone>
+    <timezone
+        id="Africa/Maseru-1"
+        pinyin="jifuwukelan">基辅 , 乌克兰
+    </timezone>
+    <timezone
+        id="Africa/Maseru"
+        pinyin="jijialiluwangda">基加利 , 卢旺达
+    </timezone>
+    <timezone
+        id="Europe/Chisinau"
+        pinyin="jixinawumoerduowa">基希讷乌 , 摩尔多瓦
+    </timezone>
+    <timezone
+        id="Africa/Djibouti"
+        pinyin="jibutijibuti">吉布提 , 吉布提
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Jilin"
+        pinyin="jilinshizhongguo">吉林 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Kuala_Lumpur"
+        pinyin="jilongpomalaixiya">吉隆坡 , 马来西亚
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Jinan"
+        pinyin="jinanzhongguo">济南 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Kathmandu"
+        pinyin="jiademanduniboer">加德满都 , 尼泊尔
+    </timezone>
+    <timezone
+        id="Asia/Calcutta"
+        pinyin="jiaergedayindu">加尔各答 , 印度
+    </timezone>
+    <timezone
+        id="America/Caracas"
+        pinyin="jialajiasiweineiruila">加拉加斯 , 委内瑞拉
+    </timezone>
+    <timezone
+        id="Atlantic/Canary"
+        pinyin="jianaliqundaoxibanya">加那利群岛 , 西班牙
+    </timezone>
+    <timezone
+        id="Asia/Gaza"
+        pinyin="jiashabalesitan">加沙 , 巴勒斯坦
+    </timezone>
+    <timezone
+        id="America/Jacksonville"
+        pinyin="jianqiaoyingguo">剑桥 , 英国
+    </timezone>
+    <timezone
+        id="America/New_York-10"
+        pinyin="jiekexunweiermeiguo">杰克逊维尔 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Phnom_Penh"
+        pinyin="jinbianjianpuzhai">金边 , 柬埔寨
+    </timezone>
+    <timezone
+        id="Africa/Kinshasa"
+        pinyin="jinshasazhayier">金沙萨 , 刚果
+    </timezone>
+    <timezone
+        id="America/Jamaica"
+        pinyin="jinsidunyamaijia">金斯敦 , 牙买加
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Jinzhou"
+        pinyin="jinzhouzhongguo">锦州 , 中国
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-2"
+        pinyin="jiujinshanmeiguo">旧金山 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Kabul"
+        pinyin="kabuerafuhan">喀布尔 , 阿富汗
+    </timezone>
+    <timezone
+        id="Africa/Khartoum"
+        pinyin="katumusudan">喀土穆 , 苏丹
+    </timezone>
+    <timezone
+        id="America/Denver-2"
+        pinyin="kaerjialijianada">卡尔加里 , 加拿大
+    </timezone>
+    <timezone
+        id="Asia/Karachi-1"
+        pinyin="kalaqibajisitan">卡拉奇 , 巴基斯坦
+    </timezone>
+    <timezone
+        id="Africa/Casablanca"
+        pinyin="kasabulankamoluoge">卡萨布兰卡 , 摩洛哥
+    </timezone>
+    <timezone
+        id="Africa/Cairo"
+        pinyin="kailuoaiji">开罗 , 埃及
+    </timezone>
+    <timezone
+        id="America/Cayman-1"
+        pinyin="kaimanqundaoyingguo">开曼群岛 , 英国
+    </timezone>
+    <timezone
+        id="Africa/Johannesburg-1"
+        pinyin="kaipudunnanfei">开普敦 , 南非
+    </timezone>
+    <timezone
+        id="Australia/Canberra"
+        pinyin="kanpeilaaodaliya">堪培拉 , 澳大利亚
+    </timezone>
+    <timezone
+        id="America/Chicago-13"
+        pinyin="kankunmoxige">坎昆 , 墨西哥
+    </timezone>
+    <timezone
+        id="Africa/Khartoum-1"
+        pinyin="kanpalawuganda">坎帕拉 , 乌干达
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-7"
+        pinyin="kekelanmeiguo">柯克兰 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Colombo"
+        pinyin="kelunposililanka">科伦坡 , 斯里兰卡
+    </timezone>
+    <timezone
+        id="Africa/Conakry"
+        pinyin="kenakelijineiya">科纳克里 , 几内亚
+    </timezone>
+    <timezone
+        id="Asia/Kuwait"
+        pinyin="keweitechengkeweite">科威特城 , 科威特
+    </timezone>
+    <timezone
+        id="Africa/Kinshasa-1"
+        pinyin="kelakefubolan">克拉科夫 , 波兰
+    </timezone>
+    <timezone
+        id="Asia/Krasnoyarsk"
+        pinyin="kelasinuoyaersikeeluosi">克拉斯诺亚尔斯克 , 俄罗斯
+    </timezone>
+    <timezone
+        id="EST5EDT-3"
+        pinyin="kelifulanmeiguo">克利夫兰 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Kunming"
+        pinyin="kunmingzhongguo">昆明 , 中国
+    </timezone>
+    <timezone
+        id="Australia/Queensland"
+        pinyin="kunshilanaodaliya">昆士兰 , 澳大利亚
+    </timezone>
+    <timezone
+        id="America/Manaus-2"
+        pinyin="labasiboliweiya">拉巴斯 , 玻利维亚
+    </timezone>
+    <timezone
+        id="Africa/Lagos"
+        pinyin="lagesiniriliya">拉各斯 , 尼日利亚
+    </timezone>
+    <timezone
+        id="Asia/Karachi-2"
+        pinyin="laheerbajisitan">拉合尔 , 巴基斯坦
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-1"
+        pinyin="lasiweijiasimeiguo">拉斯维加斯 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Lanzhou"
+        pinyin="lanzhouzhongguo">兰州 , 中国
+    </timezone>
+    <timezone
+        id="Arctic/Longyearbyen"
+        pinyin="langyierchengnuowei">朗伊尔城 , 挪威
+    </timezone>
+    <timezone
+        id="Atlantic/Reykjavik"
+        pinyin="leikeyaweikebingdao">雷克雅未克 , 冰岛
+    </timezone>
+    <timezone
+        id="Europe/Riga"
+        pinyin="lijialatuoweiya">里加 , 拉脱维亚
+    </timezone>
+    <timezone
+        id="America/Regina"
+        pinyin="lijianajianada">里贾纳 , 加拿大
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-8"
+        pinyin="leinuomeiguo">雷诺 , 美国
+    </timezone>
+    <timezone
+        id="Europe/Lisbon"
+        pinyin="lisibenputaoya">里斯本 , 葡萄牙
+    </timezone>
+    <timezone
+        id="America/Sao_Paulo-2"
+        pinyin="liyuereneilubaxi">里约热内卢 , 巴西
+    </timezone>
+    <timezone
+        id="America/Lima"
+        pinyin="limamilu">利马 , 秘鲁
+    </timezone>
+    <timezone
+        id="Asia/Riyadh-2"
+        pinyin="liyadeshatealabo">利雅得 , 沙特阿拉伯
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Liuzhou"
+        pinyin="liuzhouzhongguo">柳州 , 中国
+    </timezone>
+    <timezone
+        id="Europe/Luxembourg"
+        pinyin="lusenbaolusenbao">卢森堡 , 卢森堡
+    </timezone>
+    <timezone
+        id="America/Lima-1"
+        pinyin="luyisiweiermeiguo">路易斯维尔 , 美国
+    </timezone>
+    <timezone
+        id="Europe/London"
+        pinyin="lundunyingguo">伦敦 , 英国
+    </timezone>
+    <timezone
+        id="Europe/Rome"
+        pinyin="luomayidali">罗马 , 意大利
+    </timezone>
+    <timezone
+        id="America/Los_Angeles"
+        pinyin="luoshanjimeiguo">洛杉矶 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Luoyang"
+        pinyin="luoyangzhongguo">洛阳 , 中国
+    </timezone>
+    <timezone
+        id="Europe/Madrid-2"
+        pinyin="madelixibanya">马德里 , 西班牙
+    </timezone>
+    <timezone
+        id="Europe/Isle_of_Man"
+        pinyin="maendaoyingguo">马恩岛 , 英国
+    </timezone>
+    <timezone
+        id="Australia/Canberra-1"
+        pinyin="majiadaneluosi">马加丹 , 俄罗斯
+    </timezone>
+    <timezone
+        id="Indian/Maldives"
+        pinyin="maleimaerdaifu">马累 , 马尔代夫
+    </timezone>
+    <timezone
+        id="America/Chicago-7"
+        pinyin="managuanijialagua">马那瓜 , 尼加拉瓜
+    </timezone>
+    <timezone
+        id="America/Manaus-1"
+        pinyin="manaosibaxi">马瑙斯 , 巴西
+    </timezone>
+    <timezone
+        id="Asia/Manila"
+        pinyin="manilafeilvbin">马尼拉 , 菲律宾
+    </timezone>
+    <timezone
+        id="Europe/Riga-1"
+        pinyin="masailulaisuotuo">马塞卢 , 莱索托
+    </timezone>
+    <timezone
+        id="Asia/Muscat"
+        pinyin="masikateaman">马斯喀特 , 阿曼
+    </timezone>
+    <timezone
+        id="America/Manaus-3"
+        pinyin="matinikefaguo">马提尼克 , 法国
+    </timezone>
+    <timezone
+        id="Pacific/Majuro"
+        pinyin="mazhuluomashaoerqundaogongheguo">马朱罗 , 马绍尔群岛共和国
+    </timezone>
+    <timezone
+        id="America/New_York-6"
+        pinyin="maiamimeiguo">迈阿密 , 美国
+    </timezone>
+    <timezone
+        id="America/Chicago-8"
+        pinyin="maidixunmeiguo">麦迪逊 , 美国
+    </timezone>
+    <timezone
+        id="Europe/London-2"
+        pinyin="manchesiteyingguo">曼彻斯特 , 英国
+    </timezone>
+    <timezone
+        id="Asia/Bangkok-1"
+        pinyin="mangutaiguo">曼谷 , 泰国
+    </timezone>
+    <timezone
+        id="America/Anchorage-1"
+        pinyin="meitelakatelameiguo">梅特拉卡特拉 , 美国
+    </timezone>
+    <timezone
+        id="America/Buenos_Aires-2"
+        pinyin="menduosaagenting">门多萨 , 阿根廷
+    </timezone>
+    <timezone
+        id="America/Montevideo"
+        pinyin="mengdeweideyawulagui">蒙得维的亚 , 乌拉圭
+    </timezone>
+    <timezone
+        id="America/Chicago-14"
+        pinyin="mengteleimoxige">蒙特雷 , 墨西哥
+    </timezone>
+    <timezone
+        id="America/Montreal"
+        pinyin="mengtelierjianada">蒙特利尔 , 加拿大
+    </timezone>
+    <timezone
+        id="CST6CDT-2"
+        pinyin="mengfeisimeiguo">孟菲斯 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Kolkata-1"
+        pinyin="mengmaiyindu">孟买 , 印度
+    </timezone>
+    <timezone
+        id="Europe/Rome-1"
+        pinyin="milanyidali">米兰 , 意大利
+    </timezone>
+    <timezone
+        id="CST6CDT-3"
+        pinyin="mierwojimeiguo">密尔沃基 , 美国
+    </timezone>
+    <timezone
+        id="America/Chicago-2"
+        pinyin="mingniabolisimeiguo">明尼阿波利斯 , 美国
+    </timezone>
+    <timezone
+        id="Europe/Minsk"
+        pinyin="mingsikebaieluosi">明斯克 , 白俄罗斯
+    </timezone>
+    <timezone
+        id="Africa/Nairobi-1"
+        pinyin="mojiadishasuomali">摩加迪沙 , 索马里
+    </timezone>
+    <timezone
+        id="Europe/Moscow"
+        pinyin="mosikeeluosi">莫斯科 , 俄罗斯
+    </timezone>
+    <timezone
+        id="Australia/Melbourne"
+        pinyin="moerbenaodaliya">墨尔本 , 澳大利亚
+    </timezone>
+    <timezone
+        id="America/Mexico_City"
+        pinyin="moxigechengmoxige">墨西哥城 , 墨西哥
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Mudanjiang"
+        pinyin="mudanjiangzhongguo">牡丹江 , 中国
+    </timezone>
+    <timezone
+        id="Europe/Berlin-4"
+        pinyin="muniheideguo">慕尼黑 , 德国
+    </timezone>
+    <timezone
+        id="America/Nassau-2"
+        pinyin="nasaobahama">拿骚 , 巴哈马
+    </timezone>
+    <timezone
+        id="Asia/Baghdad-1"
+        pinyin="neiluobikenniya">内罗毕 , 肯尼亚
+    </timezone>
+    <timezone
+        id="America/Chicago-9"
+        pinyin="nashiweiermeiguo">纳什维尔 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Nanchang"
+        pinyin="nanchangzhongguo">南昌 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Nanjing"
+        pinyin="nanjingzhongguo">南京 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Nanning"
+        pinyin="nanningzhongguo">南宁 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Ningbo"
+        pinyin="ningbozhongguo">宁波 , 中国
+    </timezone>
+    <timezone
+        id="Canada/Newfoundland"
+        pinyin="niufenlanjianada">纽芬兰 , 加拿大
+    </timezone>
+    <timezone
+        id="America/New_York"
+        pinyin="niuyuemeiguo">纽约 , 美国
+    </timezone>
+    <timezone
+        id="America/Godthab"
+        pinyin="nukegelinglan">努克 , 格陵兰
+    </timezone>
+    <timezone
+        id="Pacific/Tongatapu"
+        pinyin="nukualuofatangjiagongheguo">努库阿洛法 , 汤加共和国
+    </timezone>
+    <timezone
+        id="Pacific/Noumea"
+        pinyin="numeiafaguo">努美阿 , 法国
+    </timezone>
+    <timezone
+        id="America/New_York-11"
+        pinyin="nuokesiweiermeiguo">诺克斯维尔 , 美国
+    </timezone>
+    <timezone
+        id="America/Paramaribo"
+        pinyin="palamalibosulinan">帕拉马里博 , 苏里南
+    </timezone>
+    <timezone
+        id="America/New_York-12"
+        pinyin="pizibaomeiguo">匹兹堡 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Pingdingshan"
+        pinyin="pingdingshanzhongguo">平顶山 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Pyongyang"
+        pinyin="pingrangchaoxian">平壤 , 朝鲜
+    </timezone>
+    <timezone
+        id="Atlantic/Cape_Verde"
+        pinyin="pulayafodejiao">普拉亚 , 佛得角
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Qiqihar"
+        pinyin="qiqihaerzhongguo">齐齐哈尔 , 中国
+    </timezone>
+    <timezone
+        id="America/Chihuahua"
+        pinyin="qiwawamoxige">奇瓦瓦 , 墨西哥
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Qingdao"
+        pinyin="qingdaozhongguo">青岛 , 中国
+    </timezone>
+    <timezone
+        id="Europe/Zagreb"
+        pinyin="sagelebukeluodiya">萨格勒布 , 克罗地亚
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-11"
+        pinyin="sailemumeiguo">塞勒姆 , 美国
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-9"
+        pinyin="sakelamentuomeiguo">萨克拉门托 , 美国
+    </timezone>
+    <timezone
+        id="Europe/Sarajevo"
+        pinyin="salarewobosiniyaheheisaigeweina">萨拉热窝 , 波斯尼亚和黑塞哥维那
+    </timezone>
+    <timezone
+        id="Canada/Saskatchewan"
+        pinyin="sasikachewenjianada">萨斯喀彻温 , 加拿大
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-10"
+        pinyin="shanjingchengmeiguo">山景城 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Shantou"
+        pinyin="shantouzhongguo">汕头 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Shangqiu"
+        pinyin="shangqiuzhongguo">商丘 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Shanghai"
+        pinyin="shanghaizhongguo">上海 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Shenzhen"
+        pinyin="shenzhenzhongguo">深圳 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Shenyang"
+        pinyin="shenyangzhongguo">沈阳 , 中国
+    </timezone>
+    <timezone
+        id="CST6CDT-4"
+        pinyin="shengandongniaomeiguo">圣安东尼奥 , 美国
+    </timezone>
+    <timezone
+        id="America/Sao_Paulo-3"
+        pinyin="shengbaoluobaxi">圣保罗 , 巴西
+    </timezone>
+    <timezone
+        id="Asia/Baku-2"
+        pinyin="shengbidebaoeluosi">圣彼得堡 , 俄罗斯
+    </timezone>
+    <timezone
+        id="Pacific/Kiritimati"
+        pinyin="shengdandaojilibasi">圣诞岛 , 基里巴斯
+    </timezone>
+    <timezone
+        id="America/Santiago"
+        pinyin="shengdiyagezhili">圣地亚哥 , 智利
+    </timezone>
+    <timezone
+        id="America/Santo_Domingo"
+        pinyin="shengduominggeduominijia">圣多明各 , 多米尼加
+    </timezone>
+    <timezone
+        id="America/Chicago-10"
+        pinyin="shenghesaigesidalijia">圣何塞 , 哥斯达黎加
+    </timezone>
+    <timezone
+        id="America/Santo_Domingo-1"
+        pinyin="shenghuanboduolige">圣胡安 , 波多黎哥
+    </timezone>
+    <timezone
+        id="America/Chicago-15"
+        pinyin="shengluyisimeiguo">圣路易斯 , 美国
+    </timezone>
+    <timezone
+        id="Europe/San_Marino"
+        pinyin="shengmalinuoshengmalinuo">圣马力诺 , 圣马力诺
+    </timezone>
+    <timezone
+        id="America/Guatemala-1"
+        pinyin="shengsaerwaduosaerwaduo">圣萨尔瓦多 , 萨尔瓦多
+    </timezone>
+    <timezone
+        id="Atlantic/Bermuda-2"
+        pinyin="shengyuehanjianada">圣约翰 , 加拿大
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Shijiazhuang"
+        pinyin="shijiazhuangzhongguo">石家庄 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Seoul"
+        pinyin="shouernanhan">首尔 , 南韩
+    </timezone>
+    <timezone
+        id="Europe/Stockholm"
+        pinyin="sidegeermoruidian">斯德哥尔摩 , 瑞典
+    </timezone>
+    <timezone
+        id="Europe/Skopje"
+        pinyin="sikepulimaqidungongheguo">斯科普里 , 马其顿共和国
+    </timezone>
+    <timezone
+        id="Europe/Zurich"
+        pinyin="sulishiruishi">苏黎世 , 瑞士
+    </timezone>
+    <timezone
+        id="Pacific/Fiji"
+        pinyin="suwafeiji">苏瓦 , 斐济
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Suzhou"
+        pinyin="suzhouzhongguo">苏州 , 中国
+    </timezone>
+    <timezone
+        id="Europe/Sofia"
+        pinyin="suofeiyabaojialiya">索非亚 , 保加利亚
+    </timezone>
+    <timezone
+        id="Europe/Tallinn"
+        pinyin="talinaishaniyagongheguo">塔林 , 爱沙尼亚共和国
+    </timezone>
+    <timezone
+        id="Asia/Tashkent"
+        pinyin="tashiganwuzibiekegongheguo">塔什干 , 乌兹别克共和国
+    </timezone>
+    <timezone
+        id="Pacific/Tahiti"
+        pinyin="taxitidaofaguo">塔希提岛 , 法国
+    </timezone>
+    <timezone
+        id="Asia/Taipei"
+        pinyin="taibeitaiwan">台北 , 台湾
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Taiyuan"
+        pinyin="taiyuanzhongguo">太原 , 中国
+    </timezone>
+    <timezone
+        id="America/New_York-7"
+        pinyin="taiziganghaidi">太子港 , 海地
+    </timezone>
+    <timezone
+        id="America/New_York-13"
+        pinyin="tanpameiguo">坦帕 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Tangshan"
+        pinyin="tangshanzhongguo">唐山 , 中国
+    </timezone>
+    <timezone
+        id="America/Tegucigalpa"
+        pinyin="teguxijiaerbahongdulasigongheguo">特古西加尔巴 , 洪都拉斯共和国
+    </timezone>
+    <timezone
+        id="Asia/Tel_Aviv"
+        pinyin="telaweifuyiselie">特拉维夫 , 以色列
+    </timezone>
+    <timezone
+        id="America/Tijuana"
+        pinyin="tihuanamoxige">提华纳 , 墨西哥
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Tianjin"
+        pinyin="tianjinzhongguo">天津 , 中国
+    </timezone>
+    <timezone
+        id="Africa/Tunis"
+        pinyin="tunisitunisi">突尼斯 , 突尼斯
+    </timezone>
+    <timezone
+        id="America/Guatemala-2"
+        pinyin="weidimalaweidimala">危地马拉 , 危地马拉
+    </timezone>
+    <timezone
+        id="America/Tijuana-1"
+        pinyin="weiduoliyajianada">维多利亚 , 加拿大
+    </timezone>
+    <timezone
+        id="Europe/Vilnius"
+        pinyin="weierniusilitaowan">维尔纽斯 , 立陶宛
+    </timezone>
+    <timezone
+        id="Europe/Vienna"
+        pinyin="weiyenaaodili">维也纳 , 奥地利
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Weifang"
+        pinyin="weifangzhongguo">潍坊 , 中国
+    </timezone>
+    <timezone
+        id="Africa/Windhoek"
+        pinyin="wendehekenamibiya">温得和克 , 纳米比亚
+    </timezone>
+    <timezone
+        id="America/Vancouver"
+        pinyin="wengehuajianada">温哥华 , 加拿大
+    </timezone>
+    <timezone
+        id="America/Winnipeg"
+        pinyin="wennibojianada">温尼伯 , 加拿大
+    </timezone>
+    <timezone
+        id="America/New_York-2"
+        pinyin="wotaihuajianada">渥太华 , 加拿大
+    </timezone>
+    <timezone
+        id="Asia/Oral"
+        pinyin="wulaereluosi">乌拉尔 , 俄罗斯
+    </timezone>
+    <timezone
+        id="Asia/Ulaanbaatar"
+        pinyin="wulanbatuomenggu">乌兰巴托 , 蒙古
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-wulumuqi"
+        pinyin="wulumuqizhongguo">乌鲁木齐 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Wuxi"
+        pinyin="wuxizhongguo">无锡 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Wuhan"
+        pinyin="wuhanzhongguo">武汉 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Xian"
+        pinyin="xianzhongguo">西安 , 中国
+    </timezone>
+    <timezone
+        id="America/Port_of_Spain"
+        pinyin="xibanyagangduobage">西班牙港 , 多巴哥
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Xining"
+        pinyin="xiningzhongguo">西宁 , 中国
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-3"
+        pinyin="xiyatumeiguo">西雅图 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Gaza-1"
+        pinyin="xibolunbalesitan">希伯伦 , 巴勒斯坦
+    </timezone>
+    <timezone
+        id="Australia/Sydney"
+        pinyin="xiniaodaliya">悉尼 , 澳大利亚
+    </timezone>
+    <timezone
+        id="Asia/Hong_Kong"
+        pinyin="xianggangzhongguo">香港 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Xiangyang"
+        pinyin="xiangyangzhongguo">襄阳 , 中国
+    </timezone>
+    <timezone
+        id="Europe/Simferopol"
+        pinyin="xinfeiluoboereluosi">辛菲罗波尔 , 俄罗斯
+    </timezone>
+    <timezone
+        id="America/Chicago-3"
+        pinyin="xinaoerliangmeiguo">新奥尔良 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Singapore"
+        pinyin="xinjiapoxinjiapo">新加坡 , 新加坡
+    </timezone>
+    <timezone
+        id="Australia/NSW"
+        pinyin="xinnanweiershiaodaliya">新南威尔士 , 澳大利亚
+    </timezone>
+    <timezone
+        id="America/Chicago-4"
+        pinyin="xiusidunmeiguo">休斯顿 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Xuzhou"
+        pinyin="xuzhouzhongguo">徐州 , 中国
+    </timezone>
+    <timezone
+        id="Europe/Athens"
+        pinyin="yadianxila">雅典 , 希腊
+    </timezone>
+    <timezone
+        id="Asia/Jakarta"
+        pinyin="yajiadayinni">雅加达 , 印尼
+    </timezone>
+    <timezone
+        id="Asia/Seoul-1"
+        pinyin="yakucikeeluosi">雅库茨克 , 俄罗斯
+    </timezone>
+    <timezone
+        id="Africa/Addis_Ababa"
+        pinyin="yadesiyabeibaaisaiebiya">亚的斯亚贝巴 , 埃塞俄比亚
+    </timezone>
+    <timezone
+        id="Atlantic/Azores"
+        pinyin="yashuerqundaoputaoya">亚述尔群岛 , 葡萄牙
+    </timezone>
+    <timezone
+        id="America/Santo_Domingo-2"
+        pinyin="yasongsenbalagui">亚松森 , 巴拉圭
+    </timezone>
+    <timezone
+        id="America/New_York-8"
+        pinyin="yatelandameiguo">亚特兰大 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Yantai"
+        pinyin="yantaizhongguo">烟台 , 中国
+    </timezone>
+    <timezone
+        id="America/Denver-3"
+        pinyin="yanhuchengmeiguo">盐湖城 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Rangoon"
+        pinyin="yangguangmiandian">仰光 , 缅甸
+    </timezone>
+    <timezone
+        id="Asia/Jerusalem-1"
+        pinyin="yelusalengyiselie">耶路撒冷 , 以色列
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Yichun"
+        pinyin="yichunzhongguo">伊春 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Seoul-2"
+        pinyin="yierkucikeeluosi">伊尔库茨克 , 俄罗斯
+    </timezone>
+    <timezone
+        id="Asia/Karachi-3"
+        pinyin="yisilanbaobajisitan">伊斯兰堡 , 巴基斯坦
+    </timezone>
+    <timezone
+        id="Asia/Istanbul"
+        pinyin="yisitanbuertuerqi">伊斯坦布尔 , 土耳其
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Yichang"
+        pinyin="yichangzhongguo">宜昌 , 中国
+    </timezone>
+    <timezone
+        id="America/Indiana/Indianapolis"
+        pinyin="yindiannabolisimeiguo">印第安纳波利斯 , 美国
+    </timezone>
+    <timezone
+        id="Africa/Johannesburg-2"
+        pinyin="yuehanneisibaonanfei">约翰内斯堡 , 南非
+    </timezone>
+    <timezone
+        id="Asia/Kolkata-5"
+        pinyin="zhaipueryindu">斋普尔 , 印度
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Zaozhuang"
+        pinyin="zaozhuangzhongguo">枣庄 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Zhanjiang"
+        pinyin="zhanjiangzhongguo">湛江 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Zhangjiakou"
+        pinyin="zhangjiakouzhongguo">张家口 , 中国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Zhengzhou"
+        pinyin="zhengzhouzhongguo">郑州 , 中国
+    </timezone>
+    <timezone
+        id="America/Chicago-5"
+        pinyin="zhijiagemeiguo">芝加哥 , 美国
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Zibo"
+        pinyin="zibozhongguo">淄博 , 中国
+    </timezone>
+</timezones>
