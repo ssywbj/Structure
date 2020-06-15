@@ -201,22 +201,34 @@ public class BoneBlackWallpaperService extends WallpaperService {
             //天气
             float left = margin;
             float top = mPointScreenCenter.y + mMarginIconText;
-            Bitmap bitmap = mBitmapManager.getMerge(
-                    R.drawable.paint_number_2, color, R.drawable.paint_number_5, color, R.drawable.paint_temperature_unit, color);
+            Bitmap bitmap = mBitmapManager.get(R.drawable.paint_number_2, color);
             canvas.drawBitmap(bitmap, left, top, null);
-            bitmap = mBitmapManager.get(R.drawable.paint_weather_day_duoyun, color);
-            left = margin * 1.5f;
-            top = mPointScreenCenter.y - mMarginIconText - bitmap.getHeight();
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(R.drawable.paint_number_5, color);
+            canvas.drawBitmap(bitmap, left, top, null);
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(R.drawable.paint_temperature_unit, color);
             canvas.drawBitmap(bitmap, left, top, null);
 
+            bitmap = mBitmapManager.get(R.drawable.paint_weather_day_duoyun, color);
+            top = mPointScreenCenter.y - mMarginIconText - bitmap.getHeight();
+            left = margin * 1.5f;
+            canvas.drawBitmap(bitmap, left, top, null);
+
+
             //电量
-            bitmap = mBitmapManager.getMerge(
-                    R.drawable.paint_number_7, color, R.drawable.paint_number_0, color, R.drawable.paint_sign_percentage, color);
+            bitmap = mBitmapManager.get(R.drawable.paint_sign_percentage, color);
             left = (2 * mPointScreenCenter.x - bitmap.getWidth() - margin);
             top = mPointScreenCenter.y + mMarginIconText;
             canvas.drawBitmap(bitmap, left, top, null);
+            bitmap = mBitmapManager.get(R.drawable.paint_number_0, color);
+            canvas.drawBitmap(bitmap, left -= bitmap.getWidth(), top, null);
+            bitmap = mBitmapManager.get(R.drawable.paint_number_7, color);
+            canvas.drawBitmap(bitmap, left - bitmap.getWidth(), top, null);
+
             bitmap = mBitmapManager.get(R.drawable.paint_battary, color);
             top = mPointScreenCenter.y - mMarginIconText - bitmap.getHeight();
+            left = (2 * mPointScreenCenter.x - bitmap.getWidth() - 1.6f * margin);
             canvas.drawBitmap(bitmap, left, top, null);
         }
 
@@ -235,26 +247,30 @@ public class BoneBlackWallpaperService extends WallpaperService {
 
             //星期
             offset += (bitmap.getWidth() + DimenUtil.dip2px(mContext, 4));
-            bitmap = mBitmapManager.getMerge(R.drawable.paint_text_week, color, mBitmapManager.getWeekResId(), color);//星期
+            bitmap = mBitmapManager.get(R.drawable.paint_text_week, color);//星期
+            canvas.drawBitmap(bitmap, offset, top, null);
+            offset += bitmap.getWidth();
+            bitmap = mBitmapManager.get(mBitmapManager.getWeekResId(), color);
             canvas.drawBitmap(bitmap, offset, top, null);
 
             //号数
             int units = day % 10;//个位
             int tens = day / 10;//十位
             offset = mPointScreenCenter.x;
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getNumberResId(tens), color, mBitmapManager.getNumberResId(units), color);
-            offset -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap, offset, top, null);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color);
+            canvas.drawBitmap(bitmap, offset -= bitmap.getWidth(), top, null);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color);
+            canvas.drawBitmap(bitmap, offset -= bitmap.getWidth(), top, null);
 
             //月份
             bitmap = mBitmapManager.get(R.drawable.paint_text_month, color);
-            offset -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap, offset, top, null);
+            canvas.drawBitmap(bitmap, offset -= bitmap.getWidth(), top, null);
             units = month % 10;//个位
             tens = month / 10;//十位
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getNumberResId(tens), color, mBitmapManager.getNumberResId(units), color);
-            offset -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap, offset, top, null);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color);
+            canvas.drawBitmap(bitmap, offset -= bitmap.getWidth(), top, null);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color);
+            canvas.drawBitmap(bitmap, offset - bitmap.getWidth(), top, null);
 
             Log.d(TAG, "date, month = " + month + ", day = " + day + ", week = " + week
                     + ", tens = " + tens + ", units = " + units);

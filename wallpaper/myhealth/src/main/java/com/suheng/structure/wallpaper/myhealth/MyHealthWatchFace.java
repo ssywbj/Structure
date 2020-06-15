@@ -209,10 +209,13 @@ public class MyHealthWatchFace extends WallpaperService {
             int minute = instance.get(Calendar.MINUTE);
             int units = minute % 10;//个位
             int tens = minute / 10;//十位
-            Bitmap bitmap = mBitmapManager.getMerge(mBitmapManager.getBigNumberResId(tens), color, mBitmapManager.getBigNumberResId(units), color);
-            float left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
+            Bitmap bitmap = mBitmapManager.get(mBitmapManager.getBigNumberResId(tens), color);
+            float left = mPointScreenCenter.x - bitmap.getWidth();
             float hourBitmapHeight = 1.0f * bitmap.getHeight() / 2;
             float top = mPointScreenCenter.y - hourBitmapHeight;
+            canvas.drawBitmap(bitmap, left, top, null);
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(mBitmapManager.getBigNumberResId(units), color);
             canvas.drawBitmap(bitmap, left, top, null);
             left += bitmap.getWidth();
             bitmap = mBitmapManager.get(R.drawable.my_health_minute_flag, color);
@@ -225,13 +228,19 @@ public class MyHealthWatchFace extends WallpaperService {
             tens = second / 10;//十位
             left = mPointScreenCenter.x + mRadiusInner / 2;
             top = mPointScreenCenter.y + hourBitmapHeight;
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallNumberResId(tens), color, mBitmapManager.getSmallNumberResId(units), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getSmallNumberResId(tens), color);
             left -= DimenUtil.dip2px(mContext, 1);
             top -= (bitmap.getHeight() + 2);
             canvas.drawBitmap(bitmap, left, top, null);
+
+            left += (bitmap.getWidth());
+            bitmap = mBitmapManager.get(mBitmapManager.getSmallNumberResId(units), color);
+            canvas.drawBitmap(bitmap, left, top, null);
+
             left += (bitmap.getWidth() + DimenUtil.dip2px(mContext, 2));
             bitmap = mBitmapManager.get(R.drawable.my_health_second_flag, color);
             canvas.drawBitmap(bitmap, left, top, null);
+
             left += (bitmap.getWidth() + DimenUtil.dip2px(mContext, 2));
             bitmap = mBitmapManager.get(R.drawable.my_health_second_flag, color);
             canvas.drawBitmap(bitmap, left, top, null);
@@ -241,13 +250,16 @@ public class MyHealthWatchFace extends WallpaperService {
             int hour = instance.get(Calendar.HOUR_OF_DAY);
             units = hour % 10;//个位
             tens = hour / 10;//十位
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getMiddleNumberResId(tens), color, mBitmapManager.getMiddleNumberResId(units), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(tens), color);
             left = mPointScreenCenter.x - mRadiusInner - DimenUtil.dip2px(mContext, 4);
             top = mPointScreenCenter.y - bitmap.getHeight() - mLittleTriangleHeight;
             canvas.drawBitmap(bitmap, left, top, null);
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(units), color);
+            canvas.drawBitmap(bitmap, left, top, null);
 
             int marginBottom = DimenUtil.dip2px(mContext, 2);
-            float lineLeft = left + 1.0f * bitmap.getWidth() / 5;
+            float lineLeft = mPointScreenCenter.x - mRadiusInner + DimenUtil.dip2px(mContext, 10);
             int lineHeight = DimenUtil.dip2px(mContext, 4);
             float lineTop = top - (marginBottom + lineHeight);
             float lineLen = 1.0f * bitmap.getWidth() / 4;
@@ -257,10 +269,13 @@ public class MyHealthWatchFace extends WallpaperService {
             int month = instance.get(Calendar.MONTH) + 1;
             units = month % 10;//个位
             tens = month / 10;//十位
-            left += 1.0f * bitmap.getWidth() / 3;
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallerNumberResId(tens), color
-                    , mBitmapManager.getSmallerNumberResId(units), color);
+            left = (lineLeft + DimenUtil.dip2px(mContext, 10));
+            bitmap = mBitmapManager.get(mBitmapManager.getSmallerNumberResId(tens));
             top -= (bitmap.getHeight() + marginBottom + 2.6f * lineHeight);
+            canvas.drawBitmap(bitmap, left, top, null);
+            lineLen += bitmap.getWidth();
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(mBitmapManager.getSmallerNumberResId(units), color);
             canvas.drawBitmap(bitmap, left, top, null);
             lineLen += bitmap.getWidth();
 
@@ -273,8 +288,11 @@ public class MyHealthWatchFace extends WallpaperService {
             units = day % 10;//个位
             tens = day / 10;//十位
             left += bitmap.getWidth();
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallerNumberResId(tens), color
-                    , mBitmapManager.getSmallerNumberResId(units), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getSmallerNumberResId(tens), color);
+            canvas.drawBitmap(bitmap, left, top, null);
+            lineLen += bitmap.getWidth();
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(mBitmapManager.getSmallerNumberResId(units), color);
             canvas.drawBitmap(bitmap, left, top, null);
             lineLen += bitmap.getWidth();
 
@@ -282,7 +300,7 @@ public class MyHealthWatchFace extends WallpaperService {
             mPaint.setStyle(Paint.Style.FILL);
             mPaint.setColor(ContextCompat.getColor(mContext, R.color.my_health_little_triangle));
             mRectF.set(lineLeft, lineTop - 1.0f * lineHeight / 2
-                    , lineLeft + lineLen, lineTop + 1.0f * lineHeight / 2);
+                    , lineLeft + lineLen + DimenUtil.dip2px(mContext, 4), lineTop + 1.0f * lineHeight / 2);
             canvas.drawRoundRect(mRectF, 1.0f * lineHeight / 2, 1.0f * lineHeight / 2, mPaint);
         }
 

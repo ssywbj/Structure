@@ -159,14 +159,19 @@ public class ParisBlackWallpaperService extends WallpaperService {
             int units = temperature % 10;//个位
             int tens = temperature / 10;//十位
 
-            Bitmap bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallNumberResId(tens), color
-                    , mBitmapManager.getSmallNumberResId(units), color, R.drawable.paint_temperature_unit, color);
-            float left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
+            Bitmap bitmap = mBitmapManager.get(R.drawable.paint_temperature_unit, color);
+            float left = mPointScreenCenter.x;
             float top = mPointScreenCenter.y + mRadiusOuter - bitmap.getHeight() - DimenUtil.dip2px(mContext, 30);
             canvas.drawBitmap(bitmap, left, top, null);
+            bitmap = mBitmapManager.get(mBitmapManager.getSmallNumberResId(units), color);
+            left -= bitmap.getWidth();
+            canvas.drawBitmap(bitmap, left, top, null);
+            bitmap = mBitmapManager.get(mBitmapManager.getSmallNumberResId(tens), color);
+            left -= bitmap.getWidth();
+            canvas.drawBitmap(bitmap, left, top, null);
 
-            bitmap = mBitmapManager.get(R.drawable.paint_weather_day_duoyun);
-            left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
+            bitmap = mBitmapManager.get(R.drawable.paint_weather_day_duoyun, color);
+            left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2 - DimenUtil.dip2px(mContext, 2);
             top -= (bitmap.getHeight() + DimenUtil.dip2px(mContext, 2));
             canvas.drawBitmap(bitmap, left, top, null);
         }
@@ -191,10 +196,14 @@ public class ParisBlackWallpaperService extends WallpaperService {
                     right, 2 * mPointScreenCenter.y + lineHeight / 2 - marginBottom);
             canvas.drawRoundRect(mRectF, lineHeight, lineHeight, mPaint);
 
-            Bitmap bitmap = mBitmapManager.getMerge(mBitmapManager.getSmallNumberResId(tens), color
-                    , mBitmapManager.getSmallNumberResId(units), color, R.drawable.paint_sign_percentage, color);
-            canvas.drawBitmap(bitmap, right - bitmap.getWidth() + DimenUtil.dip2px(mContext, 4)
-                    , mPointScreenCenter.y * 2 - bitmap.getHeight() - marginBottom - DimenUtil.dip2px(mContext, 6), null);
+            Bitmap bitmap = mBitmapManager.get(R.drawable.paint_sign_percentage, color);
+            float left = right - bitmap.getWidth() + DimenUtil.dip2px(mContext, 4);
+            float top = mPointScreenCenter.y * 2 - bitmap.getHeight() - marginBottom - DimenUtil.dip2px(mContext, 6);
+            canvas.drawBitmap(bitmap, left, top, null);
+            bitmap = mBitmapManager.get(mBitmapManager.getSmallNumberResId(units), color);
+            canvas.drawBitmap(bitmap, left -= bitmap.getWidth(), top, null);
+            bitmap = mBitmapManager.get(mBitmapManager.getSmallNumberResId(tens), color);
+            canvas.drawBitmap(bitmap, left - bitmap.getWidth(), top, null);
         }
 
         private void paintDate(Canvas canvas) {
@@ -215,29 +224,32 @@ public class ParisBlackWallpaperService extends WallpaperService {
             left += bitmap.getWidth();
 
             //星期
-            bitmap = mBitmapManager.getMerge(R.drawable.paint_text_week_middle, color, mBitmapManager.getWeekResId(), color);
+            bitmap = mBitmapManager.get(R.drawable.paint_text_week_middle, color);
             left += DimenUtil.dip2px(mContext, 7);
+            canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(mBitmapManager.getWeekResId(), color);
             canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
 
             //号数
             int units = day % 10;//个位
             int tens = day / 10;//十位
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getMiddleNumberResId(tens), color
-                    , mBitmapManager.getMiddleNumberResId(units), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(units), color);
             left = mPointScreenCenter.x + DimenUtil.dip2px(mContext, 1) - bitmap.getWidth();
             canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
+            bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(tens), color);
+            canvas.drawBitmap(bitmap.extractAlpha(), left -= bitmap.getWidth(), top, mPaint);
 
             //月
             bitmap = mBitmapManager.get(R.drawable.paint_text_month_middle, color);
-            left -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
+            canvas.drawBitmap(bitmap.extractAlpha(), left -= bitmap.getWidth(), top, mPaint);
             //月份
             units = month % 10;//个位
             tens = month / 10;//十位
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getMiddleNumberResId(tens), color
-                    , mBitmapManager.getMiddleNumberResId(units), color);
-            left -= bitmap.getWidth();
-            canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
+            bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(units), color);
+            canvas.drawBitmap(bitmap.extractAlpha(), left -= bitmap.getWidth(), top, mPaint);
+            bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(tens), color);
+            canvas.drawBitmap(bitmap.extractAlpha(), left - bitmap.getWidth(), top, mPaint);
 
             mPaint.clearShadowLayer();
 
@@ -254,16 +266,22 @@ public class ParisBlackWallpaperService extends WallpaperService {
             int minute = instance.get(Calendar.MINUTE);
             units = minute % 10;//个位
             tens = minute / 10;//十位
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getBigNumberResId(tens), color, mBitmapManager.getBigNumberResId(units), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getBigNumberResId(tens), color);
             top = mPointScreenCenter.y - bitmap.getHeight() - marginTop - marginTop / 4;
+            canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(mBitmapManager.getBigNumberResId(units), color);
             canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
 
             //时钟
             int hour = instance.get(Calendar.HOUR);
             units = hour % 10;//个位
             tens = hour / 10;//十位
-            bitmap = mBitmapManager.getMerge(mBitmapManager.getBigNumberResId(tens), color, mBitmapManager.getBigNumberResId(units), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getBigNumberResId(units), color);
             left = mPointScreenCenter.x - colonWidth / 2 - bitmap.getWidth() - DimenUtil.dip2px(mContext, 3);
+            canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
+            left -= bitmap.getWidth();
+            bitmap = mBitmapManager.get(mBitmapManager.getBigNumberResId(tens), color);
             canvas.drawBitmap(bitmap.extractAlpha(), left, top, mPaint);
 
             mPaint.clearShadowLayer();
