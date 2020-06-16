@@ -53,12 +53,17 @@ public class SVGView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.black));
+        mRect.set(0, 0, 400, 400);
+        //canvas.clipRect(mRect);
+        canvas.save();
+        canvas.translate(0, 100);
+        canvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.holo_red_dark));
+        canvas.restore();
 
         //this.paintScaleBitmap(canvas);
         //this.paintPath(canvas);
         //this.paintScalesText(canvas);
-        this.paintScalesBitmapMethod1(canvas);
+        //this.paintScalesBitmapMethod1(canvas);
         //this.paintScalesBitmapMethod2(canvas);
     }
 
