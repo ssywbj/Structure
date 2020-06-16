@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Photo Face</string>
+    <string name="photo_face">照片表盘</string>
+    <string name="photo_face_config_aty">选择照片</string>
+    <string name="photo_face_description">照片表盘，显示图片、日期等信息</string>
+    <string name="take_photo">拍照</string>
+    <string name="pick_from_album">从相册选择</string>
+</resources>
