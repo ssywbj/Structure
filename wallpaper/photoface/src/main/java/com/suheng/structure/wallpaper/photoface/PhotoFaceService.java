@@ -156,27 +156,53 @@ public class PhotoFaceService extends WallpaperService {
             int color = android.R.color.white;
 
             Calendar instance = Calendar.getInstance();
-            int month = instance.get(Calendar.MONTH) + 1;
-            int day = instance.get(Calendar.DAY_OF_MONTH);
 
-            //月份
-            int units = month % 10;//个位
-            int tens = month / 10;//十位
-            Bitmap bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(0), color);
+            //时
+            int hourOfDay = instance.get(Calendar.HOUR_OF_DAY);
+            int tens = hourOfDay / 10;//十位
+            int units = hourOfDay % 10;//个位
+            Bitmap bitmap = mBitmapManager.get(mBitmapManager.getBigNumberResId(tens), color);
             float left = DimenUtil.dip2px(mContext, 28);
             float top = left + DimenUtil.dip2px(mContext, 14);
             canvas.drawBitmap(bitmap, left, top, null);
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(8), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getBigNumberResId(units), color);
             canvas.drawBitmap(bitmap, left + bitmap.getWidth(), top, null);
             top += (bitmap.getHeight() + DimenUtil.dip2px(mContext, 12));
 
-            //号数
-            units = day % 10;//个位
-            tens = day / 10;//十位
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(2), color);
+            //分
+            int minute = instance.get(Calendar.MINUTE);
+            tens = minute / 10;//十位
+            units = minute % 10;//个位
+            bitmap = mBitmapManager.get(mBitmapManager.getBigNumberResId(tens), color);
             canvas.drawBitmap(bitmap, left, top, null);
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(5), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getBigNumberResId(units), color);
             canvas.drawBitmap(bitmap, left + bitmap.getWidth(), top, null);
+
+            //月份
+            top += (bitmap.getHeight() + DimenUtil.dip2px(mContext, 14));
+            int month = instance.get(Calendar.MONTH) + 1;
+            tens = month / 10;//十位
+            units = month % 10;//个位
+            bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(tens), color);
+            canvas.drawBitmap(bitmap, left, top, null);
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(units), color);
+            canvas.drawBitmap(bitmap, left, top, null);
+            left += bitmap.getWidth();
+
+            bitmap = mBitmapManager.get(R.drawable.photo_face_point_big, color);
+            canvas.drawBitmap(bitmap, left, top, null);
+            left += bitmap.getWidth();
+
+            //号数
+            int day = instance.get(Calendar.DAY_OF_MONTH);
+            tens = day / 10;//十位
+            units = day % 10;//个位
+            bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(tens), color);
+            canvas.drawBitmap(bitmap, left, top, null);
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(units), color);
+            canvas.drawBitmap(bitmap, left, top, null);
         }
 
         private BroadcastReceiver mReceiver = new BroadcastReceiver() {

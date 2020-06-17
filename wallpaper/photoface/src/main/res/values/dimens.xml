@@ -2,4 +2,7 @@
 <resources>
     <dimen name="number_big_width">34dp</dimen>
     <dimen name="number_big_height">60dp</dimen><!--60, 34-->
+
+    <dimen name="number_middle_width">22.67dp</dimen>
+    <dimen name="number_middle_height">40dp</dimen><!--60, 34, /1.5-->
 </resources>
