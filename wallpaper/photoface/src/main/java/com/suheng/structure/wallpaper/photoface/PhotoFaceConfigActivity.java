@@ -2,11 +2,14 @@ package com.suheng.structure.wallpaper.photoface;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -73,14 +76,24 @@ public class PhotoFaceConfigActivity extends AppCompatActivity {
             intent.putExtra("aspectY", 1.0 * mMetrics.heightPixels / mMetrics.widthPixels);
             intent.putExtra("outputX", mMetrics.widthPixels);//设置裁剪宽高以适应屏幕宽高，width：320, height：385
             intent.putExtra("outputY", mMetrics.heightPixels);
-            intent.putExtra("return-data", false);
+            intent.putExtra("return-data", true);
             intent.putExtra("scale", true);
             intent.putExtra("scaleUpIfNeeded", true);//防止出现黑边框
-            /*//如果设置输出的Uri会出现"“图库”无法正常使用,请尝试开启权限"异常，不知是哪里还需要设置
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, getFileUri(new File(mPhotoPath)));
-            intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());//设置输出格式*/
+            //intent.putExtra(MediaStore.EXTRA_OUTPUT, getFileUri(new File(mPhotoPath)));
+            //intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());//设置输出格式
             intent.putExtra("noFaceDetection", true);
             startActivityForResult(intent, REQUEST_CODE_CLIP);
+
+            /*Intent intent = new Intent("com.android.camera.action.CROP");
+            intent.setDataAndType(uri, "image/*");
+            intent.putExtra("crop", "true");
+            intent.putExtra("aspectX", 1);
+            intent.putExtra("aspectY", 1.0 * mMetrics.heightPixels / mMetrics.widthPixels);
+            intent.putExtra("outputX", mMetrics.widthPixels);
+            intent.putExtra("outputY", mMetrics.heightPixels);
+            intent.putExtra("scaleUpIfNeeded", true);
+            intent.putExtra("return-data", true);
+            startActivityForResult(intent, REQUEST_CODE_CLIP);*/
         } catch (Exception e) {
             Log.e(TAG, "open clip exception: " + e.toString());
         }
@@ -96,31 +109,36 @@ public class PhotoFaceConfigActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case REQUEST_CODE_TAKE_PHOTO:
+                Log.d(TAG, "take photo, path: " + mPhotoPath);
+                /*if (data == null || data.getData() == null) {
+                    Log.w(TAG, "take photo, intent or uri is null");
+                    return;
+                }
                 this.updateSystemAlbum(mPhotoPath);
+                this.notifyChanged();*/
                 break;
             case REQUEST_CODE_CLIP:
             case REQUEST_CODE_PICK_PICTURE:
                 try {
                     if (data == null || data.getData() == null) {
+                        Log.w(TAG, "pick or clip picture, intent or uri is null");
                         return;
                     }
 
                     if (requestCode == REQUEST_CODE_PICK_PICTURE) {//选择照片后再调用系统的裁剪功能
                         Log.d(TAG, "pick from album, uri: " + data.getData());
-                        this.onCrop(data.getData());
-                    } else {
-                        String[] projection = {MediaStore.Images.Media.DATA};
-                        Cursor cursor = getContentResolver().query(data.getData(), projection, null, null, null);
-                        if (cursor == null) {
-                            Log.w(TAG, "clip picture, cursor is null");
-                            return;
-                        }
-                        cursor.moveToFirst();
-                        mPhotoPath = cursor.getString(cursor.getColumnIndex(projection[0]));
-                        cursor.close();
 
-                        Log.d(TAG, "clip picture, path: " + mPhotoPath);
-                        this.notifyChanged();
+                        if (this.getPathFromUri(data.getData())) {
+                            Log.d(TAG, "pick picture, path: " + mPhotoPath);
+                            this.onCrop(this.getImageContentUri(this, mPhotoPath));
+                        }
+
+                        //this.onCrop(data.getData());
+                    } else {
+                        if (this.getPathFromUri(data.getData())) {
+                            Log.d(TAG, "clip picture, path: " + mPhotoPath);
+                            this.notifyChanged();
+                        }
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "on activity result exception: " + e.toString());
@@ -143,6 +161,33 @@ public class PhotoFaceConfigActivity extends AppCompatActivity {
      */
     private Uri getFileUri(File file) {
         return FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
+    }
+
+    private boolean getPathFromUri(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if (cursor == null) {
+            Log.w(TAG, "clip picture, cursor is null");
+            return false;
+        }
+        cursor.moveToFirst();
+        mPhotoPath = cursor.getString(cursor.getColumnIndex(projection[0]));
+        cursor.close();
+        return true;
+    }
+
+    private Uri getImageContentUri(Context context, String filePath) {
+        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                new String[]{MediaStore.Images.Media._ID}, MediaStore.Images.Media.DATA + "=? ",
+                new String[]{filePath}, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
+            Uri baseUri = Uri.parse("content://media/external/images/media");
+            cursor.close();
+            return Uri.withAppendedPath(baseUri, "" + id);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -173,12 +218,27 @@ public class PhotoFaceConfigActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                 startActivityForResult(intent, REQUEST_CODE_PICK_PICTURE);
+
+                /*Intent intent = getPhotoPickIntent();
+                startActivityForResult(intent, REQUEST_CODE_PICK_PICTURE);*/
             } catch (Exception e) {
                 Log.e(TAG, "open camera exception: " + e.toString());
             }
         } else {
             PhotoFaceConfigActivityPermissionsDispatcher.requestCameraPermissionWithPermissionCheck(this);
         }
+    }
+
+    private Intent getPhotoPickIntent() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
+        intent.setType("image/*");
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        intent.putExtra("outputX", mMetrics.widthPixels);
+        intent.putExtra("outputY", mMetrics.heightPixels);
+        intent.putExtra("return-data", true);
+        intent.putExtra("scaleUpIfNeeded", true);
+        return intent;
     }
 
     @OnNeverAskAgain({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE})
@@ -208,16 +268,33 @@ public class PhotoFaceConfigActivity extends AppCompatActivity {
         if (this.isActionSupport(MediaStore.ACTION_IMAGE_CAPTURE)) {
             mPhotoPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
                     + File.separator + "Origin" + System.currentTimeMillis() + ".jpg";
+            Log.d(TAG, "path = " + mPhotoPath);
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             Uri uri = this.getFileUri(new File(mPhotoPath));
+            //Uri uri = this.createImageUri();
+            //File file = new File(mPhotoPath);
+            //Uri uri = getImageContentUri(this, mPhotoPath);
             Log.d(TAG, "uri = " + uri);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);//指定图片存放位置。指定后，在onActivityResult里得到的data将为null
-            /*intent.putExtra("return-data", false);
-            intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
-            intent.putExtra("noFaceDetection", true);*/
+            intent.putExtra("return-data", true);
+            //intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+            intent.putExtra("noFaceDetection", true);
             startActivityForResult(intent, REQUEST_CODE_TAKE_PHOTO);
         } else {
             Toast.makeText(this, R.string.no_camera_or_app, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 创建图片地址uri,用于保存拍照后的照片 Android 10以后使用这种方法
+     */
+    private Uri createImageUri() {
+        String status = Environment.getExternalStorageState();
+        // 判断是否有SD卡,优先使用SD卡存储,当没有SD卡时使用手机存储
+        if (status.equals(Environment.MEDIA_MOUNTED)) {
+            return getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
+        } else {
+            return getContentResolver().insert(MediaStore.Images.Media.INTERNAL_CONTENT_URI, new ContentValues());
         }
     }
 
@@ -241,5 +318,10 @@ public class PhotoFaceConfigActivity extends AppCompatActivity {
             }
         });
         builder.create().show();
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 }
