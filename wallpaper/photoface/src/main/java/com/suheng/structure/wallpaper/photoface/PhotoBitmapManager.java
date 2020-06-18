@@ -10,79 +10,54 @@ public class PhotoBitmapManager extends BitmapManager {
         super(context);
     }
 
-    public int getNumberResId(int number) {
-        switch (number) {
-            case 1:
-                return R.drawable.paint_number_1;
-            case 2:
-                return R.drawable.paint_number_2;
-            case 3:
-                return R.drawable.paint_number_3;
-            case 4:
-                return R.drawable.paint_number_4;
-            case 5:
-                return R.drawable.paint_number_5;
-            case 6:
-                return R.drawable.paint_number_6;
-            case 7:
-                return R.drawable.paint_number_7;
-            case 8:
-                return R.drawable.paint_number_8;
-            case 9:
-                return R.drawable.paint_number_9;
-            default:
-                return R.drawable.paint_number_0;
-        }
-    }
-
     public int getBigNumberResId(int number) {
         switch (number) {
             case 1:
-                return R.drawable.paint_number_1_big;
+                return R.drawable.paint_number_ic_1;
             case 2:
-                return R.drawable.paint_number_2_big;
+                return R.drawable.paint_number_ic_2;
             case 3:
-                return R.drawable.paint_number_3_big;
+                return R.drawable.paint_number_ic_3;
             case 4:
-                return R.drawable.paint_number_4_big;
+                return R.drawable.paint_number_ic_4;
             case 5:
-                return R.drawable.paint_number_5_big;
+                return R.drawable.paint_number_ic_5;
             case 6:
-                return R.drawable.paint_number_6_big;
+                return R.drawable.paint_number_ic_6;
             case 7:
-                return R.drawable.paint_number_7_big;
+                return R.drawable.paint_number_ic_7;
             case 8:
-                return R.drawable.paint_number_8_big;
+                return R.drawable.paint_number_ic_8;
             case 9:
-                return R.drawable.paint_number_9_big;
+                return R.drawable.paint_number_ic_9;
             default:
-                return R.drawable.paint_number_0_big;
+                return R.drawable.paint_number_ic_0;
         }
     }
-
 
     public int getMiddleNumberResId(int number) {
         switch (number) {
             case 1:
-                return R.drawable.paint_number_1_middle;
+                return R.drawable.paint_number_ic_1_middle;
             case 2:
-                return R.drawable.paint_number_2_middle;
+                return R.drawable.paint_number_ic_2_middle;
             case 3:
-                return R.drawable.paint_number_3_middle;
+                return R.drawable.paint_number_ic_3_middle;
             case 4:
-                return R.drawable.paint_number_4_middle;
+                return R.drawable.paint_number_ic_4_middle;
             case 5:
-                return R.drawable.paint_number_5_middle;
+                return R.drawable.paint_number_ic_5_middle;
             case 6:
-                return R.drawable.paint_number_6_middle;
+                return R.drawable.paint_number_ic_6_middle;
             case 7:
-                return R.drawable.paint_number_7_middle;
+                return R.drawable.paint_number_ic_7_middle;
             case 8:
-                return R.drawable.paint_number_8_middle;
+                return R.drawable.paint_number_ic_8_middle;
             case 9:
-                return R.drawable.paint_number_9_middle;
+                return R.drawable.paint_number_ic_9_middle;
             default:
-                return R.drawable.paint_number_0_middle;
+                return R.drawable.paint_number_ic_0_middle;
         }
     }
+
 }

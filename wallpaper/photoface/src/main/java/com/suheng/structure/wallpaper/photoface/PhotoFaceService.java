@@ -1,9 +1,7 @@
 package com.suheng.structure.wallpaper.photoface;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,6 +18,7 @@ import androidx.core.content.ContextCompat;
 
 import com.suheng.structure.wallpaper.basic.DimenUtil;
 
+import java.io.File;
 import java.util.Calendar;
 
 public class PhotoFaceService extends WallpaperService {
@@ -51,10 +50,6 @@ public class PhotoFaceService extends WallpaperService {
 
             mBitmapManager = new PhotoBitmapManager(mContext);
 
-            IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(PhotoFaceConfigActivity.ACTION_SET_WATCH_FACE_PHOTO);
-            registerReceiver(mReceiver, intentFilter);
-
             mPrefs = getSharedPreferences(PhotoFaceConfigActivity.PREFS_FILE, MODE_PRIVATE);
             mPrefs.registerOnSharedPreferenceChangeListener(mOnPrefsChangeListener);
             this.getPhoto();
@@ -65,7 +60,12 @@ public class PhotoFaceService extends WallpaperService {
             if (TextUtils.isEmpty(path)) {
                 mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.photo_face_default);
             } else {
-                mBitmap = BitmapFactory.decodeFile(path);
+                File file = new File(path);
+                if (file.exists() && file.canRead()) {
+                    mBitmap = BitmapFactory.decodeFile(path);
+                } else {
+                    mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.photo_face_default);
+                }
             }
         }
 
@@ -82,6 +82,8 @@ public class PhotoFaceService extends WallpaperService {
             Log.d(TAG, "onSurfaceChanged, format = " + format + ", width = " + width + ", height = " + height);
             mPointScreenCenter.x = 1.0f * width / 2;//屏幕中心X坐标
             mPointScreenCenter.y = 1.0f * height / 2;//屏幕中心Y坐标
+
+            mRectF.set(0, 0, width, height);
 
             this.invalidate();
         }
@@ -146,9 +148,7 @@ public class PhotoFaceService extends WallpaperService {
 
         private void onDraw(Canvas canvas) {
             canvas.drawColor(ContextCompat.getColor(mContext, R.color.basic_wallpaper_bg_black));//画面背景
-            mRectF.set(0, 0, canvas.getWidth(), canvas.getHeight());
             canvas.drawBitmap(mBitmap, null, mRectF, null);
-            //canvas.drawBitmap(mBitmap, 0, 0, null);
             this.paintDate(canvas);
         }
 
@@ -188,11 +188,11 @@ public class PhotoFaceService extends WallpaperService {
             left += bitmap.getWidth();
             bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(units), color);
             canvas.drawBitmap(bitmap, left, top, null);
-            left += bitmap.getWidth();
+            left += (bitmap.getWidth() - DimenUtil.dip2px(mContext, 6));
 
-            bitmap = mBitmapManager.get(R.drawable.photo_face_point_big, color);
+            bitmap = mBitmapManager.get(R.drawable.paint_number_ic_point, color);
             canvas.drawBitmap(bitmap, left, top, null);
-            left += bitmap.getWidth();
+            left += DimenUtil.dip2px(mContext, 22);
 
             //号数
             int day = instance.get(Calendar.DAY_OF_MONTH);
@@ -204,16 +204,6 @@ public class PhotoFaceService extends WallpaperService {
             bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(units), color);
             canvas.drawBitmap(bitmap, left, top, null);
         }
-
-        private BroadcastReceiver mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (PhotoFaceConfigActivity.ACTION_SET_WATCH_FACE_PHOTO.equals(action)) {
-                    invalidate();
-                }
-            }
-        };
 
         private SharedPreferences.OnSharedPreferenceChangeListener mOnPrefsChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override

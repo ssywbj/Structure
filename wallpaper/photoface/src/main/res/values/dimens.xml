@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="number_big_width">34dp</dimen>
-    <dimen name="number_big_height">60dp</dimen><!--60, 34-->
+    <dimen name="number_big_width">54.55dp</dimen>
+    <dimen name="number_big_height">72.73dp</dimen><!--80, 60, /1.1-->
 
-    <dimen name="number_middle_width">22.67dp</dimen>
-    <dimen name="number_middle_height">40dp</dimen><!--60, 34, /1.5-->
+    <dimen name="number_middle_width">27.27dp</dimen>
+    <dimen name="number_middle_height">36.36dp</dimen><!--80, 60, /2.2-->
 </resources>

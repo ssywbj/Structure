@@ -40,7 +40,6 @@ public class PhotoFaceConfigActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_CLIP = 13;
     public static final String PREFS_FILE = "file_photo_watch_face_config";
     public static final String PREFS_KEY_PATH = "prefs_key_path";
-    public static final String ACTION_SET_WATCH_FACE_PHOTO = "action_set_watch_face_photo";
     private SharedPreferences mPrefs;
     private String mPhotoPath;
     private DisplayMetrics mMetrics = new DisplayMetrics();
