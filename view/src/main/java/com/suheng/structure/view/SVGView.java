@@ -53,14 +53,15 @@ public class SVGView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        mRect.set(0, 0, 400, 400);
+        /*mRect.set(0, 0, 400, 400);
         //canvas.clipRect(mRect);
         canvas.save();
         canvas.translate(0, 100);
         canvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.holo_red_dark));
-        canvas.restore();
+        canvas.restore();*/
 
-        //this.paintScaleBitmap(canvas);
+        canvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.holo_red_dark));
+        this.paintScaleBitmap(canvas);
         //this.paintPath(canvas);
         //this.paintScalesText(canvas);
         //this.paintScalesBitmapMethod1(canvas);
@@ -151,7 +152,7 @@ public class SVGView extends View {
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(Color.RED);
         //原图
-        float left = 4, top = 4;
+        float left = 10, top = 35;
         Bitmap bitmap = mBitmapManager.get(R.drawable.number_5_big);
         canvas.drawBitmap(bitmap, left, top, null);
         top += bitmap.getHeight();

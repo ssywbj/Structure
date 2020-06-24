@@ -10,13 +10,13 @@
         android:layout_width="300dp"
         android:layout_height="330dp" />-->
 
-    <com.suheng.structure.view.Hexagon2ProgressBar
+    <!--<com.suheng.structure.view.Hexagon2ProgressBar
         android:layout_width="300dp"
-        android:layout_height="330dp" />
+        android:layout_height="330dp" />-->
 
-    <!--<com.suheng.structure.view.SVGView
-        android:layout_width="300dp"
-        android:layout_height="300dp" />-->
+    <com.suheng.structure.view.SVGView
+        android:layout_width="match_parent"
+        android:layout_height="260dp" />
 
     <!--<com.suheng.structure.view.VectorView
         android:layout_width="match_parent"
