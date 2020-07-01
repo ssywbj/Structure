@@ -1,3 +1,5 @@
+include ':contentprovider'
+include ':database'
 include ':wallpaper:photoface'
 include ':wallpaper:roamimg'
 include ':wallpaper:myhealth'
