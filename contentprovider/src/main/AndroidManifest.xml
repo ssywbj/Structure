@@ -28,13 +28,19 @@
             </intent-filter>
         </activity>
 
-        <provider
+        <!--<provider
             android:name=".PersonProvider"
             android:authorities="com.suheng.structure.provider"
             android:exported="true"
             android:process=":provider"
             android:readPermission="com.suheng.structure.provider.READ_PERMISSION"
-            android:writePermission="com.suheng.structure.provider.WRITE_PERMISSION" />
+            android:writePermission="com.suheng.structure.provider.WRITE_PERMISSION" />-->
+
+        <provider
+            android:name=".PersonProvider"
+            android:authorities="com.suheng.structure.provider"
+            android:exported="true"
+            android:process=":provider"/>
     </application>
 
 </manifest>
