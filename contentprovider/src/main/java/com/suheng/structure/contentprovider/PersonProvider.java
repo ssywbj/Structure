@@ -8,12 +8,15 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.suheng.structure.database.manager.DBHelper;
+
+import java.util.ArrayList;
 
 public class PersonProvider extends ContentProvider {
 
@@ -40,6 +43,24 @@ public class PersonProvider extends ContentProvider {
     @Override
     public String getType(@NonNull Uri uri) {
         return null;
+    }
+
+    @Nullable
+    @Override
+    public Bundle call(@NonNull String method, @Nullable String arg, @Nullable Bundle extras) {
+        Log.d("Wbj", "call, method: " + method + ", arg: " + arg + ", extras: " + extras);
+        if (extras != null) {
+            long currentTimeMillis = extras.getLong("current_time_millis");
+            Log.d("Wbj", "call, current time millis: " + currentTimeMillis);
+        }
+        Bundle bundle = new Bundle();
+        ArrayList<String> weatherInfo = new ArrayList<>();
+        weatherInfo.add("CN");
+        weatherInfo.add("12");
+        weatherInfo.add("C");
+        weatherInfo.add("26");
+        bundle.putStringArrayList(method, weatherInfo);
+        return bundle;
     }
 
     @Nullable

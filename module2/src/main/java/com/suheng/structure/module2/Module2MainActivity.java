@@ -1,5 +1,6 @@
 package com.suheng.structure.module2;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.ContentObserver;
@@ -36,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -381,6 +383,8 @@ public class Module2MainActivity extends BasicActivity {
 
     private final static String AUTHORITY = "com.suheng.structure.provider";
     private final static Uri PERSON_URI = Uri.parse("content://" + AUTHORITY + "/person");
+    private final static String PERSON_CALL_GET_INFO = "person_call_get_info";
+    private final static int STUDENT_URI_GET_INFO = 2;
     private ContentObserver mContentObserver;
 
     public void onClickInsert(View view) {
@@ -422,6 +426,7 @@ public class Module2MainActivity extends BasicActivity {
     }
 
     public void onClickQuery(View view) {
+        //Cursor cursor = getContentResolver().query(ContentUris.withAppendedId(PERSON_URI, STUDENT_URI_GET_INFO), null, null, null, null);
         Cursor cursor = getContentResolver().query(PERSON_URI, null, null, null, null);
         if (cursor == null) {
             Log.w("Wbj", "cursor is null");
@@ -439,6 +444,24 @@ public class Module2MainActivity extends BasicActivity {
         }
 
         cursor.close();
+    }
+
+    public void onClickCall(View view) {
+        Bundle extras = new Bundle();
+        extras.putLong("current_time_millis", System.currentTimeMillis());
+        Bundle bundle = getContentResolver().call(ContentUris.withAppendedId(PERSON_URI, STUDENT_URI_GET_INFO)
+                , PERSON_CALL_GET_INFO, System.currentTimeMillis() + "", extras);
+        if (bundle == null) {
+            Log.e("Wbj", "query call error: bundle is null");
+            return;
+        }
+        ArrayList<String> data = bundle.getStringArrayList(PERSON_CALL_GET_INFO);
+        if (data == null || data.size() == 0) {
+            Log.e("Wbj", "query call error, data is null or empty");
+            return;
+        }
+        Log.d("Wbj", "query call result, 1: " + data.get(0) + ", 2: " + data.get(1)
+                + ", 3: " + data.get(2) + ", 4: " + data.get(3));
     }
 
     @Override

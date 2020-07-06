@@ -51,30 +51,33 @@
         android:padding="10dp">
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:onClick="onClickInsert"
             android:text="增" />
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:onClick="onClickDelete"
-            android:text="删"
-            tools:ignore="OnClick" />
+            android:text="删" />
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:onClick="onClickModify"
-            android:text="改"
-            tools:ignore="OnClick" />
+            android:text="改" />
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:onClick="onClickQuery"
-            android:text="查"
-            tools:ignore="OnClick" />
+            android:text="查" />
+
+        <Button
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:onClick="onClickCall"
+            android:text="Call" />
     </LinearLayout>
 </LinearLayout>
