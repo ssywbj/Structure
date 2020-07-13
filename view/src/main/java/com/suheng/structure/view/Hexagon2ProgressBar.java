@@ -13,6 +13,7 @@ import android.graphics.PathMeasure;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -67,9 +68,9 @@ public class Hexagon2ProgressBar extends View {
                 }
             }
         });
-        mValueAnimator.setDuration(1000);
+        mValueAnimator.setDuration(1800);
         mValueAnimator.setRepeatCount(ValueAnimator.INFINITE);//无限循环
-        //mValueAnimator.setInterpolator(new LinearInterpolator());
+        mValueAnimator.setInterpolator(new LinearInterpolator());
         mValueAnimator.start();
     }
 
@@ -77,6 +78,7 @@ public class Hexagon2ProgressBar extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        canvas.save();
         mPathMeasure.getPosTan(mCircleLength * mAnimatorValue, mPos, mTan);
         Log.d(TAG, "pst(" + mPos[0] + ", " + mPos[1] + ")");
         canvas.translate(1.0f * getWidth() / 2, 1.0f * getHeight() / 2);//坐标系平移
@@ -87,6 +89,8 @@ public class Hexagon2ProgressBar extends View {
         canvas.rotate((float) (Math.atan2(mTan[1], mTan[0]) * 180.0 / Math.PI));//画布旋转，让效果看起来是切线在圆上滑动；角度=弧度*180/π
         canvas.drawLine(0f, -mRadius, 120f, -mRadius, mPaint);//绘制正切线
 
+        //canvas.drawLine(0f, 0f, 0, -mRadius, mPaint);//绘制正切线
+
         //得到矩阵
         /*canvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.holo_red_dark));
         mPathMeasure.getMatrix(mCircleLength * mAnimatorValue, mMatrix
@@ -96,6 +100,7 @@ public class Hexagon2ProgressBar extends View {
         mMatrix.preRotate(270);//调整箭头的朝向为正切线的方向
         mMatrix.preTranslate(-1.0f * mBitmap.getWidth() / 2, -1.0f * mBitmap.getHeight() / 2);//箭头的中轴线移动到圆的轨道上
         canvas.drawBitmap(mBitmap, mMatrix, null);*/
+        canvas.restore();
     }
 
     @Override

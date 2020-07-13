@@ -2,6 +2,7 @@ package com.suheng.structure.database;
 
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.icu.text.TimeZoneNames;
 import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -10,6 +11,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -24,6 +27,11 @@ public class MatrixTest {
     public void textUnitMatrix() {
         Matrix matrix = new Matrix();//新建一个矩阵，默认是单位矩阵
         Log.d(TAG, "unit matrix: " + matrix.toString() + "\n" + matrix.toShortString());
+
+        TimeZone timeZone = TimeZone.getDefault();
+        Log.d(TAG, "displayName: " + timeZone.getDisplayName() + ", id: " + timeZone.getID());
+        TimeZoneNames zoneNames = TimeZoneNames.getInstance(Locale.getDefault());
+        Log.d(TAG, "getExemplarLocationName: " + zoneNames.getExemplarLocationName(timeZone.getID()));
     }
 
     @Test
@@ -77,4 +85,61 @@ public class MatrixTest {
         result = matrix.mapRect(dst, src);
         Log.d(TAG, "result: " + result + ", " + dst.toString());
     }
+
+    @Test
+    public void textPrePost() {
+        float[] src = new float[]{20, 20, 300, 300};
+        float[] dst = new float[src.length];
+        Matrix matrix = new Matrix();
+        Log.d(TAG, "unit matrix: " + matrix.toShortString());
+        Log.d(TAG, "src points: " + Arrays.toString(src));
+
+        Log.d(TAG, "scale----------------------------------------------------------------");
+        matrix.preScale(0.4f, 1.1f);
+        Log.d(TAG, "pre scale matrix: " + matrix.toShortString());
+        matrix.mapPoints(dst, src);
+        Log.d(TAG, "pre scale points: " + Arrays.toString(dst));
+        matrix.reset();
+        matrix.postScale(0.4f, 1.1f);
+        Log.d(TAG, "post scale matrix: " + matrix.toShortString());
+        matrix.mapPoints(dst, src);
+        Log.d(TAG, "post scale points: " + Arrays.toString(dst));
+
+        Log.d(TAG, "----------------------------------------------------------------");
+        matrix.reset();
+        matrix.preTranslate(4f, 7f);
+        Log.d(TAG, "pre translate matrix: " + matrix.toShortString());
+        matrix.mapPoints(dst, src);
+        Log.d(TAG, "pre translate points: " + Arrays.toString(dst));
+        matrix.reset();
+        matrix.postTranslate(4f, 7f);
+        Log.d(TAG, "post translate matrix: " + matrix.toShortString());
+        matrix.mapPoints(dst, src);
+        Log.d(TAG, "post translate points: " + Arrays.toString(dst));
+
+        Log.d(TAG, "----------------------------------------------------------------");
+        matrix.reset();
+        matrix.preRotate(30);
+        Log.d(TAG, "pre rotate matrix: " + matrix.toShortString());
+        matrix.mapPoints(dst, src);
+        Log.d(TAG, "pre rotate points: " + Arrays.toString(dst));
+        matrix.reset();
+        matrix.postRotate(30);
+        Log.d(TAG, "post rotate matrix: " + matrix.toShortString());
+        matrix.mapPoints(dst, src);
+        Log.d(TAG, "post rotate points: " + Arrays.toString(dst));
+
+        Log.d(TAG, "----------------------------------------------------------------");
+        matrix.reset();
+        matrix.preSkew(3, 2);
+        Log.d(TAG, "pre skew matrix: " + matrix.toShortString());
+        matrix.mapPoints(dst, src);
+        Log.d(TAG, "pre skew points: " + Arrays.toString(dst));
+        matrix.reset();
+        matrix.postSkew(3, 2);
+        Log.d(TAG, "post skew matrix: " + matrix.toShortString());
+        matrix.mapPoints(dst, src);
+        Log.d(TAG, "post skew points: " + Arrays.toString(dst));
+    }
+
 }

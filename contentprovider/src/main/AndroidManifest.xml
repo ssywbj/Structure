@@ -41,6 +41,7 @@
             android:authorities="com.suheng.structure.provider"
             android:exported="true"
             android:process=":provider"/>
+        <!--process：另外定义一个单独的进程，根据安全策略，其它进程（哪怕位于同一个App内）将访问不到该进程的SharedPreferences-->
     </application>
 
 </manifest>
