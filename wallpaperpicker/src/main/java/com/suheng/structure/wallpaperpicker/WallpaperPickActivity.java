@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -64,7 +65,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
         WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
         /*try {
-            wallpaperManager.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.bg));
+            wallpaperManager.setBitmap(BitmapFactory.decodeResource(getResources(), android.R.drawable.menu_frame));
         } catch (IOException e) {
             e.printStackTrace();
         }*/
@@ -160,8 +161,13 @@ public class WallpaperPickActivity extends AppCompatActivity {
      */
     public void setLiveWallPaper(String packageName, String service) {
         try {
+            Log.d(mTag, "pkg: " + packageName + ", service: " + service);
+            WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
+            if ("com.wiz.watch.facesimplepointer".equals(packageName)) {
+                wallpaperManager.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper_default));
+            }
             Method method = WallpaperManager.class.getMethod("setWallpaperComponent", ComponentName.class);
-            method.invoke(WallpaperManager.getInstance(this), new ComponentName(packageName, service));
+            method.invoke(wallpaperManager, new ComponentName(packageName, service));
             Toast.makeText(this, "表盘设置成功", Toast.LENGTH_SHORT).show();
             finish();
         } catch (Exception e) {
