@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.pm.ServiceInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
@@ -103,14 +104,20 @@ public class WallpaperPickActivity extends AppCompatActivity {
         String packageName;
         String service;
         Drawable drawable;
+        ServiceInfo serviceInfo;
+        Bundle bundle;
         List<WallpaperInfo> wallpaperInfos = new ArrayList<>();
         for (WallpaperInfo wallpaper : wallpaperInfoList) {
             packageName = wallpaper.getPackageName();
             service = wallpaper.getServiceName();
             drawable = wallpaper.loadThumbnail(packageManager);
+            serviceInfo = wallpaper.getServiceInfo();
+            bundle = serviceInfo.metaData;
             Log.d(mTag, "package: " + packageName + ", service: " + service
                     + ", drawable = " + drawable + ", label = " + wallpaper.loadLabel(packageManager)
                     + ", setting activity: " + wallpaper.getSettingsActivity());
+            Log.d(mTag, "service info, name: " + serviceInfo.name
+                    + ", recycle_life: " + bundle.getBoolean("recycle_life"));
 
             if (drawable != null) {
                 wallpaperInfos.add(wallpaper);
@@ -127,7 +134,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
         mLivePaperAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener<WallpaperInfo>() {
             @Override
             public void onItemClick(View view, WallpaperInfo data, int position) {
-                setLiveWallPaper(data.getPackageName(), data.getServiceName());
+                setLiveWallPaper(data);
             }
         });
         //https://blog.csdn.net/u010687392/article/details/47950199?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
@@ -155,19 +162,21 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
     /**
      * 设置动态壁纸（需是系统级应用和"android.permission.SET_WALLPAPER_COMPONENT"权限）
-     *
-     * @param packageName 壁纸所包名
-     * @param service     壁纸服务类，格式：包.类名称，如com.xxx.yyy.zzzz.XxxWallpaperService
      */
-    public void setLiveWallPaper(String packageName, String service) {
+    public void setLiveWallPaper(WallpaperInfo wallpaperInfo) {
         try {
-            Log.d(mTag, "pkg: " + packageName + ", service: " + service);
+            Log.d(mTag, "pkg: " + wallpaperInfo.getPackageName() + ", service: " + wallpaperInfo.getServiceName());
             WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
-            if ("com.wiz.watch.facesimplepointer".equals(packageName)) {
+            //wallpaperManager.clearWallpaper();
+
+            if (wallpaperInfo.getServiceInfo().metaData.getBoolean("recycle_life")) {
                 wallpaperManager.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper_default));
             }
+
+            //通过反射找到系统设置壁纸的方法
             Method method = WallpaperManager.class.getMethod("setWallpaperComponent", ComponentName.class);
-            method.invoke(wallpaperManager, new ComponentName(packageName, service));
+            //设置壁纸。packageName：壁纸所包名；service：壁纸服务类，格式：包.类名称，如com.xxx.yyy.zzzz.XxxWallpaperService
+            method.invoke(wallpaperManager, new ComponentName(wallpaperInfo.getPackageName(), wallpaperInfo.getServiceName()));
             Toast.makeText(this, "表盘设置成功", Toast.LENGTH_SHORT).show();
             finish();
         } catch (Exception e) {
