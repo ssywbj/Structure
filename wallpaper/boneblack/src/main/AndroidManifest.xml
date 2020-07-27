@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.suheng.structure.wallpaper.boneblack">
 
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,6 +21,21 @@
             android:name=".BoneBlackWallpaperService"
             android:enabled="true"
             android:label="@string/bone_black_wallpaper"
+            android:permission="android.permission.BIND_WALLPAPER">
+
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/bone_black_wallpaper_config" />
+        </service>
+
+        <service
+            android:name=".opengl.OpenGLService"
+            android:enabled="true"
+            android:label="OpenGL"
             android:permission="android.permission.BIND_WALLPAPER">
 
             <intent-filter>
