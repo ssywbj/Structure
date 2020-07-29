@@ -2,12 +2,10 @@ package com.suheng.structure.wallpaperpicker;
 
 import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -29,10 +27,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.suheng.structure.wallpaperpicker.adapter.RecyclerAdapter;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,6 +95,17 @@ public class WallpaperPickActivity extends AppCompatActivity {
             }
         }
 
+        try {
+            ResolveInfo resolveInfo = packageManager.resolveService(new Intent("com.wiz.watch.FaceRoamingClock")
+                    , PackageManager.GET_META_DATA);
+            WallpaperInfo info = new WallpaperInfo(this, resolveInfo);
+            Log.d(mTag, "custom resolveInfo: " + resolveInfo + "\nwallpaperInfo: " + info + "\n" +
+                    "pkg: " + info.getPackageName() + ", service: " + info.getServiceName()
+                    + ", recycle_life: " + info.getServiceInfo().metaData.getBoolean("recycle_life"));
+        } catch (Exception e) {
+            Log.e(mTag, "parse custom wallpaper info error:" + e.toString());
+        }
+
         String packageName;
         String service;
         Drawable drawable;
@@ -127,18 +132,31 @@ public class WallpaperPickActivity extends AppCompatActivity {
         mWallpaperInfoList.addAll(wallpaperInfos);
 
         this.initRecyclerView();
+
+        startService(new Intent(this, WallpaperPickService.class));
     }
 
     private void initRecyclerView() {
+        final RecyclerView recyclerView = findViewById(R.id.recycler_view_wallpaper);
         mLivePaperAdapter = new LivePaperAdapter(mWallpaperInfoList);
         mLivePaperAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener<WallpaperInfo>() {
             @Override
-            public void onItemClick(View view, WallpaperInfo data, int position) {
-                setLiveWallPaper(data);
+            public void onItemClick(View view, final WallpaperInfo data, int position) {
+                Intent intent = new Intent("com.wiz.watch.action.PICK_WALLPAPER");
+                intent.putExtra("wallpaper_info", data);
+                sendBroadcast(intent);
+
+                recyclerView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
+                    }
+                }, 100);
+
             }
         });
+
         //https://blog.csdn.net/u010687392/article/details/47950199?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
-        RecyclerView recyclerView = findViewById(R.id.recycler_view_wallpaper);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mLivePaperAdapter);
@@ -158,61 +176,6 @@ public class WallpaperPickActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         Log.d(mTag, "onBackPressed()");
-    }
-
-    /**
-     * 设置动态壁纸（需是系统级应用和"android.permission.SET_WALLPAPER_COMPONENT"权限）
-     */
-    public void setLiveWallPaper(WallpaperInfo wallpaperInfo) {
-        try {
-            Log.d(mTag, "pkg: " + wallpaperInfo.getPackageName() + ", service: " + wallpaperInfo.getServiceName());
-            WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
-            //wallpaperManager.clearWallpaper();
-
-            if (wallpaperInfo.getServiceInfo().metaData.getBoolean("recycle_life")) {
-                wallpaperManager.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper_default));
-            }
-
-            //通过反射找到系统设置壁纸的方法
-            Method method = WallpaperManager.class.getMethod("setWallpaperComponent", ComponentName.class);
-            //设置壁纸。packageName：壁纸所包名；service：壁纸服务类，格式：包.类名称，如com.xxx.yyy.zzzz.XxxWallpaperService
-            method.invoke(wallpaperManager, new ComponentName(wallpaperInfo.getPackageName(), wallpaperInfo.getServiceName()));
-            Toast.makeText(this, "表盘设置成功", Toast.LENGTH_SHORT).show();
-            finish();
-        } catch (Exception e) {
-            Log.e(mTag, "set live wallpaper fail", e);
-            Toast.makeText(this, "表盘设置失败", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    //deletePackage(@NonNull String packageName, @Nullable IPackageDeleteObserver observer, @DeleteFlags int flags);
-    public void deleteLiveWallPaper(String packageName) throws Exception {
-        Method method = PackageManager.class.getMethod("deletePackage", String.class, Object.class, int.class);
-        method.invoke(getPackageManager(), packageName, null, 0);
-    }
-
-    private String execCommand(String... command) {
-        String result;
-        try {
-            Process process = new ProcessBuilder().command(command).start();
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            int read;
-            InputStream inputStream = process.getErrorStream();
-            while ((read = inputStream.read()) != -1) {
-                byteArrayOutputStream.write(read);
-            }
-            InputStream processInputStream = process.getInputStream();
-            while ((read = processInputStream.read()) != -1) {
-                byteArrayOutputStream.write(read);
-            }
-            result = new String(byteArrayOutputStream.toByteArray());
-            processInputStream.close();
-            inputStream.close();
-            process.destroy();
-        } catch (IOException e) {
-            result = e.getMessage();
-        }
-        return result;
     }
 
     ItemTouchHelper.Callback mCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP, ItemTouchHelper.UP) {
