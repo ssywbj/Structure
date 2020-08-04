@@ -6,13 +6,13 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <com.suheng.structure.view.Hexagon4ProgressBar
+    <!--<com.suheng.structure.view.Hexagon4ProgressBar
         android:layout_width="match_parent"
         android:layout_height="180dp" />
 
     <com.suheng.structure.view.Hexagon2ProgressBar
         android:layout_width="match_parent"
-        android:layout_height="180dp" />
+        android:layout_height="180dp" />-->
 
     <!--<com.suheng.structure.view.Hexagon3ProgressBar
         android:layout_width="match_parent"
@@ -26,4 +26,16 @@
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_marginTop="4dp" />-->
+
+    <com.suheng.structure.view.BezierView
+        android:layout_width="match_parent"
+        android:layout_height="180dp" />
+
+    <com.suheng.structure.view.BezierView2
+        android:layout_width="match_parent"
+        android:layout_height="180dp" />
+
+    <com.suheng.structure.view.InfiniteLine
+        android:layout_width="match_parent"
+        android:layout_height="180dp" />
 </LinearLayout>
