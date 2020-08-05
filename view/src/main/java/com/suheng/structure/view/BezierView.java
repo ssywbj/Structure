@@ -81,8 +81,8 @@ public class BezierView extends View {
 
         //贝塞尔
         mBezierPath.moveTo(mStartPoint.x, mStartPoint.y);
-        mBezierPath.quadTo(mControlPoint.x, mControlPoint.y, mEndPoint.x, mEndPoint.y);
-        //mBezierPath.rQuadTo(200, 300, 400, -200);
+        mBezierPath.quadTo(mControlPoint.x, mControlPoint.y, mEndPoint.x, mEndPoint.y);//两点坐标
+        //mBezierPath.rQuadTo(200, 300, 400, -200);//两点距离起始点的距离
         //绘制贝塞尔
         mPaint.setColor(Color.RED);
         canvas.drawPath(mBezierPath, mPaint);

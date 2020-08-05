@@ -12,13 +12,20 @@ import android.widget.Scroller;
 
 import androidx.annotation.Nullable;
 
+/**
+ * Scroller用法
+ * 1.初始化Scroller
+ * 2.调用startScroll()开始滚动
+ * 3.执行invalidate()刷新界面
+ * 4.重写View的computeScroll()并在其内部实现与滚动相关的业务逻辑
+ * 5.再次执行invalidate()刷新界面
+ */
 public class InfiniteLine2 extends View {
-
-    private int index = 0;
-    private Paint paint;
-    private int width;
+    private int mIndex = 0;
+    private Paint mPaint;
+    private int mWidth;
     private Scroller mScroller;
-    private int downX, lastMoveX;
+    private int mDownX, mLastMoveX;
 
     public InfiniteLine2(Context context) {
         this(context, null);
@@ -34,46 +41,44 @@ public class InfiniteLine2 extends View {
     }
 
     private void init() {
+        setBackgroundColor(Color.BLUE);
         mScroller = new Scroller(getContext());
 
-        paint = new Paint();
-        paint.setColor(Color.RED);
-        paint.setTextSize(50);
-
+        mPaint = new Paint();
+        mPaint.setColor(Color.RED);
+        mPaint.setTextSize(50);
     }
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                downX = (int) event.getX();
+                mDownX = (int) event.getX();
                 break;
             case MotionEvent.ACTION_MOVE:
-                int dx = (int) (downX - event.getX()) + lastMoveX;
+                int dx = (int) (mDownX - event.getX()) + mLastMoveX;
                 smoothScrollTo(dx, 0);
                 break;
             case MotionEvent.ACTION_UP:
-                int ddx = (int) (event.getX() - downX);
+                int ddx = (int) (event.getX() - mDownX);
                 if (ddx < 0 && Math.abs(ddx) > 100) {
-                    index++;
+                    mIndex++;
                 } else if (ddx > 0 && Math.abs(ddx) > 100) {
-                    index--;
+                    mIndex--;
                 }
-                smoothScrollTo(width * index, 0);
-                lastMoveX = index * width;
+                smoothScrollTo(mWidth * mIndex, 0);
+                mLastMoveX = mIndex * mWidth;
                 break;
         }
         return true;
-
     }
 
     //调用此方法滚动到目标位置
     public void smoothScrollTo(int fx, int fy) {
-        Log.d("dsw", "dsw:" + fx + "--" + fy);
-        Log.d("dsw", "dsw---FinalX:" + mScroller.getFinalX() + "--FinalY:" + mScroller.getFinalY());
         int dx = fx - mScroller.getFinalX();
         int dy = fy - mScroller.getFinalY();
+        Log.d("Wbj", "fx: " + fx + ", fy: " + fy + "----dx: " + dx + ", dy: " + dy);
+        Log.d("Wbj", "final, x: " + mScroller.getFinalX() + ", y: " + mScroller.getFinalY());
         smoothScrollBy(dx, dy);
     }
 
@@ -84,10 +89,10 @@ public class InfiniteLine2 extends View {
         invalidate();//这里必须调用invalidate()才能保证computeScroll()会被调用，否则不一定会刷新界面，看不到滚动效果
     }
 
-
     @Override
     public void computeScroll() {
-        if (mScroller.computeScrollOffset()) {
+        super.computeScroll();
+        if (mScroller.computeScrollOffset()) {//判断View的滚动是否在继续
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
             invalidate();
         }
@@ -96,18 +101,18 @@ public class InfiniteLine2 extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        width = getMeasuredWidth();
-        drawText(canvas, (index - 1) * width, 0, index - 1);
-        drawText(canvas, index * width, 0, index);
-        drawText(canvas, (index + 1) * width, 0, index + 1);
+        mWidth = getMeasuredWidth();
+        drawText(canvas, (mIndex - 1) * mWidth, mIndex - 1);
+        drawText(canvas, mIndex * mWidth, mIndex);
+        drawText(canvas, (mIndex + 1) * mWidth, mIndex + 1);
     }
 
-    private void drawText(Canvas canvas, int startX, int startY, int index) {
+    private void drawText(Canvas canvas, int startX, int index) {
         canvas.save();
         canvas.translate(startX, 0);
-        canvas.drawText("页数：" + index, 0, 100, paint);
+        canvas.drawText("页数：" + index, 0, 100, mPaint);
         canvas.restore();
+        Log.d("Wbj", "页数：" + index);
     }
-
 
 }
