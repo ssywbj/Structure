@@ -1,0 +1,33 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.suheng.structure.wallpaper">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".ZhipuWallpaperConfigActivity"
+            android:exported="true"
+            android:label="@string/wallpaper_zhipu_wallpaper_config_aty" />
+
+        <service
+            android:name=".ZhipuWallpaperService"
+            android:enabled="true"
+            android:label="@string/wallpaper_zhipu_wallpaper"
+            android:permission="android.permission.BIND_WALLPAPER">
+
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/wallpaper_zhipu_wallpaper_config" />
+        </service>
+
+    </application>
+</manifest>

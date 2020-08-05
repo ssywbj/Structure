@@ -1,0 +1,58 @@
+if (bluetoothIsLibrary.toBoolean()) {
+    apply plugin: 'com.android.library'
+} else {
+    apply plugin: 'com.android.application'
+}
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
+
+    defaultConfig {
+        if (!bluetoothIsLibrary.toBoolean()) {
+            applicationId "com.suheng.structure.bluetooth"
+        }
+
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            if (bluetoothIsLibrary.toBoolean()) {
+                //编译为library时的功能清单文件
+                manifest.srcFile 'src/main/library/AndroidManifest.xml'
+                java {
+                    //排除不需要加载的类
+                    exclude '**/application/**'
+                }
+            } else {
+                //编译为application时的功能清单文件
+                manifest.srcFile 'src/main/application/AndroidManifest.xml'
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    implementation project(path: ':ui')
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="number_big_width">37.4dp</dimen>
+    <dimen name="number_big_height">66dp</dimen><!--60, 34, *1.1-->
+
+    <dimen name="number_small_width">11.33dp</dimen>
+    <dimen name="number_small_height">20dp</dimen><!--60, 34, /3-->
+
+    <dimen name="text_middle_width">18dp</dimen>
+    <dimen name="text_middle_height">@dimen/number_small_height</dimen><!--60, 54, /3-->
+</resources>

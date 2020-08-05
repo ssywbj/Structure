@@ -78,6 +78,7 @@ dependencies {
     annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
     implementation project(path: ':ui')
     implementation project(path: ':data')
+    implementation project(path: ':socket')
     if (isModule1Library.toBoolean()) {
         implementation project(path: ':module1')
     }
@@ -86,6 +87,9 @@ dependencies {
     }
     if (isModule3Library.toBoolean()) {
         implementation project(path: ':module3')
+    }
+    if (bluetoothIsLibrary.toBoolean()) {
+        implementation project(path: ':bluetooth')
     }
 }
 

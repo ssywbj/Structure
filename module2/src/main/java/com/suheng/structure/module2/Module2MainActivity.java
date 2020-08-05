@@ -1,6 +1,10 @@
 package com.suheng.structure.module2;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.ContentObserver;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -175,7 +180,21 @@ public class Module2MainActivity extends BasicActivity {
         }).start();
 
         //this.openSocketServer();//为什么如果不通过服务启动ServerSocket，客户端连接上服务端后会报错？
-        startService(new Intent(this, EchoService.class));
+        //startService(new Intent(this, EchoService.class));
+
+        mContentObserver = new ContentObserver(new Handler()) {//若Handler为空，那么回调在子线程中调用；若不为空，则回调在主线程中调用，也可以直接new一个Handler进去
+            @Override
+            public void onChange(boolean selfChange, Uri uri) {
+                super.onChange(selfChange, uri);
+                Log.d("Wbj", "onChange, uri: " + uri + ", selfChange: " + selfChange + ", thread: " + Thread.currentThread().getName());
+            }
+        };
+
+        try {
+            getContentResolver().registerContentObserver(PERSON_URI, true, mContentObserver);
+        } catch (Exception e) {
+            Log.e("Wbj", "register content observer error: " + e.toString(), new Exception());
+        }
     }
 
     private void openSocketServer() {
@@ -362,4 +381,92 @@ public class Module2MainActivity extends BasicActivity {
 
     }
 
+    private final static String AUTHORITY = "com.suheng.structure.provider";
+    private final static Uri PERSON_URI = Uri.parse("content://" + AUTHORITY + "/person");
+    private final static String PERSON_CALL_GET_INFO = "person_call_get_info";
+    private final static int STUDENT_URI_GET_INFO = 2;
+    private ContentObserver mContentObserver;
+
+    public void onClickInsert(View view) {
+        try {
+            ContentValues values = new ContentValues();
+            values.put("name", "又又");
+            values.put("age", 234);
+            Uri uri = getContentResolver().insert(PERSON_URI, values);
+            Log.d("Wbj", "insert, result uri: " + uri);
+
+            values.clear();
+            values.put("name", "地载");
+            values.put("age", 24);
+            uri = getContentResolver().insert(PERSON_URI, values);
+            Log.d("Wbj", "insert, result uri: " + uri);
+        } catch (Exception e) {
+            Log.e("Wbj", "insert provider data error: " + e.toString(), new Exception());
+        }
+    }
+
+    public void onClickDelete(View view) {
+        try {
+            int delete = getContentResolver().delete(PERSON_URI, "id = ?", new String[]{5 + ""});
+            Log.d("Wbj", "delete, result: " + delete);
+        } catch (Exception e) {
+            Log.e("Wbj", "delete provider data error: " + e.toString(), new Exception());
+        }
+    }
+
+    public void onClickModify(View view) {
+        try {
+            ContentValues values = new ContentValues();
+            values.put("age", 90);
+            int update = getContentResolver().update(PERSON_URI, values, "id = ?", new String[]{4 + ""});
+            Log.d("Wbj", "update, result: " + update);
+        } catch (Exception e) {
+            Log.e("Wbj", "modify provider data error: " + e.toString(), new Exception());
+        }
+    }
+
+    public void onClickQuery(View view) {
+        //Cursor cursor = getContentResolver().query(ContentUris.withAppendedId(PERSON_URI, STUDENT_URI_GET_INFO), null, null, null, null);
+        Cursor cursor = getContentResolver().query(PERSON_URI, null, null, null, null);
+        if (cursor == null) {
+            Log.w("Wbj", "cursor is null");
+            return;
+        }
+        Log.d("Wbj", "count: " + cursor.getCount());
+
+        int id, age;
+        String name;
+        while (cursor.moveToNext()) {
+            id = cursor.getInt(cursor.getColumnIndex("id"));
+            name = cursor.getString(cursor.getColumnIndex("name"));
+            age = cursor.getInt(cursor.getColumnIndex("age"));
+            Log.d("Wbj", "person, id: " + id + ", name: " + name + ", age: " + age);
+        }
+
+        cursor.close();
+    }
+
+    public void onClickCall(View view) {
+        Bundle extras = new Bundle();
+        extras.putLong("current_time_millis", System.currentTimeMillis());
+        Bundle bundle = getContentResolver().call(ContentUris.withAppendedId(PERSON_URI, STUDENT_URI_GET_INFO)
+                , PERSON_CALL_GET_INFO, System.currentTimeMillis() + "", extras);
+        if (bundle == null) {
+            Log.e("Wbj", "query call error: bundle is null");
+            return;
+        }
+        ArrayList<String> data = bundle.getStringArrayList(PERSON_CALL_GET_INFO);
+        if (data == null || data.size() == 0) {
+            Log.e("Wbj", "query call error, data is null or empty");
+            return;
+        }
+        Log.d("Wbj", "query call result, 1: " + data.get(0) + ", 2: " + data.get(1)
+                + ", 3: " + data.get(2) + ", 4: " + data.get(3));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getContentResolver().unregisterContentObserver(mContentObserver);
+    }
 }
