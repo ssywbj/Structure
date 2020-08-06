@@ -16,6 +16,7 @@ import android.view.animation.LinearInterpolator;
 
 import androidx.annotation.Nullable;
 
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 public class InfiniteLine3 extends View {
@@ -25,9 +26,9 @@ public class InfiniteLine3 extends View {
     private Rect mRectText = new Rect();
     private float mTextWidth, mTextOffset;
     private int mPageIndex;
-
     private ValueAnimator mTranslateAnim;
     private int mAnimValue;
+    private int mStartSecond;
 
     public InfiniteLine3(Context context) {
         this(context, null);
@@ -55,15 +56,15 @@ public class InfiniteLine3 extends View {
         mPaint.setStrokeWidth(1f);
         mPaintText.setStyle(Paint.Style.FILL);
         mPaintText.setTypeface(Typeface.DEFAULT_BOLD);
-        mPaintText.setTextSize(120f);
+        mPaintText.setTextSize(60f);
 
         String text = "00";
         mPaintText.getTextBounds(text, 0, text.length(), mRectText);
         //mTextWidth = (mRectText.right - mRectText.left);
         mTextWidth = 2 * Math.abs(mRectText.centerX());
+        mStartSecond = Calendar.getInstance().get(Calendar.SECOND);
 
         this.initAnim();
-        //mTranslateAnim.setRepeatCount(ValueAnimator.INFINITE);
     }
 
     private void initAnim() {
@@ -73,7 +74,9 @@ public class InfiniteLine3 extends View {
             public void onAnimationUpdate(ValueAnimator animation) {
                 mAnimValue = (int) animation.getAnimatedValue();
                 Log.d("Wbj", "onAnimationUpdate: " + mAnimValue);
-                invalidate();
+                if (mTranslateAnim != null) {
+                    invalidate();
+                }
             }
         });
         mTranslateAnim.addListener(new AnimatorListenerAdapter() {
@@ -81,14 +84,14 @@ public class InfiniteLine3 extends View {
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 mPageIndex++;
-                mTranslateAnim.setIntValues(mPageIndex * getWidth(), (mPageIndex + 1) * getWidth());
-                mTranslateAnim.start();
+                if (mTranslateAnim != null) {
+                    mTranslateAnim.setIntValues(mPageIndex * getWidth(), (mPageIndex + 1) * getWidth());
+                    mTranslateAnim.start();
+                }
             }
         });
         mTranslateAnim.setDuration(TimeUnit.SECONDS.toMillis(PER_SCREEN_SECONDS));
         mTranslateAnim.setInterpolator(new LinearInterpolator());
-        //mTranslateAnim.setRepeatCount(ValueAnimator.INFINITE);
-        //mTranslateAnim.setRepeatCount(ValueAnimator.RESTART);
     }
 
     @Override
@@ -132,7 +135,8 @@ public class InfiniteLine3 extends View {
         canvas.translate(getWidth() / 2f + pageIndex * getWidth(), 0);
         float x = -getWidth() / 2f;
         int number;
-        for (int index = pageIndex * PER_SCREEN_SECONDS - 2; index < (pageIndex + 1) * PER_SCREEN_SECONDS; index++) {
+        int start = pageIndex * PER_SCREEN_SECONDS + mStartSecond, end = PER_SCREEN_SECONDS * (pageIndex + 1) + mStartSecond;
+        for (int index = start - 2; index < end; index++) {
             number = (index + SECONDS_SCALE) % SECONDS_SCALE;
             canvas.drawText(number / 10 + "" + number % 10, x - mAnimValue, -mRectText.centerY(), mPaintText);
             x += (mTextOffset + mTextWidth);

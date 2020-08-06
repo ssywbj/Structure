@@ -37,9 +37,9 @@
         android:layout_height="180dp"
         android:visibility="gone" />-->
 
-    <com.suheng.structure.view.InfiniteLine2
+    <!--<com.suheng.structure.view.InfiniteLine2
         android:layout_width="match_parent"
-        android:layout_height="180dp" />
+        android:layout_height="180dp" />-->
 
     <com.suheng.structure.view.InfiniteLine3
         android:layout_width="match_parent"
