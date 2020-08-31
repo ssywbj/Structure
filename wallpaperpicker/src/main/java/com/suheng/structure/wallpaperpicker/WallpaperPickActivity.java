@@ -124,6 +124,9 @@ public class WallpaperPickActivity extends AppCompatActivity {
             Log.d(mTag, "service info, name: " + serviceInfo.name
                     + ", recycle_life: " + bundle.getBoolean("recycle_life"));
 
+            /*if (drawable == null) {
+                drawable = ContextCompat.getDrawable(this, R.drawable.watch_face_preview_default);
+            }*/
             if (drawable != null) {
                 wallpaperInfos.add(wallpaper);
             }
