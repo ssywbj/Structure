@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Watch Home</string>
+
+    <string name="launcher_package_name">com.qualcomm.qti.launcher</string>
+    <string name="anadigclock_package_name">com.qualcomm.qti.watchfaceanalogdigitalclock</string>
+    <string name="anadigclock_class_name">com.qualcomm.qti.watchfaceanalogdigitalclock.WatchFaceAnalogDigitalClockService</string>
+    <string name="anaclock_class_name">com.qualcomm.qti.watchfaceanalogclock.WatchFaceAnalogClockService</string>
+</resources>
