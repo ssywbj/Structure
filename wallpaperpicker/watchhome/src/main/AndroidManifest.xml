@@ -15,6 +15,7 @@
     <uses-permission android:name="android.permission.CALL_PRIVILEGED" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" />
+    <uses-feature android:name="android.software.live_wallpaper" />
 
     <application
         android:allowBackup="true"
@@ -32,7 +33,7 @@
         <activity
             android:name=".WatchHomeActivity"
             android:immersive="true"
-            android:theme="@style/WatchHomeTheme"
+            android:theme="@style/WatchHomeTheme2"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

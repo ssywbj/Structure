@@ -3,20 +3,24 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.DeviceDefault.Dialog.NoActionBar" />
 
-    <!--<style name="WatchHomeTheme" parent="android:Theme.DeviceDefault.Light.NoActionBar">
-        <item name="android:windowBackground">#00000000</item>
+    <style name="WatchHomeTheme" parent="android:Theme.DeviceDefault.Light.NoActionBar.Fullscreen">
+        <!--windowBackground的颜色要写成资源引用的方式，不能直接写值，如：#00000000，免得会没有效果-->
+        <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">false</item>
         <item name="android:windowShowWallpaper">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowSwipeToDismiss">false</item>
-    </style>  -->
+    </style>
 
-    <style name="WatchHomeTheme" parent="@android:style/Theme.Translucent.NoTitleBar">
-        <!--<item name="android:windowBackground">#00000000</item>
-        <item name="android:windowIsTranslucent">false</item>
+    <style name="WatchHomeTheme2" parent="@android:style/Theme.Translucent.NoTitleBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowShowWallpaper">true</item>
+        <item name="android:focusable">false</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
-        <item name="android:windowSwipeToDismiss">false</item>-->
+        <item name="android:windowSwipeToDismiss">false</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
+        <!--<item name="android:backgroundDimEnabled">true</item>--><!--背景是否变暗-->
     </style>
 
 </resources>

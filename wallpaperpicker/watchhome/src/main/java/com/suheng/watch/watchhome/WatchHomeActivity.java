@@ -7,9 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.WindowManager;
+import android.view.MotionEvent;
 import android.widget.AnalogClock;
 
 import androidx.annotation.Nullable;
@@ -346,6 +347,20 @@ public class WatchHomeActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        /*setContentView(R.layout.activity_home);*/
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.d("Wbj", event.getAction() + ", " + event.getX());
+        WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
+        IBinder windowToken = getWindow().getDecorView().getWindowToken();
+        wallpaperManager.sendWallpaperCommand(windowToken, "Wbj"
+                , (int) event.getX(), (int) event.getY(), 0, null);
+        wallpaperManager.setWallpaperOffsets(windowToken, 0, 8);
+        return super.onTouchEvent(event);
     }
 }
