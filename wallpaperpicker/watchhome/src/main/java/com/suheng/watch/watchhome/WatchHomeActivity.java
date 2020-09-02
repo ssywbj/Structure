@@ -1,5 +1,6 @@
 package com.suheng.watch.watchhome;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
@@ -7,10 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.AnalogClock;
 
 import androidx.annotation.Nullable;
@@ -347,20 +348,77 @@ public class WatchHomeActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        /*setContentView(R.layout.activity_home);*/
+        setContentView(R.layout.activity_home);
+
+        final View rootLayout = findViewById(R.id.watch_home);
+        final WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
+        /*rootLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(APP_TAG, "Click, x: " + rootLayout.getX() + ", y: " + rootLayout.getY() + ", z: " + rootLayout.getZ());
+                Log.d(APP_TAG, "Click, x: " + rootLayout.getPivotX() + ", y: " + rootLayout.getPivotY() + ", z: " + rootLayout.getZ());
+                Log.d(APP_TAG, "Click, x: " + rootLayout.getPivotX() + ", y: " + rootLayout.getPivotY() + ", z: " + rootLayout.getZ());
+            }
+        });*/
+        rootLayout.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                //https://www.cnblogs.com/Free-Thinker/p/8920595.html
+                //getX()：获取点击事件相对控件左边的x轴坐标，即点击事件距离控件左边的距离
+                //getY()：获取点击事件相对控件顶边的y轴坐标，即点击事件距离控件顶边的距离
+                //getRawX()：获取点击事件相对整个屏幕左边的x轴坐标，即点击事件距离整个屏幕左边的距离
+                //getRawY()：获取点击事件相对整个屏幕顶边的y轴坐标，即点击事件距离整个屏幕顶边的距离
+                final int action = event.getAction();
+                Log.d(APP_TAG, "V Touch, action: " + action + ", x: " + event.getX() + ", y: " + event.getY()
+                        + ", raw x: " + event.getRawX() + ", raw y: " + event.getRawY());
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        Log.d(APP_TAG, "down, action");
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        Log.d(APP_TAG, "move, action");
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        Log.d(APP_TAG, "up, action");
+                        wallpaperManager.sendWallpaperCommand(rootLayout.getWindowToken(), WallpaperManager.COMMAND_TAP
+                                , (int) event.getX(), (int) event.getY(), 0, null);
+                        break;
+                    default:
+                        break;
+                }
+
+                return true;//false：只会执行down事件，不会执行move和up；true：三个事件都会执行。
+            }
+        });
+        //全屏View的onTouch和Activity的onTouch区别：在View里touch，MotionEvent.getY()方法并不包含状态栏的高度，
+        //在getRawY()才包含（因为View并不会填充状态的区域，可以把View的背影换成不透明的彩色试下），而在Activity里包含
     }
 
-    @Override
+    /*@Override
     public boolean onTouchEvent(MotionEvent event) {
-        Log.d("Wbj", event.getAction() + ", " + event.getX());
         WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
         IBinder windowToken = getWindow().getDecorView().getWindowToken();
-        wallpaperManager.sendWallpaperCommand(windowToken, "Wbj"
-                , (int) event.getX(), (int) event.getY(), 0, null);
-        wallpaperManager.setWallpaperOffsets(windowToken, 0, 8);
+        //wallpaperManager.setWallpaperOffsets(windowToken, 0, 8);
+        final int action = event.getAction();
+        Log.i(APP_TAG, "Aty Touch, action: " + action + ", x: " + event.getX() + ", y: " + event.getY());
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                Log.d(APP_TAG, "down, action");
+                break;
+            case MotionEvent.ACTION_MOVE:
+                Log.d(APP_TAG, "move, action");
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.d(APP_TAG, "up, action");
+                wallpaperManager.sendWallpaperCommand(windowToken, WallpaperManager.COMMAND_TAP
+                        , (int) event.getX(), (int) event.getY(), 0, null);
+                break;
+            default:
+                break;
+        }
+
         return super.onTouchEvent(event);
-    }
+    }*/
+
 }
