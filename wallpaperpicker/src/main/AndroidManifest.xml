@@ -2,10 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.suheng.structure.wallpaperpicker">
 
-    <uses-feature android:name="android.hardware.type.watch" />
+    <!--<uses-feature android:name="android.hardware.type.watch" />-->
 
     <uses-permission android:name="android.permission.SET_WALLPAPER_COMPONENT" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
     <uses-feature
         android:name="android.software.live_wallpaper"
         android:required="true" />
@@ -21,12 +22,36 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".WallpaperPickActivity"
+            android:icon="@drawable/icon_app_alarm_clock"
+            android:label="@string/app_theme_one"
             android:theme="@style/WallpaperPickActivityTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="com.wiz.watch.WallpaperPicker" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <meta-data
+                android:name="key_icon_face"
+                android:resource="@drawable/icon_app_alarm_clock" />
+        </activity>
+
+        <activity
+            android:name=".WallpaperPick2Activity"
+            android:icon="@drawable/icon_app_blood_oxygen"
+            android:label="@string/app_theme_two"
+            android:theme="@style/WallpaperPickActivityTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <!--<action android:name="com.wiz.watch.WallpaperPicker" />-->
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="key_icon_face"
+                android:resource="@drawable/icon_app_blood_oxygen" />
         </activity>
 
         <service android:name=".WallpaperPickService" />

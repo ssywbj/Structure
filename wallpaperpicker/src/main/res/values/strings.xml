@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">WallpaperPicker</string>
+    <string name="app_theme_one">主题1</string>
+    <string name="app_theme_two">主题2</string>
 </resources>

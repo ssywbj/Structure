@@ -8,6 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="WallpaperPickActivityTheme" parent="Theme.AppCompat.Light.NoActionBar" />
+    <style name="WallpaperPickActivityTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowSwipeToDismiss">true</item>
+    </style>
 
 </resources>
