@@ -20,6 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".WallpaperPickActivity"
             android:icon="@drawable/icon_app_alarm_clock"
@@ -34,7 +35,7 @@
 
             <meta-data
                 android:name="key_icon_face"
-                android:resource="@drawable/icon_app_alarm_clock" />
+                android:resource="@drawable/icon_app_camera" />
         </activity>
 
         <activity
@@ -51,7 +52,7 @@
 
             <meta-data
                 android:name="key_icon_face"
-                android:resource="@drawable/icon_app_blood_oxygen" />
+                android:resource="@drawable/icon_app_calculator" />
         </activity>
 
         <service android:name=".WallpaperPickService" />
