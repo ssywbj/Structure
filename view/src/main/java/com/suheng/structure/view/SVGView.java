@@ -5,15 +5,21 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.View;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 public class SVGView extends View {
     private PointF mPointCenter = new PointF();
@@ -172,7 +178,8 @@ public class SVGView extends View {
         //小图放大
         left = 4;
         top += 8;
-        bitmap = mBitmapManager.getScale(R.drawable.number_5_small, 4);//放大4倍
+        //bitmap = mBitmapManager.getScale(R.drawable.number_5_small, 4);//放大4倍
+        bitmap = get(getContext(), R.drawable.number_5_small, 4);
         canvas.drawBitmap(bitmap, left, top, null);
         top += bitmap.getHeight();
 
@@ -180,17 +187,20 @@ public class SVGView extends View {
         canvas.drawLine(0, lineStartY, getWidth(), lineStartY, mPaint);
 
         left += (bitmap.getWidth() + 16);
-        bitmap = mBitmapManager.getScale(R.drawable.number_5_small, 2);//放大2倍
+        //bitmap = mBitmapManager.getScale(R.drawable.number_5_small, 2);//放大2倍
+        bitmap = get(getContext(), R.drawable.number_5_small, 2);
         canvas.drawBitmap(bitmap, left, lineStartY - 1.0f * bitmap.getHeight() / 2, null);
 
         left += (bitmap.getWidth() + 16);
-        bitmap = mBitmapManager.getScale(R.drawable.number_5_small, 1);//放大1倍（原图）
+        //bitmap = mBitmapManager.getScale(R.drawable.number_5_small, 1);//放大1倍（原图）
+        bitmap = get(getContext(), R.drawable.number_5_small, 1);//放大1倍（原图）
         canvas.drawBitmap(bitmap, left, lineStartY - 1.0f * bitmap.getHeight() / 2, null);
 
         //大图缩小
         left = 4;
         top += 8;
-        bitmap = mBitmapManager.getScale(R.drawable.number_5_big, 1);//缩小1倍（原图）
+        //bitmap = mBitmapManager.getScale(R.drawable.number_5_big, 1);//缩小1倍（原图）
+        bitmap = get(getContext(), R.drawable.number_5_big, 1);
         canvas.drawBitmap(bitmap, left, top, null);
         top += bitmap.getHeight();
 
@@ -198,11 +208,13 @@ public class SVGView extends View {
         canvas.drawLine(0, lineStartY, getWidth(), lineStartY, mPaint);
 
         left += (bitmap.getWidth() + 16);
-        bitmap = mBitmapManager.getScale(R.drawable.number_5_big, 1.0f / 2);//缩小2倍
+        //bitmap = mBitmapManager.getScale(R.drawable.number_5_big, 1.0f / 2);//缩小2倍
+        bitmap = get(getContext(), R.drawable.number_5_big, 1.0f / 2);
         canvas.drawBitmap(bitmap, left, lineStartY - 1.0f * bitmap.getHeight() / 2, null);
 
         left += (bitmap.getWidth() + 16);
-        bitmap = mBitmapManager.getScale(R.drawable.number_5_big, 1.0f / 4);//缩小4倍
+        //bitmap = mBitmapManager.getScale(R.drawable.number_5_big, 1.0f / 4);//缩小4倍
+        bitmap = get(getContext(), R.drawable.number_5_big, 1.0f / 4);
         canvas.drawBitmap(bitmap, left, lineStartY - 1.0f * bitmap.getHeight() / 2, null);
         //###########缩放测试：end，结论：单个SVG不管是缩小还是放大，都有锯齿，其中放大的更明显###############
     }
@@ -251,6 +263,30 @@ public class SVGView extends View {
         mPaint.setStyle(Paint.Style.FILL);
         //从左到右画线，文案在Path上方被绘制，绘制方向也是从左到右
         canvas.drawTextOnPath("线上方", mPath, -4, -4, mPaint);
+    }
+
+    public static Bitmap get(Context context, @DrawableRes int resId/*, int color*/, float scale) {
+        Drawable drawable = ContextCompat.getDrawable(context, resId);
+        if (drawable == null) {
+            return null;
+        }
+
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        } else if (drawable instanceof VectorDrawable || drawable instanceof VectorDrawableCompat) {
+            //drawable.setTint(ContextCompat.getColor(context, color));
+            int intrinsicWidth = drawable.getIntrinsicWidth();
+            int intrinsicHeight = drawable.getIntrinsicHeight();
+            Bitmap bitmap = Bitmap.createBitmap((int) (intrinsicWidth * scale), (int) (intrinsicHeight * scale), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG));
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+
+            return bitmap;
+        } else {
+            throw new IllegalArgumentException("unsupported drawable type");
+        }
     }
 
 }
