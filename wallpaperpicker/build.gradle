@@ -17,7 +17,7 @@ android {
     applicationVariants.all {
         variant ->
             variant.outputs.all {
-                outputFileName = "WallpaperPicker.apk"
+                outputFileName = "Wbj_WallpaperPicker.apk"
             }
     }
 
