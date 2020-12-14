@@ -4,6 +4,7 @@
 readonly module_dir=$(pwd | awk -F "/" '{print $NF}')
 echo "module: $module_dir"
 ./../gradlew ":${module_dir}:aR"
+# shellcheck disable=SC2181
 if [ $? -ne 0 ]
 then
     echo "APK打包失败，程序退出！"
@@ -14,7 +15,7 @@ fi
 readonly VERSION_NAME_IN_FILE="./build.gradle"
 if [ -e $VERSION_NAME_IN_FILE ];then
     readonly version_name=$(grep -w "versionName" $VERSION_NAME_IN_FILE | grep -Eo '([0-9]\.){3}[a-z]{1,2}')
-    if [ $version_name ];then
+    if [ "$version_name" ];then
         echo "version_name: $version_name"
     else
         echo "获取版本号失败，程序退出！"
@@ -29,7 +30,7 @@ fi
 readonly MK_FILE="Android.mk"
 if [ -e $MK_FILE ];then
     readonly apk_name=$(grep -w "LOCAL_MODULE" $MK_FILE | grep -Eo 'Wbj[[:alnum:]_]*')".apk"
-    if [ $apk_name ];then
+    if [ "$apk_name" ];then
         echo "apk_name: $apk_name"
     else
         echo "获取APK名称失败，程序退出！"
@@ -44,6 +45,7 @@ fi
 readonly SIGNED_APK_PATH="./build/outputs/apk/release"
 readonly zip_file="${apk_name}_AA_V${version_name}.zip"
 zip -j "${SIGNED_APK_PATH}/$zip_file" $MK_FILE "${SIGNED_APK_PATH}/${apk_name}"
+# shellcheck disable=SC2181
 if [ $? != 0 ];then
     echo "文件压缩失败，程序退出！"
     exit
