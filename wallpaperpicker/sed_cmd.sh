@@ -14,20 +14,20 @@ echo "new_version_code: $new_version_code"
 #sed -i 's/'"$version_code"'/'"$new_version_code"'/' $VERSION_FILE
 
 echo "------- 字符拆分：方法1 ------"
-array=(${version_name//./ }) #最后一个"/"后面接一个空格
-echo "${array[@]}"
-echo "${array[3]}"
+#array=(${version_name//./ }) #最后一个"/"后面接一个空格
+#echo "${array[@]}"
+#echo "${array[3]}"
 read -ra array4 <<<"${version_name//./ }" #最后一个"/"后面接一个空格
 echo "${array4[@]}"
 echo "${array4[1]}"
 echo "------- 字符拆分：方法2, IFS --------"
-OLD_IFS="$IFS"
-IFS="."
-array2=($version_name)
-IFS="$OLD_IFS"
-for var in "${array2[@]}"; do
-  echo "$var"
-done
+#OLD_IFS="$IFS"
+#IFS="."
+#array2=($version_name)
+#IFS="$OLD_IFS"
+#for var in "${array2[@]}"; do
+#  echo "$var"
+#done
 echo "------- IFS read -ra--------"
 IFS='.' read -ra array3 <<<"$version_name"
 for i in "${array3[@]}"; do
@@ -60,19 +60,33 @@ function basicCalc() {
   ch=$(echo $((ascii + 26)) | awk '{printf("%c", $1)}')
   echo "a+26: $ch"
 }
-basicCalc
+#basicCalc
 
 function alphabetCalc() {
   add=${1}
   quot=$((add / SHIFT))
   mod=$((add % SHIFT))
-  echo "quot: $quot, mod: $mod"
+
+  read -ra array <<<"$quot $mod"
+  echo "${array[*]}"
 }
-alphabetCalc 0
-alphabetCalc 1
-alphabetCalc 25
-alphabetCalc 26
-alphabetCalc 27
-alphabetCalc 51
-alphabetCalc 52
-alphabetCalc 53
+#array=($(alphabetCalc 0))
+read -ra array <<<"$(alphabetCalc 0)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+read -ra array <<<"$(alphabetCalc 1)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+read -ra array <<<"$(alphabetCalc 25)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+read -ra array <<<"$(alphabetCalc 26)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+read -ra array <<<"$(alphabetCalc 27)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+read -ra array <<<"$(alphabetCalc 51)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+read -ra array <<<"$(alphabetCalc 52)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+read -ra array <<<"$(alphabetCalc 53)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+
+read -ra array <<<"${version_name//./ }"
+echo "${array[@]}"
