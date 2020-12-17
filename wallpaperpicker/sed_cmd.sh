@@ -12,6 +12,8 @@ readonly new_version_code=$((version_code + 1))
 echo "new_version_code: $new_version_code"
 #sed -i '' 's/'"$version_code"'/'"$new_version_code"'/' $VERSION_FILE #mac
 #sed -i 's/'"$version_code"'/'"$new_version_code"'/' $VERSION_FILE
+#sed -i'' 's/'"$version_code"'/'"$new_version_code"'/' $VERSION_FILE
+#sed -i.bak 's/'"$version_code"'/'"$new_version_code"'/' $VERSION_FILE
 
 echo "------- 字符拆分：方法1 ------"
 #array=(${version_name//./ }) #最后一个"/"后面接一个空格
@@ -62,31 +64,49 @@ function basicCalc() {
 }
 #basicCalc
 
-function alphabetCalc() {
+function makeQuotMod() {
   add=${1}
-  quot=$((add / SHIFT))
-  mod=$((add % SHIFT))
+  quot=$((add / SHIFT)) #商数
+  mod=$((add % SHIFT))  #余数
 
   read -ra array <<<"$quot $mod"
   echo "${array[*]}"
 }
-#array=($(alphabetCalc 0))
-read -ra array <<<"$(alphabetCalc 0)"
-echo "quot: ${array[0]}, mod: ${array[1]}"
-read -ra array <<<"$(alphabetCalc 1)"
-echo "quot: ${array[0]}, mod: ${array[1]}"
-read -ra array <<<"$(alphabetCalc 25)"
-echo "quot: ${array[0]}, mod: ${array[1]}"
-read -ra array <<<"$(alphabetCalc 26)"
-echo "quot: ${array[0]}, mod: ${array[1]}"
-read -ra array <<<"$(alphabetCalc 27)"
-echo "quot: ${array[0]}, mod: ${array[1]}"
-read -ra array <<<"$(alphabetCalc 51)"
-echo "quot: ${array[0]}, mod: ${array[1]}"
-read -ra array <<<"$(alphabetCalc 52)"
-echo "quot: ${array[0]}, mod: ${array[1]}"
-read -ra array <<<"$(alphabetCalc 53)"
-echo "quot: ${array[0]}, mod: ${array[1]}"
 
-read -ra array <<<"${version_name//./ }"
-echo "${array[@]}"
+function letterCalc() {
+  ascii=97 #ascii码97代表小写字母a
+  ch=$(echo $((ascii + ${1})) | awk '{printf("%c", $1)}')
+  echo "$ch"
+}
+
+#array=($(makeQuotMod 0))
+read -ra array <<<"$(makeQuotMod 0)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+letterCalc "${array[1]}"
+read -ra array <<<"$(makeQuotMod 1)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+letterCalc "${array[1]}"
+read -ra array <<<"$(makeQuotMod 25)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+letterCalc "${array[1]}"
+read -ra array <<<"$(makeQuotMod 26)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+letterCalc "${array[1]}"
+read -ra array <<<"$(makeQuotMod 27)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+letterCalc "${array[1]}"
+read -ra array <<<"$(makeQuotMod 51)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+letterCalc "${array[1]}"
+read -ra array <<<"$(makeQuotMod 52)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+letterCalc "${array[1]}"
+read -ra array <<<"$(makeQuotMod 53)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+letterCalc "${array[1]}"
+
+#read -ra array <<<"${version_name//./ }"
+#echo "${array[*]}"
+#for var in "${array[@]}"; do
+#  echo "var: $var"
+#done
