@@ -14,6 +14,13 @@ echo "new_version_code: $new_version_code"
 #sed -i 's/'"$version_code"'/'"$new_version_code"'/' $VERSION_FILE
 #sed -i.bak 's/'"$version_code"'/'"$new_version_code"'/' $VERSION_FILE
 
+var=${version_name//./}
+echo "var: $var"
+num=$(echo "$var" | grep -Eo '[0-9]+')
+echo "num: $num"
+apl=$(echo "$var" | grep -Eo '[a-z]+')
+echo "apl: $apl"
+
 echo "------- 字符拆分：方法1 ------"
 #array=(${version_name//./ }) #最后一个"/"后面接一个空格
 #echo "${array[@]}"
@@ -103,9 +110,9 @@ function letterCalc() {
 #read -ra array <<<"$(makeQuotMod 52 26)"
 #echo "quot: ${array[0]}, mod: ${array[1]}"
 #letterCalc "${array[1]}"
-#read -ra array <<<"$(makeQuotMod 53 26)"
-#echo "quot: ${array[0]}, mod: ${array[1]}"
-#letterCalc "${array[1]}"
+read -ra array <<<"$(makeQuotMod 53 26)"
+echo "quot: ${array[0]}, mod: ${array[1]}"
+letterCalc "${array[1]}"
 
 #read -ra array <<<"${version_name//./ }"
 #for var in "${array[@]}"; do
@@ -116,18 +123,19 @@ cat tmp.txt
 sed 's/\.//g' tmp.txt
 #cat tmp.txt
 
-var=$(echo "1.0.0" | sed 's/\.//g')
+var=$(echo "13.0.0" | sed 's/\.//g')
 echo "var: $var"
-var=$(echo "$((var + 1))" | sed 's/\(.\)\(.\)/\1.\2./')
-echo "var: $var"
-var="100"
-echo "${var//\(.\)\(.\)/\1.\2.}"
-echo "var: $var"
-string="stirn.g"
-echo "${string//ir/ri}"
-echo "${string//./-}"
-var=$(echo "112234455960okcs" | sed 's/\(....\)\(...\)/\1:\2:/')
-echo "var: $var"
+var=$(echo "$((var + 1))" | rev | sed 's/\(.\)\(.\)/\1.\2./' | rev)
+#var=$(echo "$((var + 1))" | sed -r 's/(.)(.)/1.2./')
+echo "new var: $var"
+#var="100"
+#echo "${var//\(.\)\(.\)/\1.\2.}"
+#echo "var: $var"
+#string="stirn.g"
+#echo "${string//ir/ri}"
+#echo "${string//./-}"
+#var=$(echo "112234455960okcs" | sed 's/\(....\)\(...\)/\1:\2:/')
+#echo "var: $var"
 #read -ra array <<<"${version_tmp//./ }"
 #for var in "${array[@]}"; do
 #  echo "var: $((var + 1))"
