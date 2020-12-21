@@ -32,15 +32,14 @@ function modifyVersionName() {
   readonly new_apl_ascii=$((apl_ascii + 1))
   #echo "apl_ascii: $apl_ascii, new_apl_ascii: $new_apl_ascii"
   read -ra array <<<"$(makeQuotMod $((new_apl_ascii - A_ASCII)) 26)"
-  new_apl=$(echo $((A_ASCII + ${array[1]})) | awk '{printf("%c", $1)}')
+  new_apl=$(echo $((A_ASCII + array[1])) | awk '{printf("%c", $1)}')
   #echo "apl: $apl, new_apl: $new_apl"
 
   readonly num=$(echo "$ven" | grep -Eo '[0-9]+')
-  readonly new_num=$((num + ${array[0]}))
+  readonly new_num=$((num + array[0]))
   new_version_name=$(echo "$new_num$new_apl" | rev | sed 's/\(.\)\(.\)\(.\)/\1.\2.\3./' | rev)
   echo "new_version_name: $new_version_name"
-  #sed -i.bak 's/'"$version_name"'/'"$new_version_name"'/' $VERSION_FILE
-  sed -i 's/'"$version_name"'/'"$new_version_name"'/' $VERSION_FILE
+  sed -i.bak 's/'"$version_name"'/'"$new_version_name"'/' $VERSION_FILE
 }
 modifyVersionName
 
@@ -51,7 +50,7 @@ echo "version_code: $version_code"
 function modifyVersionCode() {
   readonly new_version_code=$((version_code + 1))
   echo "new_version_code: $new_version_code"
-  sed -i 's/'"$version_code"'/'"$new_version_code"'/' $VERSION_FILE
+  sed -i.bak 's/'"$version_code"'/'"$new_version_code"'/' $VERSION_FILE
 }
 modifyVersionCode
 

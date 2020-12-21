@@ -1,6 +1,5 @@
 # Built application files
 *.apk
-*.aar
 *.ap_
 *.aab
 
@@ -86,6 +85,6 @@ lint/tmp/
 
 # Custom 自定义不列入版本管理的文件（夹）
 .idea/
-#.DS_Store, 全称Desktop Services Store，Mac系统下自动创建用于存储目录自定义属性的隐藏文件，相当于Windows下的desktop.ini，
-#https://www.jianshu.com/p/46f22a29b78d
+#.DS_Store, 全称Desktop Services Store，Mac系统下自动创建用于存储目录自定义属性的隐藏文件，相当于Windows下的desktop.ini
 .DS_Store
+*.bak
