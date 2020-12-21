@@ -1,16 +1,24 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
+    buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "com.suheng.structure.wallpaper.roamimg"
         minSdkVersion 24
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 30
+        versionCode 10000000
+        versionName "1.0.0.a"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                outputFileName = "WizFace_Roaming.apk"
+            }
     }
 
     signingConfigs {

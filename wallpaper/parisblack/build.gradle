@@ -1,18 +1,25 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    compileSdkVersion 30
+    buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "com.suheng.structure.wallpaper.parisblack"
         minSdkVersion 24
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 30
+        versionCode 10000000
+        versionName "1.0.0.a"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true//兼容不支持SVG的机型
+    }
+
+    applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                outputFileName = "WizFace_ParisBlack.apk"
+            }
     }
 
     signingConfigs {
