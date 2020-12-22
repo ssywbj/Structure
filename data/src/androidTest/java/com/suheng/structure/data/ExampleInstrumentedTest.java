@@ -8,6 +8,8 @@ import androidx.test.runner.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -23,5 +25,8 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         assertEquals("com.suheng.structure.data.test", appContext.getPackageName());
+
+        TPVLog.dLog("Wbj", new Random().nextInt(100) + "");
+        TPVLog.d("Wbj", new Random().nextInt(100) + "");
     }
 }
