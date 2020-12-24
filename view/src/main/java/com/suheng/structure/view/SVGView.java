@@ -303,8 +303,8 @@ public class SVGView extends View {
         //---------------------------方法１-------------------------
         //原图
         float left = 10, top = 20;
-        //Bitmap bitmap = mBitmapManager.get(R.drawable.test_pic);
-        Bitmap bitmap = mBitmapManager2.get(R.drawable.test_pic);
+        Bitmap bitmap = mBitmapManager.get(R.drawable.test_pic);
+        //Bitmap bitmap = mBitmapManager2.get(R.drawable.earth);
         canvas.drawBitmap(bitmap, left, top, null);
         left += bitmap.getWidth();
 
@@ -338,7 +338,7 @@ public class SVGView extends View {
         //-------------------------方法3---------------------------
         //原图
         left = 10;
-        top = 160;
+        top = 260;
         bitmap = mBitmapManager2.get(R.drawable.test_pic);
         canvas.drawBitmap(bitmap, left, top, null);
         left += (bitmap.getWidth() + 10);
@@ -359,21 +359,31 @@ public class SVGView extends View {
 
         //-------------------------方法4---------------------------
         //原图
-        top = 160;
+        top = 260;
+        left -= 50;
+        //bitmap = mBitmapManager2.get(R.drawable.earth, ContextCompat.getColor(getContext(), android.R.color.holo_blue_bright));
         bitmap = mBitmapManager2.get(R.drawable.test_pic);
         canvas.drawBitmap(bitmap, left, top, null);
         left += (bitmap.getWidth() + 10);
 
         canvas.save();
+        //bitmap = mBitmapManager2.get(R.drawable.earth, ContextCompat.getColor(getContext(), android.R.color.holo_blue_dark), 0.8f);
         bitmap = mBitmapManager2.get(R.drawable.test_pic, 0.8f);
         canvas.drawBitmap(bitmap, left, top + 10, null);
         left += (bitmap.getWidth() + 10);
         canvas.restore();
 
         canvas.save();
+        //bitmap = mBitmapManager2.get(R.drawable.earth, ContextCompat.getColor(getContext(), android.R.color.darker_gray), 3.0f);
         bitmap = mBitmapManager2.get(R.drawable.test_pic, 2.0f);
         canvas.drawBitmap(bitmap, left, top - 16, null);
         canvas.restore();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mBitmapManager2.clear();
     }
 
 }
