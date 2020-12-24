@@ -30,6 +30,8 @@ public class SVGView extends View {
     private Path mPath = new Path();
     private float mRadius;
 
+    protected PaintFlagsDrawFilter mPaintFlagsDrawFilter;
+
     public SVGView(Context context) {
         super(context);
         this.init();
@@ -54,6 +56,8 @@ public class SVGView extends View {
         mPaint.setAntiAlias(true);
 
         mBitmapManager = new BitmapManager(getContext());
+        mPaintFlagsDrawFilter = new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG);
+        mBitmapManager2 = new BitmapManager2(getContext());
     }
 
     @Override
@@ -67,12 +71,14 @@ public class SVGView extends View {
         canvas.restore();*/
 
         canvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.holo_red_dark));
-        this.paintScaleBitmap(canvas);
+        this.paintScaleBitmap2(canvas);
+        //this.paintScaleBitmap(canvas);
         //this.paintPath(canvas);
         //this.paintScalesText(canvas);
         //this.paintScalesBitmapMethod1(canvas);
         //this.paintScalesBitmapMethod2(canvas);
     }
+
 
     private void paintScalesBitmapMethod2(Canvas canvas) {
         mPaint.setStyle(Paint.Style.STROKE);
@@ -279,7 +285,7 @@ public class SVGView extends View {
             int intrinsicHeight = drawable.getIntrinsicHeight();
             Bitmap bitmap = Bitmap.createBitmap((int) (intrinsicWidth * scale), (int) (intrinsicHeight * scale), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
-            canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG));
+            //canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG));
             drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
             drawable.draw(canvas);
 
@@ -287,6 +293,87 @@ public class SVGView extends View {
         } else {
             throw new IllegalArgumentException("unsupported drawable type");
         }
+    }
+
+    private BitmapManager2 mBitmapManager2;
+
+    private void paintScaleBitmap2(Canvas canvas) {
+        //canvas.setDrawFilter(mPaintFlagsDrawFilter);
+
+        //---------------------------方法１-------------------------
+        //原图
+        float left = 10, top = 20;
+        //Bitmap bitmap = mBitmapManager.get(R.drawable.test_pic);
+        Bitmap bitmap = mBitmapManager2.get(R.drawable.test_pic);
+        canvas.drawBitmap(bitmap, left, top, null);
+        left += bitmap.getWidth();
+
+        canvas.save();
+        canvas.scale(0.8f, 0.8f);
+        canvas.drawBitmap(bitmap, left + 20, top + 10, null);
+        canvas.restore();
+
+        canvas.save();
+        canvas.scale(2f, 2f);
+        canvas.drawBitmap(bitmap, left, top - 16, null);
+        canvas.restore();
+
+        //-------------------------方法２---------------------------
+        //原图
+        left += 3.8f * bitmap.getWidth();
+        canvas.drawBitmap(bitmap, left, top, null);
+        left += (bitmap.getWidth() + 10);
+
+        canvas.save();
+        bitmap = BitmapHelper.scale(bitmap, 0.8f);
+        canvas.drawBitmap(bitmap, left, top + 10, null);
+        left += (bitmap.getWidth() + 10);
+        canvas.restore();
+
+        canvas.save();
+        bitmap = BitmapHelper.scale(bitmap, 2.4f);
+        canvas.drawBitmap(bitmap, left, top - 16, null);
+        canvas.restore();
+
+        //-------------------------方法3---------------------------
+        //原图
+        left = 10;
+        top = 160;
+        bitmap = mBitmapManager2.get(R.drawable.test_pic);
+        canvas.drawBitmap(bitmap, left, top, null);
+        left += (bitmap.getWidth() + 10);
+
+        //原图
+        canvas.save();
+        bitmap = mBitmapManager2.get(R.drawable.test_pic_small);
+        canvas.drawBitmap(bitmap, left, top + 10, null);
+        left += (bitmap.getWidth() + 10);
+        canvas.restore();
+
+        //原图
+        canvas.save();
+        bitmap = mBitmapManager2.get(R.drawable.test_pic_big);
+        canvas.drawBitmap(bitmap, left, top - 16, null);
+        left += (bitmap.getWidth() + 10);
+        canvas.restore();
+
+        //-------------------------方法4---------------------------
+        //原图
+        top = 160;
+        bitmap = mBitmapManager2.get(R.drawable.test_pic);
+        canvas.drawBitmap(bitmap, left, top, null);
+        left += (bitmap.getWidth() + 10);
+
+        canvas.save();
+        bitmap = mBitmapManager2.get(R.drawable.test_pic, 0.8f);
+        canvas.drawBitmap(bitmap, left, top + 10, null);
+        left += (bitmap.getWidth() + 10);
+        canvas.restore();
+
+        canvas.save();
+        bitmap = mBitmapManager2.get(R.drawable.test_pic, 2.0f);
+        canvas.drawBitmap(bitmap, left, top - 16, null);
+        canvas.restore();
     }
 
 }
