@@ -141,7 +141,7 @@ public class BitmapManager {
     public static Bitmap rotate(Bitmap src, float degrees) {
         Matrix matrix = new Matrix();
         matrix.setRotate(degrees);
-        Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, false);
+        Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
         if (dst.equals(src)) {
             return dst;
         }

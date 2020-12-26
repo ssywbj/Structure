@@ -4,11 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
@@ -58,6 +60,8 @@ public class SVGView extends View {
         mBitmapManager = new BitmapManager(getContext());
         mPaintFlagsDrawFilter = new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG);
         mBitmapManager2 = new BitmapManager2(getContext());
+
+        mPaintRect.setStyle(Paint.Style.FILL);
     }
 
     @Override
@@ -71,6 +75,7 @@ public class SVGView extends View {
         canvas.restore();*/
 
         canvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.holo_red_dark));
+        //this.paintRect(canvas);
         this.paintScaleBitmap2(canvas);
         //this.paintScaleBitmap(canvas);
         //this.paintPath(canvas);
@@ -338,7 +343,7 @@ public class SVGView extends View {
         //-------------------------方法3---------------------------
         //原图
         left = 10;
-        top = 260;
+        top = 160;
         bitmap = mBitmapManager2.get(R.drawable.test_pic);
         canvas.drawBitmap(bitmap, left, top, null);
         left += (bitmap.getWidth() + 10);
@@ -346,6 +351,7 @@ public class SVGView extends View {
         //原图
         canvas.save();
         bitmap = mBitmapManager2.get(R.drawable.test_pic_small);
+        //bitmap = BitmapManager.rotate(bitmap, 30);
         canvas.drawBitmap(bitmap, left, top + 10, null);
         left += (bitmap.getWidth() + 10);
         canvas.restore();
@@ -359,10 +365,9 @@ public class SVGView extends View {
 
         //-------------------------方法4---------------------------
         //原图
-        top = 260;
-        left -= 50;
-        //bitmap = mBitmapManager2.get(R.drawable.earth, ContextCompat.getColor(getContext(), android.R.color.holo_blue_bright));
-        bitmap = mBitmapManager2.get(R.drawable.test_pic);
+        top = 160;
+        //bitmap = mBitmapManager2.get(R.drawable.test_pic);
+        bitmap = mBitmapManager2.getRotate(R.drawable.test_pic, 45);
         canvas.drawBitmap(bitmap, left, top, null);
         left += (bitmap.getWidth() + 10);
 
@@ -376,6 +381,7 @@ public class SVGView extends View {
         canvas.save();
         //bitmap = mBitmapManager2.get(R.drawable.earth, ContextCompat.getColor(getContext(), android.R.color.darker_gray), 3.0f);
         bitmap = mBitmapManager2.get(R.drawable.test_pic, 2.0f);
+        //bitmap = BitmapHelper.scale(mBitmapManager2.get(R.drawable.test_pic), 2);
         canvas.drawBitmap(bitmap, left, top - 16, null);
         canvas.restore();
     }
@@ -384,6 +390,32 @@ public class SVGView extends View {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mBitmapManager2.clear();
+    }
+
+    private final RectF mRectF = new RectF();
+    private final RectF mRectFDst = new RectF();
+    private final Paint mPaintRect = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    private void paintRect(Canvas canvas) {
+        canvas.setDrawFilter(mPaintFlagsDrawFilter);
+
+        mRectF.setEmpty();
+        Bitmap bitmap = mBitmapManager2.get(R.drawable.number_5_big);
+        int left = 100;
+        int top = 10;
+        mRectF.set(left, top, bitmap.getWidth() + left, bitmap.getHeight() + top);
+        mPaintRect.setColor(Color.BLUE);
+        canvas.drawRect(mRectF, mPaintRect);
+        canvas.drawBitmap(bitmap, null, mRectF, null);
+
+        Matrix matrix = new Matrix();
+        mRectFDst.setEmpty();
+        int degrees = 90;
+        matrix.setRotate(degrees, mRectF.centerX(), mRectF.centerY());
+        matrix.mapRect(mRectFDst, mRectF);
+        mPaintRect.setColor(Color.BLACK);
+        canvas.drawRect(mRectFDst, mPaintRect);
+        canvas.drawBitmap(BitmapHelper.rotate(bitmap, degrees), null, mRectFDst, null);
     }
 
 }

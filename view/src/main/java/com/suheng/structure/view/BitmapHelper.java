@@ -14,12 +14,16 @@ import androidx.core.content.ContextCompat;
 
 public class BitmapHelper {
 
-    public static Bitmap get(Context context, @DrawableRes int resId, int color, float scale) {
+    public static Bitmap get(Context context, @DrawableRes int resId, int color, float scale, float degrees) {
         Drawable drawable = ContextCompat.getDrawable(context, resId);
         if (color != Integer.MAX_VALUE) {
             drawable.setTint(color);
         }
-        return drawableToBitmap(drawable, scale);
+        return drawableToBitmap(drawable, scale, degrees);
+    }
+
+    public static Bitmap get(Context context, @DrawableRes int resId, int color, float scale) {
+        return get(context, resId, color, scale, 0);
     }
 
     public static Bitmap get(Context context, @DrawableRes int resId, int color) {
@@ -34,7 +38,7 @@ public class BitmapHelper {
         return get(context, resId, Integer.MAX_VALUE);
     }
 
-    public static Bitmap drawableToBitmap(Drawable drawable, float scale) {
+    public static Bitmap drawableToBitmap(Drawable drawable, float scale, float degrees) {
         final int intrinsicWidth = drawable.getIntrinsicWidth();
         final int intrinsicHeight = drawable.getIntrinsicHeight();
         Bitmap bitmap = Bitmap.createBitmap((int) (intrinsicWidth * scale), (int) (intrinsicHeight * scale), Bitmap.Config.ARGB_8888);
@@ -43,22 +47,36 @@ public class BitmapHelper {
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
 
+        if (degrees != 0) {
+            bitmap = rotate(bitmap, degrees);
+        }
         return bitmap;
+    }
+
+    public static Bitmap drawableToBitmap(Drawable drawable, float scale) {
+        return drawableToBitmap(drawable, scale, 0);
     }
 
     public static Bitmap drawableToBitmap(Drawable drawable) {
         return drawableToBitmap(drawable, 1);
     }
 
-    public static Bitmap rotate(Bitmap src, float degrees) {
+    public static Bitmap rotate(Bitmap src, float degrees, boolean isRecycle) {
         Matrix matrix = new Matrix();
         matrix.setRotate(degrees);
-        Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, false);
+        Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
         if (dst.equals(src)) {
             return dst;
         }
-        src.recycle();
+
+        if (isRecycle) {
+            src.recycle();
+        }
         return dst;
+    }
+
+    public static Bitmap rotate(Bitmap src, float degrees) {
+        return rotate(src, degrees, false);
     }
 
     /**
@@ -66,8 +84,8 @@ public class BitmapHelper {
      */
     public static Bitmap scale(Bitmap src, float ratio, boolean isRecycle) {
         Matrix matrix = new Matrix();
-        matrix.preScale(ratio, ratio);
-        Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, false);
+        matrix.setScale(ratio, ratio);
+        Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
         if (dst.equals(src)) {
             return dst;
         }
@@ -107,5 +125,28 @@ public class BitmapHelper {
         canvas.drawBitmap(right, rightRect, rightRectT, null);
         return dst;
     }
+
+    /*public static Bitmap drawableToBitmap(Drawable drawable, float scale) {
+        final int intrinsicWidth = drawable.getIntrinsicWidth();
+        final int intrinsicHeight = drawable.getIntrinsicHeight();
+
+        final RectF rectFSrc = new RectF();
+        rectFSrc.set(0, 0, intrinsicWidth * scale, intrinsicHeight * scale);
+        final RectF rectFDst = new RectF();
+        Matrix matrix = new Matrix();
+        final int degrees = 30;
+        matrix.setRotate(degrees);
+        //matrix.postScale(scale, scale);
+        matrix.mapRect(rectFDst, rectFSrc);
+
+        Bitmap bitmap = Bitmap.createBitmap((int) rectFDst.width(), (int) rectFDst.height(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.YELLOW);
+        canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG));
+        canvas.rotate(degrees, rectFSrc.centerX(), rectFSrc.centerY());
+        drawable.setBounds(0, 0, (int) rectFSrc.width(), (int) rectFSrc.height());
+        drawable.draw(canvas);
+        return bitmap;
+    }*/
 
 }

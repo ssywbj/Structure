@@ -18,15 +18,19 @@ public class BitmapManager2 {
         mMapBitmap = new HashMap<>();
     }
 
-    public Bitmap get(@DrawableRes int resId, int color, float scale) {
-        String key = resId + "_" + color + "_" + scale;
+    public Bitmap get(@DrawableRes int resId, int color, float scale, float degrees) {
+        String key = resId + "_" + color + "_" + scale + "_" + degrees;
         if (mMapBitmap.containsKey(key)) {
             return mMapBitmap.get(key);
         } else {
-            Bitmap bitmap = BitmapHelper.get(mContext, resId, color, scale);
+            Bitmap bitmap = BitmapHelper.get(mContext, resId, color, scale, degrees);
             mMapBitmap.put(key, bitmap);
             return bitmap;
         }
+    }
+
+    public Bitmap get(@DrawableRes int resId, int color, float scale) {
+        return get(resId, color, scale, 0);
     }
 
     public Bitmap get(@DrawableRes int resId, int color) {
@@ -39,6 +43,10 @@ public class BitmapManager2 {
 
     public Bitmap get(@DrawableRes int resId) {
         return get(resId, Integer.MAX_VALUE);
+    }
+
+    public Bitmap getRotate(@DrawableRes int resId, float degrees) {
+        return get(resId, Integer.MAX_VALUE, 1, degrees);
     }
 
     public void clear() {
