@@ -3,10 +3,12 @@ package com.suheng.structure.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.DrawableRes;
@@ -126,27 +128,39 @@ public class BitmapHelper {
         return dst;
     }
 
-    /*public static Bitmap drawableToBitmap(Drawable drawable, float scale) {
+    public static Bitmap drawableToBitmap2(Drawable drawable, float scale, int degrees) {
         final int intrinsicWidth = drawable.getIntrinsicWidth();
         final int intrinsicHeight = drawable.getIntrinsicHeight();
 
         final RectF rectFSrc = new RectF();
         rectFSrc.set(0, 0, intrinsicWidth * scale, intrinsicHeight * scale);
+
         final RectF rectFDst = new RectF();
-        Matrix matrix = new Matrix();
-        final int degrees = 30;
-        matrix.setRotate(degrees);
-        //matrix.postScale(scale, scale);
-        matrix.mapRect(rectFDst, rectFSrc);
+        final boolean needRotate = (degrees % 360 != 0);
+        if (needRotate) {
+            Matrix matrix = new Matrix();
+            matrix.setRotate(degrees);
+            matrix.mapRect(rectFDst, rectFSrc);
+        } else {
+            rectFDst.set(rectFSrc);
+        }
 
         Bitmap bitmap = Bitmap.createBitmap((int) rectFDst.width(), (int) rectFDst.height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.drawColor(Color.YELLOW);
-        canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG));
-        canvas.rotate(degrees, rectFSrc.centerX(), rectFSrc.centerY());
+        canvas.drawColor(Color.BLACK);
+
+        if (needRotate) {
+            if (degrees % 180 != 0) {
+                canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG));
+                canvas.translate((rectFDst.width() - rectFSrc.width()) / 2f, (rectFDst.height() - rectFSrc.height()) / 2f);
+            }
+            canvas.rotate(degrees, rectFSrc.centerX(), rectFSrc.centerY());
+        }
+
         drawable.setBounds(0, 0, (int) rectFSrc.width(), (int) rectFSrc.height());
         drawable.draw(canvas);
+
         return bitmap;
-    }*/
+    }
 
 }

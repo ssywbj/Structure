@@ -366,20 +366,20 @@ public class SVGView extends View {
         //-------------------------方法4---------------------------
         //原图
         top = 160;
-        //bitmap = mBitmapManager2.get(R.drawable.test_pic);
-        bitmap = mBitmapManager2.getRotate(R.drawable.test_pic, 45);
+        bitmap = mBitmapManager2.get(R.drawable.test_pic);
+        //bitmap = mBitmapManager2.getRotate(R.drawable.test_pic, 45);
         canvas.drawBitmap(bitmap, left, top, null);
         left += (bitmap.getWidth() + 10);
 
         canvas.save();
-        //bitmap = mBitmapManager2.get(R.drawable.earth, ContextCompat.getColor(getContext(), android.R.color.holo_blue_dark), 0.8f);
+        //bitmap = mBitmapManager2.get(R.drawable.earth, 0.8f);
         bitmap = mBitmapManager2.get(R.drawable.test_pic, 0.8f);
         canvas.drawBitmap(bitmap, left, top + 10, null);
         left += (bitmap.getWidth() + 10);
         canvas.restore();
 
         canvas.save();
-        //bitmap = mBitmapManager2.get(R.drawable.earth, ContextCompat.getColor(getContext(), android.R.color.darker_gray), 3.0f);
+        //bitmap = mBitmapManager2.get(R.drawable.earth, 2.0f);
         bitmap = mBitmapManager2.get(R.drawable.test_pic, 2.0f);
         //bitmap = BitmapHelper.scale(mBitmapManager2.get(R.drawable.test_pic), 2);
         canvas.drawBitmap(bitmap, left, top - 16, null);
@@ -411,11 +411,18 @@ public class SVGView extends View {
         Matrix matrix = new Matrix();
         mRectFDst.setEmpty();
         int degrees = 90;
-        matrix.setRotate(degrees, mRectF.centerX(), mRectF.centerY());
+        matrix.setRotate(degrees, mRectF.centerX(), mRectF.centerY());//先旋转
+        //matrix.postTranslate(100, 0);//后平移
+        matrix.postScale(1.3f, 1.3f, mRectF.centerX(), mRectF.centerY());//后放大
         matrix.mapRect(mRectFDst, mRectF);
         mPaintRect.setColor(Color.BLACK);
         canvas.drawRect(mRectFDst, mPaintRect);
         canvas.drawBitmap(BitmapHelper.rotate(bitmap, degrees), null, mRectFDst, null);
+
+        top += 2 * mRectF.width();
+        Drawable drawable = ContextCompat.getDrawable(getContext(), R.drawable.test_pic);
+        bitmap = BitmapHelper.drawableToBitmap2(drawable, 2.4f, 540);
+        canvas.drawBitmap(bitmap, left, top, null);
     }
 
 }
