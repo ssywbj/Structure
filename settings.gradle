@@ -1,3 +1,4 @@
+include ':dreamservice'
 include ':wallpaperpicker:watchhome'
 include ':contentprovider'
 include ':database'
