@@ -172,7 +172,7 @@ public class NumberBeatView extends WatchFaceView {
     }
 
     @Override
-    protected void updateTime() {
+    public void updateTime() {
         super.updateTime();
         mHourAnimatorValue = (mHour + mMinute / 60f) / 12;
         mMinuteAnimatorValue = (mMinute + mSecond / 60f) / 60;

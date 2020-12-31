@@ -100,7 +100,7 @@ public class ClassicPointerWatchFace extends WatchFaceView {
 
     private final Timer mTimer = new Timer();
 
-    private boolean mRunningThread = true;
+    private boolean mRunningThread = false;
 
     private Runnable mRunnable = new Runnable() {
         @Override

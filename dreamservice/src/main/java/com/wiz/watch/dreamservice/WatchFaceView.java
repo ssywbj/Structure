@@ -151,7 +151,7 @@ public class WatchFaceView extends View {
         this.notifyMsgUpdateTimePerSecond();
     }
 
-    protected void updateTime() {
+    public void updateTime() {
         mHour = getHour();
         mMinute = Calendar.getInstance().get(Calendar.MINUTE);
         mSecond = Calendar.getInstance().get(Calendar.SECOND);
