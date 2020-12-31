@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat;
 
 import com.wiz.watch.dreamservice.utils.DimenUtil;
 
+import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
 public class ClassicPointerWatchFace extends WatchFaceView {
@@ -76,6 +77,18 @@ public class ClassicPointerWatchFace extends WatchFaceView {
         this.createTime(null);
         mTicker.run();
         handleUpdateTimePerMinute();
+        /*mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                updateTime();
+                Log.d(mTAG, "mTimer.schedule, hour = " + mHour + ", minute: " + mMinute + ", second: " + mSecond
+                        + ", hour value: " + mHourAnimatorValue + ", minute value: " + mMinuteAnimatorValue
+                        + ", second value: " + mSecondAnimatorValue);
+                invalidate();
+            }
+        }, 0, 1000);*/
+
+        new Thread(mRunnable).start();
     }
 
     @Override
@@ -85,12 +98,38 @@ public class ClassicPointerWatchFace extends WatchFaceView {
         mRadiusOuter = screenRadius - DimenUtil.dip2px(mContext, 3);
     }
 
+    private final Timer mTimer = new Timer();
+
+    private boolean mRunningThread = true;
+
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            while (mRunningThread) {
+                try {
+                    updateTime();
+                    Log.d(mTAG, "mRunnable, hour = " + mHour + ", minute: " + mMinute + ", second: " + mSecond
+                            + ", hour value: " + mHourAnimatorValue + ", minute value: " + mMinuteAnimatorValue
+                            + ", second value: " + mSecondAnimatorValue);
+                    invalidate();
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
+
     @Override
     public void destroy() {
         super.destroy();
         mBitmapManager.clear();
         getHandler().removeCallbacks(mTicker);
         getHandler().removeMessages(MSG_UPDATE_RATE_MS);
+        mTimer.cancel();
+
+
+        mRunningThread = false;
     }
 
     @Override
@@ -176,7 +215,7 @@ public class ClassicPointerWatchFace extends WatchFaceView {
         mPaintCenterCircle.setColor(color);
         canvas.drawCircle(0, 0, mCenterCircleRadius / 1.5f, mPaintCenterCircle);
 
-        /*canvas.save();
+        canvas.save();
         canvas.rotate(rateSecond * 360);
         if (mStyle == 1) {
             color = Color.GREEN;
@@ -186,7 +225,7 @@ public class ClassicPointerWatchFace extends WatchFaceView {
         mPaintPointer.setColor(color);
         mPaintPointer.setStrokeWidth(mPointerHourWidth / 3f);
         canvas.drawLine(0, 2.4f * mScaleHourLen, 0, -(mRadiusOuter - 1.75f * mScaleHourLen), mPaintPointer);
-        canvas.restore();*/
+        canvas.restore();
 
         mPaintCenterCircle.setColor(Color.parseColor("#B3A100"));
         canvas.drawCircle(0, 0, mCenterCircleRadius / 4f, mPaintCenterCircle);
@@ -196,25 +235,26 @@ public class ClassicPointerWatchFace extends WatchFaceView {
         mStyle = style;
     }
 
-    private static final long UPDATE_RATE_MS = TimeUnit.MINUTES.toMillis(1);
+    private static final long UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
     private static final int MSG_UPDATE_RATE_MS = 1001;
 
     private void handleUpdateTimePerMinute() {
-        this.updateTime();
+        /*this.updateTime();
 
         Log.d(mTAG, "handleUpdateTimePerMinute, hour = " + mHour + ", minute: " + mMinute + ", second: " + mSecond
                 + ", hour value: " + mHourAnimatorValue + ", minute value: " + mMinuteAnimatorValue
                 + ", second value: " + mSecondAnimatorValue);
 
         long delayMs = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
-        getHandler().sendEmptyMessageDelayed(MSG_UPDATE_RATE_MS, delayMs);
+        getHandler().sendEmptyMessageDelayed(MSG_UPDATE_RATE_MS, delayMs);*/
     }
 
     @Override
     protected void dispatchMsg(Message msg) {
         super.dispatchMsg(msg);
         if (msg.what == MSG_UPDATE_RATE_MS) {
-            handleUpdateTimePerMinute();
+            //handleUpdateTimePerMinute();
+            //invalidate();
         }
     }
 
@@ -222,7 +262,7 @@ public class ClassicPointerWatchFace extends WatchFaceView {
 
         @Override
         public void run() {
-            onTimeChanged();
+            //onTimeChanged();
 
             long now = SystemClock.uptimeMillis();
             long next = now + (UPDATE_RATE_MS - now % UPDATE_RATE_MS);

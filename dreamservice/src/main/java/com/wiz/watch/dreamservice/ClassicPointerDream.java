@@ -1,9 +1,14 @@
 package com.wiz.watch.dreamservice;
 
+import android.os.Handler;
+import android.os.Message;
 import android.service.dreams.DreamService;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.lang.reflect.Method;
+import java.util.Timer;
 
 public class ClassicPointerDream extends DreamService {
     public static final String TAG = ClassicPointerDream.class.getSimpleName();
@@ -13,6 +18,8 @@ public class ClassicPointerDream extends DreamService {
         super.onCreate();
         Log.d(TAG, "------onCreate-------");
     }
+
+    private ClassicPointerWatchFace mClassicPointerWatchFace;
 
     @Override
     public void onAttachedToWindow() {
@@ -24,7 +31,10 @@ public class ClassicPointerDream extends DreamService {
         setFullscreen(true);
         //Set the dream layout
         setContentView(R.layout.view_classic_pointer_watch_face);
+        mClassicPointerWatchFace = findViewById(R.id.classic_pointer_watch_face);
     }
+
+    private final Timer mTimer = new Timer();
 
     @Override
     public void onDreamingStarted() {
@@ -40,12 +50,25 @@ public class ClassicPointerDream extends DreamService {
         } catch (Exception e) {
             Log.e(TAG, "reflect invoke error: " + e.toString());
         }
+
+        /*mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Log.d(TAG, "mTimer.schedule, hour = ");
+                mClassicPointerWatchFace.updateTime();
+                mClassicPointerWatchFace.invalidate();
+            }
+        }, 0, 1000);
+
+        mHandler.sendEmptyMessage(1);*/
     }
 
     @Override
     public void onDreamingStopped() {
         super.onDreamingStopped();
         Log.d(TAG, "------onDreamingStopped-------");
+        mTimer.cancel();
+        mHandler.removeMessages(1);
     }
 
     @Override
@@ -59,5 +82,16 @@ public class ClassicPointerDream extends DreamService {
         super.onDestroy();
         Log.d(TAG, "------onDestroy-------");
     }
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void dispatchMessage(@NonNull Message msg) {
+            super.dispatchMessage(msg);
+            Log.d(TAG, "dispatchMessage, hour = ");
+            mClassicPointerWatchFace.updateTime();
+            mClassicPointerWatchFace.invalidate();
+            mHandler.sendEmptyMessageDelayed(1, 1000);
+        }
+    };
 
 }
