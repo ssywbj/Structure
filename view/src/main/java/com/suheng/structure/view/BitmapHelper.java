@@ -127,7 +127,7 @@ public class BitmapHelper {
         return dst;
     }
 
-    public static Bitmap drawableToBitmap2(Drawable drawable, float scale, int degrees) {
+    public static Bitmap drawableToBitmap2(Drawable drawable, float scale, float degrees) {
         final int intrinsicWidth = drawable.getIntrinsicWidth();
         final int intrinsicHeight = drawable.getIntrinsicHeight();
 

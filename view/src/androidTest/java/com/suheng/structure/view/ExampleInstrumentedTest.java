@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -28,23 +29,29 @@ public class ExampleInstrumentedTest {
         assertEquals("com.suheng.structure.view", appContext.getPackageName());
     }
 
-    @Test
-    public void drawableToBitmap() {
+    private Drawable mDrawable;
+    private float mScale, mDegrees;
+
+    @Before
+    public void drawableInit() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        Drawable drawable = ContextCompat.getDrawable(appContext, R.drawable.number_5_big);
+        mDrawable = ContextCompat.getDrawable(appContext, R.drawable.number_5_big);
+        mScale = 2;
+        mDegrees = 90;
+    }
+
+    @Test
+    public void drawableToBitmap() {
         long currentTimeMillis = System.currentTimeMillis();
-        BitmapHelper.drawableToBitmap(drawable, 2f, 90);
+        BitmapHelper.drawableToBitmap(mDrawable, mScale, mDegrees);
         System.out.println("1, take time: " + (System.currentTimeMillis() - currentTimeMillis));
     }
 
     @Test
     public void drawableToBitmap2() {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        Drawable drawable = ContextCompat.getDrawable(appContext, R.drawable.number_5_big);
         long currentTimeMillis = System.currentTimeMillis();
-        BitmapHelper.drawableToBitmap2(drawable, 2f, 90);
+        BitmapHelper.drawableToBitmap2(mDrawable, mScale, mDegrees);
         System.out.println("2, take time: " + (System.currentTimeMillis() - currentTimeMillis));
     }
 
