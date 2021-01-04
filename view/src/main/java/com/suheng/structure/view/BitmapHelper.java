@@ -3,7 +3,6 @@ package com.suheng.structure.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
@@ -49,7 +48,7 @@ public class BitmapHelper {
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
 
-        if (degrees != 0) {
+        if (degrees % 360 != 0) {
             bitmap = rotate(bitmap, degrees);
         }
         return bitmap;
@@ -147,7 +146,7 @@ public class BitmapHelper {
 
         Bitmap bitmap = Bitmap.createBitmap((int) rectFDst.width(), (int) rectFDst.height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.drawColor(Color.BLACK);
+        //canvas.drawColor(Color.BLACK);
 
         if (needRotate) {
             if (degrees % 180 != 0) {
