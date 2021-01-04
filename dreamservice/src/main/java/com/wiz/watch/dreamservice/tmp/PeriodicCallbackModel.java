@@ -21,15 +21,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.service.dreams.DreamService;
+import android.util.Log;
 
 import androidx.annotation.VisibleForTesting;
 
-import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 import static android.content.Intent.ACTION_DATE_CHANGED;
 import static android.content.Intent.ACTION_TIMEZONE_CHANGED;
@@ -61,7 +61,9 @@ final class PeriodicCallbackModel {
 
     private static Handler sHandler;
 
-    /** Reschedules callbacks when the device time changes. */
+    /**
+     * Reschedules callbacks when the device time changes.
+     */
     @SuppressWarnings("FieldCanBeLocal")
     private final BroadcastReceiver mTimeChangedReceiver = new TimeChangedReceiver();
 
@@ -80,15 +82,16 @@ final class PeriodicCallbackModel {
 
     /**
      * @param runnable to be called every minute
-     * @param offset an offset applied to the minute to control when the callback occurs
+     * @param offset   an offset applied to the minute to control when the callback occurs
      */
     void addMinuteCallback(Runnable runnable, long offset) {
+        Log.d("ClassicPointerDream", "addMinuteCallback: " + runnable + ", offset: " + offset);
         addPeriodicCallback(runnable, Period.MINUTE, offset);
     }
 
     /**
      * @param runnable to be called every quarter-hour
-     * @param offset an offset applied to the quarter-hour to control when the callback occurs
+     * @param offset   an offset applied to the quarter-hour to control when the callback occurs
      */
     void addQuarterHourCallback(Runnable runnable, long offset) {
         addPeriodicCallback(runnable, Period.QUARTER_HOUR, offset);
@@ -96,7 +99,7 @@ final class PeriodicCallbackModel {
 
     /**
      * @param runnable to be called every hour
-     * @param offset an offset applied to the hour to control when the callback occurs
+     * @param offset   an offset applied to the hour to control when the callback occurs
      */
     void addHourCallback(Runnable runnable, long offset) {
         addPeriodicCallback(runnable, Period.HOUR, offset);
@@ -104,7 +107,7 @@ final class PeriodicCallbackModel {
 
     /**
      * @param runnable to be called every midnight
-     * @param offset an offset applied to the midnight to control when the callback occurs
+     * @param offset   an offset applied to the midnight to control when the callback occurs
      */
     void addMidnightCallback(Runnable runnable, long offset) {
         addPeriodicCallback(runnable, Period.MIDNIGHT, offset);
@@ -114,6 +117,7 @@ final class PeriodicCallbackModel {
      * @param runnable to be called periodically
      */
     private void addPeriodicCallback(Runnable runnable, Period period, long offset) {
+        Log.d("ClassicPointerDream", "addPeriodicCallback: " + runnable + ", period: " + period + ", offset: " + offset);
         final PeriodicRunnable periodicRunnable = new PeriodicRunnable(runnable, period, offset);
         mPeriodicRunnables.add(periodicRunnable);
         periodicRunnable.schedule();
@@ -135,10 +139,10 @@ final class PeriodicCallbackModel {
     /**
      * Return the delay until the given {@code period} elapses adjusted by the given {@code offset}.
      *
-     * @param now the current time
+     * @param now    the current time
      * @param period the frequency with which callbacks should be given
      * @param offset an offset to add to the normal period; allows the callback to be made relative
-     *      to the normally scheduled period end
+     *               to the normally scheduled period end
      * @return the time delay from {@code now} to schedule the callback
      */
     @VisibleForTesting
@@ -185,12 +189,14 @@ final class PeriodicCallbackModel {
     }
 
     private static DreamService mDreamService;
+
     public static DreamService getInstance() {
         if (mDreamService == null) {
             mDreamService = new DreamService();
         }
         return mDreamService;
     }
+
     /**
      * Schedules the execution of the given delegate Runnable at the next callback time.
      */
@@ -208,8 +214,8 @@ final class PeriodicCallbackModel {
 
         @Override
         public void run() {
-            LOGGER.i("Executing periodic callback for %s because the period ended", mPeriod);
-            new Thread(new Runnable() {
+            Log.i("ClassicPointerDream", "Executing periodic callback for %s because the period ended: " + mPeriod);
+            /*new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -228,20 +234,25 @@ final class PeriodicCallbackModel {
                         LOGGER.e("getMethod !", e);
                     }
                 }
-            }).start();
+            }).start();*/
             mDelegate.run();
             schedule();
         }
 
         private void runAndReschedule() {
-            LOGGER.i("Executing periodic callback for %s because the time changed", mPeriod);
+            Log.i("ClassicPointerDream", "Executing periodic callback for %s because the time changed: " + mPeriod);
             unSchedule();
             mDelegate.run();
             schedule();
         }
 
+        private static final long UPDATE_RATE_MS = TimeUnit.MINUTES.toMillis(1);
+
         private void schedule() {
             final long delay = getDelay(System.currentTimeMillis(), mPeriod, mOffset);
+            //final long delay = 1000;
+            //long delay = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
+            Log.i("ClassicPointerDream", "schedule, delay: " + delay + ", mPeriod: " + mPeriod + ", mOffset: " + mOffset);
             getHandler().postDelayed(this, delay);
         }
 
@@ -256,7 +267,7 @@ final class PeriodicCallbackModel {
     private final class TimeChangedReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            LOGGER.i("TimeChangedReceiver ++++++ ");
+            Log.i("ClassicPointerDream", "TimeChangedReceiver ++++++ ");
             for (PeriodicRunnable periodicRunnable : mPeriodicRunnables) {
                 periodicRunnable.runAndReschedule();
             }

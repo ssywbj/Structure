@@ -215,7 +215,7 @@ public class ClassicPointerWatchFace extends WatchFaceView {
         mPaintCenterCircle.setColor(color);
         canvas.drawCircle(0, 0, mCenterCircleRadius / 1.5f, mPaintCenterCircle);
 
-        canvas.save();
+        /*canvas.save();
         canvas.rotate(rateSecond * 360);
         if (mStyle == 1) {
             color = Color.GREEN;
@@ -225,7 +225,7 @@ public class ClassicPointerWatchFace extends WatchFaceView {
         mPaintPointer.setColor(color);
         mPaintPointer.setStrokeWidth(mPointerHourWidth / 3f);
         canvas.drawLine(0, 2.4f * mScaleHourLen, 0, -(mRadiusOuter - 1.75f * mScaleHourLen), mPaintPointer);
-        canvas.restore();
+        canvas.restore();*/
 
         mPaintCenterCircle.setColor(Color.parseColor("#B3A100"));
         canvas.drawCircle(0, 0, mCenterCircleRadius / 4f, mPaintCenterCircle);

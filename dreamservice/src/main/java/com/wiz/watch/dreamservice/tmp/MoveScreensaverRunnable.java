@@ -31,7 +31,8 @@ public final class MoveScreensaverRunnable implements Runnable {
     /**
      * The duration over which the fade in/out animations occur.
      */
-    private static final long FADE_TIME = 3000L;
+    //private static final long FADE_TIME = 3000L;
+    private static final long FADE_TIME = 0L;
 
     /**
      * Accelerate the hide animation.
