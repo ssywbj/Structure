@@ -8,22 +8,29 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
+import android.graphics.Picture;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 public class SVGView extends View {
+    private static final String TAG = SVGView.class.getSimpleName();
     private PointF mPointCenter = new PointF();
     private Paint mPaint = new Paint();
     private Rect mRect = new Rect();
@@ -62,11 +69,15 @@ public class SVGView extends View {
         mBitmapManager2 = new BitmapManager2(getContext());
 
         mPaintRect.setStyle(Paint.Style.FILL);
+
+        this.paintPicture();
+        Log.d(TAG, "-----------init-------");
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        Log.d(TAG, "-----------onDraw-------");
         /*mRect.set(0, 0, 400, 400);
         //canvas.clipRect(mRect);
         canvas.save();
@@ -76,12 +87,16 @@ public class SVGView extends View {
 
         canvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.holo_red_dark));
         //this.paintRect(canvas);
-        this.paintScaleBitmap2(canvas);
+        //this.paintScaleBitmap2(canvas);
         //this.paintScaleBitmap(canvas);
         //this.paintPath(canvas);
         //this.paintScalesText(canvas);
         //this.paintScalesBitmapMethod1(canvas);
         //this.paintScalesBitmapMethod2(canvas);
+
+        //canvas.drawPicture(mPicture);
+        canvas.drawPicture(mTimePicture.getTmpPicture());
+        //mTimePicture.draw(canvas);
     }
 
 
@@ -390,6 +405,8 @@ public class SVGView extends View {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mBitmapManager2.clear();
+        mTimePicture.mHandler.removeMessages(-1);
+        Log.d(TAG, "------- onDetachedFromWindow --------");
     }
 
     private final RectF mRectF = new RectF();
@@ -424,5 +441,71 @@ public class SVGView extends View {
         bitmap = BitmapHelper.drawableToBitmap2(drawable, 2.4f, 540);
         canvas.drawBitmap(bitmap, left, top, null);
     }
+
+    private final Picture mPicture = new Picture();
+
+    private void paintPicture() {
+        postInvalidate(3, 3, 5, 5);
+        Canvas canvas = mPicture.beginRecording(100, 100);
+        Bitmap bitmap = mBitmapManager2.get(R.drawable.number_5_big);
+        canvas.drawBitmap(bitmap, 0, 0, null);
+        mPicture.endRecording();
+
+        mTimePicture.paintPicture();
+        mTimePicture.invalidateTmp();
+    }
+
+    private final TimePicture mTimePicture = new TimePicture();
+
+    private class TimePicture extends Picture {
+        private final Picture mTmpPicture = new Picture();
+        private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private int mCount;
+
+        private void paintPicture() {
+            /*Canvas canvas = mTmpPicture.beginRecording(100, 100);
+            Bitmap bitmap = mBitmapManager2.get(R.drawable.number_5);
+            canvas.drawBitmap(bitmap, 0, 0, null);
+            mTmpPicture.endRecording();*/
+            mPaint.setColor(Color.WHITE);
+            mPaint.setTextSize(50);
+            mPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        }
+
+        public Picture getTmpPicture() {
+            return mTmpPicture;
+        }
+
+        public void invalidateTmp() {
+            mHandler.sendEmptyMessage(-1);
+        }
+
+        @Override
+        public void draw(@NonNull Canvas canvas) {
+            super.draw(canvas);
+            /*Bitmap bitmap = mBitmapManager2.get(R.drawable.number_5);
+            canvas.drawBitmap(bitmap, 0, 0, null);*/
+
+            canvas.drawText(String.valueOf(mCount), 50, 50, mPaint);
+            mHandler.sendEmptyMessageDelayed(-1, 1000);
+
+            //canvas.drawPicture(this);
+        }
+
+        Handler mHandler = new Handler() {
+            @Override
+            public void dispatchMessage(@NonNull Message msg) {
+                super.dispatchMessage(msg);
+                Canvas canvas = mTmpPicture.beginRecording(100, 100);
+                draw(canvas);
+                mTmpPicture.endRecording();
+                mCount++;
+                Log.d(TAG, "Handler: " + mCount);
+                //invalidate();
+                postInvalidate(200, 200, 300, 300);
+            }
+        };
+    }
+
 
 }
