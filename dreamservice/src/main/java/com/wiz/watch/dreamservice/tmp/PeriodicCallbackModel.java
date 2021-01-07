@@ -26,6 +26,7 @@ import android.util.Log;
 
 import androidx.annotation.VisibleForTesting;
 
+import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -65,7 +66,7 @@ final class PeriodicCallbackModel {
      * Reschedules callbacks when the device time changes.
      */
     @SuppressWarnings("FieldCanBeLocal")
-    private final BroadcastReceiver mTimeChangedReceiver = new TimeChangedReceiver();
+    //private final BroadcastReceiver mTimeChangedReceiver = new TimeChangedReceiver();
 
     private final List<PeriodicRunnable> mPeriodicRunnables = new CopyOnWriteArrayList<>();
 
@@ -75,7 +76,7 @@ final class PeriodicCallbackModel {
         timeChangedBroadcastFilter.addAction(ACTION_TIME_CHANGED);
         timeChangedBroadcastFilter.addAction(ACTION_DATE_CHANGED);
         timeChangedBroadcastFilter.addAction(ACTION_TIMEZONE_CHANGED);
-        context.registerReceiver(mTimeChangedReceiver, timeChangedBroadcastFilter);
+        //context.registerReceiver(mTimeChangedReceiver, timeChangedBroadcastFilter);
 
         mDreamService = getInstance();
     }
@@ -215,26 +216,26 @@ final class PeriodicCallbackModel {
         @Override
         public void run() {
             Log.i("ClassicPointerDream", "Executing periodic callback for %s because the period ended: " + mPeriod);
-            /*new Thread(new Runnable() {
+            new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         Class c = Class.forName("android.service.dreams.DreamService");
-                        Method m = c.getMethod("setDozeScreenState",int.class);
+                        /*Method m = c.getMethod("setDozeScreenState",int.class);
                         m.invoke(mDreamService,3);
 
                         SystemClock.sleep(10000);
                         m = c.getMethod("setDozeScreenState",int.class);
-                        m.invoke(mDreamService,4);
+                        m.invoke(mDreamService,4);*/
 
-                        m = c.getMethod("startDozing");
-                        m.invoke(mDreamService);
+                        Method m = c.getMethod("startDozing");
+                        m.invoke(getInstance());
 
                     } catch (Exception e) {
                         LOGGER.e("getMethod !", e);
                     }
                 }
-            }).start();*/
+            }).start();
             mDelegate.run();
             schedule();
         }
@@ -246,12 +247,12 @@ final class PeriodicCallbackModel {
             schedule();
         }
 
-        private static final long UPDATE_RATE_MS = TimeUnit.MINUTES.toMillis(1);
+        private static final long UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(30);
 
         private void schedule() {
-            final long delay = getDelay(System.currentTimeMillis(), mPeriod, mOffset);
+            //final long delay = getDelay(System.currentTimeMillis(), mPeriod, mOffset);
             //final long delay = 1000;
-            //long delay = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
+            long delay = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
             Log.i("ClassicPointerDream", "schedule, delay: " + delay + ", mPeriod: " + mPeriod + ", mOffset: " + mOffset);
             getHandler().postDelayed(this, delay);
         }
@@ -273,4 +274,5 @@ final class PeriodicCallbackModel {
             }
         }
     }
+
 }

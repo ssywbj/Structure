@@ -59,6 +59,7 @@ public class BitmapManager {
      */
     public static Bitmap get(Context context, @DrawableRes int resId, int tintColor) {
         Drawable drawable = ContextCompat.getDrawable(context, resId);
+        BitmapDrawable bitmapDrawable;
         if (drawable == null) {
             return null;
         }
