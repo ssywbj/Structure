@@ -30,6 +30,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
+import java.util.Calendar;
+
 public class SVGView extends View {
     private static final String TAG = SVGView.class.getSimpleName();
     private PointF mPointCenter = new PointF();
@@ -99,15 +101,15 @@ public class SVGView extends View {
         Log.d(TAG, "Picture, w-h: " + mPicture.getWidth() + ", " + mPicture.getHeight());
         Picture tmpPicture = mTimePicture.getTmpPicture();
         //canvas.drawPicture(tmpPicture);
-        canvas.drawPicture(tmpPicture, rectF);
+        //canvas.drawPicture(tmpPicture, rectF);
 
-        canvas.drawPicture(tmpPicture, new RectF(getWidth() / 2f - mTimePicture.mCount / 2f, 100, getWidth() / 2f + mTimePicture.mCount / 2f, 0));
+        canvas.drawPicture(tmpPicture, new RectF(getWidth() / 2f - mTimePicture.mWidth / 2f, 100, getWidth() / 2f + mTimePicture.mWidth / 2f, 0));
         PictureDrawable drawable = new PictureDrawable(tmpPicture);
         Log.d(TAG, "TmpPicture, w-h: " + tmpPicture.getWidth() + ", " + tmpPicture.getHeight()
-                + ", " + mTimePicture.mCount + ", " + mTimePicture.mHeight + ", --: " + drawable.getIntrinsicWidth() + ", " + drawable.getIntrinsicHeight()
-                + ", " + drawable.getBounds());
-        drawable.setBounds(0, 0, 110, 90);
-        drawable.draw(canvas);
+                + ", " + mTimePicture.mWidth + ", " + mTimePicture.mHeight + ", --: " + drawable.getIntrinsicWidth() + ", " + drawable.getIntrinsicHeight()
+                + ", " + drawable.getBounds() + ", " + getWidth() + ", " + getHeight());
+        /*drawable.setBounds(0, 0, 110, 90);
+        drawable.draw(canvas);*/
         //mTimePicture.draw(canvas);
     }
 
@@ -467,12 +469,17 @@ public class SVGView extends View {
         mTimePicture.invalidateTmp();
     }
 
+    @Override
+    public void onDrawForeground(Canvas canvas) {
+        super.onDrawForeground(canvas);
+    }
+
     private RectF rectF;
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        rectF = new RectF(w / 2f - mTimePicture.mCount / 2f, 0, w / 2f + mTimePicture.mCount / 2f, mTimePicture.mHeight);
+        rectF = new RectF(w / 2f - mTimePicture.mWidth / 2f, 0, w / 2f + mTimePicture.mWidth / 2f, mTimePicture.mHeight);
     }
 
     private final TimePicture mTimePicture = new TimePicture();
@@ -480,26 +487,9 @@ public class SVGView extends View {
     private class TimePicture extends Picture {
         private final Picture mTmpPicture = new Picture();
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private int mCount, mHeight;
-
+        private int mWidth, mHeight;
 
         private void paintPicture() {
-            Canvas canvas = mTmpPicture.beginRecording(0, 0);
-            Bitmap bitmap = mBitmapManager2.get(R.drawable.number_5);
-            //canvas.drawColor(Color.BLUE);
-            float left = 0;
-            canvas.drawBitmap(bitmap, left, 0, null);
-            left += bitmap.getWidth();
-            canvas.drawBitmap(bitmap, left, 0, null);
-            left += bitmap.getWidth();
-            canvas.drawBitmap(bitmap, left, 0, null);
-            mCount = (int) (left + bitmap.getWidth());
-            mHeight = bitmap.getHeight();
-            mTmpPicture.endRecording();
-
-            mPaint.setColor(Color.WHITE);
-            mPaint.setTextSize(50);
-            mPaint.setTypeface(Typeface.DEFAULT_BOLD);
         }
 
         public Picture getTmpPicture() {
@@ -507,33 +497,32 @@ public class SVGView extends View {
         }
 
         public void invalidateTmp() {
+            mPaint.setColor(Color.WHITE);
+            mPaint.setTextSize(100);
+            mPaint.setTypeface(Typeface.DEFAULT_BOLD);
+
             mHandler.sendEmptyMessage(-1);
         }
-
-        /*@Override
-        public void draw(@NonNull Canvas canvas) {
-            super.draw(canvas);
-            Bitmap bitmap = mBitmapManager2.get(R.drawable.number_5);
-            canvas.drawBitmap(bitmap, 0, 0, null);
-
-            *//*canvas.drawColor(Color.BLACK);
-            canvas.drawText(String.valueOf(mCount), 50, 50, mPaint);
-            mHandler.sendEmptyMessageDelayed(-1, 1000);*//*
-
-            //canvas.drawPicture(this);
-        }*/
 
         Handler mHandler = new Handler() {
             @Override
             public void dispatchMessage(@NonNull Message msg) {
                 super.dispatchMessage(msg);
-                /*Canvas canvas = mTmpPicture.beginRecording(100, 100);
-                draw(canvas);
-                mTmpPicture.endRecording();*/
-                mCount++;
-                Log.d(TAG, "Handler: " + mCount);
+                Canvas canvas = mTmpPicture.beginRecording(0, 0);
+                //canvas.drawColor(Color.BLUE);
+                String text = String.valueOf(Calendar.getInstance().get(Calendar.SECOND));
+                Rect rect = new Rect();
+                mPaint.getTextBounds(text, 0, text.length(), rect);
+                canvas.drawText(text, 0, 0, mPaint);
+                mTmpPicture.endRecording();
+
+                mWidth = rect.width();
+                mHeight = rect.height();
+
                 invalidate();
                 //postInvalidate(200, 200, 300, 300);
+
+                mHandler.sendEmptyMessageDelayed(-1, 1000 - (System.currentTimeMillis() % 1000));
             }
         };
     }
