@@ -2,6 +2,7 @@ package com.suheng.structure.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -75,7 +76,11 @@ public class SVGView extends View {
 
         this.paintPicture();
         Log.d(TAG, "-----------init-------");
+
+        mBitmapEarth = BitmapFactory.decodeResource(getResources(), R.drawable.earth);
     }
+
+    private Bitmap mBitmapEarth;
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -89,6 +94,11 @@ public class SVGView extends View {
         canvas.restore();*/
 
         canvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.holo_red_dark));
+
+        Bitmap bitmap = BitmapHelper.toGray(mBitmapEarth);
+        canvas.drawBitmap(bitmap, 0, 10, null);
+        canvas.drawBitmap(mBitmapEarth, bitmap.getWidth() + 20, 10, null);
+
         //this.paintRect(canvas);
         //this.paintScaleBitmap2(canvas);
         //this.paintScaleBitmap(canvas);

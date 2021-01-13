@@ -3,6 +3,8 @@ package com.suheng.structure.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
@@ -160,6 +162,21 @@ public class BitmapHelper {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    /**
+     * Bitmap去色
+     */
+    public static Bitmap toGray(Bitmap src) {
+        Bitmap dst = Bitmap.createBitmap(src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_4444);//RGB_565会多出黑色背景
+        Canvas canvas = new Canvas(dst);
+        Paint paint = new Paint();
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.setSaturation(0);//0~1，0为全灰，1为原色
+        ColorMatrixColorFilter matrixColorFilter = new ColorMatrixColorFilter(colorMatrix);
+        paint.setColorFilter(matrixColorFilter);
+        canvas.drawBitmap(src, 0, 0, paint);
+        return dst;
     }
 
 }
