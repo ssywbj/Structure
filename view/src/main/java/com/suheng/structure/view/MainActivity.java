@@ -2,6 +2,7 @@ package com.suheng.structure.view;
 
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView imageView = findViewById(R.id.view_image);
         imageView.setImageDrawable(drawable);
         drawable.start();
+        Log.d("SVGView", "drawable, NumberOfFrames: " + drawable.getNumberOfFrames() + ", Duration: " + drawable.getDuration(0));
     }
 
 }
