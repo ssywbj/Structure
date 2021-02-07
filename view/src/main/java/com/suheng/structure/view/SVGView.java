@@ -16,31 +16,28 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.PictureDrawable;
 import android.graphics.drawable.VectorDrawable;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class SVGView extends View {
     private static final String TAG = SVGView.class.getSimpleName();
-    private PointF mPointCenter = new PointF();
-    private Paint mPaint = new Paint();
-    private Rect mRect = new Rect();
+    private final PointF mPointCenter = new PointF();
+    private final Paint mPaint = new Paint();
+    private final Rect mRect = new Rect();
     private BitmapManager mBitmapManager;
 
-    private Path mPath = new Path();
+    private final Path mPath = new Path();
     private float mRadius;
 
     protected PaintFlagsDrawFilter mPaintFlagsDrawFilter;
@@ -78,21 +75,53 @@ public class SVGView extends View {
         Log.d(TAG, "-----------init-------");
 
         mBitmapEarth = BitmapFactory.decodeResource(getResources(), R.drawable.earth);
+
+        mRectClip.set(10, 140, 160, 290);
     }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Log.d(TAG, "------- onAttachedToWindow --------");
+        this.updateTimeBySecond();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mBitmapManager2.clear();
+        removeCallbacks(mRunnable);
+        Log.d(TAG, "------- onDetachedFromWindow --------");
+    }
+
+    private static final long UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
+
+    private void updateTimeBySecond() {
+        if (getHandler() == null) { //在onAttachedToWindow()中调用getHandler()以确保其不为空
+            return;
+        }
+        long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
+        getHandler().removeCallbacks(mRunnable);
+        getHandler().postDelayed(mRunnable, delayMillis);
+    }
+
+    private final Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            //Log.d(TAG, "------- updateTimeBySecond --------");
+            invalidate();
+            //postInvalidate(mRectClip.left, mRectClip.top, mRectClip.right, mRectClip.bottom);
+
+            updateTimeBySecond();
+        }
+    };
+
     private Bitmap mBitmapEarth;
+    RectF dst = new RectF();
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Log.d(TAG, "-----------onDraw-------");
-        /*mRect.set(0, 0, 400, 400);
-        //canvas.clipRect(mRect);
-        canvas.save();
-        canvas.translate(0, 100);
-        canvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.holo_red_dark));
-        canvas.restore();*/
-
         canvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.holo_red_dark));
 
         Bitmap bitmap = BitmapHelper.toGray(mBitmapEarth);
@@ -107,22 +136,14 @@ public class SVGView extends View {
         //this.paintScalesBitmapMethod1(canvas);
         //this.paintScalesBitmapMethod2(canvas);
 
-        //canvas.drawPicture(mPicture);
-        Log.d(TAG, "Picture, w-h: " + mPicture.getWidth() + ", " + mPicture.getHeight());
-        Picture tmpPicture = mTimePicture.getTmpPicture();
-        //canvas.drawPicture(tmpPicture);
-        //canvas.drawPicture(tmpPicture, rectF);
+        this.paintPicture(canvas);
 
-        canvas.drawPicture(tmpPicture, new RectF(getWidth() / 2f - mTimePicture.mWidth / 2f, 100, getWidth() / 2f + mTimePicture.mWidth / 2f, 0));
-        PictureDrawable drawable = new PictureDrawable(tmpPicture);
-        Log.d(TAG, "TmpPicture, w-h: " + tmpPicture.getWidth() + ", " + tmpPicture.getHeight()
-                + ", " + mTimePicture.mWidth + ", " + mTimePicture.mHeight + ", --: " + drawable.getIntrinsicWidth() + ", " + drawable.getIntrinsicHeight()
-                + ", " + drawable.getBounds() + ", " + getWidth() + ", " + getHeight());
-        /*drawable.setBounds(0, 0, 110, 90);
-        drawable.draw(canvas);*/
-        //mTimePicture.draw(canvas);
+        canvas.clipRect(mRectClip);
+        canvas.drawColor(Color.WHITE);
+        canvas.translate(mRectClip.centerX() - mTimePicture.mRect.centerX()
+                , mRectClip.centerY() - mTimePicture.mRect.centerY());
+        canvas.drawPicture(mTimePicture.getPicture());
     }
-
 
     private void paintScalesBitmapMethod2(Canvas canvas) {
         mPaint.setStyle(Paint.Style.STROKE);
@@ -425,14 +446,6 @@ public class SVGView extends View {
         canvas.restore();
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        mBitmapManager2.clear();
-        mTimePicture.mHandler.removeMessages(-1);
-        Log.d(TAG, "------- onDetachedFromWindow --------");
-    }
-
     private final RectF mRectF = new RectF();
     private final RectF mRectFDst = new RectF();
     private final Paint mPaintRect = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -469,73 +482,51 @@ public class SVGView extends View {
     private final Picture mPicture = new Picture();
 
     private void paintPicture() {
-        //postInvalidate(3, 3, 5, 5);
         Canvas canvas = mPicture.beginRecording(100, 100);
         Bitmap bitmap = mBitmapManager2.get(R.drawable.number_5_big);
         canvas.drawBitmap(bitmap, 0, 0, null);
         mPicture.endRecording();
-
-        mTimePicture.paintPicture();
-        mTimePicture.invalidateTmp();
-    }
-
-    @Override
-    public void onDrawForeground(Canvas canvas) {
-        super.onDrawForeground(canvas);
-    }
-
-    private RectF rectF;
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        rectF = new RectF(w / 2f - mTimePicture.mWidth / 2f, 0, w / 2f + mTimePicture.mWidth / 2f, mTimePicture.mHeight);
     }
 
     private final TimePicture mTimePicture = new TimePicture();
 
-    private class TimePicture extends Picture {
+    private static class TimePicture extends Picture {
         private final Picture mTmpPicture = new Picture();
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private int mWidth, mHeight;
+        private final Rect mRect = new Rect();
 
-        private void paintPicture() {
-        }
-
-        public Picture getTmpPicture() {
-            return mTmpPicture;
-        }
-
-        public void invalidateTmp() {
+        private TimePicture() {
             mPaint.setColor(Color.WHITE);
             mPaint.setTextSize(100);
             mPaint.setTypeface(Typeface.DEFAULT_BOLD);
-
-            mHandler.sendEmptyMessage(-1);
         }
 
-        Handler mHandler = new Handler() {
-            @Override
-            public void dispatchMessage(@NonNull Message msg) {
-                super.dispatchMessage(msg);
-                Canvas canvas = mTmpPicture.beginRecording(0, 0);
-                //canvas.drawColor(Color.BLUE);
-                String text = String.valueOf(Calendar.getInstance().get(Calendar.SECOND));
-                Rect rect = new Rect();
-                mPaint.getTextBounds(text, 0, text.length(), rect);
-                canvas.drawText(text, 0, 0, mPaint);
-                mTmpPicture.endRecording();
+        public Picture getPicture() {
+            Canvas canvas = mTmpPicture.beginRecording(0, 0);
+            String text = String.valueOf(Calendar.getInstance().get(Calendar.SECOND));
+            mPaint.getTextBounds(text, 0, text.length(), mRect);
+            canvas.clipRect(mRect);
+            canvas.drawColor(Color.BLUE);
+            canvas.drawText(text, 0, 0, mPaint);
+            mTmpPicture.endRecording();
 
-                mWidth = rect.width();
-                mHeight = rect.height();
+            return mTmpPicture;
+        }
 
-                invalidate();
-                //postInvalidate(200, 200, 300, 300);
-
-                mHandler.sendEmptyMessageDelayed(-1, 1000 - (System.currentTimeMillis() % 1000));
-            }
-        };
+        public Rect getRect() {
+            return mRect;
+        }
     }
 
+    private void paintPicture(Canvas canvas) {
+        Picture tmpPicture = mTimePicture.getPicture();
+        Rect rect = mTimePicture.getRect();
+        dst.set(getWidth() / 2f - rect.width() / 2f, 100, getWidth() / 2f + rect.width() / 2f, 0);
+        canvas.drawPicture(tmpPicture, dst);
+        Log.d(TAG, "TmpPicture, w-h: " + tmpPicture.getWidth() + ", " + tmpPicture.getHeight()
+                + ", --: " + rect.width() + ", " + rect.height() + ", --: " + +getWidth() + ", " + getHeight());
+    }
+
+    private final Rect mRectClip = new Rect();
 
 }
