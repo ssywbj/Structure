@@ -28,6 +28,8 @@ import androidx.core.content.ContextCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 public class SVGView extends View {
@@ -77,13 +79,34 @@ public class SVGView extends View {
         mBitmapEarth = BitmapFactory.decodeResource(getResources(), R.drawable.earth);
 
         mRectClip.set(10, 140, 160, 290);
+        mRectClip2.set(mRectClip.right + 10, 140, mRectClip.right + mRectClip.width(), 290);
+
+        //setLayerType(View.LAYER_TYPE_SOFTWARE, null);//关闭硬件加速
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         Log.d(TAG, "------- onAttachedToWindow --------");
-        this.updateTimeBySecond();
+        //this.updateTimeBySecond();
+
+        long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Log.d(TAG, "------- mTimer.schedule --------" + Thread.currentThread().getName());
+                //invalidate();
+                //invalidate(mRectClip);
+                postInvalidate(mRectClip.left, mRectClip.top, mRectClip.right, mRectClip.bottom);
+            }
+        }, delayMillis, 1000);
+
+        /*mTimer2.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                postInvalidate(mRectClip2.left, mRectClip2.top, mRectClip2.right, mRectClip2.bottom);
+            }
+        }, 0, 1000);*/
     }
 
     @Override
@@ -92,6 +115,9 @@ public class SVGView extends View {
         mBitmapManager2.clear();
         removeCallbacks(mRunnable);
         Log.d(TAG, "------- onDetachedFromWindow --------");
+
+        mTimer.cancel();
+        mTimer2.cancel();
     }
 
     private static final long UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
@@ -108,13 +134,16 @@ public class SVGView extends View {
     private final Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            //Log.d(TAG, "------- updateTimeBySecond --------");
+            Log.d(TAG, "------- updateTimeBySecond --------" + Thread.currentThread().getName());
             invalidate();
             //postInvalidate(mRectClip.left, mRectClip.top, mRectClip.right, mRectClip.bottom);
 
             updateTimeBySecond();
         }
     };
+
+    private final Timer mTimer = new Timer();
+    private final Timer mTimer2 = new Timer();
 
     private Bitmap mBitmapEarth;
     RectF dst = new RectF();
@@ -138,11 +167,21 @@ public class SVGView extends View {
 
         this.paintPicture(canvas);
 
+        canvas.save();
         canvas.clipRect(mRectClip);
         canvas.drawColor(Color.WHITE);
         canvas.translate(mRectClip.centerX() - mTimePicture.mRect.centerX()
                 , mRectClip.centerY() - mTimePicture.mRect.centerY());
         canvas.drawPicture(mTimePicture.getPicture());
+        canvas.restore();
+
+        /*canvas.save();
+        canvas.clipRect(mRectClip2);
+        canvas.drawColor(Color.WHITE);
+        canvas.translate(mRectClip2.centerX() - mTimePicture.mRect.centerX()
+                , mRectClip2.centerY() - mTimePicture.mRect.centerY());
+        canvas.drawPicture(mTimePicture.getPicture());
+        canvas.restore();*/
     }
 
     private void paintScalesBitmapMethod2(Canvas canvas) {
@@ -488,14 +527,14 @@ public class SVGView extends View {
         mPicture.endRecording();
     }
 
-    private final TimePicture mTimePicture = new TimePicture();
+    private final TimeView mTimePicture = new TimeView();
 
-    private static class TimePicture extends Picture {
+    private static class TimeView {
         private final Picture mTmpPicture = new Picture();
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Rect mRect = new Rect();
 
-        private TimePicture() {
+        private TimeView() {
             mPaint.setColor(Color.WHITE);
             mPaint.setTextSize(100);
             mPaint.setTypeface(Typeface.DEFAULT_BOLD);
@@ -528,5 +567,6 @@ public class SVGView extends View {
     }
 
     private final Rect mRectClip = new Rect();
+    private final Rect mRectClip2 = new Rect();
 
 }
