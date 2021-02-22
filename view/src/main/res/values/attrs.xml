@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="HourMinuteView">
+        <attr name="divider_sign" format="reference" />
+        <attr name="time_shade_bg" format="reference" />
+    </declare-styleable>
+</resources>
