@@ -1,5 +1,6 @@
 package com.suheng.structure.view;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,6 +22,7 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
@@ -82,6 +84,7 @@ public class SVGView extends View {
         mRectClip2.set(mRectClip.right + 10, 140, mRectClip.right + mRectClip.width(), 290);
 
         //setLayerType(View.LAYER_TYPE_SOFTWARE, null);//关闭硬件加速
+        this.initSecondPointerAnim();
     }
 
     @Override
@@ -107,6 +110,8 @@ public class SVGView extends View {
                 postInvalidate(mRectClip2.left, mRectClip2.top, mRectClip2.right, mRectClip2.bottom);
             }
         }, 0, 1000);*/
+
+        this.startSecondPointerAnim();
     }
 
     @Override
@@ -118,6 +123,8 @@ public class SVGView extends View {
 
         mTimer.cancel();
         mTimer2.cancel();
+
+        this.releaseAnim(mSecondAnimator);
     }
 
     private static final long UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
@@ -569,4 +576,57 @@ public class SVGView extends View {
     private final Rect mRectClip = new Rect();
     private final Rect mRectClip2 = new Rect();
 
+    protected ValueAnimator mSecondAnimator;
+    protected float mSecondAnimatorValue;
+    private long mCurrentTimeMillis;
+
+    private void initSecondPointerAnim() {
+        mSecondAnimator = ValueAnimator.ofFloat(0, 0);//属性动画
+        mSecondAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {//监听动画过程
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                if (System.currentTimeMillis() - mCurrentTimeMillis > 40) { //控制属性动画的刷新频率
+                    mCurrentTimeMillis = System.currentTimeMillis();
+
+                    if (animation.getAnimatedValue() instanceof Float) {
+                        mSecondAnimatorValue = (Float) animation.getAnimatedValue();
+                        Log.d(TAG, "pointer anim: " + mSecondAnimatorValue);
+                    }
+                }
+            }
+        });
+
+        mSecondAnimator.setDuration(TimeUnit.MINUTES.toMillis(1L));
+        mSecondAnimator.setInterpolator(new LinearInterpolator());
+        mSecondAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        /*mSecondAnimator.setEvaluator(new TypeEvaluator<Float>() {
+            @Override
+            public Float evaluate(float fraction, Float startValue, Float endValue) {
+                //Log.i(TAG, "anim evaluate: " + fraction + ", " + startValue + ", " + endValue);
+                return null;
+            }
+        });*/
+    }
+
+    protected void startSecondPointerAnim() {
+        if (mSecondAnimator == null) {
+            this.initSecondPointerAnim();
+        }
+        if (mSecondAnimator.isRunning()) {
+            mSecondAnimator.cancel();
+        }
+        Calendar calendar = Calendar.getInstance();
+        float offsetValue = (calendar.get(Calendar.SECOND) + calendar.get(Calendar.MILLISECOND) / 1000f) / 60f;
+        mSecondAnimator.setFloatValues(offsetValue, 1 + offsetValue);
+        mSecondAnimator.start();
+    }
+
+    protected void releaseAnim(ValueAnimator animator) {
+        if (animator == null) {
+            return;
+        }
+        if (animator.isRunning()) {
+            animator.cancel();
+        }
+    }
 }
