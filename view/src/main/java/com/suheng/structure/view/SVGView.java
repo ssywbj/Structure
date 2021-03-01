@@ -590,7 +590,8 @@ public class SVGView extends View {
 
                     if (animation.getAnimatedValue() instanceof Float) {
                         mSecondAnimatorValue = (Float) animation.getAnimatedValue();
-                        Log.d(TAG, "pointer anim: " + mSecondAnimatorValue);
+                        Log.d(TAG, "pointer anim: " + mSecondAnimatorValue + ", " + animation.getCurrentPlayTime()
+                                + ", " + animation.getAnimatedFraction());
                     }
                 }
             }
@@ -618,6 +619,7 @@ public class SVGView extends View {
         Calendar calendar = Calendar.getInstance();
         float offsetValue = (calendar.get(Calendar.SECOND) + calendar.get(Calendar.MILLISECOND) / 1000f) / 60f;
         mSecondAnimator.setFloatValues(offsetValue, 1 + offsetValue);
+        //mSecondAnimator.setCurrentPlayTime(2000);
         mSecondAnimator.start();
     }
 
