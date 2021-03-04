@@ -1,5 +1,6 @@
 package com.suheng.structure.view;
 
+import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -590,8 +591,8 @@ public class SVGView extends View {
 
                     if (animation.getAnimatedValue() instanceof Float) {
                         mSecondAnimatorValue = (Float) animation.getAnimatedValue();
-                        Log.d(TAG, "pointer anim: " + mSecondAnimatorValue + ", " + animation.getCurrentPlayTime()
-                                + ", " + animation.getAnimatedFraction());
+                        /*Log.d(TAG, "pointer anim: " + mSecondAnimatorValue + ", " + animation.getCurrentPlayTime()
+                                + ", " + animation.getAnimatedFraction());*/
                     }
                 }
             }
@@ -621,6 +622,30 @@ public class SVGView extends View {
         mSecondAnimator.setFloatValues(offsetValue, 1 + offsetValue);
         //mSecondAnimator.setCurrentPlayTime(2000);
         mSecondAnimator.start();
+
+        PropertyValuesHolder hourVH = PropertyValuesHolder.ofFloat("hour", 1, 10);
+        PropertyValuesHolder minuteVH = PropertyValuesHolder.ofFloat("minute", 19, 41);
+        PropertyValuesHolder secondVH = PropertyValuesHolder.ofFloat("second", 36, 10);
+        ValueAnimator valueAnimator = ValueAnimator.ofPropertyValuesHolder(hourVH, minuteVH, secondVH);
+        valueAnimator.setInterpolator(new LinearInterpolator());
+        valueAnimator.setDuration(TimeUnit.SECONDS.toMillis(10L));
+        valueAnimator.start();
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                if (animation.getAnimatedValue() instanceof PropertyValuesHolder[]) {
+                    Log.i(TAG, "animation: " + animation);
+                } else {
+                    //Log.d(TAG, "animation is PropertyValuesHolder object: " + animation);
+                    PropertyValuesHolder[] values = animation.getValues();
+                    Log.d(TAG, "animation is PropertyValuesHolder object: " + values.length + ", " + values[0].getPropertyName() +
+                            ", " + animation.getAnimatedValue("hour") + ", " + animation.getAnimatedValue("minute")
+                            + ", " + animation.getAnimatedValue("second") + ", " + animation.getAnimatedValue("mills_second"));
+                }
+
+            }
+        });
+
     }
 
     protected void releaseAnim(ValueAnimator animator) {

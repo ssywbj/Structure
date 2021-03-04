@@ -1,3 +1,5 @@
+include ':watchface:basic'
+include ':watchface'
 include ':dreamservice'
 include ':wallpaperpicker:watchhome'
 include ':contentprovider'
