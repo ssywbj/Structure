@@ -19,10 +19,15 @@ public class BitmapHelper {
 
     public static Bitmap get(Context context, @DrawableRes int resId, int color, float scale, float degrees) {
         Drawable drawable = ContextCompat.getDrawable(context, resId);
-        if (color != Integer.MAX_VALUE) {
-            drawable.setTint(color);
+        if (drawable == null) {
+            throw new NullPointerException("drawable is null, please check res id!");
+        } else {
+            if (color != Integer.MAX_VALUE) {
+                drawable.setTint(color);
+            }
+            drawable.mutate();
+            return drawableToBitmap(drawable, scale, degrees);
         }
-        return drawableToBitmap(drawable, scale, degrees);
     }
 
     public static Bitmap get(Context context, @DrawableRes int resId, int color, float scale) {
@@ -46,7 +51,6 @@ public class BitmapHelper {
         final int intrinsicHeight = drawable.getIntrinsicHeight();
         Bitmap bitmap = Bitmap.createBitmap((int) (intrinsicWidth * scale), (int) (intrinsicHeight * scale), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG));
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
 
@@ -151,8 +155,8 @@ public class BitmapHelper {
         //canvas.drawColor(Color.BLACK);
 
         if (needRotate) {
+            canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
             if (degrees % 180 != 0) {
-                canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG));
                 canvas.translate((rectFDst.width() - rectFSrc.width()) / 2f, (rectFDst.height() - rectFSrc.height()) / 2f);
             }
             canvas.rotate(degrees, rectFSrc.centerX(), rectFSrc.centerY());

@@ -19,24 +19,53 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class WatchFaceView extends View {
-    public static final int MSG_UPDATE_TIME_PER_SECOND = 11;
     private static final long UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
-    /**
-     * 当前电量百分比的值，如若是80%，那么level就是80
-     */
-    protected int mBatteryLevel;
-
     protected Context mContext;
     protected String mTAG;
-    protected PointF mPointScreenCenter = new PointF();//屏幕中心点
-    private boolean mReportedVisible;
+    protected PointF mPointScreenCenter = new PointF(); //屏幕中心点
+
     private boolean mRegisteredTimeZoneReceiver, mRegisteredTimeChangeReceiver, mRegisteredBatteryChangeReceiver;
     protected boolean mIsEditMode;
+    protected boolean mIsRoundScreen, mIsDimMode;
 
+    protected int mBatteryLevel; //当前电量百分比值，如若是80%，那么level就是80
     protected int mHour, mMinute, mSecond;
     protected float mHourRatio, mMinuteRatio, mSecondRatio;
 
-    protected boolean mIsRoundScreen, mIsDimMode;
+    private final BroadcastReceiver mTimeChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //Log.d(mTAG, "TimeChangeReceiver: " + intent.getAction());
+            onTimeTick();
+        }
+    };
+
+    private final Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updateTime();
+            invalidate();
+
+            long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
+            getHandler().postDelayed(mRunnable, delayMillis);
+        }
+    };
+
+    private final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Calendar.getInstance().setTimeZone(TimeZone.getDefault());
+        }
+    };
+
+    private final BroadcastReceiver mBatteryReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
+                mBatteryLevel = intent.getIntExtra("level", 0);//当前电量，百分比
+            }
+        }
+    };
 
     public WatchFaceView(Context context) {
         super(context);
@@ -67,31 +96,6 @@ public class WatchFaceView extends View {
         mPointScreenCenter.y = h / 2f;//屏幕中心Y坐标
     }
 
-    public void onVisibilityChanged(boolean visible) {
-        if (mIsDimMode) {
-            this.updateTime();
-            return;
-        }
-
-        mReportedVisible = visible;
-        if (visible) {
-            this.updateTime();
-
-            this.registerTimeZoneReceiver();
-            this.registerTimeChangeReceiver();
-
-            Calendar.getInstance().setTimeZone(TimeZone.getDefault());
-            invalidate();
-        } else {
-            this.unregisterTimeZoneReceiver();
-            this.unregisterTimeChangeReceiver();
-        }
-        //Log.d(mTAG, "onVisibilityChanged, visible: " + visible);
-
-        //this.notifyMsgUpdateTimePerSecond();
-    }
-
-
     @Override
     public void onScreenStateChanged(int screenState) {
         super.onScreenStateChanged(screenState);
@@ -108,6 +112,33 @@ public class WatchFaceView extends View {
         this.onVisibilityChanged(visible);
     }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        //this.onVisibilityChanged(true);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        getHandler().removeCallbacksAndMessages(null);
+    }
+
+    public void onVisibilityChanged(boolean visible) {
+        if (mIsDimMode) {
+            this.updateTime();
+            return;
+        }
+
+        //mReportedVisible = visible;
+        if (visible) {
+            this.registerTimeZoneReceiver();
+        } else {
+            this.unregisterTimeZoneReceiver();
+        }
+        //Log.d(mTAG, "onVisibilityChanged, visible: " + visible);
+    }
+
     protected void updateTime() {
         mHour = DateUtil.getHour(mContext);
         Calendar instance = Calendar.getInstance();
@@ -119,42 +150,9 @@ public class WatchFaceView extends View {
         mSecondRatio = mSecond / 60f;
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        this.onVisibilityChanged(true);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        if (mReportedVisible) {
-            this.onVisibilityChanged(false);
-        }
-    }
-
-    public void notifyMsgUpdateTimePerSecond() {
-        getHandler().removeMessages(MSG_UPDATE_TIME_PER_SECOND);
-        if (this.isVisible()) {
-            getHandler().sendEmptyMessage(MSG_UPDATE_TIME_PER_SECOND);
-        }
-    }
-
-    /**
-     * 每秒钟更新一次时间
-     */
-    private void handleUpdateTimePerSecond() {
-        if (mIsDimMode) {
-            return;
-        }
-
-        this.updateTime();
-
-        invalidate();
-        if (this.isVisible()) {
-            long delayMs = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
-            getHandler().sendEmptyMessageDelayed(MSG_UPDATE_TIME_PER_SECOND, delayMs);
-        }
+    public void updateTimePerSecond() {
+        getHandler().removeCallbacks(mRunnable);
+        getHandler().post(mRunnable);
     }
 
     private void registerTimeZoneReceiver() {
@@ -162,6 +160,7 @@ public class WatchFaceView extends View {
             return;
         }
         mRegisteredTimeZoneReceiver = true;
+
         IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
         mContext.registerReceiver(mTimeZoneReceiver, filter);
     }
@@ -178,6 +177,7 @@ public class WatchFaceView extends View {
             return;
         }
         mRegisteredTimeChangeReceiver = true;
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_TIME_TICK);
         intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
@@ -196,6 +196,7 @@ public class WatchFaceView extends View {
             return;
         }
         mRegisteredBatteryChangeReceiver = true;
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         mContext.registerReceiver(mBatteryReceiver, intentFilter);
@@ -206,10 +207,6 @@ public class WatchFaceView extends View {
             mRegisteredBatteryChangeReceiver = false;
             mContext.unregisterReceiver(mBatteryReceiver);
         }
-    }
-
-    public boolean isVisible() {
-        return mReportedVisible;
     }
 
     public boolean isEditMode() {
@@ -229,31 +226,5 @@ public class WatchFaceView extends View {
      */
     protected void onTimeTick() {
     }
-
-    private final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Calendar.getInstance().setTimeZone(TimeZone.getDefault());
-            invalidate();
-        }
-    };
-
-    private final BroadcastReceiver mTimeChangeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            //Log.d(mTAG, "TimeChangeReceiver: " + intent.getAction());
-            onTimeTick();
-        }
-    };
-
-    private final BroadcastReceiver mBatteryReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
-                mBatteryLevel = intent.getIntExtra("level", 0);//当前电量，百分比
-                invalidate();
-            }
-        }
-    };
 
 }

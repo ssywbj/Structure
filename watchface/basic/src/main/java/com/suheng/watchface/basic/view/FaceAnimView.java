@@ -19,10 +19,17 @@ import java.util.concurrent.TimeUnit;
 public class FaceAnimView extends WatchFaceView {
     public static final int TIME_NONE = -1;
     private static final int ANIM_DURATION = 800;
-    private static final int MSG_UPDATE_TIME = 52;
     private int mDefaultHour, mDefaultMinute, mDefaultSecond; //08:36:55
-    protected boolean mIsPlayingAppearAnim, mIsInitView = true;
+    protected boolean mIsPlayingAppearAnim;
     protected boolean mIsAppearAnimPointer, mIsAppearAnimNumber;
+
+    private static final String PROPERTY_HOUR_POINTER = "property_hour_pointer";
+    private static final String PROPERTY_MINUTE_POINTER = "property_minute_pointer";
+    private static final String PROPERTY_SECOND_POINTER = "property_second_pointer";
+    private static final String PROPERTY_HOUR_NUMBER = "property_hour_number";
+    private static final String PROPERTY_MINUTE_NUMBER = "property_minute_number";
+    private static final String PROPERTY_SECOND_NUMBER = "property_second_number";
+    private ValueAnimator mAppearAnimator, mSecondAnimator;
 
     public FaceAnimView(Context context) {
         super(context);
@@ -39,43 +46,19 @@ public class FaceAnimView extends WatchFaceView {
         mDefaultHour = mHour;
         mDefaultMinute = mMinute;
         mDefaultSecond = mSecond;
+
+        post(() -> {
+            Log.d(mTAG, "post(new Runnable() {})");
+            mIsPlayingAppearAnim = true;
+            startAppearAnim();
+        });
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if (mIsInitView) {//只在创建实例时执行动画
-            mIsInitView = false;
-            mIsPlayingAppearAnim = true;
-
-            if (mIsAppearAnimPointer) {
-                this.startAppearAnim();
-            }
-
-            /*if (mIsAppearAnimNumber) {
-                mHour = mDefaultHour;
-                mMinute = mDefaultMinute;
-                getHandler().removeMessages(MSG_UPDATE_TIME);
-                getHandler().sendEmptyMessageDelayed(MSG_UPDATE_TIME, 200);
-            }*/
-        }
+        Log.d(mTAG, "onAttachedToWindow, onAttachedToWindow");
     }
-
-    /*@Override
-    public void onVisibilityChanged(boolean visible) {
-        super.onVisibilityChanged(visible);
-        if (visible) {
-            if (mIsAppearAnimPointer) {
-                this.startSecondPointerAnim();
-            }
-        } else {
-            if (mIsAppearAnimPointer) {
-                releaseAnim(mSecondAnimator);
-            } else {
-                this.onAppearAnimFinished();
-            }
-        }
-    }*/
 
     @Override
     protected void onDetachedFromWindow() {
@@ -84,74 +67,110 @@ public class FaceAnimView extends WatchFaceView {
         this.releaseAnim(mSecondAnimator);
     }
 
-    /*@Override
-    protected void dispatchMsg(Message msg) {
-        if (msg.what == MSG_UPDATE_TIME) {
-            if (mHour != mCurrentHour) {
-                if (mDefaultHour < mCurrentHour) {
-                    mHour++;
-                } else if (mDefaultHour > mCurrentHour) {
-                    mHour--;
+    private void initAppearAnim() {
+        mAppearAnimator = ValueAnimator.ofPropertyValuesHolder();
+        mAppearAnimator.addUpdateListener(animation -> {
+            Object animatedValue;
+            if (mIsAppearAnimPointer) {
+                animatedValue = animation.getAnimatedValue(PROPERTY_HOUR_POINTER);
+                if (animatedValue instanceof Float) {
+                    mHourRatio = (float) animatedValue;
+                    Log.i(mTAG, "hour pointer anim: " + mHourRatio);
+                }
+                animatedValue = animation.getAnimatedValue(PROPERTY_MINUTE_POINTER);
+                if (animatedValue instanceof Float) {
+                    mMinuteRatio = (float) animatedValue;
+                    Log.i(mTAG, "minute pointer anim: " + mMinuteRatio);
+                }
+                animatedValue = animation.getAnimatedValue(PROPERTY_SECOND_POINTER);
+                if (animatedValue instanceof Float) {
+                    mSecondRatio = (float) animatedValue;
+                    Log.i(mTAG, "second pointer anim: " + mSecondRatio);
                 }
             }
 
-            if (mMinute != mCurrentMinute) {
-                if (mDefaultMinute < mCurrentMinute) {
-                    mMinute++;
-                } else if (mDefaultMinute > mCurrentMinute) {
-                    mMinute--;
+            if (mIsAppearAnimNumber) {
+                animatedValue = animation.getAnimatedValue(PROPERTY_HOUR_NUMBER);
+                if (animatedValue instanceof Integer) {
+                    mHour = (int) animatedValue;
+                    Log.d(mTAG, "hour number anim: " + mHour);
+                }
+                animatedValue = animation.getAnimatedValue(PROPERTY_MINUTE_NUMBER);
+                if (animatedValue instanceof Integer) {
+                    mMinute = (int) animatedValue;
+                    Log.d(mTAG, "minute number anim: " + mMinute);
+                }
+                animatedValue = animation.getAnimatedValue(PROPERTY_SECOND_NUMBER);
+                if (animatedValue instanceof Integer) {
+                    mSecond = (int) animatedValue;
+                    Log.d(mTAG, "second number anim: " + mSecond);
                 }
             }
-
-            if (mSecond != mCurrentSecond) {
-                if (mDefaultSecond < mCurrentSecond) {
-                    mSecond++;
-                } else if (mDefaultSecond > mCurrentSecond) {
-                    mSecond--;
-                }
-            }
-
-            if ((mHour == mCurrentHour) && (mMinute == mCurrentMinute) && (mSecond == mCurrentSecond)) {
-                getHandler().removeMessages(MSG_UPDATE_TIME);
-                this.onAppearanceAnimFinished();
-            } else {
-                getHandler().removeMessages(MSG_UPDATE_TIME);
-                getHandler().sendEmptyMessageDelayed(MSG_UPDATE_TIME, 25);
-            }
-
-            *//*int hour = getHour();
-            int minute = Calendar.getInstance().get(Calendar.MINUTE);
-            int second = Calendar.getInstance().get(Calendar.SECOND);
-            if (hour < mHour) {
-                mHour--;
-            } else if (hour > mHour) {
-                mHour++;
-            }
-            if (minute < mMinute) {
-                mMinute--;
-            } else if (minute > mMinute) {
-                mMinute++;
-            }
-            if (second < mSecond) {
-                mSecond--;
-            } else if (second > mSecond) {
-                mSecond++;
-            }
-            if (hour == mHour && minute == mMinute && second == mSecond) {
-                getHandler().removeMessages(MSG_UPDATE_TIME);
-                this.onAppearanceAnimFinished();
-            } else {
-                getHandler().removeMessages(MSG_UPDATE_TIME);
-                getHandler().sendEmptyMessageDelayed(MSG_UPDATE_TIME, 50);
-            }*//*
 
             invalidate();
-        }
-    }*/
+        });
+        mAppearAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                onAppearAnimFinished();
+            }
+        });
+        mAppearAnimator.setDuration(ANIM_DURATION);
+        mAppearAnimator.setInterpolator(new LinearInterpolator());
+    }
 
-    protected void onAppearAnimFinished() {
-        getHandler().removeMessages(MSG_UPDATE_TIME);
-        mIsPlayingAppearAnim = false;
+    private void startAppearAnim() {
+        if (mAppearAnimator == null) {
+            this.initAppearAnim();
+        }
+        if (mAppearAnimator.isRunning()) {
+            return;
+        }
+
+        final List<PropertyValuesHolder> valuesHolderList = new ArrayList<>();
+        float endAnimatorValue;
+        if (mHour != mDefaultHour) {
+            if (mIsAppearAnimPointer) {
+                mHourRatio = mDefaultHour / 12f;
+                endAnimatorValue = (mHour + mMinute / 60f) / 12;
+                valuesHolderList.add(PropertyValuesHolder.ofFloat(PROPERTY_HOUR_POINTER, mHourRatio, endAnimatorValue));
+            }
+
+            if (mIsAppearAnimNumber) {
+                valuesHolderList.add(PropertyValuesHolder.ofInt(PROPERTY_HOUR_NUMBER, mDefaultHour, mHour));
+            }
+        }
+        if (mMinute != mDefaultMinute) {
+            if (mIsAppearAnimPointer) {
+                mMinuteRatio = mDefaultMinute / 60f;
+                endAnimatorValue = (mMinute + mSecond / 60f) / 60;
+                valuesHolderList.add(PropertyValuesHolder.ofFloat(PROPERTY_MINUTE_POINTER, mMinuteRatio, endAnimatorValue));
+            }
+
+            if (mIsAppearAnimNumber) {
+                valuesHolderList.add(PropertyValuesHolder.ofInt(PROPERTY_MINUTE_NUMBER, mDefaultMinute, mMinute));
+            }
+        }
+        if (mSecond != mDefaultSecond) {
+            if (mIsAppearAnimPointer) {
+                mSecondRatio = mDefaultSecond / 60f;
+                endAnimatorValue = (mSecond + ANIM_DURATION / 1000f) / 60;
+                valuesHolderList.add(PropertyValuesHolder.ofFloat(PROPERTY_SECOND_POINTER, mSecondRatio, endAnimatorValue));
+            }
+
+            if (mIsAppearAnimNumber) {
+                valuesHolderList.add(PropertyValuesHolder.ofInt(PROPERTY_SECOND_NUMBER, mDefaultSecond, mSecond));
+            }
+        }
+
+        if (valuesHolderList.size() == 0) {
+            return;
+        }
+        final PropertyValuesHolder[] propertyValuesHolders = new PropertyValuesHolder[valuesHolderList.size()];
+        valuesHolderList.toArray(propertyValuesHolders);
+        mAppearAnimator.setValues(propertyValuesHolders);
+        mAppearAnimator.start();
     }
 
     /**
@@ -181,75 +200,8 @@ public class FaceAnimView extends WatchFaceView {
         mIsAppearAnimNumber = appearAnimNumber;
     }
 
-    private static final String PROPERTY_HOUR = "property_hour";
-    private static final String PROPERTY_MINUTE = "property_minute";
-    private static final String PROPERTY_SECOND = "property_second";
-    private ValueAnimator mAppearAnimator, mSecondAnimator;
-
-    private void initAppearAnim() {
-        mAppearAnimator = ValueAnimator.ofPropertyValuesHolder();
-        mAppearAnimator.addUpdateListener(animation -> {
-            Object animatedValue = animation.getAnimatedValue(PROPERTY_HOUR);
-            if (animatedValue instanceof Float) {
-                mHourRatio = (Float) animatedValue;
-                Log.d(mTAG, "hour pointer anim: " + mHourRatio);
-            }
-            animatedValue = animation.getAnimatedValue(PROPERTY_MINUTE);
-            if (animatedValue instanceof Float) {
-                mMinuteRatio = (Float) animatedValue;
-                Log.d(mTAG, "minute pointer anim: " + mMinuteRatio);
-            }
-            animatedValue = animation.getAnimatedValue(PROPERTY_SECOND);
-            if (animatedValue instanceof Float) {
-                mSecondRatio = (Float) animatedValue;
-                Log.d(mTAG, "second pointer anim: " + mSecondRatio);
-            }
-            //invalidate();
-        });
-        mAppearAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                onAppearAnimFinished();
-            }
-        });
-        mAppearAnimator.setDuration(ANIM_DURATION);
-        mAppearAnimator.setInterpolator(new LinearInterpolator());
-    }
-
-    private void startAppearAnim() {
-        if (mAppearAnimator == null) {
-            this.initAppearAnim();
-        }
-        if (mAppearAnimator.isRunning()) {
-            return;
-        }
-
-        final List<PropertyValuesHolder> valuesHolderList = new ArrayList<>();
-        float endAnimatorValue;
-        if (mHour != mDefaultHour) {
-            mHourRatio = mDefaultHour / 12f;
-            endAnimatorValue = (mHour + mMinute / 60f) / 12;
-            valuesHolderList.add(PropertyValuesHolder.ofFloat(PROPERTY_HOUR, mHourRatio, endAnimatorValue));
-        }
-        if (mMinute != mDefaultMinute) {
-            mMinuteRatio = mDefaultMinute / 60f;
-            endAnimatorValue = (mMinute + mSecond / 60f) / 60;
-            valuesHolderList.add(PropertyValuesHolder.ofFloat(PROPERTY_MINUTE, mMinuteRatio, endAnimatorValue));
-        }
-        if (mSecond != mDefaultSecond) {
-            mSecondRatio = mDefaultSecond / 60f;
-            endAnimatorValue = (mSecond + ANIM_DURATION / 1000f) / 60;
-            valuesHolderList.add(PropertyValuesHolder.ofFloat(PROPERTY_SECOND, mSecondRatio, endAnimatorValue));
-        }
-
-        if (valuesHolderList.size() == 0) {
-            return;
-        }
-        final PropertyValuesHolder[] propertyValuesHolders = new PropertyValuesHolder[valuesHolderList.size()];
-        valuesHolderList.toArray(propertyValuesHolders);
-        mAppearAnimator.setValues(propertyValuesHolders);
-        mAppearAnimator.start();
+    protected void onAppearAnimFinished() {
+        mIsPlayingAppearAnim = false;
     }
 
     private void initSecondPointerAnim() {
@@ -258,8 +210,7 @@ public class FaceAnimView extends WatchFaceView {
             if (animation.getAnimatedValue() instanceof Float) {
                 updateTime();
                 mSecondRatio = (Float) animation.getAnimatedValue();
-                //Log.d(mTAG, "pointer anim: " + mHourAnimatorValue + ", " + mMinuteAnimatorValue + ", " + mSecondAnimatorValue);
-
+                //Log.d(mTAG, "pointer anim: " + mHourRatio + ", " + mMinuteRatio + ", " + mSecondRatio);
                 invalidate();
             }
         });
