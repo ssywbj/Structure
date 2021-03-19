@@ -218,7 +218,7 @@ public class AlgorithmTest {
 
     @Test
     public void testLetterAdd() {
-        printArray(letterAdd(0));
+        /*printArray(letterAdd(0));
         printArray(letterAdd(1));
         printArray(letterAdd(2));
         printArray(letterAdd(25));
@@ -226,7 +226,7 @@ public class AlgorithmTest {
         printArray(letterAdd(26 * 1 + 1));
         printArray(letterAdd(26 * 25));
         printArray(letterAdd(26 * 25 + 25));
-        printArray(letterAdd(26 * 26));
+        printArray(letterAdd(26 * 26));*/
 
         /*final char a = 'a';
         System.out.println(a);
@@ -235,6 +235,30 @@ public class AlgorithmTest {
         System.out.println((char) (a + 2));
         System.out.println((char) (a + 25));
         System.out.println((char) (a + 26));*/
+
+        System.out.println(Integer.toHexString('庆'));
+
+        try {
+            byte[] bytes = "中".getBytes("utf-16");
+            System.out.println(bytes.length);
+            for (byte b : bytes) {
+                System.out.print(Integer.toHexString(Byte.toUnsignedInt(b)) + " ");
+            }
+            System.out.println();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String emoji = "\u0001[微笑]\u0002";
+        System.out.println(emoji.length());
+        emoji = "\u0001";
+        System.out.println(emoji.length());
+        emoji = "[";
+        System.out.println(emoji.length());
+        emoji = "微";
+        System.out.println(emoji.length());
+
+        System.out.println("\uD83D\uDE0E" + ", " + "\uD83D\uDE0E".length());
     }
 
     public Character[] letterAdd(int i) {
