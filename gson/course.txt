@@ -23,6 +23,10 @@ https://segmentfault.com/a/1190000020382440
 https://blog.csdn.net/u014756589/article/details/100830044
 https://blog.csdn.net/chenliguan/article/details/110151385
 
+方法签名
+https://blog.csdn.net/weixin_34380296/article/details/93098375
+https://blog.csdn.net/weixin_42117812/article/details/100560716
+
 四
 1、如何停止一个线程？
 2、如何写出线程安全的程序？
