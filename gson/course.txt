@@ -27,6 +27,9 @@ https://blog.csdn.net/chenliguan/article/details/110151385
 https://blog.csdn.net/weixin_34380296/article/details/93098375
 https://blog.csdn.net/weixin_42117812/article/details/100560716
 
+详解Java中的clone方法 -- 原型模式
+https://blog.csdn.net/zhangjg_blog/article/details/18369201
+
 四
 1、如何停止一个线程？
 https://blog.csdn.net/notOnlyRush/article/details/80111552
