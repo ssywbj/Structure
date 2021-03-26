@@ -149,7 +149,7 @@ public class AlgorithmTest {
 
     private <T> void printArray(T[] array) {
         for (T t : array) {
-            System.out.print(t);
+            System.out.print(t + "\t");
         }
         System.out.println();
     }
@@ -278,12 +278,25 @@ public class AlgorithmTest {
     //1.0.0.aa
     @Test
     public void testVersionAdd() {
-        String version = "1.0.0.aa";
+        /*String version = "1.0.0.aa";
         if (version.matches("^[0-9]+\\.([0-9]\\.){2}[a-z]{2}$")) {
             String[] split = version.split("\\.");
             printArray(split);
         } else {
             System.out.println("版本号不符合规范");
+        }*/
+
+        String gmt = "GMT-09:15";
+        //String gmt = "GMT-12:00";
+        //String gmt = "UTC-02:00";
+        //String gmt = "UTC+10:00";
+        if (gmt.matches("^(GMT|UTC|gmt|utc)[-+][0-9]{2}:[0-9]{2}$")) {
+            String sign = gmt.substring(3, 4);
+            float offset = Float.parseFloat(gmt.substring(4, 6));
+            offset += Float.parseFloat(gmt.substring(7, 9)) / 60;
+            System.out.println("sign: " + sign + ", offset: " + offset);
+        } else {
+            System.out.println("不符合规范");
         }
     }
 
