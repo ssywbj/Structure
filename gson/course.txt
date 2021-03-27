@@ -53,6 +53,10 @@ b.编写迸发程序时你会怎么做，举例说明
 
 5、如何在Android中写出优雅的异步代码？
 
+https://www.jianshu.com/p/82b357bfdfcd
+https://www.jianshu.com/p/9b53f7030ee2
+JobIntentService
+
 五
 1、CPU架构适配需要注意哪些问题？
 2、Java Native方法与Native函数是怎么绑定的？
