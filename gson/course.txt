@@ -82,8 +82,16 @@ https://www.jianshu.com/p/6e5291518483
 
 七
 1、Android中为什么非UI线程不能更新UI?
+https://blog.csdn.net/qq_38366777/article/details/108940059
+
 2、Handler发送消息的delay可靠吗？
+https://www.imooc.com/article/21997
+https://www.dazhuanlan.com/2020/03/26/5e7c55a0e8bc5/
+https://blog.csdn.net/huagbo/article/details/98472663
+
 3、主线程的Looper为什么不会导致应用ANR？
+https://blog.csdn.net/u013626215/article/details/88796172
+
 4、如何自己实现一个简单的Handler-Looper框架？
 
 八
