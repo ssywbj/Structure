@@ -83,9 +83,22 @@ C.是否对算法效果有验证闭环的意识
 
 九
 1、如何规避Android P对访问私有API的限制
+https://www.jianshu.com/p/c8b101b18616
 2、如何实现换肤功能
+https://cloud.tencent.com/developer/article/1742184
 3、VirtualApk如何实现插件化
+https://github.com/didi/VirtualAPK
+https://blog.csdn.net/yyh352091626/article/details/74852390
+https://www.jianshu.com/p/c62e889dd266
 4、Tinker如何实现热修复
+https://www.jianshu.com/p/1c2e1c1931af
+https://github.com/Tencent/tinker
+https://www.jianshu.com/p/6ae1e09ebbf5
+
+浅谈android性能优化之启动过程(冷启动和热启动)
+https://www.jb51.net/article/122034.htm
+https://blog.csdn.net/lingguiqin/article/details/79382240
+
 
 十
 1、如何开发优化类工作
