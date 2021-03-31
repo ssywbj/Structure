@@ -57,6 +57,15 @@ https://www.jianshu.com/p/82b357bfdfcd
 https://www.jianshu.com/p/9b53f7030ee2
 JobIntentService
 
+SurfaceView
+https://www.jianshu.com/p/07fa4180f0a5?appinstall=0
+https://blog.csdn.net/wtt945482445/article/details/52599724
+https://blog.csdn.net/hjjdehao/article/details/109010105
+http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2014/1213/2153.html
+https://www.sohu.com/a/156467653_733133
+http://www.cocoachina.com/articles/52088
+https://www.jianshu.com/p/6e5291518483
+
 五
 1、CPU架构适配需要注意哪些问题？
 2、Java Native方法与Native函数是怎么绑定的？
