@@ -1,12 +1,8 @@
 package com.suheng.structure.view;
 
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,12 +11,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
+        /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();
         ImageView imageView = findViewById(R.id.view_image);
         imageView.setImageDrawable(drawable);
         drawable.start();
-        Log.d("SVGView", "drawable, NumberOfFrames: " + drawable.getNumberOfFrames() + ", Duration: " + drawable.getDuration(0));
+        Log.d("SVGView", "drawable, NumberOfFrames: " + drawable.getNumberOfFrames() + ", Duration: " + drawable.getDuration(0));*/
     }
 
 }

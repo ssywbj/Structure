@@ -18,9 +18,9 @@
         android:layout_width="match_parent"
         android:layout_height="180dp" />-->
 
-    <com.suheng.structure.view.SVGView
+    <!--<com.suheng.structure.view.SVGView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" />-->
 
     <ImageView
         android:id="@+id/view_image"
@@ -51,4 +51,8 @@
     <!--<com.suheng.structure.view.InfiniteLine3
         android:layout_width="match_parent"
         android:layout_height="180dp" />-->
+
+    <com.suheng.structure.view.SurfaceViewImpl
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </FrameLayout>

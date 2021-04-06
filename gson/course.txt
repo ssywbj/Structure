@@ -104,13 +104,22 @@ C.是否对算法效果有验证闭环的意识
 
 九
 1、如何规避Android P对访问私有API的限制
-https://www.jianshu.com/p/c8b101b18616
+a.是否能够熟练使用Java反射（中级）
+b.是否有Hook调用系统API的开发经验（高级）
+c.是否对底层源码有扎实的语言功底和较强的分析能力（高级）
+https://github.com/tiann/FreeReflection/
+
 2、如何实现换肤功能
+a.是否了解Android的资源加载流程（高级）
+b.是否对各种换肤方案有深入的研究和分析（高级）
+c.可以借机引入插件化、热修复相关的话题
 https://cloud.tencent.com/developer/article/1742184
+
 3、VirtualApk如何实现插件化
 https://github.com/didi/VirtualAPK
 https://blog.csdn.net/yyh352091626/article/details/74852390
 https://www.jianshu.com/p/c62e889dd266
+
 4、Tinker如何实现热修复
 https://www.jianshu.com/p/1c2e1c1931af
 https://github.com/Tencent/tinker
