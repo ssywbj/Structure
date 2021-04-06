@@ -31,11 +31,17 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
     private final Rect mRectMinute = new Rect();
     private final Rect mRectTextMinute = new Rect();
 
+    private final Rect mRectClock = new Rect();
+    private final Rect mRectSecondPointer = new Rect();
+    private final Rect mRectMinutePointer = new Rect();
+
     private final Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
             Log.d(TAG, "Second Runnable, Second Runnable");
             drawSecond();
+
+            drawSecondPointer();
 
             long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
             if (getHandler() != null) {
@@ -49,6 +55,7 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Time Changed Receiver: action = " + intent.getAction());
             drawMinute();
+            drawMinutePointer();
         }
     };
 
@@ -85,6 +92,9 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
         //new Thread(this).start();
         //this.draw();
 
+        //setZOrderOnTop(true);//设置画布  背景透明
+        //holder.setFormat(PixelFormat.TRANSLUCENT);
+
         this.drawBg(holder);
 
         if (getHandler() != null) {
@@ -97,18 +107,30 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
         intentFilter.addAction(Intent.ACTION_TIME_TICK);
         getContext().registerReceiver(mTimeChangedReceiver, intentFilter);
         this.drawMinute();
+
+        //this.drawCircle(holder);
+        this.drawMinutePointer();
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Log.d(TAG, "surfaceChanged: format = " + format + ", width = " + width + ", height = " + height);
         final int rectWidth = 100, rectHeight = 80;
-        mRectSecond.set((width - rectWidth) / 2, height / 2 - 5 - rectHeight, (width + rectWidth) / 2, height / 2 - 5);
-        mRectMinute.set((width - rectWidth) / 2, height / 2 + 5, (width + rectWidth) / 2, height / 2 + 5 + rectHeight);
+        mRectSecond.set((width - rectWidth) / 2, 5, (width + rectWidth) / 2, 5 + rectHeight);
+        mRectMinute.set((width - rectWidth) / 2, 10 + rectHeight, (width + rectWidth) / 2, 10 + 2 * rectHeight);
+
+        final int radius = 300, secondPointerWidth = 6, minutePointerWidth = 10;
+        mRectClock.set((width - radius) / 2, 20 + 2 * rectHeight, (width + radius) / 2, 20 + 2 * rectHeight + radius);
+        mRectSecondPointer.set((width - secondPointerWidth) / 2, 20 + 2 * rectHeight, (width + secondPointerWidth) / 2, 20 + 2 * rectHeight + radius / 2);
+        mRectMinutePointer.set((width - minutePointerWidth) / 2, 60 + 2 * rectHeight, (width + minutePointerWidth) / 2, 20 + 2 * rectHeight + radius / 2);
 
         this.drawBg(holder);
         this.drawSecond();
         this.drawMinute();
+
+        this.drawCircle(holder);
+        this.drawSecondPointer();
+        this.drawMinutePointer();
     }
 
     @Override
@@ -131,7 +153,7 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
     private void drawBg(SurfaceHolder holder) {
         Canvas canvas = null;
         try {
-            canvas = holder.lockCanvas();
+            canvas = holder.lockCanvas(null);
             if (canvas == null) {
                 return;
             }
@@ -153,12 +175,24 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
                 return;
             }
 
+            //https://blog.csdn.net/skai10/article/details/8905198?utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.baidujs&dist_request_id=&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.baidujs
+            /*Paint paint = new Paint();
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            canvas.drawPaint(paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));*/
+
             canvas.drawRect(mRectSecond, mPaintSecond);
+            //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            //canvas.drawARGB(0,0,0,0);
             Calendar calendar = Calendar.getInstance();
             int second = calendar.get(Calendar.SECOND);
             String text = second / 10 + "" + second % 10;
             mPaintText.getTextBounds(text, 0, text.length(), mRectTextSecond);
             canvas.drawText(text, mRectSecond.centerX() - mRectTextSecond.centerX(), mRectSecond.centerY() - mRectTextSecond.centerY(), mPaintText);
+
+            /*Paint clearPaint = new Paint();
+            clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            canvas.drawRect(0, 0, mRectSecond.width(), mRectSecond.height(), clearPaint);*/
         } finally {
             if (canvas != null) {
                 surfaceHolder.unlockCanvasAndPost(canvas);
@@ -186,6 +220,80 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
                 surfaceHolder.unlockCanvasAndPost(canvas);
             }
         }
+    }
+
+    private void drawCircle(SurfaceHolder holder) {
+        /*Canvas canvas = null;
+        try {
+            canvas = holder.lockCanvas(mRectCircle);
+            if (canvas == null) {
+                return;
+            }
+
+            canvas.drawCircle(mRectCircle.centerX(), mRectCircle.centerY()
+                    , mRectCircle.width() / 2f, mPaintText);
+        } finally {
+            if (canvas != null) {
+                holder.unlockCanvasAndPost(canvas);
+            }
+        }*/
+    }
+
+    private void drawSecondPointer() {
+        SurfaceHolder surfaceHolder = getHolder();
+        Canvas canvas = null;
+        try {
+            canvas = surfaceHolder.lockCanvas(mRectClock);
+            if (canvas == null) {
+                return;
+            }
+
+            canvas.drawCircle(mRectClock.centerX(), mRectClock.centerY()
+                    , mRectClock.width() / 2f, mPaintText);
+
+            Calendar calendar = Calendar.getInstance();
+            int second = calendar.get(Calendar.SECOND);
+            float degrees = 1f * second / 60 * 360;
+            canvas.save();
+            canvas.rotate(degrees, mRectClock.centerX(), mRectClock.centerY());
+            canvas.drawRect(mRectSecondPointer, mPaintMinute);
+            canvas.restore();
+
+            int minute = calendar.get(Calendar.MINUTE);
+            canvas.save();
+            degrees = 1f * minute / 60 * 360;
+            canvas.rotate(degrees, mRectClock.centerX(), mRectClock.centerY());
+            canvas.drawRect(mRectMinutePointer, mPaintMinute);
+            canvas.restore();
+        } finally {
+            if (canvas != null) {
+                surfaceHolder.unlockCanvasAndPost(canvas);
+            }
+        }
+    }
+
+    private void drawMinutePointer() {
+        /*SurfaceHolder surfaceHolder = getHolder();
+        Canvas canvas = null;
+        try {
+            canvas = surfaceHolder.lockCanvas(mRectCircle);
+            if (canvas == null) {
+                return;
+            }
+
+            canvas.drawCircle(mRectCircle.centerX(), mRectCircle.centerY()
+                    , mRectCircle.width() / 2f, mPaintText);
+
+            Calendar calendar = Calendar.getInstance();
+            int minute = calendar.get(Calendar.MINUTE);
+            float degrees = 1f * minute / 60 * 360;
+            canvas.rotate(degrees, mRectCircle.centerX(), mRectCircle.centerY());
+            canvas.drawRect(mRectMinutePointer, mPaintMinute);
+        } finally {
+            if (canvas != null) {
+                surfaceHolder.unlockCanvasAndPost(canvas);
+            }
+        }*/
     }
 
 }
