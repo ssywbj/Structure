@@ -66,6 +66,10 @@ https://www.sohu.com/a/156467653_733133
 http://www.cocoachina.com/articles/52088
 https://www.jianshu.com/p/6e5291518483
 
+Java中的动态代理是什么
+https://www.cnblogs.com/czy16/p/7670014.html
+https://www.cnblogs.com/nasus/p/12205928.html
+
 五
 1、CPU架构适配需要注意哪些问题？
 2、Java Native方法与Native函数是怎么绑定的？
@@ -106,19 +110,33 @@ C.是否对算法效果有验证闭环的意识
 1、如何规避Android P对访问私有API的限制
 a.是否能够熟练使用Java反射（中级）
 b.是否有Hook调用系统API的开发经验（高级）
+https://www.jianshu.com/p/3185d49418b9
 c.是否对底层源码有扎实的语言功底和较强的分析能力（高级）
 https://github.com/tiann/FreeReflection/
 
 2、如何实现换肤功能
 a.是否了解Android的资源加载流程（高级）
 b.是否对各种换肤方案有深入的研究和分析（高级）
-c.可以借机引入插件化、热修复相关的话题
-https://cloud.tencent.com/developer/article/1742184
+c.可以借机引入插件化、热修复相关的话题（高级）
+https://blog.csdn.net/qq_30266615/article/details/103773188
+https://www.jianshu.com/p/a1e2a8d32fe6
+Javasist、RePlugin
+https://blog.csdn.net/ShuSheng0007/article/details/81269295
 
 3、VirtualApk如何实现插件化
+a.是否清楚插件化框架如何实现插件APK的类加载（高级）
+b.是否清楚插件化框架如何实现APK的的资源加载（高级）
+c.是否清楚插件化框架如何实现对四大组件的支持（高级）
 https://github.com/didi/VirtualAPK
 https://blog.csdn.net/yyh352091626/article/details/74852390
 https://www.jianshu.com/p/c62e889dd266
+
+Android Hook 简介
+https://www.jianshu.com/p/3185d49418b9
+https://www.jianshu.com/p/4f6d20076922
+
+DroidPlugin
+https://github.com/DroidPluginTeam/DroidPlugin
 
 4、Tinker如何实现热修复
 https://www.jianshu.com/p/1c2e1c1931af
