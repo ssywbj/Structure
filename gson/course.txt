@@ -139,6 +139,10 @@ DroidPlugin
 https://github.com/DroidPluginTeam/DroidPlugin
 
 4、Tinker如何实现热修复
+a.是否有过热修复的实战经验？（中级）
+b.是否清楚热修复方案如何对代码进行更新（高级）
+c.是否清楚热修复方案如何对资源进行更新（高级）
+d.是否具备框架设计开发的技术功底和技术素养（高级）
 https://www.jianshu.com/p/1c2e1c1931af
 https://github.com/Tencent/tinker
 https://www.jianshu.com/p/6ae1e09ebbf5
@@ -146,7 +150,6 @@ https://www.jianshu.com/p/6ae1e09ebbf5
 浅谈android性能优化之启动过程(冷启动和热启动)
 https://www.jb51.net/article/122034.htm
 https://blog.csdn.net/lingguiqin/article/details/79382240
-
 
 十
 1、如何开发优化类工作
