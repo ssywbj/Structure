@@ -94,7 +94,12 @@ https://www.dazhuanlan.com/2020/03/26/5e7c55a0e8bc5/
 https://blog.csdn.net/huagbo/article/details/98472663
 
 3、主线程的Looper为什么不会导致应用ANR？
+a.是否了解ANR的产生条件（中级）
+b.是否对Android App的进程运行机制有深入理解（高级）
+c.是否对Hooper的消息机制有深刻的理解（高级）
+d.是否对IO多路复用有一定的认识（高级）
 https://blog.csdn.net/u013626215/article/details/88796172
+Looper为什么不会导致CPU占用率高
 
 4、如何自己实现一个简单的Handler-Looper框架？
 
