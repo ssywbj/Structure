@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -75,14 +76,14 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
         mPaintText = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaintText.setTextSize(50);
         mPaintText.setTypeface(Typeface.DEFAULT_BOLD);
-        mPaintText.setColor(Color.BLACK);
+        mPaintText.setColor(Color.GREEN);
 
         mPaintSecond = new Paint();
         mPaintSecond.setStyle(Paint.Style.FILL);
         mPaintSecond.setColor(Color.BLUE);
 
         mPaintMinute = new Paint(mPaintSecond);
-        mPaintMinute.setColor(Color.WHITE);
+        mPaintMinute.setColor(Color.RED);
     }
 
     @Override
@@ -108,7 +109,7 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
         getContext().registerReceiver(mTimeChangedReceiver, intentFilter);
         this.drawMinute();
 
-        //this.drawCircle(holder);
+        this.drawCircle(holder);
         this.drawMinutePointer();
     }
 
@@ -143,6 +144,12 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
         getContext().unregisterReceiver(mTimeChangedReceiver);
     }
 
+    /*@Override
+    public boolean gatherTransparentRegion(Region region) {
+        region.op(mRectSecond.left, mRectSecond.top, mRectSecond.right, mRectSecond.bottom, Region.Op.UNION);
+        return false;
+    }*/
+
     @Override
     public void run() {
         while (mIsRunning) {
@@ -158,7 +165,9 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
                 return;
             }
 
-            canvas.drawColor(Color.RED);
+            //canvas.drawColor(Color.RED);
+            Rect rect = new Rect(0, 0, getWidth(), getHeight());
+            canvas.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.beauty), null, rect, null);
         } finally {
             if (canvas != null) {
                 holder.unlockCanvasAndPost(canvas);

@@ -79,7 +79,19 @@ https://www.cnblogs.com/nasus/p/12205928.html
 
 六
 1、Activity的启动流程是怎样的？
+a.是否熟悉Activity启动过程中与AMS的交互过程（高级）
+b.是否熟悉Binder通信机制（高级）
+c.是否了解插件化框架如何Hook Activity启动（高级）
+d.阐述Activity转场动画的实现原理可加分（中级）
+https://www.freesion.com/article/5412382956/
+https://blog.csdn.net/u012267215/article/details/91406211
+
 2、如何跨App启动Activity？有哪些注意事项？
+a.是否了解如何启动外部应用的Activity（初级）
+b.是否了解如何防止自己的Activity被外部非正当启动（中级）
+c.是否对拒绝服务漏洞有了解（高级）
+https://segmentfault.com/a/1190000002590573
+
 3、如何解决Activity参数的类型安全及接口繁琐的问题？
 4、如何在代码的任意位置为当前Activity添加View？
 5、如何实现类似微信的右滑返回效果？
@@ -94,14 +106,18 @@ https://www.dazhuanlan.com/2020/03/26/5e7c55a0e8bc5/
 https://blog.csdn.net/huagbo/article/details/98472663
 
 3、主线程的Looper为什么不会导致应用ANR？
+https://blog.csdn.net/qq_38366777/article/details/108956270
+https://www.jianshu.com/p/e149a2e89290
 a.是否了解ANR的产生条件（中级）
 b.是否对Android App的进程运行机制有深入理解（高级）
 c.是否对Hooper的消息机制有深刻的理解（高级）
 d.是否对IO多路复用有一定的认识（高级）
-https://blog.csdn.net/u013626215/article/details/88796172
 Looper为什么不会导致CPU占用率高
 
 4、如何自己实现一个简单的Handler-Looper框架？
+a.是否对Looper的消息机制有深刻的理解（高级）
+b.是否对Java并发包中提供的队列有较为清楚的认识（高级）
+c.是否能够运用所学知识设计出一套类似的框架（高级）
 
 八
 1、如何避免OOM的产生
