@@ -38,11 +38,22 @@ https://baijiahao.baidu.com/s?id=1662278131416406934&wfr=spider&for=pc
 https://blog.csdn.net/qq_38190057/article/details/80813516
 
 2、如何写出线程安全的程序？
+a.是否对线程安全有初步了解（初级）
+b.是否对线程安全的产生原因有思考（中级）
+c.是否知道final、volatile关键字的作用（中级）
+d.是否清楚1.5之前Java DCL为什么有缺陷（中级）
+e.是否清楚地知道如何编写线程安全的程序（高级）
+f.是否对ThreadLocal的使用注意事项有认识（高级）
 https://blog.csdn.net/chenliguan/article/details/110688852
 https://blog.csdn.net/Carson_Chu/article/details/109729083?utm_medium=distribute.pc_relevant_bbs_down.none-task-blog-baidujs-1.nonecase&depth_1-utm_source=distribute.pc_relevant_bbs_down.none-task-blog-baidujs-1.nonecase
 http://www.voidcn.com/article/p-wqkvames-bog.html
 
-3、如果你对CHM的原理不理解
+3、ConcurrentHashMap如何支持并发访问
+a.是否熟练掌握线程安全的概念（高级）
+b.是否深入理解CHM的各项并发优化的原理（高级）
+c.是否掌握锁优化的方法
+
+如果你对CHM的原理不理解
 https://blog.csdn.net/yangyiping525/article/details/108682178
 a.分析下HashMap为什么不是线程安全的
 https://blog.csdn.net/Chisunhuang/article/details/79041656
@@ -50,8 +61,17 @@ https://blog.csdn.net/wufaliang003/article/details/80219296
 b.编写迸发程序时你会怎么做，举例说明
 
 4、AtomicReference和AtomicReferenceFieldUpdater有何异同？
+a.是否熟练掌握原子操作的概念（中级）
+b.是否熟悉AR和ARFU这两个类的用法和原理（中级）
+c.是否对Java对象的内存占用有认识（高级）
+d.是否有较强的敏感度和深入探究的精神（高级）
 
 5、如何在Android中写出优雅的异步代码？
+a.是否熟练编写异步和同步的代码（中级）
+b.是否熟悉回调地狱（中级）
+c.是否能够熟练使用RxJava（中级）AutoDispose
+d.是否对Kotlin协程有了解（高级）替代RxJava
+e.是否具备编写良好代码的意识和能力（高级）
 
 https://www.jianshu.com/p/82b357bfdfcd
 https://www.jianshu.com/p/9b53f7030ee2
