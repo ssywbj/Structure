@@ -45,9 +45,7 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
             drawSecondPointer();
 
             long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
-            if (getHandler() != null) {
-                getHandler().postDelayed(mRunnable, delayMillis);
-            }
+            postDelayed(mRunnable, delayMillis);
         }
     };
 
@@ -88,7 +86,7 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.d(TAG, "surfaceCreated: handler = " + getHandler() + ", holder = " + holder);
+        Log.d(TAG, "surfaceCreated: holder = " + holder);
         mIsRunning = true;
         //new Thread(this).start();
         //this.draw();
@@ -98,9 +96,7 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
 
         this.drawBg(holder);
 
-        if (getHandler() != null) {
-            getHandler().post(mRunnable);
-        }
+        post(mRunnable);
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
@@ -138,9 +134,7 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.d(TAG, "surfaceDestroyed, surfaceDestroyed");
         mIsRunning = false;
-        if (getHandler() != null) {
-            getHandler().removeCallbacks(mRunnable);
-        }
+        removeCallbacks(mRunnable);
         getContext().unregisterReceiver(mTimeChangedReceiver);
     }
 

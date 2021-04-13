@@ -1,9 +1,15 @@
 package com.suheng.structure.view;
 
+import android.app.Activity;
+import android.app.Application;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.lang.ref.WeakReference;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,4 +48,44 @@ public class MainActivity extends AppCompatActivity {
             Log.i("wbj_maine", "INFO-, INFO-, INFO-");
         }
     }
+
+    private static WeakReference<Activity> mCurrentActivity;
+
+    Application.ActivityLifecycleCallbacks mActivityLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
+        @Override
+        public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+            mCurrentActivity = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void onActivityStarted(@NonNull Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityResumed(@NonNull Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityPaused(@NonNull Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityStopped(@NonNull Activity activity) {
+
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+
+        }
+
+        @Override
+        public void onActivityDestroyed(@NonNull Activity activity) {
+
+        }
+    };
+
 }
