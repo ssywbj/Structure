@@ -156,11 +156,33 @@ c.是否能够运用所学知识设计出一套类似的框架（高级）
 
 八
 1、如何避免OOM的产生
+a.是否对Java内存管理机制有一定认识（中级）
+b.是否对Android内存有过优化经验（高级）
+c.是否在代码编写时有良好的习惯避免内存消耗（高级）
+https://blog.csdn.net/zuo_er_lyf/article/details/90598937
+https://www.jianshu.com/p/6c29b5909eaa
+IntDef
+内存优化5R法则
+
 2、如何对图片进行缓存
-A.是否对缓存淘汰算法有一定的研究
-B.是否对常见的图片加载框架有深入研究
-C.是否对算法效果有验证闭环的意识
+A.是否对缓存淘汰算法有一定的研究（高级）
+B.是否对常见的图片加载框架有深入研究（高级）
+C.是否对算法效果有验证闭环的意识（高级）
+LRU(Least Recently Used)、LruCache
+LFU(Least Frequently Used)
+
 3、如何计算图片占用内存的大小
+a.是否了解图片加载到内存的过程以及变换（高级）
+b.是否清楚如何对图片内存占用大小进行优化（高级）
+图片体积优化
+a.跟文件存储格式无关
+b.使用inSampleSize采样：大图 -> 小图
+c.使用矩阵变换来放大图片：小图 -> 大图
+d.使用RGB_565来加载不透明图片
+e.使用9-patch图片做背景
+f.不使用图片（a.优先使用VectorDrawable；b.使用程序实现动画）
+
+ps：索引模式（Index Color）
 
 九
 1、如何规避Android P对访问私有API的限制
