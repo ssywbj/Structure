@@ -59,4 +59,12 @@
     <com.suheng.structure.view.TextureViewImpl
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <!--<com.suheng.structure.view.MaskPierceView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.suheng.structure.view.PorterDuffView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
 </FrameLayout>

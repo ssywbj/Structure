@@ -139,6 +139,7 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
             if (canvas == null) {
                 return;
             }
+            Log.v(TAG, "Bg Canvas: " + canvas);
 
             //canvas.drawColor(Color.RED);
             Rect rect = new Rect(0, 0, getWidth(), getHeight());
@@ -174,6 +175,7 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
             if (canvas == null) {
                 return;
             }
+            Log.d(TAG, "Second Canvas: " + canvas);
 
             //https://blog.csdn.net/skai10/article/details/8905198?utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.baidujs&dist_request_id=&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.baidujs
             /*Paint paint = new Paint();
@@ -182,7 +184,7 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));*/
 
             //canvas.drawRect(mRectSecond, mPaintSecond);
-            canvas.drawColor(Color.RED, PorterDuff.Mode.CLEAR);
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
             //canvas.drawARGB(0,0,0,0);
             Calendar calendar = Calendar.getInstance();
             int second = calendar.get(Calendar.SECOND);
@@ -239,6 +241,7 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
             if (canvas == null) {
                 return;
             }
+            Log.i(TAG, "Minute Canvas: " + canvas);
 
             canvas.drawRect(mRectMinute, mPaintMinute);
             Calendar calendar = Calendar.getInstance();
