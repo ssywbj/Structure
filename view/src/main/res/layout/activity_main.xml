@@ -6,11 +6,11 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <!--<com.suheng.structure.view.Hexagon4ProgressBar
+    <com.suheng.structure.view.Hexagon4ProgressBar
         android:layout_width="match_parent"
         android:layout_height="180dp" />
 
-    <com.suheng.structure.view.Hexagon2ProgressBar
+    <!--<com.suheng.structure.view.Hexagon2ProgressBar
         android:layout_width="match_parent"
         android:layout_height="180dp" />-->
 
@@ -56,9 +56,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />-->
 
-    <com.suheng.structure.view.TextureViewImpl
+    <!--<com.suheng.structure.view.TextureViewImpl
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" />-->
 
     <!--<com.suheng.structure.view.MaskPierceView
         android:layout_width="match_parent"

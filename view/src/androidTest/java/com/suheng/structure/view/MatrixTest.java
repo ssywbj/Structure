@@ -1,8 +1,7 @@
-package com.suheng.structure.database;
+package com.suheng.structure.view;
 
 import android.graphics.Matrix;
 import android.graphics.RectF;
-import android.icu.text.TimeZoneNames;
 import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -11,8 +10,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
-import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -21,17 +18,12 @@ import java.util.TimeZone;
  */
 @RunWith(AndroidJUnit4.class)
 public class MatrixTest {
-    private static final String TAG = "Wbj";
+    private static final String TAG = MatrixTest.class.getSimpleName();
 
     @Test
     public void textUnitMatrix() {
         Matrix matrix = new Matrix();//新建一个矩阵，默认是单位矩阵
         Log.d(TAG, "unit matrix: " + matrix.toString() + "\n" + matrix.toShortString());
-
-        TimeZone timeZone = TimeZone.getDefault();
-        Log.d(TAG, "displayName: " + timeZone.getDisplayName() + ", id: " + timeZone.getID());
-        TimeZoneNames zoneNames = TimeZoneNames.getInstance(Locale.getDefault());
-        Log.d(TAG, "getExemplarLocationName: " + zoneNames.getExemplarLocationName(timeZone.getID()));
     }
 
     @Test
