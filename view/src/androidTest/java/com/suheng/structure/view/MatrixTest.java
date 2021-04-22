@@ -208,6 +208,10 @@ public class MatrixTest {
         Log.v(TAG, "preScale preTranslate matrix: " + matrix.toShortString());
         matrix.mapRect(dst, src);
         Log.d(TAG, "preScale preTranslate result: " + dst.toString());
+
+        //pre、post与post、post结果一样，post、pre与pre、pre结果一样
+        //感觉pre、post与字面理解效果一样，如："preScale(0.5f, 0.8f)，postTranslate(20, 30)"按字面理解就
+        //是先缩放括号里面的指定数值再平移括号里面的指定数值，想法可能不正确，持续探究中
     }
 
 }

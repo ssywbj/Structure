@@ -24,7 +24,7 @@ public class Hexagon4ProgressBar extends View {
 
     private final Path mPath = new Path();
     private Paint mPaintPath;
-    private final int mLineLen = 240;
+    private final int mLineLen = 230;
 
     public Hexagon4ProgressBar(Context context) {
         super(context);
@@ -44,42 +44,60 @@ public class Hexagon4ProgressBar extends View {
         mPaint.setColor(Color.BLACK);//画笔颜色
 
         mPaintPath = new Paint(mPaint);
-        mPaintPath.setStrokeWidth(24f);
+        mPaintPath.setStrokeWidth(26f);
         mPaintPath.setPathEffect(new CornerPathEffect(4));
         //mPaintPath.setStrokeJoin(Paint.Join.ROUND);
 
-        this.makePathByDegrees();
+        //mPath.set(this.makePathByDegrees());
         mPath.set(this.makePathByMatrix());
     }
 
     private Path makePathByMatrix() {
-        Path path = new Path();
         float[] src = {0, 0}; //原点
-        float[] dst = new float[2]; //line1终点坐标
+        float[] point1 = new float[2]; //第一个顶点的坐标
         Matrix matrix = new Matrix();
         matrix.postTranslate(mLineLen, 0);
-        matrix.mapPoints(dst, src);
-        float[] firstLine = {src[0], src[1], dst[0], dst[1]}; //line1坐标
-        Log.d(TAG, "line1: " + Arrays.toString(firstLine));
+        matrix.mapPoints(point1, src);
 
-        //path.moveTo(firstLine[0],firstLine[1]);
-        path.moveTo(firstLine[2], firstLine[3]);
+        Path path = new Path();
 
+        final int lines = 6, len = lines - 1;
+        final float degrees = 360f / lines;
+
+        Log.i(TAG, "point1: " + Arrays.toString(point1));
+        path.moveTo(point1[0], point1[1]);
+        float[] point = new float[2]; //用于保存顶点坐标
         matrix.reset();
-        for (int i = 0; i < 5; i++) {
-            dst = new float[4]; //用于保存线段坐标：起点及终点的X、Y轴坐标
-            matrix.postRotate(60);
-            matrix.mapPoints(dst, firstLine);
-            Log.d(TAG, "line" + (i + 2) + ": " + Arrays.toString(dst));
+        for (int i = 0; i < len; i++) {
+            matrix.postRotate(degrees);
+            matrix.mapPoints(point, point1); //变换后得到各个顶点的坐标
+            Log.i(TAG, "point" + (i + 2) + ": " + Arrays.toString(point));
 
-            path.lineTo(dst[2], dst[3]);
+            path.lineTo(point[0], point[1]);
         }
-        path.close();
 
+        /*float[] line1 = {src[0], src[1], point1[0], point1[1]}; //line1坐标
+        Log.d(TAG, "line1: " + Arrays.toString(line1));
+        path.reset();
+        //path.moveTo(line1[0],line1[1]);
+        //path.lineTo(line1[2], line1[3]);
+        path.moveTo(line1[2], line1[3]);
+        matrix.reset();
+        float[] line = new float[4]; //用于保存线段坐标：起点及终点的X、Y轴坐标
+        for (int i = 0; i < len; i++) {
+            matrix.postRotate(degrees);
+            matrix.mapPoints(line, line1);
+            Log.d(TAG, "line" + (i + 2) + ": " + Arrays.toString(line));
+
+            path.lineTo(line[2], line[3]);
+        }*/
+
+        path.close();
         return path;
     }
 
     private Path makePathByDegrees() {
+        //正六边形
         final double radians = Math.toRadians(60);
         float lenCos60 = (float) (mLineLen * Math.cos(radians));
         float lenSin60 = (float) (mLineLen * Math.sin(radians));
@@ -92,8 +110,8 @@ public class Hexagon4ProgressBar extends View {
         Log.i(TAG, "point3: " + (-lenCos60) + ", " + lenSin60);
         path.lineTo(-mLineLen, 0); //第四个顶点
         Log.i(TAG, "point4: " + (-mLineLen) + ", " + 0);
-        path.lineTo(lenCos60, -lenSin60); //第五个顶点
-        Log.i(TAG, "point5: " + lenCos60 + ", " + (-lenSin60));
+        path.lineTo(-lenCos60, -lenSin60); //第五个顶点
+        Log.i(TAG, "point5: " + (-lenCos60) + ", " + (-lenSin60));
         path.lineTo(lenCos60, -lenSin60); //第六个顶点
         Log.i(TAG, "point6: " + lenCos60 + ", " + (-lenSin60));
         path.close();
