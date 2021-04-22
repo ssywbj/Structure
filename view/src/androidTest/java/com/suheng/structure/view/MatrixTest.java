@@ -61,6 +61,7 @@ public class MatrixTest {
         Log.d(TAG, "mapRadius: " + result);
     }
 
+    //前乘后乘都是以原最新结果的矩阵为参照，前乘表示它放在乘号前面做为被乘数，后乘表示它放在乘号后面做为乘数
     @Test
     public void testPrePost() {
         float[] src = new float[]{20, 20, 300, 300};
@@ -71,73 +72,76 @@ public class MatrixTest {
 
         Log.i(TAG, "Scale---------------------------------------------------------------");
         matrix.preScale(0.4f, 1.1f);
-        Log.d(TAG, "pre scale matrix: " + matrix.toShortString());
+        Log.d(TAG, "preScale matrix: " + matrix.toShortString());
         matrix.mapPoints(dst, src);
-        Log.d(TAG, "pre scale points: " + Arrays.toString(dst));
+        Log.d(TAG, "preScale points: " + Arrays.toString(dst));
         matrix.reset();
         matrix.postScale(0.4f, 1.1f);
-        Log.i(TAG, "post scale matrix: " + matrix.toShortString());
+        Log.i(TAG, "postScale matrix: " + matrix.toShortString());
         matrix.mapPoints(dst, src);
-        Log.i(TAG, "post scale points: " + Arrays.toString(dst));
+        Log.i(TAG, "postScale points: " + Arrays.toString(dst));
         matrix.setScale(0.4f, 1.1f);
-        Log.v(TAG, "scale matrix: " + matrix.toShortString());
+        Log.v(TAG, "setScale matrix: " + matrix.toShortString());
         matrix.mapPoints(dst, src);
-        Log.v(TAG, "scale points: " + Arrays.toString(dst));
+        Log.v(TAG, "setScale points: " + Arrays.toString(dst));
 
         Log.d(TAG, "Translate-----------------------------------------------------------");
         matrix.reset();
         matrix.preTranslate(4f, 7f);
-        Log.d(TAG, "pre translate matrix: " + matrix.toShortString());
+        Log.d(TAG, "preTranslate matrix: " + matrix.toShortString());
         matrix.mapPoints(dst, src);
-        Log.d(TAG, "pre translate points: " + Arrays.toString(dst));
+        Log.d(TAG, "preTranslate points: " + Arrays.toString(dst));
         matrix.reset();
         matrix.postTranslate(4f, 7f);
-        Log.i(TAG, "post translate matrix: " + matrix.toShortString());
+        Log.i(TAG, "postTranslate matrix: " + matrix.toShortString());
         matrix.mapPoints(dst, src);
-        Log.i(TAG, "post translate points: " + Arrays.toString(dst));
+        Log.i(TAG, "postTranslate points: " + Arrays.toString(dst));
         matrix.setTranslate(4f, 7f);
-        Log.v(TAG, "set translate matrix: " + matrix.toShortString());
+        Log.v(TAG, "setTranslate matrix: " + matrix.toShortString());
         matrix.mapPoints(dst, src);
-        Log.v(TAG, "set translate points: " + Arrays.toString(dst));
+        Log.v(TAG, "setTranslate points: " + Arrays.toString(dst));
 
         Log.d(TAG, "Rotate----------------------------------------------------------------");
         matrix.reset();
         matrix.preRotate(30);
-        Log.d(TAG, "pre rotate matrix: " + matrix.toShortString());
+        Log.d(TAG, "preRotate matrix: " + matrix.toShortString());
         matrix.mapPoints(dst, src);
-        Log.d(TAG, "pre rotate points: " + Arrays.toString(dst));
+        Log.d(TAG, "preRotate points: " + Arrays.toString(dst));
         matrix.reset();
         matrix.postRotate(30);
-        Log.i(TAG, "post rotate matrix: " + matrix.toShortString());
+        Log.i(TAG, "postRotate matrix: " + matrix.toShortString());
         matrix.mapPoints(dst, src);
-        Log.i(TAG, "post rotate points: " + Arrays.toString(dst));
+        Log.i(TAG, "postRotate points: " + Arrays.toString(dst));
         matrix.setRotate(30);
-        Log.v(TAG, "set rotate matrix: " + matrix.toShortString());
+        Log.v(TAG, "setRotate matrix: " + matrix.toShortString());
         matrix.mapPoints(dst, src);
-        Log.v(TAG, "set rotate points: " + Arrays.toString(dst));
+        Log.v(TAG, "setRotate points: " + Arrays.toString(dst));
 
         Log.d(TAG, "Skew----------------------------------------------------------------");
         matrix.reset();
         matrix.preSkew(3, 2);
-        Log.d(TAG, "pre skew matrix: " + matrix.toShortString());
+        Log.d(TAG, "preSkew matrix: " + matrix.toShortString());
         matrix.mapPoints(dst, src);
-        Log.d(TAG, "pre skew points: " + Arrays.toString(dst));
+        Log.d(TAG, "preSkew points: " + Arrays.toString(dst));
         matrix.reset();
         matrix.postSkew(3, 2);
-        Log.i(TAG, "post skew matrix: " + matrix.toShortString());
+        Log.i(TAG, "postSkew matrix: " + matrix.toShortString());
         matrix.mapPoints(dst, src);
-        Log.i(TAG, "post skew points: " + Arrays.toString(dst));
+        Log.i(TAG, "postSkew points: " + Arrays.toString(dst));
         matrix.setSkew(3, 2);
-        Log.v(TAG, "set skew matrix: " + matrix.toShortString());
+        Log.v(TAG, "setSkew matrix: " + matrix.toShortString());
         matrix.mapPoints(dst, src);
-        Log.v(TAG, "set skew points: " + Arrays.toString(dst));
+        Log.v(TAG, "setSkew points: " + Arrays.toString(dst));
 
-        //单个变换，pre、post、set的结果都一样
+        //pre：前乘，post：后乘。
+        //当一个矩阵与单位矩阵做乘法运算时，满足乘法交换律，所以单个变换时前乘后乘结果都一样；set是直接去改变矩阵的值，不做运算
     }
 
     @Test
     public void testMapRect() {
         RectF rectF = new RectF(100, 100, 500, 600);
+        Log.i(TAG, "origin rect: " + rectF.toString());
+
         Matrix matrix = new Matrix();
         matrix.setScale(0.5f, 0.8f);
         Log.v(TAG, "set scale matrix: " + matrix.toShortString());
@@ -161,7 +165,7 @@ public class MatrixTest {
         result = matrix.mapRect(dst, rectF);
         Log.v(TAG, "setScale preTranslate result: " + result + ", " + dst.toString());
 
-        //复合变换：后乘、前乘结果不一致
+        //复合变换：非单位矩阵的后乘、前乘结果不一致（即就是平时所说的矩阵乘法不满足乘法交换率）
     }
 
     //https://zh.wikipedia.org/wiki/%E7%9F%A9%E9%99%A3%E4%B9%98%E6%B3%95
@@ -170,6 +174,7 @@ public class MatrixTest {
     @Test
     public void testComplexMulti() {
         RectF src = new RectF(100, 100, 500, 600);
+        Log.i(TAG, "origin rect: " + src.toString());
         RectF dst = new RectF();
 
         Log.w(TAG, "pre post---------------------------------------------");
