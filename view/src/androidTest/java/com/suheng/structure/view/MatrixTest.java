@@ -164,6 +164,9 @@ public class MatrixTest {
         //复合变换：后乘、前乘结果不一致
     }
 
+    //https://zh.wikipedia.org/wiki/%E7%9F%A9%E9%99%A3%E4%B9%98%E6%B3%95
+    //https://www.cnblogs.com/ljy-endl/p/11411665.html
+    //https://baike.baidu.com/item/%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95/5446029?fr=aladdin
     @Test
     public void testComplexMulti() {
         RectF src = new RectF(100, 100, 500, 600);
@@ -174,7 +177,7 @@ public class MatrixTest {
         matrix.preScale(0.5f, 0.8f);
         matrix.mapRect(dst, src);
         Log.i(TAG, "preScale result: " + dst.toString());
-        matrix.postTranslate(20, 30);
+        matrix.postTranslate(20, 30); //translate矩阵乘以前面scale后的矩阵
         Log.v(TAG, "preScale postTranslate matrix: " + matrix.toShortString());
         matrix.mapRect(dst, src);
         Log.d(TAG, "preScale postTranslate result: " + dst.toString());
@@ -184,7 +187,7 @@ public class MatrixTest {
         matrix.postScale(0.5f, 0.8f);
         matrix.mapRect(dst, src);
         Log.i(TAG, "postScale result: " + dst.toString());
-        matrix.preTranslate(20, 30);
+        matrix.preTranslate(20, 30); //前面scale后的矩阵乘以translate矩阵
         Log.v(TAG, "postScale preTranslate matrix: " + matrix.toShortString());
         matrix.mapRect(dst, src);
         Log.d(TAG, "postScale preTranslate result: " + dst.toString());
