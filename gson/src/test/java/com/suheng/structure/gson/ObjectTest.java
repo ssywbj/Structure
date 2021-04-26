@@ -118,9 +118,11 @@ public class ObjectTest {
     //###:end----------------------------toString()------------------------------
 
     //###:start-----------------------HashCode与List、HashSet、HashMap等类----------------------------
-    //https://blog.csdn.net/qq_33619378/article/details/92661494
     //https://blog.csdn.net/lijiecao0226/article/details/24609559
     //https://www.cnblogs.com/whgk/p/6071617.html
+    //先通过hashcode来比较，如果hashcode相等，那么就用equals方法来比较两个对象是否相等
+    //1、如果两个对象equals相等，那么这两个对象的HashCode一定也相同
+    //2、如果两个对象的HashCode相同，不代表两个对象就相同，只能说明这两个对象在散列存储结构中，存放于同一个hash表中
     @Test
     public void testHashCodeUser3() {
         User3 user1 = new User3("11", "Wbj", 30);
