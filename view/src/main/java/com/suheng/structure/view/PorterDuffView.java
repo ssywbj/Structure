@@ -18,7 +18,6 @@ public class PorterDuffView extends View {
     private PorterDuffXfermode mXfermode;
     private Rect mRect;
 
-
     public PorterDuffView(Context context) {
         super(context);
         this.init();
@@ -55,10 +54,13 @@ public class PorterDuffView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        //this.paintXfermode(canvas);
-        this.paintSaveLayer(canvas);
+        this.paintXfermode(canvas);
+        //this.paintSaveLayer(canvas);
     }
 
+    //https://developer.android.com/reference/android/graphics/PorterDuff.Mode
+    //https://gitee.com/aruba/Xfermode
+    //https://blog.csdn.net/aigestudio/article/details/41316141
     private void paintXfermode(Canvas canvas) {
         int sc = canvas.saveLayer(0, 0, getWidth(), getHeight(), null, Canvas.ALL_SAVE_FLAG);//创建一个新的layer
         //canvas.drawARGB(255, 0xFF, 0, 0);//画布颜色
