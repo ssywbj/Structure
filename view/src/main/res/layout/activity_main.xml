@@ -6,9 +6,9 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <com.suheng.structure.view.Hexagon4ProgressBar
+    <!--<com.suheng.structure.view.Hexagon4ProgressBar
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" />-->
 
     <!--<com.suheng.structure.view.Hexagon2ProgressBar
         android:layout_width="match_parent"
@@ -67,4 +67,8 @@
     <!--<com.suheng.structure.view.PorterDuffView
         android:layout_width="match_parent"
         android:layout_height="match_parent" />-->
+
+    <com.suheng.structure.view.TimeDemoView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </FrameLayout>
