@@ -4,10 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
@@ -78,7 +80,7 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
 
         mPaintSecond = new Paint();
         mPaintSecond.setStyle(Paint.Style.FILL);
-        mPaintSecond.setColor(Color.BLUE);
+        mPaintSecond.setColor(Color.YELLOW);
 
         mPaintMinute = new Paint(mPaintSecond);
         mPaintMinute.setColor(Color.RED);
@@ -91,8 +93,9 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
         //new Thread(this).start();
         //this.draw();
 
-        //setZOrderOnTop(true);//设置画布  背景透明
-        //holder.setFormat(PixelFormat.TRANSLUCENT);
+        setZOrderOnTop(true);//设置画布  背景透明
+        setZOrderMediaOverlay(true);
+        holder.setFormat(PixelFormat.TRANSLUCENT);
 
         this.drawBg(holder);
 
@@ -159,9 +162,9 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
                 return;
             }
 
-            //canvas.drawColor(Color.RED);
-            Rect rect = new Rect(0, 0, getWidth(), getHeight());
-            canvas.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.beauty), null, rect, null);
+            canvas.drawColor(Color.BLUE);
+            //Rect rect = new Rect(0, 0, getWidth(), getHeight());
+            //canvas.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.beauty), null, rect, null);
         } finally {
             if (canvas != null) {
                 holder.unlockCanvasAndPost(canvas);
@@ -178,24 +181,22 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
                 return;
             }
 
-            //https://blog.csdn.net/skai10/article/details/8905198?utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.baidujs&dist_request_id=&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.baidujs
-            /*Paint paint = new Paint();
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            Paint paint = new Paint();
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
             canvas.drawPaint(paint);
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));*/
+            /*paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            canvas.drawPaint(paint);*/
 
-            canvas.drawRect(mRectSecond, mPaintSecond);
+            int saveLayer = canvas.saveLayer(mRectSecond.left, mRectSecond.top, mRectSecond.right, mRectSecond.bottom, null);
+            //canvas.drawRect(mRectSecond, mPaintSecond);
             //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-            //canvas.drawARGB(0,0,0,0);
+
             Calendar calendar = Calendar.getInstance();
             int second = calendar.get(Calendar.SECOND);
             String text = second / 10 + "" + second % 10;
             mPaintText.getTextBounds(text, 0, text.length(), mRectTextSecond);
             canvas.drawText(text, mRectSecond.centerX() - mRectTextSecond.centerX(), mRectSecond.centerY() - mRectTextSecond.centerY(), mPaintText);
-
-            /*Paint clearPaint = new Paint();
-            clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            canvas.drawRect(0, 0, mRectSecond.width(), mRectSecond.height(), clearPaint);*/
+            canvas.restoreToCount(saveLayer);
         } finally {
             if (canvas != null) {
                 surfaceHolder.unlockCanvasAndPost(canvas);
@@ -212,7 +213,7 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
                 return;
             }
 
-            canvas.drawRect(mRectMinute, mPaintMinute);
+            //canvas.drawRect(mRectMinute, mPaintMinute);
             Calendar calendar = Calendar.getInstance();
             int minute = calendar.get(Calendar.MINUTE);
             String text = minute / 10 + "" + minute % 10;

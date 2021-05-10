@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
@@ -42,7 +43,7 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
             Log.d(TAG, "Second Runnable, Second Runnable");
             drawSecond();
 
-            drawSecondPointer();
+            //drawSecondPointer();
 
             long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
             postDelayed(mRunnable, delayMillis);
@@ -177,24 +178,20 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
             }
             Log.d(TAG, "Second Canvas: " + canvas);
 
-            //https://blog.csdn.net/skai10/article/details/8905198?utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.baidujs&dist_request_id=&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.baidujs
             /*Paint paint = new Paint();
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             canvas.drawPaint(paint);
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));*/
 
-            //canvas.drawRect(mRectSecond, mPaintSecond);
-            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-            //canvas.drawARGB(0,0,0,0);
+            int saveLayer = canvas.saveLayer(mRectSecond.left, mRectSecond.top, mRectSecond.right, mRectSecond.bottom, null);
             Calendar calendar = Calendar.getInstance();
             int second = calendar.get(Calendar.SECOND);
             String text = second / 10 + "" + second % 10;
             mPaintText.getTextBounds(text, 0, text.length(), mRectTextSecond);
+            mPaintText.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
             canvas.drawText(text, mRectSecond.centerX() - mRectTextSecond.centerX(), mRectSecond.centerY() - mRectTextSecond.centerY(), mPaintText);
-
-            /*Paint clearPaint = new Paint();
-            clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            canvas.drawRect(0, 0, mRectSecond.width(), mRectSecond.height(), clearPaint);*/
+            mPaintText.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            canvas.restoreToCount(saveLayer);
         } finally {
             if (canvas != null) {
                 unlockCanvasAndPost(canvas);
@@ -243,7 +240,7 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
             }
             Log.i(TAG, "Minute Canvas: " + canvas);
 
-            canvas.drawRect(mRectMinute, mPaintMinute);
+            //canvas.drawRect(mRectMinute, mPaintMinute);
             Calendar calendar = Calendar.getInstance();
             int minute = calendar.get(Calendar.MINUTE);
             String text = minute / 10 + "" + minute % 10;
