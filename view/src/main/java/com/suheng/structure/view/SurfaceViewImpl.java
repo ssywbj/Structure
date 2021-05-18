@@ -38,6 +38,8 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
     private final Rect mRectSecondPointer = new Rect();
     private final Rect mRectMinutePointer = new Rect();
 
+    private boolean mIsRegisteredTimeChangedReceiver;
+
     private final Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
@@ -82,7 +84,8 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
         mPaintSecond.setStyle(Paint.Style.FILL);
         mPaintSecond.setColor(Color.YELLOW);
 
-        mPaintMinute = new Paint(mPaintSecond);
+        mPaintMinute = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaintMinute.setStyle(Paint.Style.FILL);
         mPaintMinute.setColor(Color.RED);
     }
 
@@ -101,11 +104,15 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
 
         post(mRunnable);
 
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
-        intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
-        intentFilter.addAction(Intent.ACTION_TIME_TICK);
-        getContext().registerReceiver(mTimeChangedReceiver, intentFilter);
+        if (!mIsRegisteredTimeChangedReceiver) {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+            intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
+            intentFilter.addAction(Intent.ACTION_TIME_TICK);
+            getContext().registerReceiver(mTimeChangedReceiver, intentFilter);
+            mIsRegisteredTimeChangedReceiver = true;
+        }
+
         this.drawMinute();
 
         this.drawCircle(holder);
@@ -138,7 +145,10 @@ public class SurfaceViewImpl extends SurfaceView implements SurfaceHolder.Callba
         Log.d(TAG, "surfaceDestroyed, surfaceDestroyed");
         mIsRunning = false;
         removeCallbacks(mRunnable);
-        getContext().unregisterReceiver(mTimeChangedReceiver);
+        if (mIsRegisteredTimeChangedReceiver) {
+            getContext().unregisterReceiver(mTimeChangedReceiver);
+            mIsRegisteredTimeChangedReceiver = false;
+        }
     }
 
     /*@Override

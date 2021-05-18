@@ -52,9 +52,9 @@
         android:layout_width="match_parent"
         android:layout_height="180dp" />-->
 
-    <com.suheng.structure.view.SurfaceViewImpl
+    <!--<com.suheng.structure.view.SurfaceViewImpl
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" />-->
 
     <!--<com.suheng.structure.view.TextureViewImpl
         android:layout_width="match_parent"
@@ -71,4 +71,8 @@
     <!--<com.suheng.structure.view.TimeDemoView
         android:layout_width="match_parent"
         android:layout_height="match_parent" />-->
+
+    <com.suheng.structure.view.ShaderView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </FrameLayout>

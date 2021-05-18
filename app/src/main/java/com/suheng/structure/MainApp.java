@@ -3,18 +3,17 @@ package com.suheng.structure;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.suheng.structure.common.CommonApplication;
 import com.suheng.structure.common.arouter.RouteTable;
-import com.suheng.structure.hook.HookManager;
 
 public class MainApp extends CommonApplication {
 
     @Override
     public void onCreate() {
-        try {
+        /*try {
             HookManager.init();
             HookManager.injectInstrumentation();
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
         super.onCreate();
         if (BuildConfig.MODULE1_IS_LIBRARY) {//module1的Application配置（如果有）

@@ -70,7 +70,7 @@ public class Hexagon4ProgressBar extends View {
         matrix.reset();
         for (int i = 0; i < len; i++) {
             matrix.postRotate(degrees);
-            matrix.mapPoints(point, point1); //变换后得到各个顶点的坐标
+            matrix.mapPoints(point, point1); //以原点为中心点，变换后得到各个顶点的坐标
             Log.i(TAG, "point" + (i + 2) + ": " + Arrays.toString(point));
 
             path.lineTo(point[0], point[1]);
