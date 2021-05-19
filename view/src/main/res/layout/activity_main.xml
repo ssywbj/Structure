@@ -76,7 +76,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />-->
 
-    <com.suheng.structure.view.GuaguakaView
+    <!--<com.suheng.structure.view.GuaguakaView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />-->
+
+    <com.suheng.structure.view.ColorFilterView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </FrameLayout>
