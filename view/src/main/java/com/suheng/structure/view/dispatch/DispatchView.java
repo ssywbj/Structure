@@ -81,11 +81,27 @@ public class DispatchView extends androidx.appcompat.widget.AppCompatButton {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        boolean onTouchEvent = super.onTouchEvent(event); //View的onTouchEvent默认返回true，即在它这里把事件消费掉
+        //Button的onTouchEvent默认返回true，即在它这里把事件消费掉，而View的onTouchEvent默认返回false
+        boolean onTouchEvent = super.onTouchEvent(event);
         onTouchEvent = false;
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+        int action = event.getAction();
+        /*if (action == MotionEvent.ACTION_DOWN) {
             Log.v(DispatchActivity.TAG, "事件分发机制处理 ----> 子View onTouchEvent: " + onTouchEvent);
+        }*/
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN: //按下后才有事件，所以一般第一个事件为Down
+                Log.v(DispatchActivity.TAG, "事件分发机制处理 ----> 子View onTouchEvent: " + onTouchEvent + ", " + action);
+                //如果返回false，那么move、up等事件将不会被触发，因为false表示不消费事件，事件会被直接往父容器传递
+                break;
+            case MotionEvent.ACTION_MOVE:
+                Log.v(DispatchActivity.TAG, "事件分发机制处理 ----> 子View onTouchEvent Move: " + action);
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.v(DispatchActivity.TAG, "事件分发机制处理 ----> 子View onTouchEvent Up: " + action);
+                break;
         }
+
         return onTouchEvent;
     }
 

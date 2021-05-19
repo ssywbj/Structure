@@ -67,11 +67,6 @@ public class ShaderView extends View {
     private int mTrans;
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-    }
-
-    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         int rectWidth = mBg.getWidth() * 2;
@@ -134,12 +129,12 @@ public class ShaderView extends View {
         mLinearGradient2.setLocalMatrix(mMatrixText);
         mPaintText.setShader(mLinearGradient2);
         canvas.drawText(mText, 0, 0, mPaintText);
-        mTrans += 10;
+        mTrans += 15;
         if (mTrans >= 2 * mRectText.width()) {
             mTrans = 0;
         }
         canvas.restore();
-        postInvalidateDelayed(20);
+        postInvalidateDelayed(30);
     }
 
 }
