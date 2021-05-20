@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
@@ -41,7 +42,7 @@ public class GuaguakaView2 extends View {
     }
 
     private void init() {
-        mBitmapResult = BitmapFactory.decodeResource(getResources(), R.mipmap.guaguaka_result);
+        //mBitmapResult = BitmapFactory.decodeResource(getResources(), R.mipmap.guaguaka_result);
         mBitmapOver = BitmapFactory.decodeResource(getResources(), R.mipmap.guaguaka_over);
 
         mPaintDst.setDither(true);
@@ -65,6 +66,16 @@ public class GuaguakaView2 extends View {
         mRectF.set(0, 0, w, mBitmapOver.getHeight());
         mBitmapDst = Bitmap.createBitmap(w, mBitmapOver.getHeight(), Bitmap.Config.ARGB_8888);
         mCanvasDst = new Canvas(mBitmapDst);
+
+        mBitmapResult = Bitmap.createBitmap(w, mBitmapOver.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(mBitmapResult);
+        canvas.drawColor(Color.WHITE);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setDither(true);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setColor(Color.BLUE);
+        paint.setTextSize(40);
+        canvas.drawText("中奖结果", w / 2f, mBitmapOver.getHeight() / 2f, paint);
     }
 
     //http://www.voidcn.com/article/p-wvoxlzgs-ev.html
