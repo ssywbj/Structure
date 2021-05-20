@@ -44,8 +44,6 @@ public class GuaguakaView extends View {
         mBitmapResult = BitmapFactory.decodeResource(getResources(), R.mipmap.guaguaka_result);
         mBitmapOver = BitmapFactory.decodeResource(getResources(), R.mipmap.guaguaka_over);
 
-        mBitmapDst = Bitmap.createBitmap(mBitmapOver.getWidth(), mBitmapOver.getHeight(), Bitmap.Config.ARGB_8888);
-        mCanvasDst = new Canvas(mBitmapDst);
         mPaintDst.setDither(true);
         mPaintDst.setStyle(Paint.Style.STROKE);
         mPaintDst.setStrokeWidth(40);
@@ -55,22 +53,33 @@ public class GuaguakaView extends View {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        setMeasuredDimension(getMeasuredWidth(), mBitmapOver.getHeight());
+    }
+
+    @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         mRectF.set(0, 0, w, mBitmapOver.getHeight());
+        mBitmapDst = Bitmap.createBitmap(w, mBitmapOver.getHeight(), Bitmap.Config.ARGB_8888);
+        mCanvasDst = new Canvas(mBitmapDst);
     }
 
     //http://www.voidcn.com/article/p-wvoxlzgs-ev.html
     //https://www.jianshu.com/p/0e8d39d36fa0
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        final float x = event.getX(), y = event.getY();
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                mPathDst.moveTo(event.getX(), event.getY());
+                mPathDst.reset();
+                mPathDst.moveTo(x, y);
                 return true;
             case MotionEvent.ACTION_MOVE:
-                mPathDst.lineTo(event.getX(), event.getY());
-                postInvalidate();
+                mPathDst.lineTo(x, y);
+                invalidate();
                 break;
         }
         //performClick();
@@ -85,8 +94,6 @@ public class GuaguakaView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.clipRect(mRectF);
-
         canvas.drawBitmap(mBitmapResult, null, mRectF, null);
 
         int saveLayer = canvas.saveLayer(mRectF, null);
