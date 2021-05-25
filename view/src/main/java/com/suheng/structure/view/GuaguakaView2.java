@@ -104,10 +104,10 @@ public class GuaguakaView2 extends View {
         return super.onTouchEvent(event);
     }
 
-    /*@Override
+    @Override
     public boolean performClick() {
         return super.performClick();
-    }*/
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
