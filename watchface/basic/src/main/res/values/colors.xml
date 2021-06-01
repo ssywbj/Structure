@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="conner_btn_bg">#333333</color>
+    <color name="conner_btn_blue_border">#02A0E9</color>
+
+    <color name="wiz_scale_scrollbar_thumb_color">#515151</color>
+    <color name="wiz_scale_scrollbar_track_color">#181818</color>
+    <color name="wiz_primary_color_alpha_22">#22ffffff</color>
+    <color name="wiz_window_background_color">#000000</color>
+
+    <drawable name="transl">#00000000</drawable>
+</resources>

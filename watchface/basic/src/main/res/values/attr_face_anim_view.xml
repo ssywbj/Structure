@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FaceAnimView">
+        <attr name="isEditMode" format="boolean" />
+        <attr name="isHour24Scale" format="boolean" />
+        <attr name="isDimMode" format="boolean" />
+    </declare-styleable>
+</resources>

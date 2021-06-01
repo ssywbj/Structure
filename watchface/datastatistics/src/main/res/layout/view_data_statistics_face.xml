@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.wiz.watchface.datastatistics.view.PanelView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:backgroundTexture="@drawable/panel_bg" />
+
+    <com.wiz.watchface.datastatistics.view.TimeView
+        android:id="@+id/time_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <com.wiz.watchface.datastatistics.view.WeatherView
+        android:id="@+id/weather_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="46dp" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="@dimen/icon_margin_top_part_start"
+        android:layout_marginTop="@dimen/icon_margin_bottom_part"
+        android:rotation="-45">
+
+        <com.wiz.watchface.datastatistics.view.KcalView
+            android:id="@+id/kcal_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/kcal_view"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="4dp"
+            android:layout_toEndOf="@id/kcal_view"
+            android:text="kcal"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_data_unit"
+            android:textStyle="italic|bold" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="@dimen/icon_margin_top2_part_top"
+        android:layout_marginEnd="@dimen/icon_margin_top2_part_start"
+        android:rotation="45">
+
+        <TextView
+            android:id="@+id/text_steps_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="2dp"
+            android:text="steps"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_data_unit"
+            android:textStyle="italic|bold" />
+
+        <com.wiz.watchface.datastatistics.view.StepsView
+            android:id="@+id/steps_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/text_steps_unit" />
+    </RelativeLayout>
+
+    <com.wiz.watchface.datastatistics.view.BatteryView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/icon_margin_bottom_part"
+        android:layout_marginBottom="@dimen/icon_margin_bottom_part"
+        android:rotation="-45" />
+
+    <com.wiz.watchface.datastatistics.view.AlarmView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="@dimen/icon_margin_bottom_part"
+        android:layout_marginBottom="@dimen/icon_margin_bottom_part"
+        android:rotation="45" />
+
+</merge>

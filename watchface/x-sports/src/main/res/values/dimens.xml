@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="number_width">37.4dp</dimen>
+    <dimen name="number_height">66dp</dimen><!--60, 34, *1.1-->
+
+    <dimen name="number_width_small">13.6dp</dimen>
+    <dimen name="number_height_small">24dp</dimen><!--60, 34, /2.5-->
+
+    <dimen name="colon_width_small">7.8dp</dimen>
+    <dimen name="colon_height_small">@dimen/number_height_small</dimen><!--60, 17, /2.5-->
+
+    <dimen name="icon_info_width">28dp</dimen>
+</resources>

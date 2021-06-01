@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="conner_btn_radius">46dp</dimen>
+    <dimen name="sport_layout_padding_start">12dp</dimen>
+    <dimen name="sport_layout_padding_top">30dp</dimen>
+
+    <dimen name="bottom_layout_mt">-4dp</dimen>
+
+    <dimen name="bottom_layout_mb">20dp</dimen>
+    <dimen name="bottom_text_size">24sp</dimen>
+    <dimen name="text_title_size">31sp</dimen>
+    <dimen name="text_subtitle_size">23sp</dimen>
+
+    <dimen name="horizontal_spacing">14dp</dimen>
+</resources>

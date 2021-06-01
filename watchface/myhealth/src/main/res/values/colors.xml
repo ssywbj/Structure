@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="second_number">@color/alphabet_uppercase</color>
+    <color name="my_health_little_triangle">#F7C744</color>
+    <color name="alphabet_uppercase">#CCFFFFFF</color>
+</resources>

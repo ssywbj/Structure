@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">简约指针</string>
+    <string name="bone_black_wallpaper">@string/app_name</string>
+</resources>

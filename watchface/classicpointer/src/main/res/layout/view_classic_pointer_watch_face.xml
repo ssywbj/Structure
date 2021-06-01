@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.wiz.watch.faceclassic.ClassicWatchFace
+        android:id="@+id/classic_pointer_watch_face"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.structure.wallpaper.basic.view.WizImageButton
+        android:id="@+id/btn_top_left"
+        android:layout_width="@dimen/conner_btn_dimen"
+        android:layout_height="@dimen/conner_btn_dimen"
+        android:layout_alignStart="@id/classic_pointer_watch_face"
+        android:layout_alignTop="@id/classic_pointer_watch_face"
+        android:layout_marginStart="@dimen/conner_btn_margin"
+        android:layout_marginTop="@dimen/conner_btn_margin"
+        android:background="@drawable/corner_btn_bg" />
+
+    <com.structure.wallpaper.basic.view.WizImageButton
+        android:id="@+id/btn_top_right"
+        android:layout_width="@dimen/conner_btn_dimen"
+        android:layout_height="@dimen/conner_btn_dimen"
+        android:layout_alignTop="@id/classic_pointer_watch_face"
+        android:layout_alignEnd="@id/classic_pointer_watch_face"
+        android:layout_marginTop="@dimen/conner_btn_margin"
+        android:layout_marginEnd="@dimen/conner_btn_margin"
+        android:background="@drawable/corner_btn_bg" />
+
+    <com.structure.wallpaper.basic.view.WizImageButton
+        android:id="@+id/btn_bottom_left"
+        android:layout_width="@dimen/conner_btn_dimen"
+        android:layout_height="@dimen/conner_btn_dimen"
+        android:layout_alignStart="@id/classic_pointer_watch_face"
+        android:layout_alignBottom="@id/classic_pointer_watch_face"
+        android:layout_marginStart="@dimen/conner_btn_margin"
+        android:layout_marginBottom="@dimen/conner_btn_margin"
+        android:background="@drawable/corner_btn_bg" />
+
+    <com.structure.wallpaper.basic.view.WizImageButton
+        android:id="@+id/btn_bottom_right"
+        android:layout_width="@dimen/conner_btn_dimen"
+        android:layout_height="@dimen/conner_btn_dimen"
+        android:layout_alignEnd="@id/classic_pointer_watch_face"
+        android:layout_alignBottom="@id/classic_pointer_watch_face"
+        android:layout_marginEnd="@dimen/conner_btn_margin"
+        android:layout_marginBottom="@dimen/conner_btn_margin"
+        android:background="@drawable/corner_btn_bg" />
+</merge>

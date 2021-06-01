@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">漫游时钟</string>
+    <string name="roaming_watch_face">@string/app_name</string>
+    <string name="roaming_watch_face_config_aty">设置时区</string>
+</resources>

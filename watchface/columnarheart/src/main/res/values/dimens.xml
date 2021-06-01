@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="info_icon">70dp</dimen>
+    <dimen name="bottom_icon">80dp</dimen>
+</resources>

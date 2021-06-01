@@ -1,0 +1,5 @@
+<resources>
+    <string name="dstatistics_app_name">Data Statistics</string>
+    <string name="tpe_unit_c" translatable="false">%s&#176;C</string>
+    <string name="tpe_unit_f" translatable="false">%s&#176;F</string>
+</resources>

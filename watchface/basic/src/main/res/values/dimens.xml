@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="conner_btn_radius">12dp</dimen>
+    <dimen name="circle_btn_radius">60dp</dimen>
+    <dimen name="rect_btn_radius">30dp</dimen>
+    <dimen name="face_plugin_margin_lr">4dp</dimen>
+    <dimen name="stroke_width">3dp</dimen>
+
+    <dimen name="wiz_scale_scrollbar_track_width_default">6dp</dimen>
+    <dimen name="wiz_scale_scrollbar_paddingEnd_default">3dp</dimen>
+    <dimen name="wiz_scale_scrollbar_thumb_width_default">6dp</dimen>
+    <dimen name="wiz_scale_scrollbar_paddingTop_default">0dp</dimen>
+
+    <dimen name="plugin_parent_layout_height">120dp</dimen>
+    <dimen name="plugin_parent_layout_padding">1.6dp</dimen>
+
+    <dimen name="app_list_ptop">1dp</dimen>
+    <dimen name="app_list_pbootom">@dimen/app_list_ptop</dimen>
+    <dimen name="app_list_pstart">1dp</dimen>
+</resources>

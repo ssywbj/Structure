@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">简约数字</string>
+    <string name="paris_black_wallpaper">@string/app_name</string>
+</resources>

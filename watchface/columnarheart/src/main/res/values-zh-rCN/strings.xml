@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">多功能 ①</string>
+    <string name="columnar_heart_watch_face">@string/app_name</string>
+</resources>

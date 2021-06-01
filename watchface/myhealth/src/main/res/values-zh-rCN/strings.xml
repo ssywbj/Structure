@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">我的健康</string>
+    <string name="my_health_watch_face">@string/app_name</string>
+</resources>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Photo</string>
+    <string name="photo_face">@string/app_name</string>
+    <string name="photo_face_config_aty">Choose a Photo</string>
+    <string name="take_photo">Take a Photo</string>
+    <string name="pick_from_album">Choose from Album</string>
+</resources>

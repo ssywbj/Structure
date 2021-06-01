@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="ratio" format="float" translatable="false" type="string">0.8</item>
+
+    <dimen name="margin_left">20dp</dimen>
+    <dimen name="margin_top">10dp</dimen>
+</resources>

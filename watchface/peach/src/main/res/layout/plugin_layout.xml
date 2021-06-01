@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.wiz.watch.facepeach.MonitorFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/monitor"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animation_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg_color" />
+
+    <com.wiz.watch.facepeach.TimeView
+        android:id="@+id/time"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/time_view_height"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="@dimen/time_view_margin_horizontal"
+        app:time_color="@color/time_color" />
+</com.wiz.watch.facepeach.MonitorFrameLayout>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="8dp"
+    android:paddingTop="20dp"
+    android:paddingEnd="8dp"
+    android:paddingBottom="6dp">
+
+    <com.wiz.watchface.plugindata.view.HorizontalTimeView
+        android:id="@+id/view_horizontal_time"
+        android:layout_width="match_parent"
+        android:layout_height="114dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp" />
+
+    <com.wiz.watchface.plugindata.view.HorizontalDateView
+        android:id="@+id/view_horizontal_date"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_below="@id/view_horizontal_time"
+        android:layout_marginStart="26dp"
+        android:layout_marginEnd="26dp" />
+
+    <FrameLayout
+        android:id="@+id/parent_plugin_1"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/plugin_parent_layout_height"
+        android:layout_above="@+id/parent_plugin_2"
+        android:layout_marginStart="@dimen/face_plugin_margin_lr"
+        android:layout_marginEnd="@dimen/face_plugin_margin_lr"
+        android:padding="@dimen/plugin_parent_layout_padding">
+
+        <FrameLayout
+            android:id="@+id/root_plugin_1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+
+        <Button
+            android:id="@+id/btn_shade_plugin_1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/parent_plugin_2"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/plugin_parent_layout_height"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="@dimen/face_plugin_margin_lr"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="@dimen/face_plugin_margin_lr"
+        android:padding="@dimen/plugin_parent_layout_padding">
+
+        <FrameLayout
+            android:id="@+id/root_plugin_2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+
+        <Button
+            android:id="@+id/btn_shade_plugin_2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent" />
+    </FrameLayout>
+
+</RelativeLayout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="icon_margin_top_part_start">62dp</dimen>
+
+    <dimen name="icon_margin_top2_part_start">54dp</dimen>
+    <dimen name="icon_margin_top2_part_top">70dp</dimen>
+
+    <dimen name="icon_margin_bottom_part">72dp</dimen>
+
+    <dimen name="date_top_offset">70dp</dimen>
+
+    <dimen name="text_week">36dp</dimen>
+    <dimen name="text_week_en_small">34dp</dimen>
+    <dimen name="text_week_en_big">40dp</dimen>
+    <dimen name="text_month">34dp</dimen>
+    <dimen name="text_date">50dp</dimen>
+
+    <item name="ratio" format="float" translatable="false" type="string">1.4</item>
+    <dimen name="text_data">30dp</dimen>
+    <dimen name="text_data_unit">20sp</dimen>
+</resources>

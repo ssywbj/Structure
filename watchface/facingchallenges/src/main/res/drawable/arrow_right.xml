@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="25dp"
+    android:height="17dp"
+    android:viewportWidth="25"
+    android:viewportHeight="17">
+    <path
+        android:fillColor="@color/sport_icon"
+        android:fillType="evenOdd"
+        android:pathData="M12.0842,8.9236L6.0843,16.9238L0.0842,16.9238L6.0843,8.9236L0.0842,0.9238L6.0832,0.9238L12.0842,8.9236ZM24.0844,8.9239L18.0844,16.9238L12.0844,16.9238L18.0844,8.9239L12.0844,0.9238L18.0844,0.9238L24.0844,8.9239Z"
+        android:strokeWidth="1"
+        android:strokeColor="#00000000" />
+</vector>

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">健康圆环</string>
+    <string name="watch_face_name">@string/app_name</string>
+</resources>

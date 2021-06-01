@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.wiz.watch.facedynamic.view.DimPanelView
+        android:id="@+id/dim_dynamic_panel_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/face_panel"/>
+    <com.wiz.watch.facedynamic.view.DimWeekPanel
+        android:id="@+id/dim_dynamic_week_panel"
+        android:layout_width="124dp"
+        android:layout_height="124dp"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_marginTop="74dp" />
+
+    <com.wiz.watch.facedynamic.view.DimClockPanel
+        android:id="@+id/dim_dynamic_second_clock_panel"
+        android:layout_width="162dp"
+        android:layout_height="162dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="36dp" />
+
+    <com.wiz.watch.facedynamic.view.DimClockPanel
+        android:id="@+id/dim_dynamic_clock_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:hourPointer="@drawable/hour_pointer"
+        app:minutePointer="@drawable/minute_pointer"/>
+</FrameLayout>

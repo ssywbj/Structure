@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="number_big_height">20.8dp</dimen><!--80, 60, /2*1.04-->
+    <dimen name="number_big_width">15.6dp</dimen>
+
+    <dimen name="conner_btn_dimen">60dp</dimen>
+    <dimen name="conner_btn_margin">12dp</dimen>
+    <dimen name="conner_btn_radius">12dp</dimen>
+</resources>

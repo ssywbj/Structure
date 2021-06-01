@@ -1,12 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
-    <com.suheng.watchface.basic.view.PanelView
+    <!--<com.wiz.watch.facesimplepointer.SimplePointerWatchFace
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" />-->
 
+    <!--<com.wiz.watch.facesimplenumber.SimpleNumberWatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.facephoto.PhotoWatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.facemyhealth.MyHealthWatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.faceroamingclock.RoamingWatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.facedigitalbeat.DigitalBeatWatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.faceclassic.ClassicWatchFace
+        android:id="@+id/watch_face"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.facesimplepointer.SimplePointerWatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.facehealthdata.HealthDataWatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.facehealthycircle.HealthyCircleWatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.facexsports.XSportsWatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.facesundiary.SunDiaryWatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.facenumberstack.NumberStackWatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.facecolumnarheart.ColumnarHeartWatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+    <!--<com.wiz.watch.facemultifunction3.MultiFunction3WatchFace
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
 </FrameLayout>

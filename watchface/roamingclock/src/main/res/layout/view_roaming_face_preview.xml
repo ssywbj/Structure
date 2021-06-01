@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.wiz.watch.faceroamingclock.RoamingWatchFace
+        android:id="@+id/roaming_watch_face"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.structure.wallpaper.basic.view.WizButton
+        android:id="@+id/btn_pick_timezone"
+        android:layout_width="76dp"
+        android:layout_height="76dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="30dp"
+        android:background="@drawable/btn_pick_face_style" />
+
+</merge>

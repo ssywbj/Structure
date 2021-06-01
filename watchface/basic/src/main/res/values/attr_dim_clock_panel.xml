@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DimClockPanel">
+        <attr name="secondPointer" format="reference" />
+        <attr name="minutePointer" format="reference" />
+        <attr name="hourPointer" format="reference" />
+    </declare-styleable>
+</resources>

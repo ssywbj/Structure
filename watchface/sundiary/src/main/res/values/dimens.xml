@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="info_icon">32dp</dimen>
+    <dimen name="number_height">44dp</dimen>
+
+    <dimen name="number_height_small">26.4dp</dimen><!--44*0.6-->
+    <dimen name="number_0_width_small">31.2dp</dimen><!--52-->
+    <dimen name="number_1_width_small">14.4dp</dimen><!--24-->
+    <dimen name="number_2_width_small">25.8dp</dimen><!--43-->
+    <dimen name="number_3_width_small">24dp</dimen><!--40-->
+    <dimen name="number_4_width_small">22.8dp</dimen><!--38-->
+    <dimen name="number_5_width_small">25.2dp</dimen><!--42-->
+
+    <dimen name="alphabet_uppercase_31_width_small">18.6dp</dimen><!--31-->
+
+</resources>

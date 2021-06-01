@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Simple Number</string>
+    <string name="paris_black_wallpaper">@string/app_name</string>
+</resources>

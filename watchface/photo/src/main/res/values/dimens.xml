@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="ratio" format="float" translatable="false" type="string">0.9</item>
+    <dimen name="preview_btn_margin">30dp</dimen>
+    <dimen name="preview_btn_size">76dp</dimen>
+
+    <dimen name="margin_left">28dp</dimen>
+    <dimen name="margin_top">14dp</dimen>
+
+    <dimen name="wiz_button_bg_corner">46dp</dimen>
+    <dimen name="wiz_button_width">324dp</dimen>
+    <dimen name="wiz_button_height">84dp</dimen>
+    <dimen name="wiz_button_a4">30sp</dimen>
+</resources>

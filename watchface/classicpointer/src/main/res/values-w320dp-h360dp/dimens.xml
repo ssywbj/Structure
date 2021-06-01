@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="conner_btn_dimen">50dp</dimen>
+    <dimen name="conner_btn_margin">10dp</dimen>
+    <dimen name="conner_btn_radius">10dp</dimen>
+</resources>

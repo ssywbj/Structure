@@ -1,0 +1,54 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        applicationId "com.wiz.watch.faceheartcurve"
+        minSdkVersion 25
+        targetSdkVersion 30
+        versionCode 10000202
+        versionName "2.0.0.c"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            //minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
+            zipAlignEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.appcompat:appcompat:1.3.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    implementation project(path: ':watchface:basic')
+}
+
+/*
+def apkSignerPath = getRootDir().getPath() + "/ApkSigner.jar"
+def toBeSignedApkPath = getBuildDir().getPath() + "/outputs/apk/release/heartcurve-release-unsigned.apk"
+def signedApkPath = rootProject.ext.watchFaceApkDir.getPath() + File.separator + "WizFace_HeartCurve.apk"
+def requestUrl = "http://192.168.115.239/sign/sign"
+def signType = "normal"//签名类型：platform、normal、media、shared、testkey、verity、releasekey
+configurations {
+    apkSignClassPath
+}
+dependencies {
+    apkSignClassPath files("${apkSignerPath}")
+}
+task apkSignMulti(type: JavaExec, dependsOn: "assembleRelease") {
+    classpath = configurations.apkSignClassPath
+    main = "com.android.signapk.ApkSigner"
+    args("${toBeSignedApkPath}", "${signedApkPath}", "${requestUrl}", "${signType}")
+}*/

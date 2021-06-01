@@ -1,0 +1,1318 @@
+<timezones>
+    <timezone
+        id="Africa/Abidjan"
+        pinyin=" ">Abidjan , CotedIvoire
+    </timezone>
+    <timezone
+        id="Africa/Accra"
+        pinyin=" ">Accra , Republic of Ghana
+    </timezone>
+    <timezone
+        id="Africa/Addis_Ababa"
+        pinyin=" ">AddisAbaba , Ethiopia
+    </timezone>
+    <timezone
+        id="Australia/Adelaide"
+        pinyin=" ">Adelaide , Australia
+    </timezone>
+    <timezone
+        id="Asia/Aqtau"
+        pinyin=" ">Aktau , Kazakhstan
+    </timezone>
+    <timezone
+        id="America/Denver"
+        pinyin=" ">Albuquerque , USA
+    </timezone>
+    <timezone
+        id="Africa/Algiers"
+        pinyin=" ">Algiers , Algeria
+    </timezone>
+    <timezone
+        id="Asia/Almaty"
+        pinyin=" ">Almaty , Kazakhstan
+    </timezone>
+    <timezone
+        id="Asia/Amman"
+        pinyin=" ">Amman , Jordan
+    </timezone>
+    <timezone
+        id="Europe/Amsterdam-1"
+        pinyin=" ">Amsterdam , TheNetherlands
+    </timezone>
+    <timezone
+        id="Asia/Anadyr"
+        pinyin=" ">Anadyr , Russia
+    </timezone>
+    <timezone
+        id="America/Anchorage"
+        pinyin=" ">Anchorage , USA
+    </timezone>
+    <timezone
+        id="Europe/Istanbul"
+        pinyin=" ">Ankara , Turkey
+    </timezone>
+    <timezone
+        id="America/New_York-9"
+        pinyin=" ">AnnArbor , USA
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Anshan"
+        pinyin=" ">Anshan , China
+    </timezone>
+    <timezone
+        id="Atlantic/Bermuda-1"
+        pinyin=" ">Aruba , theNetherlands
+    </timezone>
+    <timezone
+        id="America/Santo_Domingo-2"
+        pinyin=" ">Asuncion , Paraguay
+    </timezone>
+    <timezone
+        id="Europe/Athens"
+        pinyin=" ">Athens , Greece
+    </timezone>
+    <timezone
+        id="America/New_York-8"
+        pinyin=" ">Atlanta , USA
+    </timezone>
+    <timezone
+        id="Pacific/Auckland"
+        pinyin=" ">Auckland , NewZealand
+    </timezone>
+    <timezone
+        id="CST6CDT-1"
+        pinyin=" ">Austin , USA
+    </timezone>
+    <timezone
+        id="Atlantic/Azores"
+        pinyin=" ">Azores , Portugal
+    </timezone>
+    <timezone
+        id="Asia/Baghdad"
+        pinyin=" ">Baghdad , Iraq
+    </timezone>
+    <timezone
+        id="Asia/Baku"
+        pinyin=" ">Baku , Azerbaijan
+    </timezone>
+    <timezone
+        id="EST5EDT-1"
+        pinyin=" ">Baltimore , USA
+    </timezone>
+    <timezone
+        id="Asia/Kolkata-3"
+        pinyin=" ">Bangalore , India
+    </timezone>
+    <timezone
+        id="Asia/Bangkok-1"
+        pinyin=" ">Bangkok , Thailand
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Baoding"
+        pinyin=" ">Baoding , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Baotou"
+        pinyin=" ">Baotou , China
+    </timezone>
+    <timezone
+        id="Europe/Madrid-1"
+        pinyin=" ">Barcelona , Spain
+    </timezone>
+    <timezone
+        id="Asia/Shanghai"
+        pinyin=" ">Beijing , China
+    </timezone>
+    <timezone
+        id="Asia/Beirut"
+        pinyin=" ">Beirut , Lebanon
+    </timezone>
+    <timezone
+        id="Europe/Belfast"
+        pinyin=" ">Belfast , UnitedKingdom
+    </timezone>
+    <timezone
+        id="Europe/Belgrade"
+        pinyin=" ">Belgrade , Serbia
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Benxi"
+        pinyin=" ">Benxi , China
+    </timezone>
+    <timezone
+        id="Europe/Berlin-1"
+        pinyin=" ">Berlin , Germany
+    </timezone>
+    <timezone
+        id="Atlantic/Bermuda"
+        pinyin=" ">Bermuda , British
+    </timezone>
+    <timezone
+        id="America/Bogota"
+        pinyin=" ">Bogota , Colombia
+    </timezone>
+    <timezone
+        id="America/New_York-4"
+        pinyin=" ">Boston , USA
+    </timezone>
+    <timezone
+        id="America/Denver-4"
+        pinyin=" ">Boulder , USA
+    </timezone>
+    <timezone
+        id="America/Sao_Paulo-1"
+        pinyin=" ">Brasilia , Brazil
+    </timezone>
+    <timezone
+        id="Europe/Bratislava"
+        pinyin=" ">Bratislava , SlovakRepublic
+    </timezone>
+    <timezone
+        id="Africa/Brazzaville"
+        pinyin=" ">Brazzaville , Congo
+    </timezone>
+    <timezone
+        id="America/Barbados"
+        pinyin=" ">Bridgetown , Barbados
+    </timezone>
+    <timezone
+        id="Australia/Brisbane"
+        pinyin=" ">Brisbane , Australia
+    </timezone>
+    <timezone
+        id="Europe/Brussels"
+        pinyin=" ">Brussels , Belgium
+    </timezone>
+    <timezone
+        id="Europe/Bucharest-2"
+        pinyin=" ">Bucharest , Romania
+    </timezone>
+    <timezone
+        id="Europe/Budapest"
+        pinyin=" ">Budapest , Hungary
+    </timezone>
+    <timezone
+        id="America/Buenos_Aires"
+        pinyin=" ">BuenosAires , Argentina
+    </timezone>
+    <timezone
+        id="Africa/Cairo"
+        pinyin=" ">Cairo , Egypt
+    </timezone>
+    <timezone
+        id="Asia/Calcutta"
+        pinyin=" ">Calcutta , India
+    </timezone>
+    <timezone
+        id="America/Denver-2"
+        pinyin=" ">Calgary , Canada
+    </timezone>
+    <timezone
+        id="America/Jacksonville"
+        pinyin=" ">Cambridge , British
+    </timezone>
+    <timezone
+        id="Atlantic/Canary"
+        pinyin=" ">CanaryIslands , Spain
+    </timezone>
+    <timezone
+        id="Australia/Canberra"
+        pinyin=" ">Canberra , Australia
+    </timezone>
+    <timezone
+        id="America/Chicago-13"
+        pinyin=" ">Cancun , Mexico
+    </timezone>
+    <timezone
+        id="Africa/Johannesburg-1"
+        pinyin=" ">CapeTown , SouthAfrica
+    </timezone>
+    <timezone
+        id="America/Caracas"
+        pinyin=" ">Caracas , Venezuela
+    </timezone>
+    <timezone
+        id="Africa/Casablanca"
+        pinyin=" ">Casablanca , Morocco
+    </timezone>
+    <timezone
+        id="America/Cayman-1"
+        pinyin=" ">CaymanIslands , British
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Changchun"
+        pinyin=" ">Changchun , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Changsha"
+        pinyin=" ">Changsha , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Changzhou"
+        pinyin=" ">Changzhou , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Chengdu"
+        pinyin=" ">Chengdu , China
+    </timezone>
+    <timezone
+        id="America/Chicago-5"
+        pinyin=" ">Chicago , USA
+    </timezone>
+    <timezone
+        id="America/Chihuahua"
+        pinyin=" ">Chihuahua , Mexico
+    </timezone>
+    <timezone
+        id="Europe/Chisinau"
+        pinyin=" ">Chisinau , Moldova
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Chongqing"
+        pinyin=" ">Chongqing , China
+    </timezone>
+    <timezone
+        id="Pacific/Kiritimati"
+        pinyin=" ">ChristmasIsland , Kiribati
+    </timezone>
+    <timezone
+        id="EST5EDT-3"
+        pinyin=" ">Cleveland , USA
+    </timezone>
+    <timezone
+        id="Asia/Colombo"
+        pinyin=" ">Colombo , SriLanka
+    </timezone>
+    <timezone
+        id="America/New_York-5"
+        pinyin=" ">Columbus , USA
+    </timezone>
+    <timezone
+        id="Africa/Conakry"
+        pinyin=" ">Conakry , Guinea
+    </timezone>
+    <timezone
+        id="Europe/Copenhagen"
+        pinyin=" ">Copenhagen , Denmark
+    </timezone>
+    <timezone
+        id="Africa/Dakar"
+        pinyin=" ">Dakar , Senegal
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Dalian"
+        pinyin=" ">Dalian , China
+    </timezone>
+    <timezone
+        id="America/Chicago-1"
+        pinyin=" ">Dallas , USA
+    </timezone>
+    <timezone
+        id="Asia/Damascus"
+        pinyin=" ">Damascus , Syria
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Daqing"
+        pinyin=" ">Daqing , China
+    </timezone>
+    <timezone
+        id="Africa/Dar_es_Salaam"
+        pinyin=" ">DaresSalaam , Tanzania
+    </timezone>
+    <timezone
+        id="Australia/Darwin"
+        pinyin=" ">Darwin , Australia
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Datong"
+        pinyin=" ">Datong , China
+    </timezone>
+    <timezone
+        id="America/Dawson_Creek-1"
+        pinyin=" ">DawsonCreek , Canada
+    </timezone>
+    <timezone
+        id="Asia/Kolkata"
+        pinyin=" ">Delhi , India
+    </timezone>
+    <timezone
+        id="America/Denver-1"
+        pinyin=" ">Denver , USA
+    </timezone>
+    <timezone
+        id="America/Detroit-1"
+        pinyin=" ">Detroit , USA
+    </timezone>
+    <timezone
+        id="Asia/Dhaka"
+        pinyin=" ">Dhaka , Bangladesh
+    </timezone>
+    <timezone
+        id="Africa/Djibouti"
+        pinyin=" ">Djibouti , Djibouti
+    </timezone>
+    <timezone
+        id="Asia/Qatar"
+        pinyin=" ">Doha , Qatar
+    </timezone>
+    <timezone
+        id="Asia/Dubai"
+        pinyin=" ">Dubai , UnitedArabEmirates
+    </timezone>
+    <timezone
+        id="Europe/Dublin"
+        pinyin=" ">Dublin , RepublicofIreland
+    </timezone>
+    <timezone
+        id="Chile/EasterIsland"
+        pinyin=" ">EasterIsland , Chile
+    </timezone>
+    <timezone
+        id="America/Edmonton"
+        pinyin=" ">Edmonton , Canada
+    </timezone>
+    <timezone
+        id="Europe/Berlin-3"
+        pinyin=" ">Frankfurt , Germany
+    </timezone>
+    <timezone
+        id="Africa/Freetown"
+        pinyin=" ">Freetown , SierraLeone
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Fushun"
+        pinyin=" ">Fushun , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Fuxin"
+        pinyin=" ">Fuxin , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Fuzhou"
+        pinyin=" ">Fuzhou , China
+    </timezone>
+    <timezone
+        id="Africa/Gaborone"
+        pinyin=" ">Gaborone , Botswana
+    </timezone>
+    <timezone
+        id="Asia/Gaza"
+        pinyin=" ">Gaza , Palestine
+    </timezone>
+    <timezone
+        id="Pacific/Guam"
+        pinyin=" ">Guam , Guam
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Guangzhou"
+        pinyin=" ">Guangzhou , China
+    </timezone>
+    <timezone
+        id="America/Guatemala-2"
+        pinyin=" ">GuatemalaCity , Guatemala
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Guiyang"
+        pinyin=" ">Guiyang , China
+    </timezone>
+    <timezone
+        id="Asia/Jerusalem-2"
+        pinyin=" ">Haifa , Israel
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Haikou"
+        pinyin=" ">Haikou , China
+    </timezone>
+    <timezone
+        id="America/Halifax"
+        pinyin=" ">Halifax , Canada
+    </timezone>
+    <timezone
+        id="Europe/Berlin-2"
+        pinyin=" ">Hamburg , Germany
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Handan"
+        pinyin=" ">Handan , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Hangzhou"
+        pinyin=" ">Hangzhou , China
+    </timezone>
+    <timezone
+        id="Asia/Bangkok-2"
+        pinyin=" ">Hanoi , Vietnam
+    </timezone>
+    <timezone
+        id="Africa/Harare"
+        pinyin=" ">Harare , Zimbabwe
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Harbin"
+        pinyin=" ">Harbin , China
+    </timezone>
+    <timezone
+        id="America/Havana"
+        pinyin=" ">Havana , Cuba
+    </timezone>
+    <timezone
+        id="Asia/Gaza-1"
+        pinyin=" ">Hebron , Palestine
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Hefei"
+        pinyin=" ">Hefei , China
+    </timezone>
+    <timezone
+        id="Europe/Helsinki"
+        pinyin=" ">Helsinki , Finland
+    </timezone>
+    <timezone
+        id="Australia/Hobart"
+        pinyin=" ">Hobart , Australia
+    </timezone>
+    <timezone
+        id="Asia/Ho_Chi_Minh"
+        pinyin=" ">HoChiMinhCity , Vietnam
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Hohhot"
+        pinyin=" ">Hohhot , China
+    </timezone>
+    <timezone
+        id="Asia/Hong_Kong"
+        pinyin=" ">HongKong , China
+    </timezone>
+    <timezone
+        id="Pacific/Honolulu"
+        pinyin=" ">Honolulu , USA
+    </timezone>
+    <timezone
+        id="America/Chicago-4"
+        pinyin=" ">Houston , USA
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Huai'an"
+        pinyin=" ">Huaian , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Huainan"
+        pinyin=" ">Huainan , China
+    </timezone>
+    <timezone
+        id="Asia/Kolkata-4"
+        pinyin=" ">Hyderabad , India
+    </timezone>
+    <timezone
+        id="America/Indiana/Indianapolis"
+        pinyin=" ">Indianapolis , USA
+    </timezone>
+    <timezone
+        id="Asia/Seoul-2"
+        pinyin=" ">Irkutsk , Russia
+    </timezone>
+    <timezone
+        id="Asia/Karachi-3"
+        pinyin=" ">Islamabad , Pakistan
+    </timezone>
+    <timezone
+        id="Europe/Isle_of_Man"
+        pinyin=" ">IsleofMan , UnitedKingdom
+    </timezone>
+    <timezone
+        id="Asia/Istanbul"
+        pinyin=" ">Istanbul , Turkey
+    </timezone>
+    <timezone
+        id="America/New_York-10"
+        pinyin=" ">Jacksonville , USA
+    </timezone>
+    <timezone
+        id="Asia/Jakarta"
+        pinyin=" ">Jakarta , Indonesia
+    </timezone>
+    <timezone
+        id="Asia/Jerusalem-1"
+        pinyin=" ">Jerusalem , Israel
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Jilin"
+        pinyin=" ">Jilin , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Jinan"
+        pinyin=" ">Jinan , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Jinzhou"
+        pinyin=" ">Jinzhou , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Jixi"
+        pinyin=" ">Jixi , China
+    </timezone>
+    <timezone
+        id="Africa/Johannesburg-2"
+        pinyin=" ">Johannesburg , SouthAfrica
+    </timezone>
+    <timezone
+        id="Asia/Kabul"
+        pinyin=" ">Kabul , Afghanistan
+    </timezone>
+    <timezone
+        id="Africa/Khartoum-1"
+        pinyin=" ">Kampala , Uganda
+    </timezone>
+    <timezone
+        id="Asia/Karachi-1"
+        pinyin=" ">Karachi , Pakistan
+    </timezone>
+    <timezone
+        id="Asia/Kathmandu"
+        pinyin=" ">Kathmandu , Nepal
+    </timezone>
+    <timezone
+        id="Africa/Khartoum"
+        pinyin=" ">Khartoum , Sudan
+    </timezone>
+    <timezone
+        id="Africa/Maseru-1"
+        pinyin=" ">Kiev , Ukraine
+    </timezone>
+    <timezone
+        id="Africa/Maseru"
+        pinyin=" ">Kigali , Rwanda
+    </timezone>
+    <timezone
+        id="America/Jamaica"
+        pinyin=" ">Kingston , Jamaica
+    </timezone>
+    <timezone
+        id="Africa/Kinshasa"
+        pinyin=" ">Kinshasa , Congo
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-7"
+        pinyin=" ">Kirkland , USA
+    </timezone>
+    <timezone
+        id="America/New_York-11"
+        pinyin=" ">Knoxville , USA
+    </timezone>
+    <timezone
+        id="Africa/Kinshasa-1"
+        pinyin=" ">Krakow , Poland
+    </timezone>
+    <timezone
+        id="Asia/Krasnoyarsk"
+        pinyin=" ">Krasnoyarsk , Russia
+    </timezone>
+    <timezone
+        id="Asia/Kuala_Lumpur"
+        pinyin=" ">KualaLumpur , Malaysia
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Kunming"
+        pinyin=" ">Kunming , China
+    </timezone>
+    <timezone
+        id="Asia/Kuwait"
+        pinyin=" ">KuwaitCity , Kuwait
+    </timezone>
+    <timezone
+        id="Africa/Lagos"
+        pinyin=" ">Lagos , Nigeria
+    </timezone>
+    <timezone
+        id="Asia/Karachi-2"
+        pinyin=" ">Lahore , Pakistan
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Lanzhou"
+        pinyin=" ">Lanzhou , China
+    </timezone>
+    <timezone
+        id="America/Manaus-2"
+        pinyin=" ">LaPaz , Bolivia
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-1"
+        pinyin=" ">LasVegas , USA
+    </timezone>
+    <timezone
+        id="America/Lima"
+        pinyin=" ">Lima , Peru
+    </timezone>
+    <timezone
+        id="Europe/Lisbon"
+        pinyin=" ">Lisbon , Portugal
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Liuzhou"
+        pinyin=" ">Liuzhou , China
+    </timezone>
+    <timezone
+        id="Europe/London"
+        pinyin=" ">London , UnitedKingdom
+    </timezone>
+    <timezone
+        id="Arctic/Longyearbyen"
+        pinyin=" ">Longyearbyen , Norway
+    </timezone>
+    <timezone
+        id="America/Los_Angeles"
+        pinyin=" ">LosAngeles , USA
+    </timezone>
+    <timezone
+        id="America/Lima-1"
+        pinyin=" ">Louisville , USA
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Luoyang"
+        pinyin=" ">Luoyang , China
+    </timezone>
+    <timezone
+        id="Europe/Luxembourg"
+        pinyin=" ">Luxembourg , Luxembourg
+    </timezone>
+    <timezone
+        id="Asia/Macau"
+        pinyin=" ">Macau , China
+    </timezone>
+    <timezone
+        id="America/Chicago-8"
+        pinyin=" ">Madison , USA
+    </timezone>
+    <timezone
+        id="Europe/Madrid-2"
+        pinyin=" ">Madrid , Spain
+    </timezone>
+    <timezone
+        id="Australia/Canberra-1"
+        pinyin=" ">Magadan , Russia
+    </timezone>
+    <timezone
+        id="Pacific/Majuro"
+        pinyin=" ">Majuro , MarshallIslands
+    </timezone>
+    <timezone
+        id="Indian/Maldives"
+        pinyin=" ">Male , Maldives
+    </timezone>
+    <timezone
+        id="America/Chicago-7"
+        pinyin=" ">Managua , Nicaragua
+    </timezone>
+    <timezone
+        id="America/Manaus-1"
+        pinyin=" ">Manaus , Brazil
+    </timezone>
+    <timezone
+        id="Europe/London-2"
+        pinyin=" ">Manchester , UnitedKingdom
+    </timezone>
+    <timezone
+        id="Asia/Manila"
+        pinyin=" ">Manila , Philippines
+    </timezone>
+    <timezone
+        id="America/Manaus-3"
+        pinyin=" ">Martinique , France
+    </timezone>
+    <timezone
+        id="Europe/Riga-1"
+        pinyin=" ">Maseru , Lesotho
+    </timezone>
+    <timezone
+        id="Australia/Melbourne"
+        pinyin=" ">Melbourne , Australia
+    </timezone>
+    <timezone
+        id="CST6CDT-2"
+        pinyin=" ">Memphis , USA
+    </timezone>
+    <timezone
+        id="America/Buenos_Aires-2"
+        pinyin=" ">Mendoza , Argentina
+    </timezone>
+    <timezone
+        id="America/Anchorage-1"
+        pinyin=" ">Metlakatla , USA
+    </timezone>
+    <timezone
+        id="America/Mexico_City"
+        pinyin=" ">MexicoCity , Mexico
+    </timezone>
+    <timezone
+        id="America/New_York-6"
+        pinyin=" ">Miami , USA
+    </timezone>
+    <timezone
+        id="Europe/Rome-1"
+        pinyin=" ">Milan , Italy
+    </timezone>
+    <timezone
+        id="CST6CDT-3"
+        pinyin=" ">Milwaukee , USA
+    </timezone>
+    <timezone
+        id="America/Chicago-2"
+        pinyin=" ">Minneapolis , USA
+    </timezone>
+    <timezone
+        id="Europe/Minsk"
+        pinyin=" ">Minsk , Belarus
+    </timezone>
+    <timezone
+        id="Africa/Nairobi-1"
+        pinyin=" ">Mogadishu , Somalia
+    </timezone>
+    <timezone
+        id="America/Chicago-14"
+        pinyin=" ">Monterey , Mexico
+    </timezone>
+    <timezone
+        id="America/Montevideo"
+        pinyin=" ">Montevideo , Uruguay
+    </timezone>
+    <timezone
+        id="America/Montreal"
+        pinyin=" ">Montreal , Canada
+    </timezone>
+    <timezone
+        id="Europe/Moscow"
+        pinyin=" ">Moscow , Russia
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-10"
+        pinyin=" ">MountainView , USA
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Mudanjiang"
+        pinyin=" ">Mudanjiang , China
+    </timezone>
+    <timezone
+        id="Asia/Kolkata-1"
+        pinyin=" ">Mumbai , India
+    </timezone>
+    <timezone
+        id="Europe/Berlin-4"
+        pinyin=" ">Munich , Germany
+    </timezone>
+    <timezone
+        id="Asia/Muscat"
+        pinyin=" ">Muscat , Oman
+    </timezone>
+    <timezone
+        id="Asia/Baghdad-1"
+        pinyin=" ">Nairobi , Kenya
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Nanchang"
+        pinyin=" ">Nanchang , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Nanjing"
+        pinyin=" ">Nanjing , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Nanning"
+        pinyin=" ">Nanning , China
+    </timezone>
+    <timezone
+        id="America/Chicago-9"
+        pinyin=" ">Nashville , USA
+    </timezone>
+    <timezone
+        id="America/Nassau-2"
+        pinyin=" ">Nassau , Bahamas
+    </timezone>
+    <timezone
+        id="Canada/Newfoundland"
+        pinyin=" ">Newfoundland , Canada
+    </timezone>
+    <timezone
+        id="America/Chicago-3"
+        pinyin=" ">NewOrleans , USA
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-11"
+        pinyin=" ">Salem , USA
+    </timezone>
+    <timezone
+        id="Australia/NSW"
+        pinyin=" ">NewSouthWales , Australia
+    </timezone>
+    <timezone
+        id="America/New_York"
+        pinyin=" ">NewYork , USA
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Ningbo"
+        pinyin=" ">Ningbo , China
+    </timezone>
+    <timezone
+        id="Pacific/Noumea"
+        pinyin=" ">Noumea , French
+    </timezone>
+    <timezone
+        id="Pacific/Tongatapu"
+        pinyin=" ">Nuku'alofa , TongaRepublic
+    </timezone>
+    <timezone
+        id="America/Godthab"
+        pinyin=" ">Nuuk , Greenland
+    </timezone>
+    <timezone
+        id="America/Chicago-6"
+        pinyin=" ">OklahomaCity , USA
+    </timezone>
+    <timezone
+        id="Asia/Tokyo-2"
+        pinyin=" ">Osaka , Japan
+    </timezone>
+    <timezone
+        id="Europe/Oslo"
+        pinyin=" ">Oslo , Norway
+    </timezone>
+    <timezone
+        id="America/New_York-2"
+        pinyin=" ">Ottawa , Canada
+    </timezone>
+    <timezone
+        id="Europe/Bucharest-1"
+        pinyin=" ">Oulu , Finland
+    </timezone>
+    <timezone
+        id="America/Paramaribo"
+        pinyin=" ">Paramaribo , Surinam
+    </timezone>
+    <timezone
+        id="Europe/Paris"
+        pinyin=" ">Paris , France
+    </timezone>
+    <timezone
+        id="EST5EDT-2"
+        pinyin=" ">Philadelphia , USA
+    </timezone>
+    <timezone
+        id="Asia/Phnom_Penh"
+        pinyin=" ">PhnomPenh , Cambodia
+    </timezone>
+    <timezone
+        id="America/Phoenix-1"
+        pinyin=" ">Phoenix , USA
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Pingdingshan"
+        pinyin=" ">Pingdingshan , China
+    </timezone>
+    <timezone
+        id="America/New_York-12"
+        pinyin=" ">Pittsburgh , USA
+    </timezone>
+    <timezone
+        id="America/New_York-7"
+        pinyin=" ">PortauPrince , Haiti
+    </timezone>
+    <timezone
+        id="PST8PDT"
+        pinyin=" ">Portland , USA
+    </timezone>
+    <timezone
+        id="America/Port_of_Spain"
+        pinyin=" ">PortofSpain , Tobago
+    </timezone>
+    <timezone
+        id="Europe/Prague"
+        pinyin=" ">Prague , formerCzechoslovakia
+    </timezone>
+    <timezone
+        id="Atlantic/Cape_Verde"
+        pinyin=" ">Praia , CapeVerde
+    </timezone>
+    <timezone
+        id="Asia/Pyongyang"
+        pinyin=" ">Pyongyang , NorthKorea
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Qingdao"
+        pinyin=" ">Qingdao , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Qiqihar"
+        pinyin=" ">Qiqihar , China
+    </timezone>
+    <timezone
+        id="Australia/Queensland"
+        pinyin=" ">Queensland , Australia
+    </timezone>
+    <timezone
+        id="America/Guayaquil"
+        pinyin=" ">Quito , Ecuador
+    </timezone>
+    <timezone
+        id="America/Regina"
+        pinyin=" ">Regina , Canada
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-8"
+        pinyin=" ">Reno , USA
+    </timezone>
+    <timezone
+        id="Atlantic/Reykjavik"
+        pinyin=" ">Reykjavik , Iceland
+    </timezone>
+    <timezone
+        id="Europe/Riga"
+        pinyin=" ">Riga , Latvia
+    </timezone>
+    <timezone
+        id="America/Sao_Paulo-2"
+        pinyin=" ">RiodeJaneiro , Brazil
+    </timezone>
+    <timezone
+        id="Asia/Riyadh-2"
+        pinyin=" ">Riyadh , SaudiArabia
+    </timezone>
+    <timezone
+        id="Europe/Rome"
+        pinyin=" ">Rome , Italy
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-9"
+        pinyin=" ">Sacramento , USA
+    </timezone>
+    <timezone
+        id="America/Denver-3"
+        pinyin=" ">SaltLakeCity , USA
+    </timezone>
+    <timezone
+        id="CST6CDT-4"
+        pinyin=" ">SanAntonio , USA
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-2"
+        pinyin=" ">SanFrancisco , USA
+    </timezone>
+    <timezone
+        id="America/Chicago-10"
+        pinyin=" ">SanJose , CostaRica
+    </timezone>
+    <timezone
+        id="America/Santo_Domingo-1"
+        pinyin=" ">SanJuan , PuertoRico
+    </timezone>
+    <timezone
+        id="Europe/San_Marino"
+        pinyin=" ">SanMarino , SanMarino
+    </timezone>
+    <timezone
+        id="America/Guatemala-1"
+        pinyin=" ">SanSalvador , ElSalvador
+    </timezone>
+    <timezone
+        id="America/Santiago"
+        pinyin=" ">Santiago , Chile
+    </timezone>
+    <timezone
+        id="America/Santo_Domingo"
+        pinyin=" ">SantoDomingo , Dominica
+    </timezone>
+    <timezone
+        id="America/Sao_Paulo-3"
+        pinyin=" ">SaoPaulo , Brazil
+    </timezone>
+    <timezone
+        id="Europe/Sarajevo"
+        pinyin=" ">Sarajevo , BosniaandHerzegovina
+    </timezone>
+    <timezone
+        id="Canada/Saskatchewan"
+        pinyin=" ">Saskatchewan , Canada
+    </timezone>
+    <timezone
+        id="America/Los_Angeles-3"
+        pinyin=" ">Seattle , USA
+    </timezone>
+    <timezone
+        id="Asia/Seoul"
+        pinyin=" ">Seoul , SouthKorea
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Shanghai"
+        pinyin=" ">Shanghai , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Shangqiu"
+        pinyin=" ">Shangqiu , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Shantou"
+        pinyin=" ">Shantou , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Shenyang"
+        pinyin=" ">Shenyang , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Shenzhen"
+        pinyin=" ">Shenzhen , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Shijiazhuang"
+        pinyin=" ">Shijiazhuang , China
+    </timezone>
+    <timezone
+        id="Europe/Simferopol"
+        pinyin=" ">Simferopol , Russia
+    </timezone>
+    <timezone
+        id="Asia/Singapore"
+        pinyin=" ">Singapore , Singapore
+    </timezone>
+    <timezone
+        id="Europe/Skopje"
+        pinyin=" ">Skopje , RepublicofMacedonia
+    </timezone>
+    <timezone
+        id="Europe/Sofia"
+        pinyin=" ">Sofia , Bulgaria
+    </timezone>
+    <timezone
+        id="Atlantic/Bermuda-2"
+        pinyin=" ">St.John's , Canada
+    </timezone>
+    <timezone
+        id="America/Chicago-15"
+        pinyin=" ">St.Louis , USA
+    </timezone>
+    <timezone
+        id="Asia/Baku-2"
+        pinyin=" ">St.Petersburg , Russia
+    </timezone>
+    <timezone
+        id="Europe/Stockholm"
+        pinyin=" ">Stockholm , Sweden
+    </timezone>
+    <timezone
+        id="Pacific/Fiji"
+        pinyin=" ">Suva , Fiji
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Suzhou"
+        pinyin=" ">Suzhou , China
+    </timezone>
+    <timezone
+        id="Australia/Sydney"
+        pinyin=" ">Sydney , Australia
+    </timezone>
+    <timezone
+        id="Pacific/Tahiti"
+        pinyin=" ">Tahiti , French
+    </timezone>
+    <timezone
+        id="Asia/Taipei"
+        pinyin=" ">Taipei , Taiwan
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Taiyuan"
+        pinyin=" ">Taiyuan , China
+    </timezone>
+    <timezone
+        id="Europe/Tallinn"
+        pinyin=" ">Tallinn , RepublicofEstonia
+    </timezone>
+    <timezone
+        id="America/New_York-13"
+        pinyin=" ">Tampa , USA
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Tangshan"
+        pinyin=" ">Tangshan , China
+    </timezone>
+    <timezone
+        id="Asia/Tashkent"
+        pinyin=" ">Tashkent , RepublicofUzbekistan
+    </timezone>
+    <timezone
+        id="Asia/Tbilisi"
+        pinyin=" ">Tbilisi , Georgia
+    </timezone>
+    <timezone
+        id="America/Tegucigalpa"
+        pinyin=" ">Tegucigalpa , RepublicofHonduras
+    </timezone>
+    <timezone
+        id="Asia/Tehran"
+        pinyin=" ">Tehran , Iran
+    </timezone>
+    <timezone
+        id="Asia/Tel_Aviv"
+        pinyin=" ">TelAviv , Israel
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Tianjin"
+        pinyin=" ">Tianjin , China
+    </timezone>
+    <timezone
+        id="America/Tijuana"
+        pinyin=" ">Tijuana , Mexico
+    </timezone>
+    <timezone
+        id="Asia/Tokyo"
+        pinyin=" ">Tokyo , Japan
+    </timezone>
+    <timezone
+        id="America/Toronto"
+        pinyin=" ">Toronto , Canada
+    </timezone>
+    <timezone
+        id="Asia/Damascus-1"
+        pinyin=" ">Tripoli , Libya
+    </timezone>
+    <timezone
+        id="Africa/Tunis"
+        pinyin=" ">Tunis , Tunisia
+    </timezone>
+    <timezone
+        id="Asia/Ulaanbaatar"
+        pinyin=" ">UlanBator , Mongolia
+    </timezone>
+    <timezone
+        id="Asia/Oral"
+        pinyin=" ">Urals , Russia
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-wulumuqi"
+        pinyin=" ">Urumqi , China
+    </timezone>
+    <timezone
+        id="America/Vancouver"
+        pinyin=" ">Vancouver , Canada
+    </timezone>
+    <timezone
+        id="Europe/Vatican"
+        pinyin=" ">VaticanCity , Vatican
+    </timezone>
+    <timezone
+        id="America/Tijuana-1"
+        pinyin=" ">Victoria , Canada
+    </timezone>
+    <timezone
+        id="Europe/Vienna"
+        pinyin=" ">Vienna , Austria
+    </timezone>
+    <timezone
+        id="Europe/Vilnius"
+        pinyin=" ">Vilnius , Lithuania
+    </timezone>
+    <timezone
+        id="Asia/Vladivostok"
+        pinyin=" ">Vladivostok , Russia
+    </timezone>
+    <timezone
+        id="Europe/Warsaw"
+        pinyin=" ">Warsaw , Poland
+    </timezone>
+    <timezone
+        id="America/Detroit-2"
+        pinyin=" ">Washington , DC
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Weifang"
+        pinyin=" ">Weifang , China
+    </timezone>
+    <timezone
+        id="Africa/Windhoek"
+        pinyin=" ">Windhoek , Namibia
+    </timezone>
+    <timezone
+        id="America/Winnipeg"
+        pinyin=" ">Winnipeg , Canada
+    </timezone>
+    <timezone
+        id="Europe/Warsaw-1"
+        pinyin=" ">Wroclaw , Poland
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Wuhan"
+        pinyin=" ">Wuhan , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Wuxi"
+        pinyin=" ">Wuxi , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Xian"
+        pinyin=" ">Xian , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Xiangyang"
+        pinyin=" ">Xiangyang , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Xining"
+        pinyin=" ">Xining , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Xuzhou"
+        pinyin=" ">Xuzhou , China
+    </timezone>
+    <timezone
+        id="Asia/Seoul-1"
+        pinyin=" ">Yakutsk , Russia
+    </timezone>
+    <timezone
+        id="Asia/Rangoon"
+        pinyin=" ">Yangon , Myanmar
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Yantai"
+        pinyin=" ">Yantai , China
+    </timezone>
+    <timezone
+        id="Asia/Yerevan"
+        pinyin=" ">Yerevan , Armenia
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Yichang"
+        pinyin=" ">Yichang , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Yichun"
+        pinyin=" ">Yichun , China
+    </timezone>
+    <timezone
+        id="Europe/Zagreb"
+        pinyin=" ">Zagreb , Croatia
+    </timezone>
+    <timezone
+        id="Asia/Kolkata-5"
+        pinyin=" ">Japur , India
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Zaozhuang"
+        pinyin=" ">Zaozhuang , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Zhangjiakou"
+        pinyin=" ">Zhangjiakou , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Zhanjiang"
+        pinyin=" ">Zhanjiang , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Zhengzhou"
+        pinyin=" ">Zhengzhou , China
+    </timezone>
+    <timezone
+        id="Asia/Shanghai-Zibo"
+        pinyin=" ">Zibo , China
+    </timezone>
+    <timezone
+        id="Europe/Zurich"
+        pinyin=" ">Zurich , Switzerland
+    </timezone>
+</timezones>

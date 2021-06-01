@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="ratio" format="float" translatable="false" type="string">1.8</item>
+    <dimen name="inner_radius_offset">32dp</dimen>
+    <dimen name="hour_margin_top">3dp</dimen>
+</resources>

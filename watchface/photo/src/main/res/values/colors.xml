@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="text_battery">#666666</color>
+    <color name="wiz_button_bg_black">#252525</color>
+    <color name="wiz_button_bg_black_press">#e6252525</color>
+    <color name="wiz_button_bg_black_disable">#252525</color>
+</resources>

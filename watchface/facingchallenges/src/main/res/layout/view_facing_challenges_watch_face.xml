@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:orientation="vertical"
+    android:weightSum="4">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+        <com.wiz.watch.facefacingchallenges.VerticalTimeView
+            android:id="@+id/vertical_time_view"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5.4"
+            android:paddingStart="@dimen/sport_layout_padding_start"
+            android:paddingTop="@dimen/sport_layout_padding_top"
+            android:paddingEnd="0dp"
+            android:paddingBottom="@dimen/sport_layout_padding_top"
+            app:horizontalSpacing="14dp" />
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4.6"
+            android:paddingStart="@dimen/sport_layout_padding_start"
+            android:paddingTop="@dimen/sport_layout_padding_top"
+            android:paddingEnd="@dimen/sport_layout_padding_start"
+            android:paddingBottom="@dimen/sport_layout_padding_top">
+
+            <LinearLayout
+                style="@style/SportRootLayout"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/text_steps"
+                    style="@style/TextSportData"
+                    android:textColor="#A9EB0E" />
+
+                <TextView
+                    style="@style/TextSportType"
+                    android:text="steps" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                style="@style/SportRootLayout"
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/text_sport_time"
+                    style="@style/TextSportData"
+                    android:textColor="#00B7FF" />
+
+                <TextView
+                    style="@style/TextSportType"
+                    android:text="sports" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/SportRootLayout"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/text_calories"
+                    style="@style/TextSportData"
+                    android:textColor="#FF0A0A" />
+
+                <TextView
+                    style="@style/TextSportType"
+                    android:text="kcal" />
+            </LinearLayout>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/bottom_layout_mt"
+        android:layout_weight="1">
+
+        <RelativeLayout
+            android:id="@+id/layout_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="@dimen/bottom_layout_mb"
+            android:background="@drawable/corner_btn_bg">
+
+            <ImageView
+                android:id="@+id/image_app_coin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/icon_sport_flag" />
+
+            <ImageView
+                android:id="@+id/image_right_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/arrow_right" />
+
+            <!--<TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:ellipsize="end"
+                android:gravity="start|center_vertical"
+                android:singleLine="true"
+                android:text="start running"
+                android:textAllCaps="true"
+                android:textColor="@color/sport_icon"
+                android:textSize="@dimen/bottom_text_size"
+                android:textStyle="bold|italic" />-->
+        </RelativeLayout>
+    </FrameLayout>
+
+</LinearLayout>

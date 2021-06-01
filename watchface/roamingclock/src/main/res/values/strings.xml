@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Roaming Clock</string>
+    <string name="roaming_watch_face">@string/app_name</string>
+    <string name="roaming_watch_face_config_aty">Set Time Zone</string>
+</resources>

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">经典指针</string>
+    <string name="classic_watch_face">@string/app_name</string>
+</resources>
