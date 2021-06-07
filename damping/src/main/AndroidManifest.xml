@@ -23,6 +23,7 @@
         <activity android:name="com.suheng.damping.SwipeRefreshActivity" />
         <activity android:name="com.suheng.damping.BounceEffectActivity" />
         <activity android:name="com.suheng.damping.DampingActivity" />
+        <activity android:name="com.suheng.damping.RebounceEffectsActivity" />
     </application>
 
 </manifest>
