@@ -10,14 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
-        android:background="@android:color/holo_red_dark"
+        android:background="@drawable/demo_bg"
         app:mode="damping_refresh">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/demo_bg"/>
+            android:background="@android:color/darker_gray"/>
     </com.suheng.damping.view.DampingView3>
 
     <!--<com.suheng.damping.view.DampingProgressBar
