@@ -3,7 +3,6 @@ package com.suheng.damping.view;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
@@ -12,6 +11,7 @@ import android.util.TypedValue;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 public class DampingProgressBar extends View {
     public static final String TAG = DampingProgressBar.class.getSimpleName();
@@ -41,7 +41,7 @@ public class DampingProgressBar extends View {
         mPaintProgress.setAntiAlias(true);
         mPaintProgress.setStyle(Paint.Style.STROKE);
         mPaintProgress.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2.5f, getResources().getDisplayMetrics()));
-        mPaintProgress.setColor(Color.GRAY);
+        mPaintProgress.setColor(ContextCompat.getColor(getContext(), android.R.color.holo_red_dark));
         mPaintProgress.setStrokeCap(Paint.Cap.ROUND);
 
         mPaintCircle = new Paint(mPaintProgress);

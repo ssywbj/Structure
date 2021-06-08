@@ -1,8 +1,8 @@
 package com.suheng.damping.view;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -11,7 +11,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
-import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 
 import androidx.core.widget.NestedScrollView;
@@ -20,14 +19,25 @@ import com.suheng.damping.R;
 
 public class DampingView3 extends NestedScrollView {
     private static final String TAG = DampingView3.class.getSimpleName();
-
-    private View mDampingLayout;
-    private final Rect mRect = new Rect(); //用于记录childView的初始位置
+    private static final float REFRESHING_START_ALPHA = 0;
+    private static final float REFRESHING_DELTA_ALPHA = 1 - REFRESHING_START_ALPHA;
+    private static final float REFRESHING_START_SCALE = 0.5f;
+    private static final float REFRESHING_DELTA_SCALE = 1 - REFRESHING_START_SCALE;
 
     private int mMode;
 
-    private View mLayoutLoading;
-    private int mLoadingViewHeight;
+    private View mLayoutRefresh;
+    private int mHeightRefreshLayout = 150;
+    private DampingProgressBar mProgressBar;
+    private View mTextRefreshing;
+
+    private boolean mRefreshing;
+    private OnRefreshListener mOnRefreshListener;
+
+    private View mLayoutContent;
+
+    private int mScreenHeight;
+    private float mMoveHeight;
 
     public DampingView3(Context context) {
         this(context, null);
@@ -58,130 +68,111 @@ public class DampingView3 extends NestedScrollView {
     private void init() {
     }
 
-    private void calcHeights() {
-        mLoadingViewHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
-                , 70, getResources().getDisplayMetrics());
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        if (getChildCount() != 1 || mMode == 0) {
+            return;
+        }
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getContext().getDisplay().getRealMetrics(displayMetrics);
         mScreenHeight = displayMetrics.heightPixels;
-        Log.i(TAG, "screen height: " + mScreenHeight + ", mLoadingViewHeight: " + mLoadingViewHeight);
-    }
+        //Log.d(TAG, "screen height: " + mScreenHeight);
 
-    private static final float LOADING_START_ALPHA = 0.3f;
-    private static final float LOADING_DELTA_ALPHA = 1 - LOADING_START_ALPHA;
-    private static final float LOADING_START_SCALE = 0.5f;
-    private static final float LOADING_DELTA_SCALE = 1 - LOADING_START_SCALE;
+        mLayoutContent = getChildAt(0);
 
-    View childView;
-    private View mTextLoading;
-    private DampingProgressBar mProgressBar;
+        if (mMode == 2) {
+            mHeightRefreshLayout = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
+                    , 70, getResources().getDisplayMetrics());
+            //Log.d(TAG, "refreshing layout Height: " + mHeightRefreshLayout);
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        Log.i(TAG, "onFinishInflate: " + getChildCount());
-        if (getChildCount() == 1) {
-            childView = getChildAt(0);
-            if (mMode == 2) {
-                this.calcHeights();
+            final ViewGroup.LayoutParams layoutParams = mLayoutContent.getLayoutParams();
+            removeView(mLayoutContent);
 
-                final ViewGroup.LayoutParams layoutParams = childView.getLayoutParams();
-                removeView(childView);
+            mLayoutRefresh = inflate(getContext(), R.layout.damping_view_title, null);
+            FrameLayout layoutParent = new FrameLayout(getContext());
+            layoutParent.addView(mLayoutContent, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+            layoutParent.addView(mLayoutRefresh, LayoutParams.MATCH_PARENT, mHeightRefreshLayout);
+            addView(layoutParent, layoutParams);
 
-                mLayoutLoading = inflate(getContext(), R.layout.damping_view_title, null);
-                FrameLayout layoutParent = new FrameLayout(getContext());
-                layoutParent.addView(childView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-                layoutParent.addView(mLayoutLoading, LayoutParams.MATCH_PARENT, mLoadingViewHeight);
-                addView(layoutParent, layoutParams);
+            mTextRefreshing = findViewById(R.id.damping_text_loading);
+            mProgressBar = findViewById(R.id.damping_progress_bar);
 
-                mDampingLayout = layoutParent;
+            mTextRefreshing.setScaleX(REFRESHING_START_SCALE);
+            mTextRefreshing.setScaleY(REFRESHING_START_SCALE);
+            mTextRefreshing.setAlpha(REFRESHING_START_ALPHA);
 
-                mTextLoading = findViewById(R.id.damping_text_loading);
-                mProgressBar = findViewById(R.id.damping_progress_bar);
-
-                mTextLoading.setScaleX(LOADING_START_SCALE);
-                mTextLoading.setScaleY(LOADING_START_SCALE);
-                mTextLoading.setAlpha(LOADING_START_ALPHA);
-
-                mProgressBar.setScaleX(LOADING_START_SCALE);
-                mProgressBar.setScaleY(LOADING_START_SCALE);
-                mProgressBar.setAlpha(LOADING_START_ALPHA);
-            } else if (mMode == 1) {
-                mDampingLayout = childView;
-            }
+            mProgressBar.setScaleX(REFRESHING_START_SCALE);
+            mProgressBar.setScaleY(REFRESHING_START_SCALE);
+            mProgressBar.setAlpha(REFRESHING_START_ALPHA);
         }
     }
-
-    int mTop;
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
-        if (mDampingLayout != null) {
-            mTop = mDampingLayout.getTop();
-            if (mMode == 2) {
-                //mLoadingViewHeight = 200;
-                mLayoutLoading.setTranslationY(-mLoadingViewHeight);
-            }
+        if (mMode == 2) {
+            //mLoadingViewHeight = 200;
+            mLayoutRefresh.setTranslationY(-mHeightRefreshLayout);
         }
     }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (mDampingLayout != null) {
+        if (mLayoutContent != null && !mRefreshing) {
             this.calcDampingArea(ev);
         }
         return super.dispatchTouchEvent(ev);
     }
 
     private float mPreviousY;
-    private float mMoveHeight;
-    private int mScreenHeight;
-    float startY, distanceY;
+    private float mStartY, mDistanceY;
 
     private void calcDampingArea(MotionEvent ev) {
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mPreviousY = ev.getY();
-                startY = mPreviousY;
+                mStartY = mPreviousY;
                 mMoveHeight = 0;
                 break;
             case MotionEvent.ACTION_MOVE: //0.8 * pow(1 - x, 4), x=s/h, s是滑动距离、h是屏幕高度
                 float currentY = ev.getY();
-                //distanceY = Math.abs(currentY - startY);
-                float factor = (float) (0.8 * Math.pow(1 - 1.0 * distanceY / mScreenHeight, 4));
+                mDistanceY = Math.abs(currentY - mStartY);
+                float factor = (float) (0.8 * Math.pow(1 - 1.0 * mDistanceY / mScreenHeight, 4));
 
                 float deltaY = currentY - mPreviousY;
 
                 Log.d(TAG, mPreviousY + "--" + currentY + ", distance y: "
-                        + distanceY + ",factor: " + factor);
+                        + mDistanceY + ", deltaY: " + deltaY + ", move height: " + mMoveHeight + ", factor: " + factor);
 
-                //mMoveHeight += deltaY * factor;
-                mMoveHeight += deltaY;
+                if ((!canScrollVertically(-1))) {
+                    if (currentY - mPreviousY > 0) {
+                        Log.i(TAG, "from top scroll, down pull");
+                        double moveHeight = 1.5 * deltaY * factor;
+                        mMoveHeight += moveHeight;
+                        //mMoveHeight += deltaY;
+                        if (mMode == 2) {
+                            if (mMoveHeight < mHeightRefreshLayout) {
+                                float percent = mMoveHeight / mHeightRefreshLayout;
+                                mTextRefreshing.setScaleX(REFRESHING_START_SCALE + REFRESHING_DELTA_SCALE * percent);
+                                mTextRefreshing.setScaleY(mTextRefreshing.getScaleX());
+                                mTextRefreshing.setAlpha(REFRESHING_START_ALPHA + REFRESHING_DELTA_ALPHA * percent);
 
-                if ((!canScrollVertically(-1)) && (currentY - mPreviousY) > 0) {
-                    Log.d(TAG, "scroll to up, top: " + mDampingLayout.getTop()
-                            + ", bottom: " + mDampingLayout.getBottom() + ", move height: " + mMoveHeight);
-                    if (mLayoutLoading != null) {
-                        if (mMoveHeight <= 2.5 * mLoadingViewHeight) {
-                            if (mMoveHeight <= mLoadingViewHeight) {
-                                float percent = mMoveHeight / mLoadingViewHeight;
-                                mTextLoading.setScaleX(LOADING_START_SCALE + LOADING_DELTA_SCALE * percent);
-                                mTextLoading.setScaleY(mTextLoading.getScaleX());
-                                mTextLoading.setAlpha(LOADING_START_ALPHA + LOADING_DELTA_ALPHA * percent);
+                                mProgressBar.setScaleX(mTextRefreshing.getScaleX());
+                                mProgressBar.setScaleY(mTextRefreshing.getScaleX());
+                                mProgressBar.setAlpha(mTextRefreshing.getAlpha());
 
-                                mProgressBar.setScaleX(mTextLoading.getScaleX());
-                                mProgressBar.setScaleY(mTextLoading.getScaleX());
-                                mProgressBar.setAlpha(mTextLoading.getAlpha());
+                                mLayoutRefresh.setTranslationY(-mHeightRefreshLayout + mMoveHeight);
+                            } else {
+                                mLayoutRefresh.setTranslationY((float) (mLayoutRefresh.getTranslationY() + moveHeight * 0.3));
                             }
-                            mLayoutLoading.setTranslationY(-mLoadingViewHeight + mMoveHeight);
-
-                            childView.setTranslationY(mMoveHeight);
                         }
+
+                        mLayoutContent.setTranslationY(mMoveHeight);
+                    } else {
+                        Log.v(TAG, "from top scroll, up pull");
                     }
-                    /*mDampingLayout.layout(mDampingLayout.getLeft(), (int) (mTop + mMoveHeight)
-                            , mDampingLayout.getRight(), mDampingLayout.getBottom());*/
                 }
 
                 /*if (canScrollVertically(1)) {
@@ -192,41 +183,72 @@ public class DampingView3 extends NestedScrollView {
                 mPreviousY = currentY;
                 break;
             case MotionEvent.ACTION_UP:
-                childView.setTranslationY(0);
-                if (mLayoutLoading != null) {
-                    mLayoutLoading.setTranslationY(-mLoadingViewHeight);
-                }
-                //this.verticalAnimation();
-                //mDampingLayout.layout(mDampingLayout.getLeft(), mTop, mDampingLayout.getRight(), mDampingLayout.getBottom());
-                //mTextView.setTranslationY(-mLoadingViewHeight);
+                if (mMode == 2) {
+                    if (mMoveHeight < mHeightRefreshLayout) {
+                        this.setRefreshing(false);
+                    } else {
+                        //mLayoutContent.setTranslationY(mHeightRefreshLayout);
+                        this.dampingAnim(mLayoutContent, mLayoutContent.getTranslationY(), mHeightRefreshLayout);
 
-                /*mTextView.setAlpha(mLoadingStartAlpha);
-                mTextView.setScaleX(mLoadingStartScale);
-                mTextView.setScaleY(mLoadingStartScale);*/
+                        //mLayoutRefresh.setTranslationY(-mHeightRefreshLayout + mHeightRefreshLayout);
+                        this.dampingAnim(mLayoutRefresh, mLayoutRefresh.getTranslationY(), -mHeightRefreshLayout + mHeightRefreshLayout);
+                        if (mOnRefreshListener != null) {
+                            mRefreshing = true;
+                            mOnRefreshListener.onRefresh();
+                        }
+                    }
+                } else if (mMode == 1) {
+                    mLayoutContent.setTranslationY(0);
+                    this.dampingAnim(mLayoutContent, mMoveHeight, 0);
+                }
                 break;
         }
     }
 
-    private void verticalAnimation() {
-        TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f,
-                (int) (mTop + mMoveHeight), mTop); //上下回弹的动画效果
-        animation.setDuration(600);
-        animation.setFillAfter(true);
-        animation.setInterpolator(new DampInterpolator());
-        mDampingLayout.setAnimation(animation);
+    private void dampingAnim(View view, float start, float end) {
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(start, end);
+        valueAnimator.setDuration(800);
+        valueAnimator.setInterpolator(new DampInterpolator());
+        valueAnimator.addUpdateListener(animation -> {
+            Object object = animation.getAnimatedValue();
+            if (object instanceof Float) {
+                float value = (float) object;
+                //Log.d(TAG, "damp interpolator, value: " + value);
+                view.setTranslationY(value);
+            }
+        });
+        valueAnimator.start();
+    }
 
-        /*TranslateAnimation animation1 = new TranslateAnimation(0.0f, 0.0f,
-                -mLoadingViewHeight+distanceY, -mLoadingViewHeight); //上下回弹的动画效果
-        animation1.setDuration(600);
-        animation1.setFillAfter(true);
-        mTextView.setAnimation(animation);*/
+    public void setRefreshing(boolean refreshing) {
+        mRefreshing = refreshing;
+
+        if (mRefreshing) {
+        } else {
+            //mLayoutContent.setTranslationY(0);
+            this.dampingAnim(mLayoutContent, mLayoutContent.getTranslationY(), 0);
+            //mLayoutRefresh.setTranslationY(-mHeightRefreshLayout);
+            this.dampingAnim(mLayoutRefresh, mLayoutRefresh.getTranslationY(), -mHeightRefreshLayout);
+        }
+    }
+
+    public void setOnRefreshListener(OnRefreshListener onRefreshListener) {
+        mOnRefreshListener = onRefreshListener;
     }
 
     private static class DampInterpolator implements Interpolator {
         @Override
         public float getInterpolation(float input) {
-            return (float) (1 - Math.pow((1 - input), 5));
+            float ratio = (float) (1 - Math.pow((1 - input), 5));
+            float value = 1 - (float) (0.8 * Math.pow(1 - input, 4));
+            //Log.v(TAG, "damp interpolator, input: " + input + ", ratio: " + ratio + ", value: " + value);
+            return value;
         }
+    }
+
+    public interface OnRefreshListener {
+
+        void onRefresh();
     }
 
     protected float getFriction(float overScrollLength, float offset, boolean isEasing) {

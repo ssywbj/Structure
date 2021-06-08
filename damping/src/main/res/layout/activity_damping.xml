@@ -7,11 +7,13 @@
     tools:context=".DampingActivity">
 
     <com.suheng.damping.view.DampingView3
+        android:id="@+id/damping_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
+        android:fillViewport="true"
         android:background="@drawable/demo_bg"
-        app:mode="damping_refresh">
+        app:mode="damping">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"

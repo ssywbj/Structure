@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.suheng.damping.view.DampingView3;
 import com.suheng.damping.view.RecyclerItemDecoration;
 
 import java.util.ArrayList;
@@ -31,10 +33,27 @@ public class DampingActivity extends AppCompatActivity {
         ContentAdapter adapter = new ContentAdapter(datas);
         recyclerView.setAdapter(adapter);
 
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 20; i++) {
             datas.add(String.valueOf(i));
         }
         adapter.notifyDataSetChanged();
+
+        DampingView3 dampingView = findViewById(R.id.damping_view);
+        dampingView.setOnRefreshListener(() -> {
+            Toast.makeText(DampingActivity.this, "Refreshing", Toast.LENGTH_SHORT).show();
+
+            dampingView.postDelayed(() -> {
+                Toast.makeText(DampingActivity.this, "Refresh Finish", Toast.LENGTH_SHORT).show();
+                dampingView.setRefreshing(false);
+                int size = datas.size();
+                /*datas.clear();
+                for (int i = size; i < size + 10; i++) {
+                    datas.add(String.valueOf(i));
+                }
+                adapter.notifyDataSetChanged();*/
+            }, 5000);
+
+        });
     }
 
     private static final class ContentAdapter extends RecyclerView.Adapter<ContentHolder> {

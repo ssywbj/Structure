@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Damping">
         <activity
-            android:name="com.suheng.damping.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.Damping.NoActionBar">
             <intent-filter>
@@ -20,10 +20,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.suheng.damping.SwipeRefreshActivity" />
-        <activity android:name="com.suheng.damping.BounceEffectActivity" />
-        <activity android:name="com.suheng.damping.DampingActivity" />
-        <activity android:name="com.suheng.damping.RebounceEffectsActivity" />
+        <activity android:name=".SwipeRefreshActivity" />
+        <activity android:name=".BounceEffectActivity" />
+        <activity
+            android:name=".DampingActivity"
+            android:theme="@style/Theme.Damping.NoActionBar" />
+        <activity android:name=".RebounceEffectsActivity" />
     </application>
 
 </manifest>

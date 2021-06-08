@@ -2,22 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/holo_blue_dark"
-    android:orientation="vertical"
-    android:gravity="center">
+    android:gravity="bottom|center_horizontal"
+    android:orientation="vertical">
 
     <com.suheng.damping.view.DampingProgressBar
         android:id="@+id/damping_progress_bar"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="4dp" />
+        android:layout_width="28dp"
+        android:layout_height="28dp" />
 
     <TextView
         android:id="@+id/damping_text_loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:text="Loading"
-        android:textColor="@android:color/holo_red_dark"
+        android:layout_marginBottom="2dp"
+        android:text="Refreshing"
+        android:textColor="@android:color/darker_gray"
         android:textSize="16sp" />
 </LinearLayout>
