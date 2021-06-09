@@ -26,4 +26,8 @@ public class MainActivity extends AppCompatActivity {
     public void openDampingActivity(View view) {
         startActivity(new Intent(this, DampingActivity.class));
     }
+
+    public void openDampingActivity2(View view) {
+        startActivity(new Intent(this, DampingActivity2.class));
+    }
 }

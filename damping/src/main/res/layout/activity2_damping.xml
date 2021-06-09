@@ -13,7 +13,7 @@
         android:scrollbars="vertical"
         android:fillViewport="true"
         android:background="@drawable/demo_bg"
-        app:mode="damping">
+        app:mode="damping_refresh">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"

@@ -25,7 +25,9 @@
         <activity
             android:name=".DampingActivity"
             android:theme="@style/Theme.Damping.NoActionBar" />
-        <activity android:name=".RebounceEffectsActivity" />
+        <activity
+            android:name=".DampingActivity2"
+            android:theme="@style/Theme.Damping.NoActionBar" />
     </application>
 
 </manifest>
