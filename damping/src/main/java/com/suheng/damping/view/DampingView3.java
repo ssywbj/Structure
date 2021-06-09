@@ -138,21 +138,31 @@ public class DampingView3 extends NestedScrollView {
                 break;
             case MotionEvent.ACTION_MOVE: //0.8 * pow(1 - x, 4), x=s/h, s是滑动距离、h是屏幕高度
                 float currentY = ev.getY();
+
                 mDistanceY = Math.abs(currentY - mStartY);
                 float factor = (float) (0.8 * Math.pow(1 - 1.0 * mDistanceY / mScreenHeight, 4));
-
                 float deltaY = currentY - mPreviousY;
+                mPreviousY = currentY;
 
                 Log.d(TAG, mPreviousY + "--" + currentY + ", distance y: "
                         + mDistanceY + ", deltaY: " + deltaY + ", move height: " + mMoveHeight + ", factor: " + factor);
 
-                if ((!canScrollVertically(-1))) {
-                    if (currentY - mPreviousY > 0) {
-                        Log.i(TAG, "from top scroll, down pull");
-                        double moveHeight = 1.5 * deltaY * factor;
-                        mMoveHeight += moveHeight;
-                        //mMoveHeight += deltaY;
-                        if (mMode == 2) {
+                boolean fromTopDownPull = !canScrollVertically(-1) && (currentY - mStartY > 0);
+                boolean fromBottomUpPull = !canScrollVertically(1) && (currentY - mStartY < 0);
+                if (fromTopDownPull || fromBottomUpPull) {
+                    if (fromTopDownPull) {
+                        Log.i(TAG, "from top down pull");
+                    }
+                    if (fromBottomUpPull) {
+                        Log.i(TAG, "from bottom up pull");
+                    }
+
+                    double moveHeight = 1.5 * deltaY * factor;
+                    mMoveHeight += moveHeight;
+                    //mMoveHeight += deltaY;
+
+                    if (mMode == 2) {
+                        if (fromTopDownPull) {
                             if (mMoveHeight < mHeightRefreshLayout) {
                                 float percent = mMoveHeight / mHeightRefreshLayout;
                                 mTextRefreshing.setScaleX(REFRESHING_START_SCALE + REFRESHING_DELTA_SCALE * percent);
@@ -168,19 +178,10 @@ public class DampingView3 extends NestedScrollView {
                                 mLayoutRefresh.setTranslationY((float) (mLayoutRefresh.getTranslationY() + moveHeight * 0.3));
                             }
                         }
-
-                        mLayoutContent.setTranslationY(mMoveHeight);
-                    } else {
-                        Log.v(TAG, "from top scroll, up pull");
                     }
+
+                    mLayoutContent.setTranslationY(mMoveHeight);
                 }
-
-                /*if (canScrollVertically(1)) {
-                } else {
-                    Log.i(TAG, "scroll to bottom");
-                }*/
-
-                mPreviousY = currentY;
                 break;
             case MotionEvent.ACTION_UP:
                 if (mMode == 2) {

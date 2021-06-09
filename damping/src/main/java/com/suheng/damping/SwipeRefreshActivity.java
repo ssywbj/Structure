@@ -33,7 +33,7 @@ public class SwipeRefreshActivity extends AppCompatActivity implements SwipeRefr
         ContentAdapter adapter = new ContentAdapter(datas);
         recyclerView.setAdapter(adapter);
 
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 20; i++) {
             datas.add(String.valueOf(i));
         }
         adapter.notifyDataSetChanged();

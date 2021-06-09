@@ -51,7 +51,7 @@ public class DampingActivity extends AppCompatActivity {
                     datas.add(String.valueOf(i));
                 }
                 adapter.notifyDataSetChanged();*/
-            }, 5000);
+            }, 2000);
 
         });
     }
