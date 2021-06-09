@@ -146,8 +146,15 @@ public class DampingLayout extends NestedScrollView {
                 float deltaY = currentY - mPreviousY;
                 mPreviousY = currentY;
 
-                boolean fromTopDownPull = !canScrollVertically(-1) && (currentY - mStartY > 0);
-                boolean fromBottomUpPull = !canScrollVertically(1) && (currentY - mStartY < 0);
+                boolean fromTopDownPull = false, fromBottomUpPull = false;
+                if (mMode == 2) {
+                    fromTopDownPull = (!canScrollVertically(-1) && (currentY - mStartY) > 0);
+                    fromBottomUpPull = (!canScrollVertically(1) && (currentY - mStartY) < 0);
+                } else if (mMode == 1) {
+                    fromTopDownPull = (!mLayoutContent.canScrollVertically(-1) && (currentY - mStartY) > 0);
+                    fromBottomUpPull = (!mLayoutContent.canScrollVertically(1) && (currentY - mStartY) < 0);
+                }
+
                 if (fromTopDownPull || fromBottomUpPull) {
                     /*if (fromTopDownPull) {
                         Log.i(TAG, "from top down pull");
