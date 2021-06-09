@@ -1,6 +1,7 @@
 package com.suheng.damping.view;
 
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
@@ -53,9 +54,9 @@ public class DampingView3 extends NestedScrollView {
         super(context, attrs, defStyle);
         TypedArray typedArray = null;
         try {
-            typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.DampingView, 0, 0);
+            typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.DampingLayout, 0, 0);
 
-            mMode = typedArray.getInt(R.styleable.DampingView_mode, 0);
+            mMode = typedArray.getInt(R.styleable.DampingLayout_mode, 0);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -78,7 +79,8 @@ public class DampingView3 extends NestedScrollView {
         }
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        getContext().getDisplay().getRealMetrics(displayMetrics);
+        //getContext().getDisplay().getRealMetrics(displayMetrics);
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
         mScreenHeight = displayMetrics.heightPixels;
         //Log.d(TAG, "screen height: " + mScreenHeight);
 

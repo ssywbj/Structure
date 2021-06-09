@@ -1,6 +1,7 @@
 package com.suheng.damping.view;
 
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
@@ -19,8 +20,8 @@ import androidx.core.widget.NestedScrollView;
 
 import com.suheng.damping.R;
 
-public class DampingView4 extends NestedScrollView {
-    private static final String TAG = DampingView4.class.getSimpleName();
+public class DampingLayout extends NestedScrollView {
+    private static final String TAG = DampingLayout.class.getSimpleName();
     private static final float REFRESHING_START_ALPHA = 0;
     private static final float REFRESHING_DELTA_ALPHA = 1 - REFRESHING_START_ALPHA;
     private static final float REFRESHING_START_SCALE = 0.5f;
@@ -29,7 +30,7 @@ public class DampingView4 extends NestedScrollView {
     private int mMode;
 
     private View mLayoutRefresh;
-    private int mHeightRefreshLayout = 150;
+    private int mHeightRefreshLayout;
     private DampingProgressBar mProgressBar;
     private View mTextRefreshing;
 
@@ -38,24 +39,23 @@ public class DampingView4 extends NestedScrollView {
 
     private View mLayoutContent;
 
-    private int mScreenHeight;
-    private float mMoveHeight;
+    private int mScreenHeight, mMoveHeight;
 
-    public DampingView4(Context context) {
+    public DampingLayout(Context context) {
         this(context, null);
     }
 
-    public DampingView4(Context context, AttributeSet attrs) {
+    public DampingLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public DampingView4(Context context, AttributeSet attrs, int defStyle) {
+    public DampingLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         TypedArray typedArray = null;
         try {
-            typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.DampingView, 0, 0);
+            typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.DampingLayout, 0, 0);
 
-            mMode = typedArray.getInt(R.styleable.DampingView_mode, 0);
+            mMode = typedArray.getInt(R.styleable.DampingLayout_mode, 0);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -78,7 +78,8 @@ public class DampingView4 extends NestedScrollView {
         }
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        getContext().getDisplay().getRealMetrics(displayMetrics);
+        //getContext().getDisplay().getRealMetrics(displayMetrics);
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
         mScreenHeight = displayMetrics.heightPixels;
         //Log.d(TAG, "screen height: " + mScreenHeight);
 
@@ -86,7 +87,7 @@ public class DampingView4 extends NestedScrollView {
 
         if (mMode == 2) {
             mHeightRefreshLayout = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
-                    , 70, getResources().getDisplayMetrics());
+                    , 76, getResources().getDisplayMetrics());
             //Log.d(TAG, "refreshing layout Height: " + mHeightRefreshLayout);
 
             final ViewGroup.LayoutParams layoutParams = mLayoutContent.getLayoutParams();
@@ -129,7 +130,7 @@ public class DampingView4 extends NestedScrollView {
     }
 
     private float mPreviousY;
-    private float mStartY, mDistanceY;
+    private float mStartY;
 
     private void calcDampingArea(MotionEvent ev) {
         switch (ev.getAction()) {
@@ -142,33 +143,43 @@ public class DampingView4 extends NestedScrollView {
                 break;
             case MotionEvent.ACTION_MOVE: //0.8 * pow(1 - x, 4), x=s/h, s是滑动距离、h是屏幕高度
                 float currentY = ev.getY();
-
-                mDistanceY = Math.abs(currentY - mStartY);
-                float factor = (float) (0.8 * Math.pow(1 - 1.0 * mDistanceY / mScreenHeight, 4));
                 float deltaY = currentY - mPreviousY;
                 mPreviousY = currentY;
-
-                Log.d(TAG, mPreviousY + "--" + currentY + ", distance y: "
-                        + mDistanceY + ", deltaY: " + deltaY + ", move height: " + mMoveHeight + ", factor: " + factor);
 
                 boolean fromTopDownPull = !canScrollVertically(-1) && (currentY - mStartY > 0);
                 boolean fromBottomUpPull = !canScrollVertically(1) && (currentY - mStartY < 0);
                 if (fromTopDownPull || fromBottomUpPull) {
-                    if (fromTopDownPull) {
+                    /*if (fromTopDownPull) {
                         Log.i(TAG, "from top down pull");
                     }
                     if (fromBottomUpPull) {
                         Log.i(TAG, "from bottom up pull");
-                    }
+                    }*/
 
-                    double moveHeight = 1.5 * deltaY * factor;
+                    float distance = Math.abs(currentY - mStartY);
+
+                    float factor = (float) (0.8 * Math.pow(1 - distance / mScreenHeight, 4));
+                    /*factor *= 0.25;
+                    factor += 0.25;
+                    double moveHeight = deltaY * factor;*/
+
+                    float damping = (mScreenHeight - distance) / mScreenHeight;
+                    if (currentY - mStartY < 0) {
+                        damping = 1 - damping;
+                    }
+                    damping *= 0.25;
+                    damping += 0.25;
+                    double moveHeight = deltaY * damping;
+
                     mMoveHeight += moveHeight;
-                    //mMoveHeight += deltaY;
+                    Log.d(TAG, "distance y: " + distance + ", factor: " + factor + ", damping: " + damping
+                            + ", moveHeight: " + (deltaY * factor) + "--" + (deltaY * damping) + ", move height: "
+                            + mMoveHeight);
 
                     if (mMode == 2) {
                         if (fromTopDownPull) {
                             if (mMoveHeight < mHeightRefreshLayout) {
-                                float percent = mMoveHeight / mHeightRefreshLayout;
+                                float percent = 1.0f * mMoveHeight / mHeightRefreshLayout;
                                 mTextRefreshing.setScaleX(REFRESHING_START_SCALE + REFRESHING_DELTA_SCALE * percent);
                                 mTextRefreshing.setScaleY(mTextRefreshing.getScaleX());
                                 mTextRefreshing.setAlpha(REFRESHING_START_ALPHA + REFRESHING_DELTA_ALPHA * percent);
@@ -179,7 +190,7 @@ public class DampingView4 extends NestedScrollView {
 
                                 mLayoutRefresh.setTranslationY(-mHeightRefreshLayout + mMoveHeight);
                             } else {
-                                mLayoutRefresh.setTranslationY((float) (mLayoutRefresh.getTranslationY() + moveHeight * 0.3));
+                                mLayoutRefresh.setTranslationY((float) (mLayoutRefresh.getTranslationY() + moveHeight * 0.25));
                             }
                         }
                     }
@@ -187,10 +198,8 @@ public class DampingView4 extends NestedScrollView {
                     if (mMode == 2) {
                         mLayoutContent.setTranslationY(mMoveHeight);
                     } else if (mMode == 1) {
-                        mLayoutContent.setTranslationY(mMoveHeight);
-
-                        /*mLayoutContent.layout(mRect.left, (int) (mRect.top + mMoveHeight), mRect.right,
-                                (int) (mRect.bottom + mMoveHeight));*/
+                        mLayoutContent.layout(mRect.left, mRect.top + mMoveHeight, mRect.right,
+                                mRect.bottom + mMoveHeight);
                     }
 
                 }
@@ -211,11 +220,8 @@ public class DampingView4 extends NestedScrollView {
                         }
                     }
                 } else if (mMode == 1) {
-                    //mLayoutContent.setTranslationY(0);
-                    this.dampingAnim(mLayoutContent, mMoveHeight, 0);
-
-                    /*this.dampAnimation(mLayoutContent);
-                    mLayoutContent.layout(mRect.left, mRect.top, mRect.right, mRect.bottom); //子控件回到初始位置*/
+                    this.dampAnimation(mLayoutContent);
+                    mLayoutContent.layout(mRect.left, mRect.top, mRect.right, mRect.bottom);
                 }
                 break;
         }
@@ -224,9 +230,8 @@ public class DampingView4 extends NestedScrollView {
     private final Rect mRect = new Rect();
 
     private void dampAnimation(View view) {
-        TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f,
-                view.getTop(), mRect.top); //上下回弹的动画效果
-        animation.setDuration(600);
+        TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, view.getTop(), mRect.top);
+        animation.setDuration(800);
         animation.setFillAfter(true);
         animation.setInterpolator(new DampInterpolator());
         view.setAnimation(animation);

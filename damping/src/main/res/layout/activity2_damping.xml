@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".DampingActivity">
 
-    <com.suheng.damping.view.DampingView3
+    <com.suheng.damping.view.DampingLayout
         android:id="@+id/damping_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,5 +20,5 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/darker_gray"/>
-    </com.suheng.damping.view.DampingView3>
+    </com.suheng.damping.view.DampingLayout>
 </FrameLayout>

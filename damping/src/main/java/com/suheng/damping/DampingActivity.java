@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.suheng.damping.view.DampingView3;
+import com.suheng.damping.view.DampingLayout;
 import com.suheng.damping.view.RecyclerItemDecoration;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class DampingActivity extends AppCompatActivity {
         }
         adapter.notifyDataSetChanged();
 
-        DampingView3 dampingView = findViewById(R.id.damping_view);
+        DampingLayout dampingView = findViewById(R.id.damping_view);
         dampingView.setOnRefreshListener(() -> {
             Toast.makeText(DampingActivity.this, "Refreshing", Toast.LENGTH_SHORT).show();
 
