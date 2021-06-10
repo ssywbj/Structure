@@ -30,4 +30,8 @@ public class MainActivity extends AppCompatActivity {
     public void openDampingActivity2(View view) {
         startActivity(new Intent(this, DampingActivity2.class));
     }
+
+    public void openDampingActivity3(View view) {
+        startActivity(new Intent(this, DampingActivity3.class));
+    }
 }

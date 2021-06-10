@@ -28,6 +28,10 @@
         <activity
             android:name=".DampingActivity2"
             android:theme="@style/Theme.Damping.NoActionBar" />
+
+        <activity
+            android:name=".DampingActivity3"
+            android:theme="@style/Theme.Damping.NoActionBar" />
     </application>
 
 </manifest>

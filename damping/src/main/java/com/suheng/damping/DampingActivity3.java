@@ -18,12 +18,12 @@ import com.suheng.damping.view.RecyclerItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DampingActivity2 extends AppCompatActivity {
+public class DampingActivity3 extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity2_damping);
+        setContentView(R.layout.activity3_damping);
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
@@ -33,24 +33,25 @@ public class DampingActivity2 extends AppCompatActivity {
         ContentAdapter adapter = new ContentAdapter(datas);
         recyclerView.setAdapter(adapter);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             datas.add(String.valueOf(i));
         }
         adapter.notifyDataSetChanged();
 
         DampingLayout dampingView = findViewById(R.id.damping_view);
         dampingView.setOnRefreshListener(() -> {
-            Toast.makeText(DampingActivity2.this, "Refreshing", Toast.LENGTH_SHORT).show();
+            Toast.makeText(DampingActivity3.this, "Refreshing", Toast.LENGTH_SHORT).show();
 
             dampingView.postDelayed(() -> {
-                Toast.makeText(DampingActivity2.this, "Refresh Finish", Toast.LENGTH_SHORT).show();
+                Toast.makeText(DampingActivity3.this, "Refresh Finish", Toast.LENGTH_SHORT).show();
                 dampingView.setRefreshing(false);
                 int size = datas.size();
+                /*datas.clear();
                 for (int i = size; i < size + 10; i++) {
                     datas.add(String.valueOf(i));
                 }
-                adapter.notifyDataSetChanged();
-            }, 3000);
+                adapter.notifyDataSetChanged();*/
+            }, 2000);
 
         });
     }
@@ -70,7 +71,7 @@ public class DampingActivity2 extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ContentHolder holder, int position) {
-            holder.textName.setText(mDataList.get(position));
+            holder.textName.setText("纵向滑动：" + position);
         }
 
         @Override

@@ -42,9 +42,18 @@
         android:layout_height="wrap_content"
         android:onClick="openDampingActivity2"
         android:padding="6dp"
-        android:text="Damping_Mode2"
+        android:text="场景1"
         android:textAllCaps="false"
         android:textAppearance="@android:color/black"
         android:textSize="22sp" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="openDampingActivity3"
+        android:padding="6dp"
+        android:text="场景2"
+        android:textAllCaps="false"
+        android:textAppearance="@android:color/black"
+        android:textSize="22sp" />
 </LinearLayout>

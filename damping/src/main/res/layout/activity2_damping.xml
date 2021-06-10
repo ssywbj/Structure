@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.suheng.damping.view.DampingLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/damping_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DampingActivity">
+    android:background="@android:color/white"
+    android:fillViewport="true"
+    app:mode="damping_refresh"
+    tools:context=".DampingActivity2">
 
-    <com.suheng.damping.view.DampingLayout
-        android:id="@+id/damping_view"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="vertical"
-        android:fillViewport="true"
-        android:background="@drawable/demo_bg"
-        app:mode="damping_refresh">
+        android:overScrollMode="never"
+        android:scrollbarSize="6dp"
+        android:scrollbarThumbVertical="@android:color/holo_blue_dark"
+        android:scrollbars="vertical" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/darker_gray"/>
-    </com.suheng.damping.view.DampingLayout>
-</FrameLayout>
+</com.suheng.damping.view.DampingLayout>
