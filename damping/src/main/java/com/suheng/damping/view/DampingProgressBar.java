@@ -24,7 +24,7 @@ public class DampingProgressBar extends View {
     private float mCircleLength;
     private final Path mPathDst = new Path();
     private ValueAnimator mValueAnimator;
-    private float mStartDst, mStopDst;
+    private float mStartDst, mStopDst = 10;
 
     public DampingProgressBar(Context context) {
         super(context);
@@ -41,7 +41,7 @@ public class DampingProgressBar extends View {
         mPaintProgress.setAntiAlias(true);
         mPaintProgress.setStyle(Paint.Style.STROKE);
         mPaintProgress.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2.5f, getResources().getDisplayMetrics()));
-        mPaintProgress.setColor(ContextCompat.getColor(getContext(), android.R.color.holo_red_dark));
+        mPaintProgress.setColor(ContextCompat.getColor(getContext(), android.R.color.darker_gray));
         mPaintProgress.setStrokeCap(Paint.Cap.ROUND);
 
         mPaintCircle = new Paint(mPaintProgress);
@@ -60,27 +60,20 @@ public class DampingProgressBar extends View {
             }
         });
         mValueAnimator.setDuration(1200);
-        mValueAnimator.setRepeatCount(ValueAnimator.INFINITE);//无限循环
+        mValueAnimator.setRepeatCount(ValueAnimator.INFINITE);
 
-        post(() -> mValueAnimator.start());
+        //post(() -> mValueAnimator.start());
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        //Log.d(TAG, "onSizeChanged, w = " + w + ", h = " + h);
         float diameter = Math.min(w, h) - mPaintCircle.getStrokeWidth();
         mPathCircle.reset();
         mPathCircle.addCircle(0, 0, diameter / 2f, Path.Direction.CW);
 
         mPathMeasure.setPath(mPathCircle, false);
         mCircleLength = mPathMeasure.getLength();
-        //Log.d(TAG, "circle length = " + mCircleLength);
-
-        if (mValueAnimator.isRunning()) {
-            mValueAnimator.cancel();
-            mValueAnimator.start();
-        }
     }
 
     @Override
@@ -92,13 +85,38 @@ public class DampingProgressBar extends View {
         canvas.drawPath(mPathCircle, mPaintCircle);
         mPathDst.reset();
         mPathMeasure.getSegment(mStartDst, mStopDst, mPathDst, true);
-        canvas.drawPath(mPathDst, mPaintProgress);//绘制截取的片段
+        canvas.drawPath(mPathDst, mPaintProgress);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mValueAnimator.cancel();
+        this.stop();
+    }
+
+    public void setProgressColor(int color) {
+        mPaintProgress.setColor(color);
+        mPaintCircle.set(mPaintProgress);
+        mPaintCircle.setAlpha(50);
+    }
+
+    public void start() {
+        if (mValueAnimator == null || mValueAnimator.isRunning()) {
+            return;
+        }
+
+        mValueAnimator.start();
+    }
+
+    public void stop() {
+        if (mValueAnimator != null && mValueAnimator.isRunning()) {
+            mValueAnimator.cancel();
+        }
+
+        mStartDst = 0;
+        mStopDst = 10;
+        invalidate();
     }
 
 }

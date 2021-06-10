@@ -15,7 +15,8 @@
         android:text="SwipeRefreshLayout"
         android:textAllCaps="false"
         android:textColor="@android:color/black"
-        android:textSize="22sp" />
+        android:textSize="22sp"
+        android:visibility="gone" />
 
     <Button
         android:layout_width="wrap_content"
@@ -25,14 +26,15 @@
         android:text="BounceEffect"
         android:textAllCaps="false"
         android:textAppearance="@android:color/black"
-        android:textSize="22sp" />
+        android:textSize="22sp"
+        android:visibility="gone" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="openDampingActivity"
         android:padding="6dp"
-        android:text="Damping_Mode1"
+        android:text="Mode1"
         android:textAllCaps="false"
         android:textAppearance="@android:color/black"
         android:textSize="22sp" />
@@ -42,7 +44,7 @@
         android:layout_height="wrap_content"
         android:onClick="openDampingActivity2"
         android:padding="6dp"
-        android:text="场景1"
+        android:text="Mode2-场景1"
         android:textAllCaps="false"
         android:textAppearance="@android:color/black"
         android:textSize="22sp" />
@@ -52,7 +54,7 @@
         android:layout_height="wrap_content"
         android:onClick="openDampingActivity3"
         android:padding="6dp"
-        android:text="场景2"
+        android:text="Mode2-场景2"
         android:textAllCaps="false"
         android:textAppearance="@android:color/black"
         android:textSize="22sp" />

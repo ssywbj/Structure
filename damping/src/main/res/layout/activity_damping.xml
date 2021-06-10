@@ -12,13 +12,13 @@
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
         android:fillViewport="true"
-        android:background="@drawable/demo_bg"
+        android:background="@color/white"
         app:mode="damping">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/darker_gray"/>
+            android:overScrollMode="never"
+            android:layout_height="wrap_content" />
     </com.suheng.damping.view.DampingLayout>
 </FrameLayout>

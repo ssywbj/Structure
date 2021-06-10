@@ -1,5 +1,6 @@
 package com.suheng.damping;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,8 @@ public class DampingActivity2 extends AppCompatActivity {
         adapter.notifyDataSetChanged();
 
         DampingLayout dampingView = findViewById(R.id.damping_view);
+        dampingView.setTextColor(Color.BLUE);
+        dampingView.setProgressColor(Color.BLUE);
         dampingView.setOnRefreshListener(() -> {
             Toast.makeText(DampingActivity2.this, "Refreshing", Toast.LENGTH_SHORT).show();
 

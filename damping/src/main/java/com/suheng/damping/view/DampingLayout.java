@@ -13,8 +13,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.core.widget.NestedScrollView;
 
@@ -32,7 +34,7 @@ public class DampingLayout extends NestedScrollView {
     private View mLayoutRefresh;
     private int mHeightRefreshLayout;
     private DampingProgressBar mProgressBar;
-    private View mTextRefreshing;
+    private TextView mTextRefreshing;
 
     private boolean mRefreshing;
     private OnRefreshListener mOnRefreshListener;
@@ -194,15 +196,16 @@ public class DampingLayout extends NestedScrollView {
                                 mProgressBar.setScaleY(mTextRefreshing.getScaleX());
                                 mProgressBar.setAlpha(mTextRefreshing.getAlpha());
 
-                                mLayoutRefresh.setTranslationY(-mHeightRefreshLayout + mMoveHeight);
+                                mLayoutRefresh.setTranslationY((float) (mLayoutRefresh.getTranslationY() + moveHeight));
                             } else {
-                                mLayoutRefresh.setTranslationY((float) (mLayoutRefresh.getTranslationY() + moveHeight * 0.25));
+                                mLayoutRefresh.setTranslationY((float) (mLayoutRefresh.getTranslationY() + moveHeight * 0.5));
+                                //mTextRefreshing.setText("松手更新");
                             }
                         }
                     }
 
                     if (mMode == 2) {
-                        mLayoutContent.setTranslationY(mMoveHeight);
+                        mLayoutContent.setTranslationY((float) (mLayoutContent.getTranslationY() + moveHeight));
                     } else if (mMode == 1) {
                         mLayoutContent.layout(mRect.left, mRect.top + mMoveHeight, mRect.right,
                                 mRect.bottom + mMoveHeight);
@@ -221,6 +224,9 @@ public class DampingLayout extends NestedScrollView {
                         //mLayoutRefresh.setTranslationY(-mHeightRefreshLayout + mHeightRefreshLayout);
                         this.dampingAnim(mLayoutRefresh, mLayoutRefresh.getTranslationY(), -mHeightRefreshLayout + mHeightRefreshLayout);
                         if (mOnRefreshListener != null) {
+                            mProgressBar.start();
+                            //mTextRefreshing.setText("正在更新");
+
                             mRefreshing = true;
                             mOnRefreshListener.onRefresh();
                         }
@@ -258,15 +264,32 @@ public class DampingLayout extends NestedScrollView {
         valueAnimator.start();
     }
 
+    private void dampingAnim2(View view, float start, float end) {
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(start, end);
+        valueAnimator.setDuration(400);
+        valueAnimator.setInterpolator(new LinearInterpolator());
+        valueAnimator.addUpdateListener(animation -> {
+            Object object = animation.getAnimatedValue();
+            if (object instanceof Float) {
+                float value = (float) object;
+                //Log.d(TAG, "damp interpolator, value: " + value);
+                view.setTranslationY(value);
+            }
+        });
+        valueAnimator.start();
+    }
+
     public void setRefreshing(boolean refreshing) {
         mRefreshing = refreshing;
 
-        if (mRefreshing) {
-        } else {
+        if (!mRefreshing) {
             //mLayoutContent.setTranslationY(0);
-            this.dampingAnim(mLayoutContent, mLayoutContent.getTranslationY(), 0);
+            this.dampingAnim2(mLayoutContent, mLayoutContent.getTranslationY(), 0);
             //mLayoutRefresh.setTranslationY(-mHeightRefreshLayout);
-            this.dampingAnim(mLayoutRefresh, mLayoutRefresh.getTranslationY(), -mHeightRefreshLayout);
+            this.dampingAnim2(mLayoutRefresh, mLayoutRefresh.getTranslationY(), -mHeightRefreshLayout);
+
+            mProgressBar.stop();
+            //mTextRefreshing.setText("下拉刷新");
         }
     }
 
@@ -284,22 +307,17 @@ public class DampingLayout extends NestedScrollView {
         }
     }
 
+    public void setProgressColor(int color) {
+        mProgressBar.setProgressColor(color);
+    }
+
+    public void setTextColor(int color) {
+        mTextRefreshing.setTextColor(color);
+    }
+
     public interface OnRefreshListener {
 
         void onRefresh();
-    }
-
-    protected float getFriction(float overScrollLength, float offset, boolean isEasing) {
-        int viewPortLength = getResources().getDisplayMetrics().heightPixels;
-        if (isEasing) {
-            return frictionFactor((Math.abs(overScrollLength) - Math.abs(offset)) / viewPortLength);
-        } else {
-            return 0.8f;
-        }
-    }
-
-    protected float frictionFactor(float overscrollFraction) {
-        return (float) (0.8 * Math.pow(1 - overscrollFraction, 4));
     }
 
 }
