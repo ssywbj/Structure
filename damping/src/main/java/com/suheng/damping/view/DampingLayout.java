@@ -12,8 +12,6 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -42,6 +40,8 @@ public class DampingLayout extends NestedScrollView {
     private View mLayoutContent;
 
     private int mScreenHeight, mMoveHeight;
+
+    private EaseCubicInterpolator mInterpolator25_0_0_1;
 
     public DampingLayout(Context context) {
         this(context, null);
@@ -83,9 +83,8 @@ public class DampingLayout extends NestedScrollView {
         //getContext().getDisplay().getRealMetrics(displayMetrics);
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
         mScreenHeight = displayMetrics.heightPixels;
-        //Log.d(TAG, "screen height: " + mScreenHeight);
-
         mLayoutContent = getChildAt(0);
+        mInterpolator25_0_0_1 = new EaseCubicInterpolator(0.25f, 0, 0, 1);
 
         if (mMode == 2) {
             mHeightRefreshLayout = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
@@ -218,10 +217,8 @@ public class DampingLayout extends NestedScrollView {
                     if (mMoveHeight < mHeightRefreshLayout) {
                         this.setRefreshing(false);
                     } else {
-                        //mLayoutContent.setTranslationY(mHeightRefreshLayout);
                         this.dampingAnim(mLayoutContent, mLayoutContent.getTranslationY(), mHeightRefreshLayout);
 
-                        //mLayoutRefresh.setTranslationY(-mHeightRefreshLayout + mHeightRefreshLayout);
                         this.dampingAnim(mLayoutRefresh, mLayoutRefresh.getTranslationY(), -mHeightRefreshLayout + mHeightRefreshLayout);
                         if (mOnRefreshListener != null) {
                             mProgressBar.start();
@@ -243,36 +240,20 @@ public class DampingLayout extends NestedScrollView {
 
     private void dampAnimation(View view) {
         TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, view.getTop(), mRect.top);
-        animation.setDuration(800);
+        animation.setDuration(600);
         animation.setFillAfter(true);
-        animation.setInterpolator(new DampInterpolator());
+        animation.setInterpolator(mInterpolator25_0_0_1);
         view.setAnimation(animation);
     }
 
     private void dampingAnim(View view, float start, float end) {
         ValueAnimator valueAnimator = ValueAnimator.ofFloat(start, end);
-        valueAnimator.setDuration(800);
-        valueAnimator.setInterpolator(new DampInterpolator());
+        valueAnimator.setDuration(300);
+        valueAnimator.setInterpolator(mInterpolator25_0_0_1);
         valueAnimator.addUpdateListener(animation -> {
             Object object = animation.getAnimatedValue();
             if (object instanceof Float) {
                 float value = (float) object;
-                //Log.d(TAG, "damp interpolator, value: " + value);
-                view.setTranslationY(value);
-            }
-        });
-        valueAnimator.start();
-    }
-
-    private void dampingAnim2(View view, float start, float end) {
-        ValueAnimator valueAnimator = ValueAnimator.ofFloat(start, end);
-        valueAnimator.setDuration(400);
-        valueAnimator.setInterpolator(new LinearInterpolator());
-        valueAnimator.addUpdateListener(animation -> {
-            Object object = animation.getAnimatedValue();
-            if (object instanceof Float) {
-                float value = (float) object;
-                //Log.d(TAG, "damp interpolator, value: " + value);
                 view.setTranslationY(value);
             }
         });
@@ -283,10 +264,8 @@ public class DampingLayout extends NestedScrollView {
         mRefreshing = refreshing;
 
         if (!mRefreshing) {
-            //mLayoutContent.setTranslationY(0);
-            this.dampingAnim2(mLayoutContent, mLayoutContent.getTranslationY(), 0);
-            //mLayoutRefresh.setTranslationY(-mHeightRefreshLayout);
-            this.dampingAnim2(mLayoutRefresh, mLayoutRefresh.getTranslationY(), -mHeightRefreshLayout);
+            this.dampingAnim(mLayoutContent, mLayoutContent.getTranslationY(), 0);
+            this.dampingAnim(mLayoutRefresh, mLayoutRefresh.getTranslationY(), -mHeightRefreshLayout);
 
             mProgressBar.stop();
             //mTextRefreshing.setText("下拉刷新");
@@ -295,16 +274,6 @@ public class DampingLayout extends NestedScrollView {
 
     public void setOnRefreshListener(OnRefreshListener onRefreshListener) {
         mOnRefreshListener = onRefreshListener;
-    }
-
-    private static class DampInterpolator implements Interpolator {
-        @Override
-        public float getInterpolation(float input) {
-            float ratio = (float) (1 - Math.pow((1 - input), 5));
-            float value = 1 - (float) (0.8 * Math.pow(1 - input, 4));
-            //Log.v(TAG, "damp interpolator, input: " + input + ", ratio: " + ratio + ", value: " + value);
-            return value;
-        }
     }
 
     public void setProgressColor(int color) {
