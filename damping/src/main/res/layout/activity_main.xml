@@ -15,8 +15,7 @@
         android:text="SwipeRefreshLayout"
         android:textAllCaps="false"
         android:textColor="@android:color/black"
-        android:textSize="22sp"
-        android:visibility="gone" />
+        android:textSize="22sp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -27,7 +26,7 @@
         android:textAllCaps="false"
         android:textAppearance="@android:color/black"
         android:textSize="22sp"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <Button
         android:layout_width="wrap_content"
@@ -58,4 +57,10 @@
         android:textAllCaps="false"
         android:textAppearance="@android:color/black"
         android:textSize="22sp" />
+
+    <View
+        android:id="@+id/view_fling"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@android:color/holo_blue_dark" />
 </LinearLayout>

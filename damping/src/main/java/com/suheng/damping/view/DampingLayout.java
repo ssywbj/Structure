@@ -146,6 +146,26 @@ public class DampingLayout extends NestedScrollView {
                 float deltaY = currentY - mPreviousY;
                 mPreviousY = currentY;
 
+                float distance = Math.abs(currentY - mStartY);
+
+                float factor = (float) (0.8 * Math.pow(1 - distance / mScreenHeight, 4));
+                    /*factor *= 0.25;
+                    factor += 0.25;
+                    double moveHeight = deltaY * factor;*/
+
+                float damping = (mScreenHeight - distance) / mScreenHeight;
+                if (currentY - mStartY < 0) {
+                    damping = 1 - damping;
+                }
+                damping *= 0.25;
+                damping += 0.25;
+                double moveHeight = deltaY * damping;
+
+                mMoveHeight += moveHeight;
+                Log.d(TAG, "distance y: " + distance + ", factor: " + factor + ", damping: " + damping
+                        + ", moveHeight: " + (deltaY * factor) + "--" + (deltaY * damping) + ", move height: "
+                        + mMoveHeight);
+
                 boolean fromTopDownPull = false, fromBottomUpPull = false;
                 if (mMode == 2) {
                     fromTopDownPull = (!canScrollVertically(-1) && (currentY - mStartY) > 0);
@@ -156,33 +176,6 @@ public class DampingLayout extends NestedScrollView {
                 }
 
                 if (fromTopDownPull || fromBottomUpPull) {
-                    /*if (fromTopDownPull) {
-                        Log.i(TAG, "from top down pull");
-                    }
-                    if (fromBottomUpPull) {
-                        Log.i(TAG, "from bottom up pull");
-                    }*/
-
-                    float distance = Math.abs(currentY - mStartY);
-
-                    float factor = (float) (0.8 * Math.pow(1 - distance / mScreenHeight, 4));
-                    /*factor *= 0.25;
-                    factor += 0.25;
-                    double moveHeight = deltaY * factor;*/
-
-                    float damping = (mScreenHeight - distance) / mScreenHeight;
-                    if (currentY - mStartY < 0) {
-                        damping = 1 - damping;
-                    }
-                    damping *= 0.25;
-                    damping += 0.25;
-                    double moveHeight = deltaY * damping;
-
-                    mMoveHeight += moveHeight;
-                    Log.d(TAG, "distance y: " + distance + ", factor: " + factor + ", damping: " + damping
-                            + ", moveHeight: " + (deltaY * factor) + "--" + (deltaY * damping) + ", move height: "
-                            + mMoveHeight);
-
                     if (mMode == 2) {
                         if (fromTopDownPull) {
                             if (mMoveHeight < mHeightRefreshLayout) {
