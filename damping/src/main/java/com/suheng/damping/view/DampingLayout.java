@@ -146,26 +146,6 @@ public class DampingLayout extends NestedScrollView {
                 float deltaY = currentY - mPreviousY;
                 mPreviousY = currentY;
 
-                float distance = Math.abs(currentY - mStartY);
-
-                float factor = (float) (0.8 * Math.pow(1 - distance / mScreenHeight, 4));
-                    /*factor *= 0.25;
-                    factor += 0.25;
-                    double moveHeight = deltaY * factor;*/
-
-                float damping = (mScreenHeight - distance) / mScreenHeight;
-                if (currentY - mStartY < 0) {
-                    damping = 1 - damping;
-                }
-                damping *= 0.25;
-                damping += 0.25;
-                double moveHeight = deltaY * damping;
-
-                mMoveHeight += moveHeight;
-                Log.d(TAG, "distance y: " + distance + ", factor: " + factor + ", damping: " + damping
-                        + ", moveHeight: " + (deltaY * factor) + "--" + (deltaY * damping) + ", move height: "
-                        + mMoveHeight);
-
                 boolean fromTopDownPull = false, fromBottomUpPull = false;
                 if (mMode == 2) {
                     fromTopDownPull = (!canScrollVertically(-1) && (currentY - mStartY) > 0);
@@ -176,6 +156,26 @@ public class DampingLayout extends NestedScrollView {
                 }
 
                 if (fromTopDownPull || fromBottomUpPull) {
+                    float distance = Math.abs(currentY - mStartY);
+
+                    float factor = (float) (0.8 * Math.pow(1 - distance / mScreenHeight, 4));
+                    /*factor *= 0.25;
+                    factor += 0.25;
+                    double moveHeight = deltaY * factor;*/
+
+                    float damping = (mScreenHeight - distance) / mScreenHeight;
+                    if (currentY - mStartY < 0) {
+                        damping = 1 - damping;
+                    }
+                    damping *= 0.25;
+                    damping += 0.25;
+                    double moveHeight = deltaY * damping;
+
+                    mMoveHeight += moveHeight;
+                    Log.d(TAG, "distance y: " + distance + ", factor: " + factor + ", damping: " + damping
+                            + ", moveHeight: " + (deltaY * factor) + "--" + (deltaY * damping) + ", move height: "
+                            + mMoveHeight);
+
                     if (mMode == 2) {
                         if (fromTopDownPull) {
                             if (mMoveHeight < mHeightRefreshLayout) {
@@ -258,7 +258,28 @@ public class DampingLayout extends NestedScrollView {
 
         if (!mRefreshing) {
             this.dampingAnim(mLayoutContent, mLayoutContent.getTranslationY(), 0);
-            this.dampingAnim(mLayoutRefresh, mLayoutRefresh.getTranslationY(), -mHeightRefreshLayout);
+
+            final float alpha = mTextRefreshing.getAlpha();
+            final float deltaScale = mTextRefreshing.getScaleX() - REFRESHING_START_SCALE;
+            ValueAnimator valueAnimator = ValueAnimator.ofFloat(mLayoutRefresh.getTranslationY(), -mHeightRefreshLayout);
+            valueAnimator.setDuration(300);
+            valueAnimator.setInterpolator(mInterpolator25_0_0_1);
+            valueAnimator.addUpdateListener(animation -> {
+                Object object = animation.getAnimatedValue();
+                if (object instanceof Float) {
+                    float value = (float) object;
+                    mLayoutRefresh.setTranslationY(value);
+                    float ratio = Math.abs(value) / mHeightRefreshLayout;
+                    mTextRefreshing.setScaleX(REFRESHING_START_SCALE + deltaScale * (1 - ratio));
+                    mTextRefreshing.setScaleY(mTextRefreshing.getScaleX());
+                    mTextRefreshing.setAlpha(alpha - alpha * ratio);
+
+                    mProgressBar.setScaleX(mTextRefreshing.getScaleX());
+                    mProgressBar.setScaleY(mTextRefreshing.getScaleX());
+                    mProgressBar.setAlpha(mTextRefreshing.getAlpha());
+                }
+            });
+            valueAnimator.start();
 
             mProgressBar.stop();
             //mTextRefreshing.setText("下拉刷新");
