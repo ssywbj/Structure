@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.suheng.structure.wallpaperpicker">
+    package="com.suheng.structure.wallpaperpicker"
+    android:sharedUserId="android.uid.system">
+    <!--普通app变系统app条件：1.apk使用系统签名；2.push到system的app或priv-app目录，再加上sharedUserId可以让系统app获取大部分权限-->
 
     <!--<uses-feature android:name="android.hardware.type.watch" />-->
 
