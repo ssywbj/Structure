@@ -16,6 +16,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.widget.NestedScrollView;
 
 import com.suheng.damping.R;
@@ -110,6 +111,10 @@ public class DampingLayout extends NestedScrollView {
             mProgressBar.setScaleX(REFRESHING_START_SCALE);
             mProgressBar.setScaleY(REFRESHING_START_SCALE);
             mProgressBar.setAlpha(REFRESHING_START_ALPHA);
+
+            /*setOnScrollChangeListener((OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                Log.d(TAG, "setOnScrollChangeListener, scrollX: " + scrollX + ", scrollY: " + scrollY + ", oldScrollX: " + oldScrollX + ", oldScrollY: " + oldScrollY);
+            });*/
         }
     }
 
@@ -119,6 +124,41 @@ public class DampingLayout extends NestedScrollView {
         if (mMode == 2 && mLayoutRefresh != null) {
             mLayoutRefresh.setTranslationY(-mHeightRefreshLayout);
         }
+    }
+
+    //https://www.cnblogs.com/xlqwe/p/6183492.html
+    //https://blog.csdn.net/qq_42944793/article/details/88417127
+    //https://www.jianshu.com/p/6547ec3202bd
+    @Override
+    public boolean onNestedFling(@NonNull View target, float velocityX, float velocityY, boolean consumed) {
+        Log.d(TAG, "onNestedFling, velocityX: " + velocityX + ", velocityY: " + velocityY + ", consumed: " + consumed);
+        return super.onNestedFling(target, velocityX, velocityY, consumed);
+    }
+
+    @Override
+    public boolean onNestedPreFling(@NonNull View target, float velocityX, float velocityY) {
+        Log.d(TAG, "onNestedPreFling, velocityX: " + velocityX + ", velocityY: " + velocityY);
+        return super.onNestedPreFling(target, velocityX, velocityY);
+    }
+
+    @Override
+    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+        Log.d(TAG, "onOverScrolled, scrollX: " + scrollX + ", scrollY: " + scrollY + ", clampedX: " + clampedX + ", clampedX: " + clampedY);
+    }
+
+    @Override
+    protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
+        Log.d(TAG, "overScrollBy, deltaX: " + deltaX + ", deltaY: " + deltaY + ", scrollX: " + scrollX + ", scrollY: " + scrollY
+                + ", scrollRangeX: " + scrollRangeX + ", scrollRangeY: " + scrollRangeY + ", maxOverScrollX: "
+                + maxOverScrollX + ", maxOverScrollY: " + maxOverScrollY + ", isTouchEvent: " + isTouchEvent);
+        return super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
+    }
+
+    @Override
+    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+        super.onScrollChanged(l, t, oldl, oldt);
+        Log.d(TAG, "onScrollChanged, l: " + l + ", t: " + t + ", oldl: " + oldl + ", oldt: " + oldt);
     }
 
     @Override
@@ -140,22 +180,24 @@ public class DampingLayout extends NestedScrollView {
                 mMoveHeight = 0;
 
                 mRect.set(mLayoutContent.getLeft(), mLayoutContent.getTop(), mLayoutContent.getRight(), mLayoutContent.getBottom());
+                Log.i(TAG, "canScrollVertically: " + (!canScrollVertically(-1)));
                 break;
             case MotionEvent.ACTION_MOVE: //0.8 * pow(1 - x, 4), x=s/h, s是滑动距离、h是屏幕高度
                 float currentY = ev.getY();
                 float deltaY = currentY - mPreviousY;
                 mPreviousY = currentY;
 
-                boolean fromTopDownPull = false, fromBottomUpPull = false;
+                /*boolean fromTopDownPull = false, fromBottomUpPull = false;
                 if (mMode == 2) {
                     fromTopDownPull = (!canScrollVertically(-1) && (currentY - mStartY) > 0);
                     fromBottomUpPull = (!canScrollVertically(1) && (currentY - mStartY) < 0);
                 } else if (mMode == 1) {
                     fromTopDownPull = (!mLayoutContent.canScrollVertically(-1) && (currentY - mStartY) > 0);
                     fromBottomUpPull = (!mLayoutContent.canScrollVertically(1) && (currentY - mStartY) < 0);
-                }
+                }*/
+                //Log.i(TAG, "canScrollVertically: " + (!canScrollVertically(-1)) + ", fromTopDownPull: " + fromTopDownPull);
 
-                if (fromTopDownPull || fromBottomUpPull) {
+                //if (fromTopDownPull || fromBottomUpPull) {
                     float distance = Math.abs(currentY - mStartY);
 
                     float factor = (float) (0.8 * Math.pow(1 - distance / mScreenHeight, 4));
@@ -177,7 +219,7 @@ public class DampingLayout extends NestedScrollView {
                             + mMoveHeight);
 
                     if (mMode == 2) {
-                        if (fromTopDownPull) {
+                        //if (fromTopDownPull) {
                             if (mMoveHeight < mHeightRefreshLayout) {
                                 float percent = 1.0f * mMoveHeight / mHeightRefreshLayout;
                                 mTextRefreshing.setScaleX(REFRESHING_START_SCALE + REFRESHING_DELTA_SCALE * percent);
@@ -193,7 +235,7 @@ public class DampingLayout extends NestedScrollView {
                                 mLayoutRefresh.setTranslationY((float) (mLayoutRefresh.getTranslationY() + moveHeight * 0.5));
                                 //mTextRefreshing.setText("松手更新");
                             }
-                        }
+                        //}
                     }
 
                     if (mMode == 2) {
@@ -203,7 +245,7 @@ public class DampingLayout extends NestedScrollView {
                                 mRect.bottom + mMoveHeight);
                     }
 
-                }
+                //}
                 break;
             case MotionEvent.ACTION_UP:
                 if (mMode == 2) {
