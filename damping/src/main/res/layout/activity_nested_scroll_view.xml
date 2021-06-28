@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.suheng.damping.view.DampingLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<com.suheng.damping.view.DampingView2 xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/damping_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/demo_bg"
     android:fillViewport="true"
-    android:overScrollMode="never"
     android:scrollbars="vertical"
-    app:mode="damping_refresh"
-    tools:context=".DampingActivity">
+    tools:context=".NestedScrollViewActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -64,11 +60,12 @@
             android:textColor="#666666"
             android:textSize="20sp" />
 
-        <HorizontalScrollView
+        <!--<HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="350dp"
             android:layout_margin="10dp"
-            android:background="#AAFFFFFF">
+            android:background="#AAFFFFFF"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -129,14 +126,14 @@
                     android:textColor="@android:color/holo_orange_dark"
                     android:textSize="18sp" />
             </LinearLayout>
-        </HorizontalScrollView>
+        </HorizontalScrollView>-->
 
-        <androidx.recyclerview.widget.RecyclerView
+        <!--<androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="400dp"
             android:layout_margin="8dp"
-            android:background="#88FFFFFF" />
+            android:background="#88FFFFFF" />-->
 
         <TextView
             android:layout_width="match_parent"
@@ -148,5 +145,27 @@
             android:text="卡片2"
             android:textColor="#FFFFFF"
             android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_margin="12dp"
+            android:background="#AA000000"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="卡片3"
+            android:textColor="#FF0000"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:layout_margin="12dp"
+            android:background="#AA000000"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="卡片4"
+            android:textColor="#00FF00"
+            android:textSize="20sp" />
     </LinearLayout>
-</com.suheng.damping.view.DampingLayout>
+</com.suheng.damping.view.DampingView2>

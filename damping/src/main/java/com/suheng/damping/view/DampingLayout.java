@@ -16,7 +16,6 @@ import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.core.widget.NestedScrollView;
 
 import com.suheng.damping.R;
@@ -122,41 +121,6 @@ public class DampingLayout extends NestedScrollView {
         }
     }
 
-    //https://www.cnblogs.com/xlqwe/p/6183492.html
-    //https://blog.csdn.net/qq_42944793/article/details/88417127
-    //https://www.jianshu.com/p/6547ec3202bd
-    @Override
-    public boolean onNestedFling(@NonNull View target, float velocityX, float velocityY, boolean consumed) {
-        Log.d(TAG, "onNestedFling, velocityX: " + velocityX + ", velocityY: " + velocityY + ", consumed: " + consumed);
-        return super.onNestedFling(target, velocityX, velocityY, consumed);
-    }
-
-    @Override
-    public boolean onNestedPreFling(@NonNull View target, float velocityX, float velocityY) {
-        Log.d(TAG, "onNestedPreFling, velocityX: " + velocityX + ", velocityY: " + velocityY);
-        return super.onNestedPreFling(target, velocityX, velocityY);
-    }
-
-    @Override
-    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
-        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
-        Log.d(TAG, "onOverScrolled, scrollX: " + scrollX + ", scrollY: " + scrollY + ", clampedX: " + clampedX + ", clampedX: " + clampedY);
-    }
-
-    @Override
-    protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
-        Log.d(TAG, "overScrollBy, deltaX: " + deltaX + ", deltaY: " + deltaY + ", scrollX: " + scrollX + ", scrollY: " + scrollY
-                + ", scrollRangeX: " + scrollRangeX + ", scrollRangeY: " + scrollRangeY + ", maxOverScrollX: "
-                + maxOverScrollX + ", maxOverScrollY: " + maxOverScrollY + ", isTouchEvent: " + isTouchEvent);
-        return super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
-    }
-
-    @Override
-    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        super.onScrollChanged(l, t, oldl, oldt);
-        Log.d(TAG, "onScrollChanged, l: " + l + ", t: " + t + ", oldl: " + oldl + ", oldt: " + oldt);
-    }
-
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (mLayoutContent != null && !mRefreshing) {
@@ -183,13 +147,11 @@ public class DampingLayout extends NestedScrollView {
                 mPreviousY = currentY;
 
                 boolean fromTopDownPull = false, fromBottomUpPull = false;
-                if (mMode == 2) {
-                    fromTopDownPull = (!canScrollVertically(-1) && (currentY - mStartY) > 0);
-                    fromBottomUpPull = (!canScrollVertically(1) && (currentY - mStartY) < 0);
-                } else if (mMode == 1) {
-                    fromTopDownPull = (!mLayoutContent.canScrollVertically(-1) && (currentY - mStartY) > 0);
-                    fromBottomUpPull = (!mLayoutContent.canScrollVertically(1) && (currentY - mStartY) < 0);
-                }
+                fromTopDownPull = (!mLayoutContent.canScrollVertically(-1) && (currentY - mStartY) > 0);
+                fromBottomUpPull = (!mLayoutContent.canScrollVertically(1) && (currentY - mStartY) < 0);
+                Log.d(TAG, "fromTopDownPull: " + fromTopDownPull + ", fromBottomUpPull: " + fromBottomUpPull);
+                Log.i(TAG, "canScrollVertically-1: " + (!mLayoutContent.canScrollVertically(-1))
+                        + ", canScrollVertically1: " + (!mLayoutContent.canScrollVertically(1)));
 
                 if (fromTopDownPull || fromBottomUpPull) {
                     float distance = Math.abs(currentY - mStartY);
@@ -208,9 +170,9 @@ public class DampingLayout extends NestedScrollView {
                     double moveHeight = deltaY * damping;
 
                     mMoveHeight += moveHeight;
-                    Log.d(TAG, "distance y: " + distance + ", factor: " + factor + ", damping: " + damping
+                    /*Log.d(TAG, "distance y: " + distance + ", factor: " + factor + ", damping: " + damping
                             + ", moveHeight: " + (deltaY * factor) + "--" + (deltaY * damping) + ", move height: "
-                            + mMoveHeight);
+                            + mMoveHeight);*/
 
                     if (mMode == 2) {
                         if (fromTopDownPull) {

@@ -21,6 +21,9 @@
         </activity>
 
         <activity android:name=".SwipeRefreshActivity" />
+        <activity android:name=".NestedScrollViewActivity" />
+        <activity android:name=".SpringAnimActivity" />
+        <activity android:name=".FlingAnimActivity" />
         <activity android:name=".DampingViewActivity" />
         <activity
             android:name=".DampingActivity"
