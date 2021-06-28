@@ -16,12 +16,12 @@ import com.suheng.damping.view.RecyclerItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BounceEffectActivity extends AppCompatActivity {
+public class DampingViewActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bounce_effect);
+        setContentView(R.layout.activity_damping_view);
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
@@ -31,7 +31,7 @@ public class BounceEffectActivity extends AppCompatActivity {
         ContentAdapter adapter = new ContentAdapter(datas);
         recyclerView.setAdapter(adapter);
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 30; i++) {
             datas.add(String.valueOf(i));
         }
         adapter.notifyDataSetChanged();

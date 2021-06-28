@@ -67,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, SwipeRefreshActivity.class));
     }
 
-    public void openBounceEffectActivity(View view) {
-        startActivity(new Intent(this, BounceEffectActivity.class));
+    public void openDampingViewActivity(View view) {
+        startActivity(new Intent(this, DampingViewActivity.class));
 
         //SpringAnimation springAnimation = new SpringAnimation(view, DynamicAnimation.TRANSLATION_Y);
         /*SpringAnimation springAnimation = new SpringAnimation(view, DynamicAnimation.TRANSLATION_Y, 0);

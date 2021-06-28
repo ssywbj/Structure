@@ -20,9 +20,9 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="openBounceEffectActivity"
+        android:onClick="openDampingViewActivity"
         android:padding="6dp"
-        android:text="BounceEffect"
+        android:text="DampingView"
         android:textAllCaps="false"
         android:textAppearance="@android:color/black"
         android:textSize="22sp"

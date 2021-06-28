@@ -21,7 +21,7 @@
         </activity>
 
         <activity android:name=".SwipeRefreshActivity" />
-        <activity android:name=".BounceEffectActivity" />
+        <activity android:name=".DampingViewActivity" />
         <activity
             android:name=".DampingActivity"
             android:theme="@style/Theme.Damping.NoActionBar" />

@@ -111,10 +111,6 @@ public class DampingLayout extends NestedScrollView {
             mProgressBar.setScaleX(REFRESHING_START_SCALE);
             mProgressBar.setScaleY(REFRESHING_START_SCALE);
             mProgressBar.setAlpha(REFRESHING_START_ALPHA);
-
-            /*setOnScrollChangeListener((OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                Log.d(TAG, "setOnScrollChangeListener, scrollX: " + scrollX + ", scrollY: " + scrollY + ", oldScrollX: " + oldScrollX + ", oldScrollY: " + oldScrollY);
-            });*/
         }
     }
 
@@ -180,24 +176,22 @@ public class DampingLayout extends NestedScrollView {
                 mMoveHeight = 0;
 
                 mRect.set(mLayoutContent.getLeft(), mLayoutContent.getTop(), mLayoutContent.getRight(), mLayoutContent.getBottom());
-                Log.i(TAG, "canScrollVertically: " + (!canScrollVertically(-1)));
                 break;
             case MotionEvent.ACTION_MOVE: //0.8 * pow(1 - x, 4), x=s/h, s是滑动距离、h是屏幕高度
                 float currentY = ev.getY();
                 float deltaY = currentY - mPreviousY;
                 mPreviousY = currentY;
 
-                /*boolean fromTopDownPull = false, fromBottomUpPull = false;
+                boolean fromTopDownPull = false, fromBottomUpPull = false;
                 if (mMode == 2) {
                     fromTopDownPull = (!canScrollVertically(-1) && (currentY - mStartY) > 0);
                     fromBottomUpPull = (!canScrollVertically(1) && (currentY - mStartY) < 0);
                 } else if (mMode == 1) {
                     fromTopDownPull = (!mLayoutContent.canScrollVertically(-1) && (currentY - mStartY) > 0);
                     fromBottomUpPull = (!mLayoutContent.canScrollVertically(1) && (currentY - mStartY) < 0);
-                }*/
-                //Log.i(TAG, "canScrollVertically: " + (!canScrollVertically(-1)) + ", fromTopDownPull: " + fromTopDownPull);
+                }
 
-                //if (fromTopDownPull || fromBottomUpPull) {
+                if (fromTopDownPull || fromBottomUpPull) {
                     float distance = Math.abs(currentY - mStartY);
 
                     float factor = (float) (0.8 * Math.pow(1 - distance / mScreenHeight, 4));
@@ -219,7 +213,7 @@ public class DampingLayout extends NestedScrollView {
                             + mMoveHeight);
 
                     if (mMode == 2) {
-                        //if (fromTopDownPull) {
+                        if (fromTopDownPull) {
                             if (mMoveHeight < mHeightRefreshLayout) {
                                 float percent = 1.0f * mMoveHeight / mHeightRefreshLayout;
                                 mTextRefreshing.setScaleX(REFRESHING_START_SCALE + REFRESHING_DELTA_SCALE * percent);
@@ -235,7 +229,7 @@ public class DampingLayout extends NestedScrollView {
                                 mLayoutRefresh.setTranslationY((float) (mLayoutRefresh.getTranslationY() + moveHeight * 0.5));
                                 //mTextRefreshing.setText("松手更新");
                             }
-                        //}
+                        }
                     }
 
                     if (mMode == 2) {
@@ -245,7 +239,7 @@ public class DampingLayout extends NestedScrollView {
                                 mRect.bottom + mMoveHeight);
                     }
 
-                //}
+                }
                 break;
             case MotionEvent.ACTION_UP:
                 if (mMode == 2) {
@@ -264,7 +258,7 @@ public class DampingLayout extends NestedScrollView {
                         }
                     }
                 } else if (mMode == 1) {
-                    this.dampAnimation(mLayoutContent);
+                    this.restoreAnim(mLayoutContent);
                     mLayoutContent.layout(mRect.left, mRect.top, mRect.right, mRect.bottom);
                 }
                 break;
@@ -273,7 +267,7 @@ public class DampingLayout extends NestedScrollView {
 
     private final Rect mRect = new Rect();
 
-    private void dampAnimation(View view) {
+    private void restoreAnim(View view) {
         TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, view.getTop(), mRect.top);
         animation.setDuration(600);
         animation.setFillAfter(true);

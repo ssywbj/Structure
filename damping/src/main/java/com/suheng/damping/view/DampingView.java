@@ -11,12 +11,11 @@ import android.view.animation.TranslateAnimation;
 import androidx.core.widget.NestedScrollView;
 
 public class DampingView extends NestedScrollView {
-    private int mPreviousY = 0;
-    private int mStartY = 0;
+    private int mPreviousY, mStartY;
 
     private View mChildView;
-    private final Rect mRect = new Rect(); //用于记录childView的初始位置
-    private float mMoveHeight; //水平移动搞定距离
+    private final Rect mRect = new Rect();
+    private float mMoveHeight;
 
     public DampingView(Context context) {
         this(context, null);
@@ -33,9 +32,11 @@ public class DampingView extends NestedScrollView {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        if (getChildCount() > 0) {
-            mChildView = getChildAt(0);
+        if (getChildCount() != 1) {
+            return;
         }
+
+        mChildView = getChildAt(0);
     }
 
     @Override
@@ -57,29 +58,24 @@ public class DampingView extends NestedScrollView {
                 int deltaY = currentY - mPreviousY;
                 mPreviousY = currentY;
 
-                //判定是否在顶部或者滑到了底部
+                //判定是否在顶部、底部开始操作
                 if ((!mChildView.canScrollVertically(-1) && (currentY - mStartY) > 0)
                         || (!mChildView.canScrollVertically(1) && (currentY - mStartY) < 0)) {
                     //计算阻尼
-                    float distance = currentY - mStartY;
-                    if (distance < 0) {
-                        distance *= -1;
-                    }
+                    float distance = Math.abs(currentY - mStartY);
 
-                    float damping = 0.5f; //阻尼值
+                    float damping; //阻尼值
                     float height = getHeight();
-                    if (height != 0) {
-                        if (distance > height) {
-                            damping = 0;
-                        } else {
-                            damping = (height - distance) / height;
-                        }
+                    if (distance > height) {
+                        damping = 0;
+                    } else {
+                        damping = (height - distance) / height;
                     }
                     if (currentY - mStartY < 0) {
                         damping = 1 - damping;
                     }
 
-                    damping *= 0.25; //阻力值限制再0.3-0.5之间，平滑过度
+                    damping *= 0.25;
                     damping += 0.25;
 
                     mMoveHeight = mMoveHeight + (deltaY * damping);
@@ -89,7 +85,7 @@ public class DampingView extends NestedScrollView {
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                this.verticalAnimation(); //开始回移动画
+                this.restoreAnim(); //回移动画
                 mChildView.layout(mRect.left, mRect.top, mRect.right, mRect.bottom); //子控件回到初始位置
 
                 mStartY = 0;
@@ -100,12 +96,11 @@ public class DampingView extends NestedScrollView {
         return super.dispatchTouchEvent(ev);
     }
 
-    private void verticalAnimation() {
+    private void restoreAnim() {
         TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f,
-                mChildView.getTop(), mRect.top); //上下回弹的动画效果
+                mChildView.getTop(), mRect.top);
         animation.setDuration(600);
         animation.setFillAfter(true);
-        //设置阻尼动画效果
         animation.setInterpolator(new DampInterpolator());
         mChildView.setAnimation(animation);
     }
