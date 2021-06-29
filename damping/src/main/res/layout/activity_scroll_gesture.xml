@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/aty_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/holo_purple"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".ScrollGestureActivity">
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="openSwipeRefreshActivity"
         android:padding="6dp"
         android:text="SwipeRefreshLayout"
         android:textAllCaps="false"
@@ -20,7 +21,6 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="openNestedScrollViewActivity"
         android:padding="6dp"
         android:text="NestedScrollView"
         android:textAllCaps="false"
@@ -30,9 +30,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="openSpringAnimActivity"
         android:padding="6dp"
-        android:text="SpringAnimation"
+        android:text="FlingAnim"
         android:textAllCaps="false"
         android:textColor="@android:color/black"
         android:textSize="22sp" />
@@ -40,27 +39,6 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="openFlingAnimActivity"
-        android:padding="6dp"
-        android:text="FlingAnimation"
-        android:textAllCaps="false"
-        android:textColor="@android:color/black"
-        android:textSize="22sp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="openScrollGestureActivity"
-        android:padding="6dp"
-        android:text="OverScroll+Gesture"
-        android:textAllCaps="false"
-        android:textColor="@android:color/black"
-        android:textSize="22sp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="openDampingViewActivity"
         android:padding="6dp"
         android:text="DampingView"
         android:textAllCaps="false"
@@ -71,7 +49,6 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="openDampingActivity"
         android:padding="6dp"
         android:text="Mode1"
         android:textAllCaps="false"
@@ -81,7 +58,6 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="openDampingActivity2"
         android:padding="6dp"
         android:text="Mode2-场景1"
         android:textAllCaps="false"
@@ -91,10 +67,13 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="openDampingActivity3"
         android:padding="6dp"
         android:text="Mode2-场景2"
         android:textAllCaps="false"
         android:textAppearance="@android:color/black"
         android:textSize="22sp" />
+
+    <com.suheng.damping.view.InfiniteLine2
+        android:layout_width="match_parent"
+        android:layout_height="80dp"/>
 </LinearLayout>

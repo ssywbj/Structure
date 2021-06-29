@@ -72,7 +72,17 @@ public class DampingView2 extends NestedScrollView {
     @Override
     protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
-        Log.v(TAG, "onOverScrolled, scrollX: " + scrollX + ", scrollY: " + scrollY + ", clampedX: " + clampedX + ", clampedX: " + clampedY);
+        Log.v(TAG, "onOverScrolled, scrollX: " + scrollX + ", scrollY: " + scrollY + ", clampedX: " + clampedX
+                + ", clampedY: " + clampedY + ", OverScrollMode: " + getOverScrollMode());
+        Log.v(TAG, "getTopFadingEdgeStrength: " + getTopFadingEdgeStrength() + ", getBottomFadingEdgeStrength: "
+                + getBottomFadingEdgeStrength() + ", " + getVerticalFadingEdgeLength() + ", " + getHorizontalFadingEdgeLength());
+    }
+
+    @Override
+    protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
+        Log.v(TAG, "overScrollBy, deltaX: " + deltaX + ", deltaY: " + deltaY + ", scrollX: " + scrollX + ", scrollY: " + scrollY + ", scrollRangeX: " + scrollRangeX
+                + ", scrollRangeY: " + scrollRangeY + ", maxOverScrollX: " + maxOverScrollX + ", maxOverScrollY: " + maxOverScrollY + ", isTouchEvent: " + isTouchEvent);
+        return super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
     }
 
     //https://www.cnblogs.com/xlqwe/p/6183492.html
@@ -93,7 +103,7 @@ public class DampingView2 extends NestedScrollView {
     @Override
     public void fling(int velocityY) {
         super.fling(velocityY);
-        Log.w(TAG, "fling, velocityY: " + velocityY );
+        Log.w(TAG, "fling, velocityY: " + velocityY);
     }
 
     /*@Override

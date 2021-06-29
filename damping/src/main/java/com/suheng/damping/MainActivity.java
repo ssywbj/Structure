@@ -32,6 +32,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, FlingAnimActivity.class));
     }
 
+    public void openScrollGestureActivity(View view) {
+        startActivity(new Intent(this, ScrollGestureActivity.class));
+    }
+
     public void openDampingViewActivity(View view) {
         startActivity(new Intent(this, DampingViewActivity.class));
     }
