@@ -4,4 +4,7 @@
         <attr name="divider_sign" format="reference" />
         <attr name="time_shade_bg" format="reference" />
     </declare-styleable>
+
+    <!-- DateTimePicker -->
+    <attr name="wheelWidth" format="dimension|reference"/>
 </resources>

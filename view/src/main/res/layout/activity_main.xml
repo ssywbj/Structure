@@ -77,16 +77,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />-->
 
-    <com.suheng.structure.view.GuaguakaView
+    <!--<com.suheng.structure.view.GuaguakaView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <com.suheng.structure.view.GuaguakaView2
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="1dp" />
+        android:layout_marginTop="1dp" />-->
 
     <!--<com.suheng.structure.view.ColorFilterView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />-->
+
+    <com.suheng.structure.view.wheel.DateTimePicker
+        android:id="@+id/datePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"/>
 </LinearLayout>

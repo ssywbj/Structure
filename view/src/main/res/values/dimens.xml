@@ -2,4 +2,26 @@
 <resources>
     <dimen name="alphabet_uppercase_small_width">8.305dp</dimen>
     <dimen name="alphabet_uppercase_small_height">14.625dp</dimen><!--60, 34, /3.0-->
+
+    <!-- picker-->
+    <dimen name="picker_content_margin_title">16dp</dimen>
+    <dimen name="picker_wheel_margin">10dp</dimen>
+    <dimen name="picker_wheel_text_first">16dp</dimen>
+    <dimen name="picker_wheel_text_title">14dp</dimen>
+    <dimen name="picker_wheel_text_second">18dp</dimen>
+    <dimen name="picker_wheel_text_select">22dp</dimen>
+    <dimen name="picker_wheel_item_height">36dp</dimen>
+    <dimen name="picker_wheel_item_height_select">40dp</dimen>
+    <dimen name="picker_wheel_padding">5dp</dimen>
+    <dimen name="picker_wheel_additional_item_space">5dp</dimen>
+    <dimen name="picker_wheel_label_offset">4dp</dimen>
+
+    <dimen name="picker_wheel_width_hour">40dp</dimen>
+    <dimen name="picker_wheel_width_minute">40dp</dimen>
+    <dimen name="picker_wheel_width_format">80dp</dimen>
+    <dimen name="picker_wheel_width_year">60dp</dimen>
+    <dimen name="picker_wheel_width_month">110dp</dimen>
+    <dimen name="picker_wheel_width_day">56dp</dimen>
+    <dimen name="picker_wheel_width_month_day">134dp</dimen>
+
 </resources>

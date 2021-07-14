@@ -9,7 +9,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.suheng.structure.view.wheel.DateTimePicker;
+
 import java.lang.ref.WeakReference;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +42,17 @@ public class MainActivity extends AppCompatActivity {
         Log.i("wbj_main", "INFO, INFO, INFO");
         Log.w("wbj_main", "WARN, WARN, WARN");
         Log.e("wbj_main", "ERROR, ERROR, ERROR");
+
+        DateTimePicker picker = findViewById(R.id.datePicker);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 16);
+        calendar.set(Calendar.MINUTE, 30);
+        picker.init(calendar, DateTimePicker.FORMAT_H_M);
+        picker.setOnDateChangeListener(new DateTimePicker.OnDateTimeChangeListener() {
+            @Override
+            public void onChange(DateTimePicker picker, Calendar calendar) {
+            }
+        });
     }
 
     @Override

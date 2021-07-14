@@ -5,4 +5,8 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="alphabet_uppercase">#5C5C5C</color>
 
+    <color name="os_text_primary_color">#000000</color>
+    <color name="os_text_tertiary_color">#66000000</color>
+    <color name="os_text_quaternary_color">#40000000</color>
+    <color name="os_altitude_tertiary_color">#FFFFFF</color>
 </resources>
