@@ -5,6 +5,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -298,6 +300,133 @@ public class AlgorithmTest {
         } else {
             System.out.println("不符合规范");
         }
+    }
+
+    @Test
+    public void testSnakeMatrix() {
+        int[][] matrix = {{1, 2, 3, 4}, {12, 13, 14, 5}, {11, 16, 15, 6}, {10, 9, 8, 7}};
+        int[] dst = this.splitMatrix(matrix);
+        System.out.println(Arrays.toString(dst));
+
+        System.out.println("----111111111111111111111111111111111111111111111111111111111111");
+
+        int[][] result = this.buildMatrix(7);
+        for (int[] arr : result) {
+            System.out.println(Arrays.toString(arr));
+        }
+        System.out.println(Arrays.toString(this.splitMatrix(result)));
+
+        System.out.println("----22222222222222222222222222222222222222222222222222222222222");
+
+        result = this.buildMatrix(4);
+        for (int[] arr : result) {
+            System.out.println(Arrays.toString(arr));
+        }
+        System.out.println(Arrays.toString(this.splitMatrix(result)));
+
+        System.out.println("----3333333333333333333333333333333333333333333333333333333333");
+
+        result = this.buildMatrix(5, 11);
+        for (int[] arr : result) {
+            System.out.println(Arrays.toString(arr));
+        }
+        System.out.println(Arrays.toString(this.splitMatrix(result)));
+    }
+
+    public int[] splitMatrix(final int[][] matrix) {
+        final int len = matrix.length;
+        final int[] dst = new int[len * len];
+        this.splitMatrix(matrix, 0, len, dst, 0);
+        return dst;
+    }
+
+    /**
+     * 示例：
+     * [1,  2,  3,  4,  5]
+     * [16, 17, 18, 19, 6]
+     * [15, 24, 25, 20, 7]
+     * [14, 23, 22, 21, 8]
+     * [13, 12, 11, 10, 9]
+     * <p>
+     * 思路：先按顶部、右边、底部、左边的顺序顺时针读取一圈，然后left索引加1（往后、往下）len减1（往前）递归读取
+     * ，当left > len时，说明完全读取。
+     *
+     * @param matrix   要读取的矩阵
+     * @param left     矩阵左边索引
+     * @param len      矩阵长度
+     * @param dst      保存读取结果
+     * @param dstIndex dst索引
+     */
+    private void splitMatrix(final int[][] matrix, int left, int len, final int[] dst, int dstIndex) {
+        if (left > len) {
+            return;
+        }
+
+        for (int i = left; i < len; i++) { //读取顶部数字
+            dst[dstIndex] = matrix[left][i];
+            dstIndex++;
+        }
+
+        for (int i = left + 1; i < len; i++) { //读取右边数字
+            dst[dstIndex] = matrix[i][len - 1];
+            dstIndex++;
+        }
+
+        for (int i = len - 2; i >= left; i--) { //读取底部数字
+            dst[dstIndex] = matrix[len - 1][i];
+            dstIndex++;
+        }
+
+        for (int i = len - 2; i > left; i--) { //读取左边数字
+            dst[dstIndex] = matrix[i][left];
+            dstIndex++;
+        }
+
+        left += 1;
+        len -= 1;
+
+        splitMatrix(matrix, left, len, dst, dstIndex);
+    }
+
+    public int[][] buildMatrix(final int len) {
+        return this.buildMatrix(len, 1);
+    }
+
+    public int[][] buildMatrix(final int len, final int startValue) {
+        int[][] matrix = new int[len][len];
+        this.buildMatrix(matrix, 0, len, startValue);
+        return matrix;
+    }
+
+    private void buildMatrix(final int[][] matrix, int left, int right, int startValue) {
+        if (left > right) {
+            return;
+        }
+
+        for (int i = left; i < right; i++) {
+            matrix[left][i] = startValue;
+            startValue++;
+        }
+
+        for (int i = left + 1; i < right; i++) {
+            matrix[i][right - 1] = startValue;
+            startValue++;
+        }
+
+        for (int i = right - 2; i >= left; i--) {
+            matrix[right - 1][i] = startValue;
+            startValue++;
+        }
+
+        for (int i = right - 2; i > left; i--) {
+            matrix[i][left] = startValue;
+            startValue++;
+        }
+
+        left += 1;
+        right -= 1;
+
+        buildMatrix(matrix, left, right, startValue);
     }
 
 }
