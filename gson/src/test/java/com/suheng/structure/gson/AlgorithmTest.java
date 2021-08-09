@@ -5,7 +5,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -26,78 +28,87 @@ public class AlgorithmTest {
 
     @Test
     public void testCountUnits() {
-        Assert.assertEquals(1, countUnits(0));
+        int shift = 2;
+        Assert.assertEquals(1, countUnits(1, shift));
+        Assert.assertEquals(2, countUnits(2, shift));
+        Assert.assertEquals(3, countUnits(4, shift));
+        Assert.assertEquals(4, countUnits(8, shift));
+        Assert.assertEquals(5, countUnits(16, shift));
+
+        shift = 8;
+        Assert.assertEquals(1, countUnits(1, shift));
+        Assert.assertEquals(1, countUnits(2, shift));
+        Assert.assertEquals(1, countUnits(4, shift));
+        Assert.assertEquals(2, countUnits(8, shift));
+        Assert.assertEquals(2, countUnits(16, shift));
+
+        shift = 16;
+        Assert.assertEquals(1, countUnits(1, shift));
+        Assert.assertEquals(1, countUnits(2, shift));
+        Assert.assertEquals(1, countUnits(4, shift));
+        Assert.assertEquals(1, countUnits(8, shift));
+        Assert.assertEquals(2, countUnits(16, shift));
+    }
+
+    @Test
+    public void testCountUnitsTenShift() {
         Assert.assertEquals(1, countUnits(1));
-        Assert.assertEquals(1, countUnits(9));
-        Assert.assertEquals(2, countUnits(10));
-        Assert.assertEquals(2, countUnits(99));
+        Assert.assertEquals(1, countUnits(2));
+        Assert.assertEquals(1, countUnits(4));
+        Assert.assertEquals(1, countUnits(8));
+        Assert.assertEquals(2, countUnits(16));
         Assert.assertEquals(3, countUnits(100));
-        Assert.assertEquals(3, countUnits(101));
         Assert.assertEquals(3, countUnits(999));
         Assert.assertEquals(4, countUnits(1000));
         Assert.assertEquals(4, countUnits(2121));
-        Assert.assertEquals(4, countUnits(19931));
+        Assert.assertEquals(5, countUnits(19931));
         Assert.assertEquals(9, countUnits(576734534));
         Assert.assertEquals(10, countUnits(1132123142));
     }
 
-    /**
-     * 统计一个整数有多少位
-     */
-    public int countUnits(int number) {
-        /*int count = 0;
-        do {
-            number /= 10;
-            count++;
-        } while (number != 0);
+    @Test
+    public void testObtainUnits() {
+        int shift = 2; //512 256 128 64 32 16 8 4 2 1
+        Assert.assertArrayEquals(new int[]{0}, obtainUnits(0, shift));
+        Assert.assertArrayEquals(new int[]{1, 0, 0, 1}, obtainUnits(9, shift));
+        Assert.assertArrayEquals(new int[]{1, 1, 0, 0}, obtainUnits(12, shift));
+        Assert.assertArrayEquals(new int[]{1, 1, 0, 0, 0, 1, 0}, obtainUnits(98, shift));
+        Assert.assertArrayEquals(new int[]{1, 1, 1, 1, 1, 0, 0, 0, 0, 1}, obtainUnits(993, shift));
+        Assert.assertArrayEquals(new int[]{1, 1, 1, 1, 1, 1, 0, 1, 0, 1}, obtainUnits(1013, shift));
 
-        return count;*/
-        return countUnits(number, 10);
-    }
+        shift = 8; //512 64 8 1
+        Assert.assertArrayEquals(new int[]{0}, obtainUnits(0, shift));
+        Assert.assertArrayEquals(new int[]{1, 1}, obtainUnits(9, shift));
+        Assert.assertArrayEquals(new int[]{1, 4}, obtainUnits(12, shift));
+        Assert.assertArrayEquals(new int[]{1, 4, 2}, obtainUnits(98, shift));
+        Assert.assertArrayEquals(new int[]{1, 7, 4, 1}, obtainUnits(993, shift));
+        Assert.assertArrayEquals(new int[]{1, 7, 6, 5}, obtainUnits(1013, shift));
 
-    /**
-     * 获取一个整数位上的数字
-     */
-    public int[] obtainUnits(int number) {
-        final int len = countUnits(number);
-        final int[] units = new int[len];
-        int count = 0;
-        do {
-            units[len - count - 1] = number % 10;
-            number /= 10;
-            count++;
-        } while (number != 0);
-
-        return units;
+        shift = 16; //4096 256 16 1
+        Assert.assertArrayEquals(new int[]{0}, obtainUnits(0, shift));
+        Assert.assertArrayEquals(new int[]{12}, obtainUnits(12, shift));
+        Assert.assertArrayEquals(new int[]{6, 2}, obtainUnits(98, shift));
+        Assert.assertArrayEquals(new int[]{3, 14, 1}, obtainUnits(993, shift));
+        Assert.assertArrayEquals(new int[]{3, 14, 15}, obtainUnits(1007, shift));
+        Assert.assertArrayEquals(new int[]{1, 3, 9, 13}, obtainUnits(5021, shift));
     }
 
     @Test
-    public void testObtainUnits() {
-        //printArray(obtainUnits(0));
+    public void testObtainUnitsTenShift() {
         Assert.assertArrayEquals(new int[]{0}, obtainUnits(0));
-        //printArray(obtainUnits(1));
-        Assert.assertArrayEquals(new int[]{1}, obtainUnits(1));
-        //printArray(obtainUnits(9));
         Assert.assertArrayEquals(new int[]{9}, obtainUnits(9));
-        //printArray(obtainUnits(10));
         Assert.assertArrayEquals(new int[]{1, 0}, obtainUnits(10));
-        //printArray(obtainUnits(99));
-        Assert.assertArrayEquals(new int[]{9, 9}, obtainUnits(99));
-        //printArray(obtainUnits(104));
-        Assert.assertArrayEquals(new int[]{1, 0, 4}, obtainUnits(104));
-        //printArray(obtainUnits(993));
+        Assert.assertArrayEquals(new int[]{9, 8}, obtainUnits(98));
         Assert.assertArrayEquals(new int[]{9, 9, 3}, obtainUnits(993));
-        //printArray(obtainUnits(1000));
         Assert.assertArrayEquals(new int[]{1, 0, 0, 0}, obtainUnits(1000));
-        //printArray(obtainUnits(2131));
         Assert.assertArrayEquals(new int[]{2, 1, 3, 1}, obtainUnits(2131));
-        //printArray(obtainUnits(19435));
         Assert.assertArrayEquals(new int[]{1, 9, 4, 3, 5}, obtainUnits(19435));
-        //printArray(obtainUnits(512764538));
         Assert.assertArrayEquals(new int[]{5, 1, 2, 7, 6, 4, 5, 3, 8}, obtainUnits(512764538));
-        //printArray(obtainUnits(1042687345));
         Assert.assertArrayEquals(new int[]{1, 0, 4, 2, 6, 8, 7, 3, 4, 5}, obtainUnits(1042687345));
+    }
 
+    @Test
+    public void testObtainUnits2() {
         /*printArray(obtainBinary(0));
         printArray(obtainBinary(1));
         printArray(obtainBinary(2));
@@ -206,9 +217,13 @@ public class AlgorithmTest {
     }
 
     /**
-     * 统计一个整数有多少位
+     * 统计整数有多少位
+     *
+     * @param number 要统计的数字
+     * @param shift  数的进制，如：二进制传2、八进制传8、十进制传10，以类类推
+     * @return 数字number在shift进制下的位数
      */
-    public int countUnits(int number, int shift) {
+    public static int countUnits(int number, final int shift) {
         int count = 0;
         do {
             number /= shift;
@@ -216,6 +231,48 @@ public class AlgorithmTest {
         } while (number != 0);
 
         return count;
+    }
+
+    /**
+     * 统计整数在十进制位下有多少位
+     *
+     * @param number 要统计的数字
+     * @return 数字number在shift进制下的位数
+     */
+    public static int countUnits(final int number) {
+        return countUnits(number, 10);
+    }
+
+    /**
+     * 获取整数所有数位上的数字
+     *
+     * @param number 要获取的数字
+     * @param shift  数的进制，如：二进制传2、八进制传8、十进制传10，以类类推
+     * @return 一维整型数组：保存数字number在shift进制下的所有数位上的数字（高位在前，低位在后）
+     */
+    public static int[] obtainUnits(int number, final int shift) {
+        final List<Integer> arrayList = new ArrayList<>();
+        do {
+            arrayList.add(number % shift);
+            number /= shift;
+        } while (number != 0);
+
+        final int size = arrayList.size();
+        final int[] units = new int[size];
+        for (int i = 0; i < size; i++) {
+            units[size - i - 1] = arrayList.get(i);
+        }
+        return units;
+    }
+
+    /**
+     * 获取整数在十进制位下所有数位上的数字
+     *
+     * @param number 要获取的数字
+     * @return 一维整型数组：保存数字number在十进制下的所有数位上的数字（高位在前，低位在后）
+     */
+    public int[] obtainUnits(final int number) {
+        return obtainUnits(number, 10);
     }
 
     @Test
@@ -341,51 +398,58 @@ public class AlgorithmTest {
     }
 
     /**
+     * 矩阵的螺旋递归
+     * <p>
      * 示例：
+     * <p>
+     * <pre>
      * [1,  2,  3,  4,  5]
      * [16, 17, 18, 19, 6]
      * [15, 24, 25, 20, 7]
      * [14, 23, 22, 21, 8]
      * [13, 12, 11, 10, 9]
+     *
+     * 输出：1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+     * </pre>
      * <p>
-     * 思路：先按顶部、右边、底部、左边的顺序顺时针读取一圈，然后left索引加1（往后、往下）len减1（往前）递归读取
-     * ，当left > len时，说明完全读取。
+     * 思路：先按顶部、右边、底部、左边的顺序顺时针读取一圈，然后left索引加1（往后、往下）right减1（往前）递归读取。
+     * 当left > right时，说明完全读取。
      *
      * @param matrix   要读取的矩阵
      * @param left     矩阵左边索引
-     * @param len      矩阵长度
+     * @param right    矩阵右边边界
      * @param dst      保存读取结果
      * @param dstIndex dst索引
      */
-    private void splitMatrix(final int[][] matrix, int left, int len, final int[] dst, int dstIndex) {
-        if (left > len) {
+    private void splitMatrix(final int[][] matrix, int left, int right, final int[] dst, int dstIndex) {
+        if (left > right) {
             return;
         }
 
-        for (int i = left; i < len; i++) { //读取顶部数字
+        for (int i = left; i < right; i++) { //读取顶部数字
             dst[dstIndex] = matrix[left][i];
             dstIndex++;
         }
 
-        for (int i = left + 1; i < len; i++) { //读取右边数字
-            dst[dstIndex] = matrix[i][len - 1];
+        for (int i = left + 1; i < right; i++) { //读取右边数字
+            dst[dstIndex] = matrix[i][right - 1];
             dstIndex++;
         }
 
-        for (int i = len - 2; i >= left; i--) { //读取底部数字
-            dst[dstIndex] = matrix[len - 1][i];
+        for (int i = right - 2; i >= left; i--) { //读取底部数字
+            dst[dstIndex] = matrix[right - 1][i];
             dstIndex++;
         }
 
-        for (int i = len - 2; i > left; i--) { //读取左边数字
+        for (int i = right - 2; i > left; i--) { //读取左边数字
             dst[dstIndex] = matrix[i][left];
             dstIndex++;
         }
 
         left += 1;
-        len -= 1;
+        right -= 1;
 
-        splitMatrix(matrix, left, len, dst, dstIndex);
+        splitMatrix(matrix, left, right, dst, dstIndex);
     }
 
     public int[][] buildMatrix(final int len) {
