@@ -45,7 +45,7 @@
 #)
 
 modules=(
-  vianneyhalter
+  sundiary
 )
 
 readonly isManualModify=$(echo "$1" | grep -Eiw "y|yes") #传参y或yes(忽略大小写)，表示已经手动修改版本号。

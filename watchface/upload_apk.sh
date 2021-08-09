@@ -140,7 +140,8 @@ function restoreGradleFile() { #还原build.gradle文件，用于打包或压缩
 }
 
 #---------------- 编译打包 ----------------
-./../../gradlew ":watchface:${module_dir}:apkSign"
+#./../../gradlew ":watchface:${module_dir}:apkSign"
+./../../gradlew ":watchface:${module_dir}:aR"
 sign_result=$?
 if [ $sign_result -eq 0 ]; then
   if [ -e "${VERSION_FILE}.bak" ]; then
@@ -153,10 +154,13 @@ else
 fi
 
 #---------------- zip压缩 ----------------
-readonly ZIP_FILE_PATH="./build"
-readonly SIGNED_APK_PATH="../apks/"
+#readonly ZIP_FILE_PATH="./build"
+#readonly SIGNED_APK_PATH="../apks/"
+readonly ZIP_FILE_PATH="./build/outputs/apk/release"
+readonly SIGNED_APK_PATH="${ZIP_FILE_PATH}/${module_dir}-release-unsigned.apk"
 readonly zip_file="${apk_name}_AA_V${version_name}.zip"
-zip -j "${ZIP_FILE_PATH}/$zip_file" $MK_FILE "${SIGNED_APK_PATH}${apk_name}.apk"
+#zip -j "${ZIP_FILE_PATH}/${zip_file}" ${MK_FILE} "${SIGNED_APK_PATH}${apk_name}.apk"
+zip -j "${ZIP_FILE_PATH}/${zip_file}" ${MK_FILE} "${SIGNED_APK_PATH}"
 zip_result=$?
 if [ $zip_result != 0 ]; then
   echo "文件压缩失败，程序退出！"
@@ -185,4 +189,4 @@ close
 bye
 EOF
 }
-uploadToFtp
+#uploadToFtp
