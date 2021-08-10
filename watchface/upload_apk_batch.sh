@@ -5,47 +5,32 @@
 
 #modules=(
 #  auspiciousdragon
-#  calendar
 #  classicpointer
-#  dataplugin
 #  digitalbeat
 #  dynamic
-#  elevator
 #  facingchallenges
 #  healthdata
 #  healthycircle
-#  healthylife
 #  joker
-#  luxury
-#  maze
-#  mexico
 #  myhealth
 #  numberpointer
-#  numberstack
 #  peach
 #  photo
 #  plugindata
-#  pointerplugin
 #  qrs217
-#  retroelectronic
 #  roamingclock
-#  scale123
 #  shuttle
 #  simplenumber
 #  simplepointer
-#  soberlyonyx
-#  spaceman
-#  sportstalent
 #  sundiary
 #  svendandersen
 #  timerace
-#  traverse
-#  vianneyhalter
 #  x-sports
 #)
 
 modules=(
   sundiary
+  x-sports
 )
 
 readonly isManualModify=$(echo "$1" | grep -Eiw "y|yes") #传参y或yes(忽略大小写)，表示已经手动修改版本号。

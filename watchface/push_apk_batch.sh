@@ -2,47 +2,32 @@
 
 #modules=(
 #  auspiciousdragon
-#  calendar
 #  classicpointer
-#  dataplugin
 #  digitalbeat
 #  dynamic
-#  elevator
 #  facingchallenges
 #  healthdata
 #  healthycircle
-#  healthylife
 #  joker
-#  luxury
-#  maze
-#  mexico
 #  myhealth
 #  numberpointer
-#  numberstack
 #  peach
 #  photo
 #  plugindata
-#  pointerplugin
 #  qrs217
-#  retroelectronic
 #  roamingclock
-#  scale123
 #  shuttle
 #  simplenumber
 #  simplepointer
-#  soberlyonyx
-#  spaceman
-#  sportstalent
 #  sundiary
 #  svendandersen
 #  timerace
-#  traverse
-#  vianneyhalter
 #  x-sports
 #)
 
 modules=(
-  vianneyhalter
+  sundiary
+  x-sports
 )
 
 readonly sh_file="push_apk.sh"
