@@ -154,12 +154,12 @@ else
 fi
 
 #---------------- zip压缩 ----------------
-#readonly ZIP_FILE_PATH="./build"
-#readonly SIGNED_APK_PATH="../apks/"
-readonly ZIP_FILE_PATH="./build/outputs/apk/release"
-readonly SIGNED_APK_PATH="${ZIP_FILE_PATH}/${module_dir}-release-unsigned.apk"
+readonly ZIP_FILE_PATH="./build"
+readonly SIGNED_APK_DIR="../apks"
+readonly BUILD_APK_PATH="./build/outputs/apk/release/${module_dir}-release-unsigned.apk"
+readonly SIGNED_APK_PATH="${SIGNED_APK_DIR}/${apk_name}.apk"
+cp "${BUILD_APK_PATH}" "${SIGNED_APK_PATH}"
 readonly zip_file="${apk_name}_AA_V${version_name}.zip"
-#zip -j "${ZIP_FILE_PATH}/${zip_file}" ${MK_FILE} "${SIGNED_APK_PATH}${apk_name}.apk"
 zip -j "${ZIP_FILE_PATH}/${zip_file}" ${MK_FILE} "${SIGNED_APK_PATH}"
 zip_result=$?
 if [ $zip_result != 0 ]; then

@@ -20,4 +20,10 @@ ext {
     arouterApiVersion = '1.3.1'//ARouter
     arouterCompilerVersion = '1.1.4'
     eventBusVersion = '3.0.0'//EventBus
+
+    watchFaceApkDir = new File(getRootDir().getPath() + File.separator + "watchface" + File.separator + "apks")
+    if (!watchFaceApkDir.exists()) {
+        watchFaceApkDir.mkdirs()
+    }
+
 }
