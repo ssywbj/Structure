@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <wallpaper xmlns:android="http://schemas.android.com/apk/res/android"
-    android:settingsActivity="com.suheng.structure.wallpaper.myhealth.MyHealthWatchFaceConfigActivity"
     android:description="@string/my_health_watch_face_description"
     android:thumbnail="@drawable/myhealth_watch_face_preview"/>

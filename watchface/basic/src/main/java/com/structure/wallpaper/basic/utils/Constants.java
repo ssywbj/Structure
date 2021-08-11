@@ -8,9 +8,6 @@ public class Constants {
     public static final String REGEX_SPILT = "#";
 
     public static final String ACTION_UPDATE_FACE_WIDGET = "action_update_face_widget";
-    public static final String ACTION_UPDATE_VIEW_ID = "action_update_view_id";
-    public static final String KEY_UPDATE_VIEW_ID = "key_update_view_id";
     public static final String KEY_FACE_WIDGET_PKG = "key_face_widget_pkg";
     public static final String KEY_FACE_WIDGET_CLZ = "key_face_widget_clz";
-    public static final String KEY_WIDGET_PLUGIN_INFO = "key_widget_plugin_info";
 }

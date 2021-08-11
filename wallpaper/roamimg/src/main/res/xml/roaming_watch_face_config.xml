@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <wallpaper xmlns:android="http://schemas.android.com/apk/res/android"
-    android:settingsActivity="com.suheng.structure.wallpaper.roamimg.RoamingWatchFaceConfigActivity"
+    android:settingsActivity="com.suheng.wallpaper.roamimg.RoamingWatchFaceConfigActivity"
     android:description="@string/roaming_watch_face_description"
     android:thumbnail="@drawable/roaming_watch_face_preview"/>

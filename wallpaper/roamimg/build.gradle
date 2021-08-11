@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        applicationId "com.suheng.structure.wallpaper.roamimg"
+        applicationId "com.suheng.wallpaper.roamimg"
         minSdkVersion 24
         targetSdkVersion 30
         versionCode 10000000

@@ -4,7 +4,7 @@
     public static *** i(...);
     public static *** d(...);
     public static *** w(...);
-    public static *** e(...);
+#    public static *** e(...);
 }
 
 -assumenosideeffects class java.io.PrintStream {
