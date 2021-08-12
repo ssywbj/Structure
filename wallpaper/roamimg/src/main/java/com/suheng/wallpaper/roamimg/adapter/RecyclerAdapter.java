@@ -12,7 +12,7 @@ public abstract class RecyclerAdapter<T> extends RecyclerView.Adapter {
 
     private OnItemClickListener<T> mOnItemClickListener;
     private OnItemLongClickListener<T> mOnItemLongClickListener;
-    private List<T> mDataList;
+    private final List<T> mDataList;
 
     public RecyclerAdapter(List<T> dataList) {
         mDataList = dataList;

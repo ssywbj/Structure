@@ -1,7 +1,9 @@
-package com.suheng.wallpaper.roamimg;
+package com.suheng.wallpaper.roamimg.city;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
+
+import com.suheng.wallpaper.roamimg.R;
 
 import org.xmlpull.v1.XmlPullParserException;
 

@@ -14,13 +14,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.suheng.wallpaper.roamimg.adapter.RecyclerAdapter;
+import com.suheng.wallpaper.roamimg.city.SsCity;
+import com.suheng.wallpaper.roamimg.city.SsWorldTimeData;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RoamingWatchFaceConfigActivity extends AppCompatActivity {
     private CityAdapter mCityAdapter;
-    private List<SsCity> mSsCities = new ArrayList<>();
+    private final List<SsCity> mSsCities = new ArrayList<>();
 
     public static final String PREFS_FILE = "file_roaming_watchface_config";
     public static final String PREFS_KEY_GMT = "prefs_key_gmt";

@@ -1,7 +1,5 @@
 package com.suheng.wallpaper.roamimg;
 
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,43 +9,33 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.service.wallpaper.WallpaperService;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.suheng.wallpaper.basic.DimenUtil;
+import com.suheng.wallpaper.basic.service.CanvasWallpaperService;
+import com.suheng.wallpaper.basic.utils.DateUtil;
 
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class RoamingWatchFace extends WallpaperService {
-    public static final String TAG = RoamingWatchFace.class.getSimpleName();
+public class RoamingWatchFace extends CanvasWallpaperService {
 
     @Override
     public Engine onCreateEngine() {
-        return new LiveWallpaperEngine();
+        return new LiveEngine();
     }
 
-    private final class LiveWallpaperEngine extends Engine {
-        private PointF mPointScreenCenter = new PointF();//屏幕中心点
-        private float mRadiusOuter, mRadiusInner;
-        private float mMarginHorizontal, mMarginVertical;
+    private final class LiveEngine extends CanvasEngine {
+        private final PointF mPointScreenCenter = new PointF();//屏幕中心点
+        private float mMarginHorizontal;
 
         private Paint mPaint;
 
         private Paint mPaintCity;
-        private Rect mRect = new Rect();
+        private final Rect mRect = new Rect();
         private float mMarginTime;
-
-        private Context mContext;
-        private boolean mVisible;
-        private boolean mAmbientMode;
 
         private RoamingBitmapManager mBitmapManager;
         private SharedPreferences mPrefs;
@@ -55,10 +43,6 @@ public class RoamingWatchFace extends WallpaperService {
         @Override
         public void onCreate(SurfaceHolder surfaceHolder) {
             super.onCreate(surfaceHolder);
-            Log.d(TAG, "onCreate, surfaceHolder = " + surfaceHolder);
-
-            mContext = RoamingWatchFace.this;
-
             mBitmapManager = new RoamingBitmapManager(mContext);
 
             mPaint = new Paint();
@@ -78,89 +62,40 @@ public class RoamingWatchFace extends WallpaperService {
         @Override
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             super.onSurfaceChanged(holder, format, width, height);
-            Log.d(TAG, "onSurfaceChanged, format = " + format + ", width = " + width + ", height = " + height);
             mPointScreenCenter.x = 1.0f * width / 2;//屏幕中心X坐标
             mPointScreenCenter.y = 1.0f * height / 2;//屏幕中心Y坐标
-            mRadiusOuter = Math.min(mPointScreenCenter.x, mPointScreenCenter.y)
-                    - DimenUtil.dip2px(mContext, 1);
-            mRadiusInner = mRadiusOuter - DimenUtil.dip2px(mContext, 36);
-
             mMarginHorizontal = DimenUtil.dip2px(mContext, 26);
-            mMarginVertical = DimenUtil.dip2px(mContext, 60);
             mMarginTime = DimenUtil.dip2px(mContext, 12);
-            this.invalidate();
+
+            invalidate();
         }
 
         @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
-            Log.i(TAG, "onVisibilityChanged, visible = " + visible);
-            mVisible = visible;
-            Intent intent = new Intent("com.google.android.wearable.watchfaces.action.REQUEST_STATE");
-            sendBroadcast(intent);
             if (visible) {
-                this.invalidate();
+                registerReceiverTimeTick();
             } else {
-                mHandler.removeMessages(111);
+                unregisterReceiverTimeTick();
             }
         }
 
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
             super.onSurfaceDestroyed(holder);
-            Log.i(TAG, "onSurfaceDestroyed");
-            mVisible = false;
-            mHandler.removeMessages(111);
-
             mBitmapManager.clear();
         }
 
         @Override
-        public void onDestroy() {
-            super.onDestroy();
-            Log.i(TAG, "onDestroy");
-            mVisible = false;
-            mHandler.removeMessages(111);
+        public void updateTime() {
+            Calendar calendar = Calendar.getInstance();
 
-            mBitmapManager.clear();
+            mHour = DateUtil.getHour(mContext);
+            mMinute = calendar.get(Calendar.MINUTE);
         }
 
         @Override
-        public Bundle onCommand(String action, int x, int y, int z, Bundle extras, boolean resultRequested) {
-            super.onCommand(action, x, y, z, extras, resultRequested);
-            if (action.matches("com.google.android.wearable.action.BACKGROUND_ACTION")) {
-                mAmbientMode = extras.getBoolean("ambient_mode", false);
-                if (mAmbientMode) {
-                    this.invalidate();
-                } else if (mVisible) {//Redraw digital clock in green during non-ambient mode
-                    this.invalidate();
-                }
-            } else if (action.matches("com.google.android.wearable.action.AMBIENT_UPDATE")) {
-                this.invalidate();
-            }
-            Log.i(TAG, "onCommand, action = " + action + ", x = " + x + ", y = " + y + ", ambient_mode = " + mAmbientMode);
-            return extras;
-        }
-
-        private void invalidate() {
-            SurfaceHolder surfaceHolder = getSurfaceHolder();
-            Canvas canvas = null;
-            try {
-                canvas = surfaceHolder.lockCanvas();
-                if (canvas != null) {
-                    this.onDraw(canvas);
-                }
-            } finally {
-                if (canvas != null) {
-                    surfaceHolder.unlockCanvasAndPost(canvas);
-                }
-            }
-
-            mHandler.removeMessages(111);
-            mHandler.sendEmptyMessageDelayed(111, 1000);
-        }
-
-        private void onDraw(Canvas canvas) {
+        public void onDraw(Canvas canvas) {
             canvas.drawColor(ContextCompat.getColor(mContext, R.color.basic_wallpaper_bg_black), PorterDuff.Mode.CLEAR);//画面背景
 
             final float lineWidth = DimenUtil.dip2px(mContext, 3.5f);
@@ -331,14 +266,6 @@ public class RoamingWatchFace extends WallpaperService {
             bitmap = mBitmapManager.get(mBitmapManager.getWeekResId(timeZone), color);
             canvas.drawBitmap(bitmap, left, top, null);
         }
-
-        private final Handler mHandler = new Handler() {
-            @Override
-            public void dispatchMessage(@NonNull Message msg) {
-                super.dispatchMessage(msg);
-                invalidate();
-            }
-        };
     }
 
 }

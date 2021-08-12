@@ -1,6 +1,9 @@
 package com.suheng.wallpaper.basic.service;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,73 +23,65 @@ public abstract class CanvasWallpaperService extends WallpaperService {
     protected Context mContext;
     protected String mTAG;
     private Handler mHandler;
-    protected int mHour, mMinute, mSecond;
-    protected float mHourRatio, mMinuteRatio, mSecondRatio;
-    protected boolean mIsHour24Scale;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mContext = this;
+        mTAG = getClass().getSimpleName();
+        mHandler = new Handler();
+        Log.d(mTAG, "onCreate, service: " + this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(mTAG, "onDestroy");
+    }
 
     public abstract class CanvasEngine extends Engine {
+
+        protected int mHour, mMinute, mSecond;
+        protected float mHourRatio, mMinuteRatio, mSecondRatio;
+        protected boolean mIsHour24Scale;
+        private boolean mRegisteredReceiverTimeTick;
 
         public abstract void onDraw(Canvas canvas);
 
         private final Runnable mRunnableSecondTicker = new Runnable() {
             @Override
             public void run() {
-                updateTime();
-                invalidate();
-
-                long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
-                mHandler.postDelayed(mRunnableSecondTicker, delayMillis);
+                onSecondTick();
             }
         };
 
-        public void invalidate() {
-            SurfaceHolder surfaceHolder = getSurfaceHolder();
-            Canvas canvas = null;
-            try {
-                canvas = surfaceHolder.lockCanvas();
-                if (canvas != null) {
-                    this.onDraw(canvas);
-                }
-            } catch (Exception e) {
-                Log.e(mTAG, "draw live wallpaper exception: " + e, new Exception());
-            } finally {
-                if (canvas != null) {
-                    surfaceHolder.unlockCanvasAndPost(canvas);
-                }
+        private final BroadcastReceiver mReceiverTimeTick = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                onMinuteTick();
             }
-        }
+        };
 
-        protected void registerSecondTicker() {
-            this.unregisterSecondTicker();
-            mHandler.post(mRunnableSecondTicker);
-        }
-
-        protected void unregisterSecondTicker() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                if (mHandler.hasCallbacks(mRunnableSecondTicker)) {
-                    mHandler.removeCallbacks(mRunnableSecondTicker);
-                }
-            } else {
-                mHandler.removeCallbacks(mRunnableSecondTicker);
-            }
-        }
-
+        @Override
         public void onCreate(SurfaceHolder surfaceHolder) {
             super.onCreate(surfaceHolder);
             Log.d(mTAG, "onCreate, surfaceHolder = " + surfaceHolder);
         }
 
+        @Override
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             super.onSurfaceChanged(holder, format, width, height);
             Log.d(mTAG, "onSurfaceChanged, format = " + format + ", width = " + width
                     + ", height = " + height + ", holder = " + holder);
         }
 
+        @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
             Log.d(mTAG, "onVisibilityChanged, visible = " + visible + ", holder = " + getSurfaceHolder());
         }
 
+        @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
             super.onSurfaceDestroyed(holder);
             Log.d(mTAG, "onSurfaceDestroyed, holder: " + holder);
@@ -126,33 +121,88 @@ public abstract class CanvasWallpaperService extends WallpaperService {
             super.onTouchEvent(event);
             Log.d(mTAG, "onTouchEvent, action = " + event.getAction());
         }*/
-    }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mContext = this;
-        mTAG = getClass().getSimpleName();
-        mHandler = new Handler();
-        Log.d(mTAG, "onCreate, service: " + this);
-    }
+        public void invalidate() {
+            SurfaceHolder surfaceHolder = getSurfaceHolder();
+            Canvas canvas = null;
+            try {
+                canvas = surfaceHolder.lockCanvas();
+                if (canvas != null) {
+                    this.onDraw(canvas);
+                }
+            } catch (Exception e) {
+                Log.e(mTAG, "draw live wallpaper exception: " + e, new Exception());
+            } finally {
+                if (canvas != null) {
+                    surfaceHolder.unlockCanvasAndPost(canvas);
+                }
+            }
+        }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(mTAG, "onDestroy");
-    }
+        protected void registerRunnableSecondTicker() {
+            this.unregisterRunnableSecondTicker();
+            mHandler.post(mRunnableSecondTicker);
+        }
 
-    public void updateTime() {
-        Calendar calendar = Calendar.getInstance();
+        protected void unregisterRunnableSecondTicker() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (mHandler.hasCallbacks(mRunnableSecondTicker)) {
+                    mHandler.removeCallbacks(mRunnableSecondTicker);
+                }
+            } else {
+                mHandler.removeCallbacks(mRunnableSecondTicker);
+            }
+        }
 
-        mHour = mIsHour24Scale ? calendar.get(Calendar.HOUR_OF_DAY) : DateUtil.getHour(this);
-        mMinute = calendar.get(Calendar.MINUTE);
-        mSecond = calendar.get(Calendar.SECOND);
+        protected void registerReceiverTimeTick() {
+            if (mRegisteredReceiverTimeTick) {
+                return;
+            }
+            mRegisteredReceiverTimeTick = true;
 
-        mHourRatio = ((mIsHour24Scale ? mHour : mHour % 12) + mMinute / 60f) / (mIsHour24Scale ? 24 : 12);
-        mMinuteRatio = (mMinute + mSecond / 60f) / 60;
-        mSecondRatio = (mSecond + calendar.get(Calendar.MILLISECOND) / 1000f) / 60f;
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(Intent.ACTION_TIME_TICK);
+            mContext.registerReceiver(mReceiverTimeTick, intentFilter);
+        }
+
+        protected void unregisterReceiverTimeTick() {
+            if (mRegisteredReceiverTimeTick) {
+                mRegisteredReceiverTimeTick = false;
+                mContext.unregisterReceiver(mReceiverTimeTick);
+            }
+        }
+
+        public void updateTime() {
+            Calendar calendar = Calendar.getInstance();
+
+            mHour = mIsHour24Scale ? calendar.get(Calendar.HOUR_OF_DAY) : DateUtil.getHour(mContext);
+            mMinute = calendar.get(Calendar.MINUTE);
+            mSecond = calendar.get(Calendar.SECOND);
+
+            mHourRatio = ((mIsHour24Scale ? mHour : mHour % 12) + mMinute / 60f) / (mIsHour24Scale ? 24 : 12);
+            mMinuteRatio = (mMinute + mSecond / 60f) / 60;
+            mSecondRatio = (mSecond + calendar.get(Calendar.MILLISECOND) / 1000f) / 60f;
+        }
+
+        /**
+         * 每一秒钟调用一次该方法，注册后生效
+         */
+        protected void onSecondTick() {
+            updateTime();
+            this.invalidate();
+
+            long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
+            mHandler.postDelayed(mRunnableSecondTicker, delayMillis);
+        }
+
+        /**
+         * 每一分钟调用一次该方法，注册后生效
+         */
+        protected void onMinuteTick() {
+            updateTime();
+            this.invalidate();
+        }
+
     }
 
     /*public CanvasHandler getHandler() {

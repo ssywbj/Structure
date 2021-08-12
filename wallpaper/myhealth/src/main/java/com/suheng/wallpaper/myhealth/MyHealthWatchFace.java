@@ -23,15 +23,6 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
         return new LiveEngine();
     }
 
-    @Override
-    public void updateTime() {
-        Calendar calendar = Calendar.getInstance();
-
-        mHour = DateUtil.getHour(this);
-        mMinute = calendar.get(Calendar.MINUTE);
-        mSecond = calendar.get(Calendar.SECOND);
-    }
-
     private final class LiveEngine extends CanvasEngine {
         private static final int SCALES = 6;
         private static final float SCALE_DEGREES = 1.0f * 360 / SCALES;
@@ -70,9 +61,9 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
             if (visible) {
-                registerSecondTicker();
+                registerRunnableSecondTicker();
             } else {
-                unregisterSecondTicker();
+                unregisterRunnableSecondTicker();
             }
         }
 
@@ -80,6 +71,15 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
         public void onSurfaceDestroyed(SurfaceHolder holder) {
             super.onSurfaceDestroyed(holder);
             mBitmapManager.clear();
+        }
+
+        @Override
+        public void updateTime() {
+            Calendar calendar = Calendar.getInstance();
+
+            mHour = DateUtil.getHour(mContext);
+            mMinute = calendar.get(Calendar.MINUTE);
+            mSecond = calendar.get(Calendar.SECOND);
         }
 
         @Override
@@ -145,12 +145,10 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
         }
 
         private void paintTime(Canvas canvas) {
-            Calendar instance = Calendar.getInstance();
             //分钟
             int color = android.R.color.white;
-            int minute = instance.get(Calendar.MINUTE);
-            int units = minute % 10;//个位
-            int tens = minute / 10;//十位
+            int units = mMinute % 10;//个位
+            int tens = mMinute / 10;//十位
             Bitmap bitmap = mBitmapManager.get(mBitmapManager.getBigNumberResId(tens), color);
             float left = mPointScreenCenter.x - bitmap.getWidth();
             float hourBitmapHeight = 1.0f * bitmap.getHeight() / 2;
@@ -165,9 +163,8 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
 
             //秒钟
             color = R.color.second_number;
-            int second = instance.get(Calendar.SECOND);
-            units = second % 10;//个位
-            tens = second / 10;//十位
+            units = mSecond % 10;//个位
+            tens = mSecond / 10;//十位
             left = mPointScreenCenter.x + mRadiusInner / 2;
             top = mPointScreenCenter.y + hourBitmapHeight;
             bitmap = mBitmapManager.get(mBitmapManager.getSmallNumberResId(tens), color);
@@ -189,9 +186,8 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
 
             //时钟
             color = R.color.my_health_little_triangle;
-            int hour = instance.get(Calendar.HOUR_OF_DAY);
-            units = hour % 10;//个位
-            tens = hour / 10;//十位
+            units = mHour % 10;//个位
+            tens = mHour / 10;//十位
             bitmap = mBitmapManager.get(mBitmapManager.getMiddleNumberResId(tens), color);
             left = mPointScreenCenter.x - mRadiusInner - DimenUtil.dip2px(mContext, 4);
             top = mPointScreenCenter.y - bitmap.getHeight() - mLittleTriangleHeight;
@@ -208,7 +204,8 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
 
             //黄线上方的日期
             color = android.R.color.white;
-            int month = instance.get(Calendar.MONTH) + 1;
+            Calendar calendar = Calendar.getInstance();
+            int month = calendar.get(Calendar.MONTH) + 1;
             units = month % 10;//个位
             tens = month / 10;//十位
             left = (lineLeft + DimenUtil.dip2px(mContext, 10));
@@ -226,7 +223,7 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
             canvas.drawBitmap(bitmap, left, top, null);
             lineLen += bitmap.getWidth();
 
-            int day = instance.get(Calendar.DAY_OF_MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
             units = day % 10;//个位
             tens = day / 10;//十位
             left += bitmap.getWidth();
