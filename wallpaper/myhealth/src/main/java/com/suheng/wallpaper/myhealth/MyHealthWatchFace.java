@@ -1,6 +1,5 @@
 package com.suheng.wallpaper.myhealth;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -42,8 +41,6 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
         private Paint mPaint;
         private final RectF mRectF = new RectF();
 
-        private boolean mVisible;
-        private boolean mAmbientMode;
         private int mLittleTriangleHeight;
 
         private MyHealthBitmapManager mBitmapManager;
@@ -72,9 +69,6 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
         @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
-            mVisible = visible;
-            Intent intent = new Intent("com.google.android.wearable.watchfaces.action.REQUEST_STATE");
-            sendBroadcast(intent);
             if (visible) {
                 registerSecondTicker();
             } else {
@@ -85,35 +79,8 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
             super.onSurfaceDestroyed(holder);
-            mVisible = false;
-
             mBitmapManager.clear();
         }
-
-        @Override
-        public void onDestroy() {
-            super.onDestroy();
-            mVisible = false;
-
-            mBitmapManager.clear();
-        }
-
-        /*@Override
-        public Bundle onCommand(String action, int x, int y, int z, Bundle extras, boolean resultRequested) {
-            super.onCommand(action, x, y, z, extras, resultRequested);
-            if (action.matches("com.google.android.wearable.action.BACKGROUND_ACTION")) {
-                mAmbientMode = extras.getBoolean("ambient_mode", false);
-                if (mAmbientMode) {
-                    this.invalidate();
-                } else if (mVisible) {//Redraw digital clock in green during non-ambient mode
-                    this.invalidate();
-                }
-            } else if (action.matches("com.google.android.wearable.action.AMBIENT_UPDATE")) {
-                this.invalidate();
-            }
-            Log.i(mTAG, "onCommand, action = " + action + ", x = " + x + ", y = " + y + ", ambient_mode = " + mAmbientMode);
-            return extras;
-        }*/
 
         @Override
         public void onDraw(Canvas canvas) {

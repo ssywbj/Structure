@@ -3,6 +3,7 @@ package com.suheng.wallpaper.basic.service;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
@@ -90,6 +91,41 @@ public abstract class CanvasWallpaperService extends WallpaperService {
             super.onSurfaceDestroyed(holder);
             Log.d(mTAG, "onSurfaceDestroyed, holder: " + holder);
         }
+
+        @Override
+        public Bundle onCommand(String action, int x, int y, int z, Bundle extras, boolean resultRequested) {
+            super.onCommand(action, x, y, z, extras, resultRequested);
+            if ("com.google.android.wearable.action.BACKGROUND_ACTION".equals(action)) {
+                boolean ambientMode = extras.getBoolean("ambient_mode", false);
+                Log.d(mTAG, "onCommand, ambientMode = " + ambientMode);
+            } else if ("com.google.android.wearable.action.AMBIENT_UPDATE".equals(action)) {
+                Log.d(mTAG, "onCommand, action = " + action);
+            } else if ("android.wallpaper.tap".equals(action)) {
+                Log.d(mTAG, "onCommand, isPreview = " + isPreview() + ", isRestricted = " + isRestricted());
+            }
+            Log.d(mTAG, "onCommand, action = " + action + ", x = " + x + ", y = " + y
+                    + ", extras = " + extras + ", resultRequested = " + resultRequested);
+            return extras;
+        }
+
+        @Override
+        public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
+            super.onOffsetsChanged(xOffset, yOffset, xOffsetStep, yOffsetStep, xPixelOffset, yPixelOffset);
+            Log.d(mTAG, "onOffsetsChanged, xOffset = " + xOffset + ", yOffset = " + yOffset + ", xOffsetStep " + xOffsetStep
+                    + ", yOffsetStep = " + yOffsetStep + ", xPixelOffset = " + xPixelOffset + ", yPixelOffset = " + yPixelOffset);
+        }
+
+        @Override
+        public void onDesiredSizeChanged(int desiredWidth, int desiredHeight) {
+            super.onDesiredSizeChanged(desiredWidth, desiredHeight);
+            Log.d(mTAG, "onDesiredSizeChanged, desiredWidth = " + desiredWidth + ", desiredHeight = " + desiredHeight);
+        }
+
+        /*@Override
+        public void onTouchEvent(MotionEvent event) {
+            super.onTouchEvent(event);
+            Log.d(mTAG, "onTouchEvent, action = " + event.getAction());
+        }*/
     }
 
     @Override
