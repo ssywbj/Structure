@@ -4,15 +4,13 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.suheng.structure.view.wheel.DateTimePicker;
-
 import java.lang.ref.WeakReference;
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         Log.w("wbj_main", "WARN, WARN, WARN");
         Log.e("wbj_main", "ERROR, ERROR, ERROR");
 
-        DateTimePicker picker = findViewById(R.id.datePicker);
+        /*DateTimePicker picker = findViewById(R.id.datePicker);
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 16);
         calendar.set(Calendar.MINUTE, 30);
@@ -52,7 +50,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChange(DateTimePicker picker, Calendar calendar) {
             }
-        });
+        });*/
+
+        TextView textView = findViewById(R.id.text_bold);
+        Log.d("Wbj", "getStyle：" + textView.getTypeface().getStyle());
     }
 
     @Override

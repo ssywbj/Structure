@@ -41,11 +41,11 @@ public class InfiniteLine2 extends View {
     }
 
     private void init() {
-        setBackgroundColor(Color.BLUE);
+        setBackgroundColor(Color.WHITE);
         mScroller = new Scroller(getContext());
 
         mPaint = new Paint();
-        mPaint.setColor(Color.RED);
+        mPaint.setColor(Color.BLACK);
         mPaint.setTextSize(50);
     }
 
