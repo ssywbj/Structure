@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.suheng.wallpaper.roamimg.adapter.RecyclerAdapter;
+import com.suheng.wallpaper.basic.adapter.RecyclerAdapter;
 import com.suheng.wallpaper.roamimg.city.SsCity;
 import com.suheng.wallpaper.roamimg.city.SsWorldTimeData;
 

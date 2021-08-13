@@ -12,6 +12,7 @@ import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
+import com.suheng.wallpaper.basic.manager.BitmapManager;
 import com.suheng.wallpaper.basic.utils.DateUtil;
 
 import java.util.Calendar;
@@ -40,11 +41,11 @@ public abstract class CanvasWallpaperService extends WallpaperService {
     }
 
     public abstract class CanvasEngine extends Engine {
-
         protected int mHour, mMinute, mSecond;
         protected float mHourRatio, mMinuteRatio, mSecondRatio;
         protected boolean mIsHour24Scale;
         private boolean mRegisteredReceiverTimeTick;
+        protected BitmapManager mBitmapManager;
 
         public abstract void onDraw(Canvas canvas);
 
@@ -66,6 +67,7 @@ public abstract class CanvasWallpaperService extends WallpaperService {
         public void onCreate(SurfaceHolder surfaceHolder) {
             super.onCreate(surfaceHolder);
             Log.d(mTAG, "onCreate, surfaceHolder = " + surfaceHolder);
+            mBitmapManager = new BitmapManager(mContext);
         }
 
         @Override
@@ -85,6 +87,7 @@ public abstract class CanvasWallpaperService extends WallpaperService {
         public void onSurfaceDestroyed(SurfaceHolder holder) {
             super.onSurfaceDestroyed(holder);
             Log.d(mTAG, "onSurfaceDestroyed, holder: " + holder);
+            mBitmapManager.clear();
         }
 
         @Override

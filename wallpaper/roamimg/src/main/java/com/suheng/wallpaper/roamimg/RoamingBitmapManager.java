@@ -2,7 +2,7 @@ package com.suheng.wallpaper.roamimg;
 
 import android.content.Context;
 
-import com.suheng.wallpaper.basic.utils.BitmapManager;
+import com.suheng.wallpaper.basic.manager.BitmapManager;
 
 import java.util.Calendar;
 import java.util.TimeZone;

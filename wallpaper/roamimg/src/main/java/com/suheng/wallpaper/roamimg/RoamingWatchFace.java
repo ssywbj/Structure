@@ -13,7 +13,7 @@ import android.view.SurfaceHolder;
 
 import androidx.core.content.ContextCompat;
 
-import com.suheng.wallpaper.basic.DimenUtil;
+import com.suheng.wallpaper.basic.utils.DimenUtil;
 import com.suheng.wallpaper.basic.service.CanvasWallpaperService;
 import com.suheng.wallpaper.basic.utils.DateUtil;
 
