@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -51,9 +50,6 @@ public class MainActivity extends AppCompatActivity {
             public void onChange(DateTimePicker picker, Calendar calendar) {
             }
         });*/
-
-        TextView textView = findViewById(R.id.text_bold);
-        Log.d("Wbj", "getStyle：" + textView.getTypeface().getStyle());
     }
 
     @Override

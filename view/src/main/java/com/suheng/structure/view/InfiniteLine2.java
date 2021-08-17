@@ -1,15 +1,22 @@
 package com.suheng.structure.view;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.graphics.fonts.FontStyle;
+import android.provider.Settings;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Scroller;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
@@ -46,7 +53,56 @@ public class InfiniteLine2 extends View {
 
         mPaint = new Paint();
         mPaint.setColor(Color.BLACK);
-        mPaint.setTextSize(50);
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, metrics));
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d("Wbj", "onConfigurationChanged: " + newConfig);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasWindowFocus) {
+        super.onWindowFocusChanged(hasWindowFocus);
+        Log.d("Wbj", "onWindowFocusChanged: " + hasWindowFocus);
+    }
+
+    @Override
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        if (visibility == VISIBLE) {
+            boolean checked = this.isBoldTextAdjustment();
+            if (checked) {
+                Log.d("Wbj", "粗休");
+                mPaint.setTypeface(Typeface.DEFAULT_BOLD);
+            } else {
+                Log.d("Wbj", "非粗体");
+                mPaint.setTypeface(Typeface.DEFAULT);
+            }
+        }
+    }
+
+    private boolean isBoldTextAdjustment2() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            int boldTextAdjustment = FontStyle.FONT_WEIGHT_BOLD - FontStyle.FONT_WEIGHT_NORMAL;
+            int fontWeightAdjustment = Settings.Secure.getInt(getContext().getContentResolver(),
+                    "font_weight_adjustment", 0); //Android S新特性：粗体文字
+            return fontWeightAdjustment == boldTextAdjustment;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isBoldTextAdjustment() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            Configuration configuration = getResources().getConfiguration();
+            int boldTextAdjustment = FontStyle.FONT_WEIGHT_BOLD - FontStyle.FONT_WEIGHT_NORMAL;
+            return configuration.fontWeightAdjustment == boldTextAdjustment; //Android S新特性：粗体文字
+        } else {
+            return false;
+        }
     }
 
     @Override
