@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="number_big_width">57.8dp</dimen>
-    <dimen name="number_big_height">102dp</dimen><!--60, 34, *1.7-->
-
-    <dimen name="number_middle_width">28.33dp</dimen>
-    <dimen name="number_middle_height">50dp</dimen><!--60, 34, /1.2-->
-
-    <dimen name="number_small_width">15.45dp</dimen>
-    <dimen name="number_small_height">27.27dp</dimen><!--60, 34, /2.2-->
-
-    <dimen name="number_smaller_width">10.97dp</dimen>
-    <dimen name="number_smaller_height">19.35dp</dimen><!--60, 34, /3.1-->
-
-    <dimen name="alphabet_uppercase_small_width">8.305dp</dimen>
-    <dimen name="alphabet_uppercase_small_height">14.625dp</dimen><!--60, 34, /3.0-->
-    <dimen name="reverse_paint_sign_percentage_width">14dp</dimen>
-
-    <dimen name="info_icon">19dp</dimen>
+    <item name="ratio" format="float" translatable="false" type="string">1.8</item>
 </resources>

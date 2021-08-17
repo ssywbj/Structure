@@ -25,6 +25,7 @@ public class BitmapHelper {
             }
             drawable.mutate();
             return drawableToBitmap(drawable, scale, degrees);
+            //return drawableToBitmap2(drawable, scale, degrees);
         }
     }
 
