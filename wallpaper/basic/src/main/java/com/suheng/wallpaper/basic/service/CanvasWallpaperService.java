@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Canvas;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,14 +38,14 @@ public abstract class CanvasWallpaperService extends WallpaperService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(mTAG, "onDestroy");
+        Log.d(mTAG, "onDestroy, service: " + this);
     }
 
     public abstract class CanvasEngine extends Engine {
         protected int mHour, mMinute, mSecond;
         protected float mHourRatio, mMinuteRatio, mSecondRatio;
         protected boolean mIsHour24Scale;
-        private boolean mRegisteredReceiverTimeTick;
+        private boolean mRegisteredReceiverTimeTick, mRegisteredBatteryChangeReceiver;
         protected BitmapManager mBitmapManager;
 
         public abstract void onDraw(Canvas canvas);
@@ -56,10 +57,20 @@ public abstract class CanvasWallpaperService extends WallpaperService {
             }
         };
 
-        private final BroadcastReceiver mReceiverTimeTick = new BroadcastReceiver() {
+        private final BroadcastReceiver mReceiverMinuteTicker = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 onMinuteTick();
+            }
+        };
+
+        private final BroadcastReceiver mBatteryReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
+                    int level = intent.getIntExtra("level", 0);//当前电量，百分比的值
+                    onBatteryChange(level);
+                }
             }
         };
 
@@ -68,6 +79,12 @@ public abstract class CanvasWallpaperService extends WallpaperService {
             super.onCreate(surfaceHolder);
             Log.d(mTAG, "onCreate, surfaceHolder = " + surfaceHolder);
             mBitmapManager = new BitmapManager(mContext);
+        }
+
+        @Override
+        public void onSurfaceCreated(SurfaceHolder holder) {
+            super.onSurfaceCreated(holder);
+            Log.d(mTAG, "onSurfaceCreated, holder = " + holder);
         }
 
         @Override
@@ -109,8 +126,8 @@ public abstract class CanvasWallpaperService extends WallpaperService {
         @Override
         public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
             super.onOffsetsChanged(xOffset, yOffset, xOffsetStep, yOffsetStep, xPixelOffset, yPixelOffset);
-            Log.d(mTAG, "onOffsetsChanged, xOffset = " + xOffset + ", yOffset = " + yOffset + ", xOffsetStep " + xOffsetStep
-                    + ", yOffsetStep = " + yOffsetStep + ", xPixelOffset = " + xPixelOffset + ", yPixelOffset = " + yPixelOffset);
+            /*Log.d(mTAG, "onOffsetsChanged, xOffset = " + xOffset + ", yOffset = " + yOffset + ", xOffsetStep " + xOffsetStep
+                    + ", yOffsetStep = " + yOffsetStep + ", xPixelOffset = " + xPixelOffset + ", yPixelOffset = " + yPixelOffset);*/
         }
 
         @Override
@@ -124,6 +141,18 @@ public abstract class CanvasWallpaperService extends WallpaperService {
             super.onTouchEvent(event);
             Log.d(mTAG, "onTouchEvent, action = " + event.getAction());
         }*/
+
+        public void updateTime() {
+            Calendar calendar = Calendar.getInstance();
+
+            mHour = mIsHour24Scale ? calendar.get(Calendar.HOUR_OF_DAY) : DateUtil.getHour(mContext);
+            mMinute = calendar.get(Calendar.MINUTE);
+            mSecond = calendar.get(Calendar.SECOND);
+
+            mHourRatio = ((mIsHour24Scale ? mHour : mHour % 12) + mMinute / 60f) / (mIsHour24Scale ? 24 : 12);
+            mMinuteRatio = (mMinute + mSecond / 60f) / 60;
+            mSecondRatio = (mSecond + calendar.get(Calendar.MILLISECOND) / 1000f) / 60f;
+        }
 
         public void invalidate() {
             SurfaceHolder surfaceHolder = getSurfaceHolder();
@@ -157,7 +186,7 @@ public abstract class CanvasWallpaperService extends WallpaperService {
             }
         }
 
-        protected void registerReceiverTimeTick() {
+        protected void registerReceiverMinuteTicker() {
             if (mRegisteredReceiverTimeTick) {
                 return;
             }
@@ -165,26 +194,41 @@ public abstract class CanvasWallpaperService extends WallpaperService {
 
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(Intent.ACTION_TIME_TICK);
-            mContext.registerReceiver(mReceiverTimeTick, intentFilter);
+            mContext.registerReceiver(mReceiverMinuteTicker, intentFilter);
         }
 
-        protected void unregisterReceiverTimeTick() {
+        protected void unregisterReceiverMinuteTicker() {
             if (mRegisteredReceiverTimeTick) {
                 mRegisteredReceiverTimeTick = false;
-                mContext.unregisterReceiver(mReceiverTimeTick);
+                mContext.unregisterReceiver(mReceiverMinuteTicker);
             }
         }
 
-        public void updateTime() {
-            Calendar calendar = Calendar.getInstance();
+        protected void registerBatteryChangeReceiver() {
+            if (mRegisteredBatteryChangeReceiver) {
+                return;
+            }
+            mRegisteredBatteryChangeReceiver = true;
 
-            mHour = mIsHour24Scale ? calendar.get(Calendar.HOUR_OF_DAY) : DateUtil.getHour(mContext);
-            mMinute = calendar.get(Calendar.MINUTE);
-            mSecond = calendar.get(Calendar.SECOND);
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+            mContext.registerReceiver(mBatteryReceiver, intentFilter);
+        }
 
-            mHourRatio = ((mIsHour24Scale ? mHour : mHour % 12) + mMinute / 60f) / (mIsHour24Scale ? 24 : 12);
-            mMinuteRatio = (mMinute + mSecond / 60f) / 60;
-            mSecondRatio = (mSecond + calendar.get(Calendar.MILLISECOND) / 1000f) / 60f;
+        protected void unregisterBatteryChangeReceiver() {
+            if (mRegisteredBatteryChangeReceiver) {
+                mRegisteredBatteryChangeReceiver = false;
+                mContext.unregisterReceiver(mBatteryReceiver);
+            }
+        }
+
+        protected int getBatteryLevel() {
+            BatteryManager batterymanager = (BatteryManager) mContext.getSystemService(Context.BATTERY_SERVICE);
+            if (batterymanager == null) {
+                return 0;
+            } else {
+                return batterymanager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+            }
         }
 
         /**
@@ -196,6 +240,7 @@ public abstract class CanvasWallpaperService extends WallpaperService {
 
             long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
             mHandler.postDelayed(mRunnableSecondTicker, delayMillis);
+            Log.d(mTAG, "onSecondTick, hour = " + mHour + ", minute = " + mMinute + ", second = " + mSecond + ", holder: " + getSurfaceHolder());
         }
 
         /**
@@ -206,9 +251,12 @@ public abstract class CanvasWallpaperService extends WallpaperService {
             this.invalidate();
         }
 
+        /**
+         * 电量改变时调用该方法。注：注册后生效
+         */
+        protected void onBatteryChange(int level) {
+        }
+
     }
 
-    /*public CanvasHandler getHandler() {
-        return mHandler;
-    }*/
 }

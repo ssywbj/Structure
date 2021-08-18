@@ -74,9 +74,9 @@ public class RoamingWatchFace extends CanvasWallpaperService {
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
             if (visible) {
-                registerReceiverTimeTick();
+                registerReceiverMinuteTicker();
             } else {
-                unregisterReceiverTimeTick();
+                unregisterReceiverMinuteTicker();
             }
         }
 

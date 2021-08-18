@@ -10,20 +10,20 @@ import android.view.SurfaceHolder;
 
 import androidx.core.content.ContextCompat;
 
-import com.suheng.wallpaper.basic.utils.DimenUtil;
-import com.suheng.wallpaper.basic.service.CanvasWallpaperService;
+import com.suheng.wallpaper.basic.service.AnimWallpaperService;
 import com.suheng.wallpaper.basic.utils.DateUtil;
+import com.suheng.wallpaper.basic.utils.DimenUtil;
 
 import java.util.Calendar;
 
-public class MyHealthWatchFace extends CanvasWallpaperService {
+public class MyHealthWatchFace extends AnimWallpaperService {
 
     @Override
     public Engine onCreateEngine() {
         return new LiveEngine();
     }
 
-    private final class LiveEngine extends CanvasEngine {
+    private final class LiveEngine extends AnimEngine {
         private static final int SCALES = 6;
         private static final float SCALE_DEGREES = 1.0f * 360 / SCALES;
         private final PointF mPointScreenCenter = new PointF();//屏幕中心点
@@ -35,6 +35,8 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
         private int mLittleTriangleHeight;
         private float mScaleMinute, mScaleSecond, mScaleHour, mScaleDate;
 
+        private int mBatteryLevel;
+
         @Override
         public void onCreate(SurfaceHolder surfaceHolder) {
             super.onCreate(surfaceHolder);
@@ -45,6 +47,11 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
             mScaleSecond = mScaleMinute / 3.3f;
             mScaleHour = mScaleMinute / 2;
             mScaleDate = mScaleMinute / 5;
+
+            mBatteryLevel = getBatteryLevel();
+
+            needAppearAnimNumber();
+            setDefaultTime(8, 32, 55);
         }
 
         @Override
@@ -62,17 +69,24 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
         @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
-            if (visible) {
-                registerRunnableSecondTicker();
-            } else {
+            if (!visible) {
                 unregisterRunnableSecondTicker();
             }
         }
 
         @Override
+        protected void onAppearAnimFinished() {
+            registerRunnableSecondTicker();
+        }
+
+        @Override
+        protected void onBatteryChange(int level) {
+            mBatteryLevel = level;
+        }
+
+        @Override
         public void updateTime() {
             Calendar calendar = Calendar.getInstance();
-
             mHour = DateUtil.getHour(mContext);
             mMinute = calendar.get(Calendar.MINUTE);
             mSecond = calendar.get(Calendar.SECOND);
@@ -264,7 +278,7 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
                 canvas.rotate(rotateDegrees, mPointScreenCenter.x, mPointScreenCenter.y);//画布旋转后，在低分辨率手机上bitmap会有些锯齿现象，但能接受
                 //canvas.drawLine(mPointScreenCenter.x, mPointScreenCenter.y, mPointScreenCenter.x, stopY, mPaint);
 
-                if (index == 1) {//卡路里后半部分
+                if (index == 1) { //卡路里后半部分
                     bitmap = mBitmapManager.get(R.drawable.number_2, color, ratio);
                 } else if (index == 3) {
                     bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_k, color, ratio);
@@ -274,7 +288,7 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
                     bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a, color, ratio);
                 } else if (index == 6) {
                     bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_l, color, ratio);
-                } else if (index == 13) {//心率
+                } else if (index == 13) { //心率
                     bitmap = mBitmapManager.get(R.drawable.icon_heart_rate, color, ratioIcon);
                 } else if (index == 15) {
                     bitmap = mBitmapManager.get(R.drawable.number_1, color, ratio);
@@ -288,7 +302,7 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
                     bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_p, color, ratio);
                 } else if (index == 21) {
                     bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_m, color, ratio);
-                } else if (index == 27) {//跑步
+                } else if (index == 27) { //跑步
                     bitmap = mBitmapManager.get(R.drawable.number_2, color, ratio, 180);
                 } else if (index == 28) {
                     bitmap = mBitmapManager.get(R.drawable.number_1, color, ratio, 180);
@@ -334,32 +348,76 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
                     bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_t, color, ratio, 180);
                 } else if (index == 57) {
                     bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color, ratio, 180);
-                } else if (index == 61) {//电量
-                    bitmap = mBitmapManager.get(R.drawable.sign_percentage, color, ratio);
-                } else if (index == 62) {
-                    bitmap = mBitmapManager.get(R.drawable.number_0, color, ratio, 180);
-                } else if (index == 63) {
-                    bitmap = mBitmapManager.get(R.drawable.number_0, color, ratio, 180);
-                } else if (index == 64) {
-                    bitmap = mBitmapManager.get(R.drawable.number_1, color, ratio, 180);
-                } else if (index == 66) {
-                    bitmap = mBitmapManager.get(R.drawable.icon_battary, color, ratioIcon * 1.1f);
-                } else if (index == 68) {
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_y, color, ratio, 180);
-                } else if (index == 69) {
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_g, color, ratio, 180);
-                } else if (index == 70) {
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_r, color, ratio, 180);
-                } else if (index == 71) {
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, ratio, 180);
-                } else if (index == 72) {
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color, ratio, 180);
-                } else if (index == 73) {
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, ratio, 180);
-                } else if (index == 95) {//卡路里前半部分
+                } else if (index >= 61 && index <= 73) { //电量
+                    if (mBatteryLevel == 100) {
+                        if (index == 61) {
+                            bitmap = mBitmapManager.get(R.drawable.sign_percentage, color, ratio);
+                        } else if (index == 62) {
+                            bitmap = mBitmapManager.get(R.drawable.number_0, color, ratio, 180);
+                        } else if (index == 63) {
+                            bitmap = mBitmapManager.get(R.drawable.number_0, color, ratio, 180);
+                        } else if (index == 64) {
+                            bitmap = mBitmapManager.get(R.drawable.number_1, color, ratio, 180);
+                        } else if (index == 66) {
+                            bitmap = mBitmapManager.get(R.drawable.icon_battary, color, ratioIcon * 1.1f);
+                        } else if (index == 68) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_y, color, ratio, 180);
+                        } else if (index == 69) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_g, color, ratio, 180);
+                        } else if (index == 70) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_r, color, ratio, 180);
+                        } else if (index == 71) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, ratio, 180);
+                        } else if (index == 72) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color, ratio, 180);
+                        } else if (index == 73) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, ratio, 180);
+                        }
+                    } else if (mBatteryLevel < 10) {
+                        if (index == 62) {
+                            bitmap = mBitmapManager.get(R.drawable.sign_percentage, color, ratio);
+                        } else if (index == 63) {
+                            bitmap = mBitmapManager.get(getNumberResId(mBatteryLevel), color, ratio, 180);
+                        } else if (index == 65) {
+                            bitmap = mBitmapManager.get(R.drawable.icon_battary, color, ratio, 180);
+                        } else if (index == 67) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_y, color, ratio, 180);
+                        } else if (index == 68) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_g, color, ratio, 180);
+                        } else if (index == 69) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_r, color, ratio, 180);
+                        } else if (index == 70) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, ratio, 180);
+                        } else if (index == 71) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color, ratio, 180);
+                        } else if (index == 72) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, ratio, 180);
+                        }
+                    } else {
+                        if (index == 61) {
+                            bitmap = mBitmapManager.get(R.drawable.sign_percentage, color, ratio);
+                        } else if (index == 62) {
+                            bitmap = mBitmapManager.get(getNumberResId(mBatteryLevel % 10), color, ratio, 180);
+                        } else if (index == 63) {
+                            bitmap = mBitmapManager.get(getNumberResId(mBatteryLevel / 10), color, ratio, 180);
+                        } else if (index == 65) {
+                            bitmap = mBitmapManager.get(R.drawable.icon_battary, color, ratio, 180);
+                        } else if (index == 67) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_y, color, ratio, 180);
+                        } else if (index == 68) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_g, color, ratio, 180);
+                        } else if (index == 69) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_r, color, ratio, 180);
+                        } else if (index == 70) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, ratio, 180);
+                        } else if (index == 71) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color, ratio, 180);
+                        } else if (index == 72) {
+                            bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, ratio, 180);
+                        }
+                    }
+                } else if (index == 95) {  //卡路里前半部分
                     bitmap = mBitmapManager.get(R.drawable.icon_calorie, color, ratioIcon);
-                    //bitmap = mBitmapManager.get(R.drawable.paint_calorie_bak, color);
-                    //bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.paint_calorie_bak);
                 } else if (index == 97) {
                     bitmap = mBitmapManager.get(R.drawable.number_0, color, ratio);
                 } else if (index == 98) {
@@ -371,12 +429,6 @@ public class MyHealthWatchFace extends CanvasWallpaperService {
                 }
 
                 if (bitmap != null) {
-                    /*mPaint.reset();
-                    mPaint.setAntiAlias(true);
-                    mPaint.setColor(Color.RED);
-                    canvas.drawBitmap(bitmap.extractAlpha(), mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2
-                            , stopY - 1.0f * bitmap.getHeight() / 2, mPaint);*/
-
                     canvas.drawBitmap(bitmap, mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2
                             , stopY - 1.0f * bitmap.getHeight() / 2, null);
                 }
