@@ -48,8 +48,6 @@ public class MyHealthWatchFace extends AnimWallpaperService {
             mScaleHour = mScaleMinute / 2;
             mScaleDate = mScaleMinute / 5;
 
-            mBatteryLevel = getBatteryLevel();
-
             needAppearAnimNumber();
             setDefaultTime(8, 32, 55);
         }
@@ -70,16 +68,16 @@ public class MyHealthWatchFace extends AnimWallpaperService {
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
             if (visible) {
-                registerBatteryChangeReceiver();
+                mBatteryLevel = getBatteryLevel();
             } else {
                 unregisterBatteryChangeReceiver();
-
                 unregisterRunnableSecondTicker();
             }
         }
 
         @Override
         protected void onAppearAnimFinished() {
+            registerBatteryChangeReceiver();
             registerRunnableSecondTicker();
         }
 
