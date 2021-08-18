@@ -16,7 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.suheng.structure.ui.R;
 import com.suheng.structure.ui.architecture.view.IView;
 
 import permissions.dispatcher.NeedsPermission;
@@ -138,7 +137,7 @@ public abstract class BasicActivity extends AppCompatActivity implements IView {
     @OnNeverAskAgain({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE})
     public void neverAskAgainExternalStoragePermission() {//点击不再询问后执行的方法
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("权限申请").setMessage("在设置—应用管理—" + getString(R.string.app_name)
+        builder.setTitle("权限申请").setMessage("在设置—应用管理—" + getApplicationInfo().loadLabel(getPackageManager())
                 + "—权限中开启存储权限，以正常使用应用。");
         builder.setPositiveButton("去设置", new DialogInterface.OnClickListener() {
             @Override
@@ -166,7 +165,7 @@ public abstract class BasicActivity extends AppCompatActivity implements IView {
     @OnNeverAskAgain(Manifest.permission.CALL_PHONE)
     public void neverAskAgainCallPhonePermission() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("权限申请").setMessage("在设置—应用管理—" + getString(R.string.app_name)
+        builder.setTitle("权限申请").setMessage("在设置—应用管理—" + getApplicationInfo().loadLabel(getPackageManager())
                 + "—权限中开启电话权限，以正常使用应用。");
         builder.setPositiveButton("去设置", new DialogInterface.OnClickListener() {
             @Override
