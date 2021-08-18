@@ -69,7 +69,11 @@ public class MyHealthWatchFace extends AnimWallpaperService {
         @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
-            if (!visible) {
+            if (visible) {
+                registerBatteryChangeReceiver();
+            } else {
+                unregisterBatteryChangeReceiver();
+
                 unregisterRunnableSecondTicker();
             }
         }
