@@ -50,6 +50,13 @@ public class MainActivity extends AppCompatActivity {
             public void onChange(DateTimePicker picker, Calendar calendar) {
             }
         });*/
+
+        /*textView.post(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });*/
     }
 
     @Override

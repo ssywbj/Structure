@@ -2,12 +2,20 @@ package com.suheng.structure.view;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.Xfermode;
 import android.graphics.fonts.FontStyle;
 import android.provider.Settings;
+import android.text.TextPaint;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -48,13 +56,16 @@ public class InfiniteLine2 extends View {
     }
 
     private void init() {
-        setBackgroundColor(Color.WHITE);
+        setBackgroundColor(Color.GRAY);
         mScroller = new Scroller(getContext());
 
         mPaint = new Paint();
         mPaint.setColor(Color.BLACK);
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, metrics));
+
+        mBitmapWhite = this.createWhiteBitmap(RECT_WIDTH, RECT_HEIGHT, Color.WHITE);
+        mBitmapBlack = this.createWhiteBitmap(RECT_WIDTH / 2, RECT_HEIGHT / 2, Color.BLACK);
     }
 
     @Override
@@ -154,6 +165,30 @@ public class InfiniteLine2 extends View {
         }
     }
 
+    private static final int RECT_WIDTH = 300, RECT_HEIGHT = 100;
+    private final Paint mPaintRect = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private RectF mRectXfermode;
+    private static final Xfermode[] sModes = {
+            new PorterDuffXfermode(PorterDuff.Mode.CLEAR),
+            new PorterDuffXfermode(PorterDuff.Mode.SRC), //显示源图
+            new PorterDuffXfermode(PorterDuff.Mode.DST), //只绘制目标图像
+            new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER), //在目标图像的顶部绘制源图像
+            new PorterDuffXfermode(PorterDuff.Mode.DST_OVER), //在源图像的上方绘制目标图像
+            new PorterDuffXfermode(PorterDuff.Mode.SRC_IN), //只在源图像和目标图像相交的地方绘制源图像
+            new PorterDuffXfermode(PorterDuff.Mode.DST_IN), //只在源图像和目标图像相交的地方绘制目标图像
+            new PorterDuffXfermode(PorterDuff.Mode.SRC_OUT), //只在源图像和目标图像不相交的地方绘制源图像
+            new PorterDuffXfermode(PorterDuff.Mode.DST_OUT), //只在源图像和目标图像不相交的地方绘制目标图像
+            new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP), //在源图像和目标图像相交的地方绘制源图像，在不相交的地方绘制目标图像
+            new PorterDuffXfermode(PorterDuff.Mode.DST_ATOP), //在源图像和目标图像相交的地方绘制目标图像，在不相交的地方绘制源图像
+            new PorterDuffXfermode(PorterDuff.Mode.XOR), //在源图像和目标图像重叠之外的任何地方绘制他们，而在不重叠的地方不绘制任何内容
+            new PorterDuffXfermode(PorterDuff.Mode.DARKEN), //变暗
+            new PorterDuffXfermode(PorterDuff.Mode.LIGHTEN), //变亮
+            new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY), //正片叠底
+            new PorterDuffXfermode(PorterDuff.Mode.SCREEN), //滤色
+            new PorterDuffXfermode(PorterDuff.Mode.ADD), //饱和相加
+            new PorterDuffXfermode(PorterDuff.Mode.OVERLAY), //叠加
+    };
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -161,14 +196,65 @@ public class InfiniteLine2 extends View {
         drawText(canvas, (mIndex - 1) * mWidth, mIndex - 1);
         drawText(canvas, mIndex * mWidth, mIndex);
         drawText(canvas, (mIndex + 1) * mWidth, mIndex + 1);
+
+        //中间镂空的矩形：start
+        //Xfermode: https://www.jianshu.com/p/d11892bbe055
+        mPaintRect.setColor(Color.WHITE);
+        if (mRectXfermode == null) {
+            mRectXfermode = new RectF((getWidth() - RECT_WIDTH) / 2f, (getHeight() - RECT_HEIGHT) / 2f
+                    , (getWidth() + RECT_WIDTH) / 2f, (getHeight() + RECT_HEIGHT) / 2f);
+        }
+        int saveLayer = canvas.saveLayer(mRectXfermode, null);
+        canvas.drawRect(mRectXfermode, mPaintRect); //目标图像
+        mPaintRect.setXfermode(sModes[0]); //CLEAR
+        mPaintRect.setColor(Color.parseColor("#000000"));
+        float bottom = (getHeight() + RECT_HEIGHT / 2f) / 2f;
+        canvas.drawRect((getWidth() - RECT_WIDTH / 2f) / 2f, (getHeight() - RECT_HEIGHT / 2f) / 2f
+                , (getWidth() + RECT_WIDTH / 2f) / 2f, bottom, mPaintRect); //源图像
+        mPaintRect.setXfermode(null);
+        canvas.restoreToCount(saveLayer);
+
+        bottom += (mBitmapWhite.getHeight() / 2f - 10);
+        float left = (getWidth() - mBitmapWhite.getWidth()) / 2f;
+        int sc = canvas.saveLayer(left, bottom, left + mBitmapWhite.getWidth(), bottom + mBitmapWhite.getHeight(), null);
+        canvas.drawBitmap(mBitmapWhite, left, bottom, mPaintBimap); //先绘制目标图像
+        mPaintBimap.setXfermode(sModes[7]); //再设置相交模式，SRC_OUT: 只在源图像和目标图像不相交的地方绘制源图像
+        canvas.drawBitmap(mBitmapBlack, (getWidth() - mBitmapBlack.getWidth()) / 2f
+                , bottom + mBitmapBlack.getHeight() / 2f, mPaintBimap); //最后绘制源图像
+        mPaintBimap.setXfermode(null);
+        canvas.restoreToCount(sc);
+        //中间镂空的矩形：end
+    }
+
+    private Bitmap mBitmapWhite, mBitmapBlack;
+    private final Paint mPaintBimap = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    private Bitmap createWhiteBitmap(int width, int height, int color) {
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(color);
+        return bitmap;
     }
 
     private void drawText(Canvas canvas, int startX, int index) {
         canvas.save();
         canvas.translate(startX, 0);
-        canvas.drawText("页数：" + index, 0, 100, mPaint);
+        String text = "粗体测试：" + index;
+        canvas.drawText(getEllipsizeText(text, mPaint).toString(), 0, 100, mPaint);
         canvas.restore();
         Log.d("Wbj", "页数：" + index);
+    }
+
+    private TextPaint mTextPaint;
+    private final Rect mRect = new Rect();
+
+    private CharSequence getEllipsizeText(String origin, Paint paint) {
+        if (mTextPaint == null) {
+            mTextPaint = new TextPaint(paint);
+        }
+        paint.getTextBounds(origin, 0, origin.length(), mRect);
+        return TextUtils.ellipsize(origin, mTextPaint
+                , mRect.width() * 0.8f, TextUtils.TruncateAt.MIDDLE);
     }
 
 }

@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -13,9 +12,11 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.TextureView;
+import android.view.View;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +41,6 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
     private final Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            Log.d(TAG, "Second Runnable, Second Runnable");
             drawSecond();
 
             //drawSecondPointer();
@@ -53,7 +53,6 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
     private final BroadcastReceiver mTimeChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Time Changed Receiver: action = " + intent.getAction());
             drawMinute();
             drawMinutePointer();
         }
@@ -75,7 +74,7 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
         mPaintText = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaintText.setTextSize(50);
         mPaintText.setTypeface(Typeface.DEFAULT_BOLD);
-        mPaintText.setColor(Color.GREEN);
+        //mPaintText.setColor(Color.GREEN);
 
         mPaintSecond = new Paint();
         mPaintSecond.setStyle(Paint.Style.FILL);
@@ -83,12 +82,6 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
 
         mPaintMinute = new Paint(mPaintSecond);
         mPaintMinute.setColor(Color.RED);
-
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
-        intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
-        intentFilter.addAction(Intent.ACTION_TIME_TICK);
-        getContext().registerReceiver(mTimeChangedReceiver, intentFilter);
 
         //setOpaque(true);
     }
@@ -107,8 +100,6 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
 
         this.drawBg();
 
-        post(mRunnable);
-
         this.drawMinute();
 
         /*this.drawCircle();
@@ -123,14 +114,39 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         Log.d(TAG, "onSurfaceTextureDestroyed");
-        removeCallbacks(mRunnable);
-        getContext().unregisterReceiver(mTimeChangedReceiver);
+        //removeCallbacks(mRunnable);
+        //getContext().unregisterReceiver(mTimeChangedReceiver);
         return false;
     }
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-        Log.d(TAG, "onSurfaceTextureUpdated ");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.d(TAG, "onSurfaceTextureUpdated " + isAvailable() + ", " + isActivated() + ", " + surface.isReleased());
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        Log.d(TAG, "onDetachedFromWindow");
+    }
+
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        Log.d(TAG, "onVisibilityChanged, visibility: " + visibility);
+        if (visibility == VISIBLE) {
+            post(mRunnable);
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+            intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
+            intentFilter.addAction(Intent.ACTION_TIME_TICK);
+            getContext().registerReceiver(mTimeChangedReceiver, intentFilter);
+        } else {
+            removeCallbacks(mRunnable);
+            getContext().unregisterReceiver(mTimeChangedReceiver);
+        }
     }
 
     private void drawBg() {
@@ -142,9 +158,9 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
             }
             Log.v(TAG, "Bg Canvas: " + canvas);
 
-            //canvas.drawColor(Color.RED);
-            Rect rect = new Rect(0, 0, getWidth(), getHeight());
-            canvas.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.beauty), null, rect, null);
+            canvas.drawColor(Color.RED);
+            //Rect rect = new Rect(0, 0, getWidth(), getHeight());
+            //canvas.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.beauty), null, rect, null);
         } finally {
             if (canvas != null) {
                 unlockCanvasAndPost(canvas);
@@ -176,19 +192,17 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
             if (canvas == null) {
                 return;
             }
-            Log.d(TAG, "Second Canvas: " + canvas);
-
-            /*Paint paint = new Paint();
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            canvas.drawPaint(paint);
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));*/
-
-            int saveLayer = canvas.saveLayer(mRectSecond.left, mRectSecond.top, mRectSecond.right, mRectSecond.bottom, null);
             Calendar calendar = Calendar.getInstance();
             int second = calendar.get(Calendar.SECOND);
+            Log.d(TAG, "Second Canvas: " + canvas + ", second: " + second);
             String text = second / 10 + "" + second % 10;
             mPaintText.getTextBounds(text, 0, text.length(), mRectTextSecond);
-            mPaintText.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+
+            int saveLayer = canvas.saveLayer(mRectSecond.left, mRectSecond.top, mRectSecond.right, mRectSecond.bottom, null);
+            mPaintText.setColor(Color.TRANSPARENT);
+            canvas.drawRect(mRectSecond, mPaintText);
+            mPaintText.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OUT));
+            mPaintText.setColor(Color.GREEN);
             canvas.drawText(text, mRectSecond.centerX() - mRectTextSecond.centerX(), mRectSecond.centerY() - mRectTextSecond.centerY(), mPaintText);
             mPaintText.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             canvas.restoreToCount(saveLayer);
