@@ -64,8 +64,8 @@ public class InfiniteLine2 extends View {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, metrics));
 
-        mBitmapWhite = this.createWhiteBitmap(RECT_WIDTH, RECT_HEIGHT, Color.WHITE);
-        mBitmapBlack = this.createWhiteBitmap(RECT_WIDTH / 2, RECT_HEIGHT / 2, Color.BLACK);
+        mBitmapWhite = this.createBitmap(RECT_WIDTH, RECT_HEIGHT, Color.WHITE);
+        mBitmapBlack = this.createBitmap(RECT_WIDTH / 2, RECT_HEIGHT / 2, Color.BLACK);
     }
 
     @Override
@@ -229,7 +229,7 @@ public class InfiniteLine2 extends View {
     private Bitmap mBitmapWhite, mBitmapBlack;
     private final Paint mPaintBimap = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    private Bitmap createWhiteBitmap(int width, int height, int color) {
+    private Bitmap createBitmap(int width, int height, int color) {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         canvas.drawColor(color);

@@ -194,18 +194,22 @@ public class TextureViewImpl extends TextureView implements TextureView.SurfaceT
             }
             Calendar calendar = Calendar.getInstance();
             int second = calendar.get(Calendar.SECOND);
-            Log.d(TAG, "Second Canvas: " + canvas + ", second: " + second);
             String text = second / 10 + "" + second % 10;
             mPaintText.getTextBounds(text, 0, text.length(), mRectTextSecond);
 
             int saveLayer = canvas.saveLayer(mRectSecond.left, mRectSecond.top, mRectSecond.right, mRectSecond.bottom, null);
-            mPaintText.setColor(Color.TRANSPARENT);
+            //canvas.drawColor(Color.TRANSPARENT,PorterDuff.Mode.CLEAR);
+            mPaintText.setColor(Color.BLUE);
             canvas.drawRect(mRectSecond, mPaintText);
             mPaintText.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OUT));
             mPaintText.setColor(Color.GREEN);
             canvas.drawText(text, mRectSecond.centerX() - mRectTextSecond.centerX(), mRectSecond.centerY() - mRectTextSecond.centerY(), mPaintText);
-            mPaintText.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            final float scale = 10f;
+            canvas.drawRect(mRectSecond.left + scale, mRectSecond.top + scale, mRectSecond.right - scale, mRectSecond.bottom - scale, mPaintText);
+            mPaintText.setXfermode(null);
             canvas.restoreToCount(saveLayer);
+
+            Log.d(TAG, "Second Canvas: " + canvas + ", second: " + second + ", saveLayer: " + saveLayer);
         } finally {
             if (canvas != null) {
                 unlockCanvasAndPost(canvas);
