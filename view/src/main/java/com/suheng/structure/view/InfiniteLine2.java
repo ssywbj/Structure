@@ -3,6 +3,7 @@ package com.suheng.structure.view;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -66,6 +67,8 @@ public class InfiniteLine2 extends View {
 
         mBitmapWhite = this.createBitmap(RECT_WIDTH, RECT_HEIGHT, Color.WHITE);
         mBitmapBlack = this.createBitmap(RECT_WIDTH / 2, RECT_HEIGHT / 2, Color.BLACK);
+
+        this.initBitmapLogo();
     }
 
     @Override
@@ -224,6 +227,42 @@ public class InfiniteLine2 extends View {
         mPaintBimap.setXfermode(null);
         canvas.restoreToCount(sc);
         //中间镂空的矩形：end
+
+        //图片Loading：start
+        //https://juejin.cn/post/6844903464976252942
+        sc = canvas.saveLayer(mRectFLoading.left, TOP_OFFSET, mRectFLoading.right, mRectFLoading.bottom, mPaintLoading, Canvas.ALL_SAVE_FLAG);
+        canvas.drawBitmap(mBitmapLoading, mRectFLoading.left, TOP_OFFSET, null);
+        mPaintLoading.setXfermode(mXfermode);
+        mPaintLoading.setColor(Color.RED);
+        canvas.drawRect(mRectFLoading, mPaintLoading);
+        mPaintLoading.setXfermode(null);
+        canvas.restoreToCount(sc);
+        if (mCurrentTop > 0) {
+            mCurrentTop--;
+            mRectFLoading.top -= 1;
+            postInvalidate();
+        }
+        //图片Loading：end
+    }
+
+    private Bitmap mBitmapLoading;
+    private Paint mPaintLoading;
+    private Xfermode mXfermode;
+    private int mCurrentTop;
+    private final RectF mRectFLoading = new RectF();
+    private static final float TOP_OFFSET = 200;
+
+    private void initBitmapLogo() {
+        mPaintLoading = new Paint();
+        mPaintLoading.setAntiAlias(true);//设置抗锯齿
+        mBitmapLoading = BitmapFactory.decodeResource(getResources(), R.drawable.earth);//从资源文件中解析获取Bitmap
+        mXfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
+
+        mCurrentTop = mBitmapLoading.getHeight();
+        mRectFLoading.left = 20;
+        mRectFLoading.top = TOP_OFFSET + mCurrentTop;
+        mRectFLoading.right = mBitmapLoading.getWidth() + mRectFLoading.left;
+        mRectFLoading.bottom = mRectFLoading.top;
     }
 
     private Bitmap mBitmapWhite, mBitmapBlack;
