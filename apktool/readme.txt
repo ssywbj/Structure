@@ -8,7 +8,8 @@ https://www.zhihu.com/question/29370382
 java -jar apktool.jar d -f /e/Workspace/Android/Structure/wallpaper/myhealth/build/outputs/apk/release/Wallpaper_MyHealth.apk -o ../resolve
 
 /e/Workspace/Android/Structure/wallpaper/myhealth/build/outputs/apk/release/Wallpaper_MyHealth.apk：apk所在路径
-../resolve：破解后的APK资源所在的目录
+-o ../resolve：-o用于指定破解后的APK资源保存的目录，现为resolve（不指定的话，会默认在apktool.jar的同级目录生成一个和apk名称相同的
+文件夹，如上为Wallpaper_MyHealth）
 
 破解APK的代码（尽量还原）
 1.Wallpaper_MyHealth.apk重命名为压缩文件，如Wallpaper_MyHealth.zip；
