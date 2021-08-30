@@ -59,6 +59,25 @@ public class BitmapManager {
         return getRotate(resId, 1, degrees);
     }
 
+    public Bitmap getMerge(@DrawableRes int leftId, int leftColor, @DrawableRes int rightId, int rightColor, float scale) {
+        String key = leftId + "_" + leftColor + "_" + rightId + "_" + rightColor + "_" + scale;
+        if (mMapBitmap.containsKey(key)) {
+            return mMapBitmap.get(key);
+        } else {
+            Bitmap bitmap = BitmapHelper.mergeLeftRight(get(leftId, leftColor, scale), get(rightId, rightColor, scale));
+            mMapBitmap.put(key, bitmap);
+            return bitmap;
+        }
+    }
+
+    public Bitmap getMerge(@DrawableRes int leftId, int leftColor, @DrawableRes int rightId, int rightColor) {
+        return getMerge(leftId, leftColor, rightId, rightColor, 1);
+    }
+
+    public Bitmap getMerge(@DrawableRes int leftId, @DrawableRes int rightId) {
+        return getMerge(leftId, Integer.MAX_VALUE, rightId, Integer.MAX_VALUE, 1);
+    }
+
     public void clear() {
         for (Map.Entry<String, Bitmap> bitmapEntry : mMapBitmap.entrySet()) {
             Bitmap bitmap = bitmapEntry.getValue();

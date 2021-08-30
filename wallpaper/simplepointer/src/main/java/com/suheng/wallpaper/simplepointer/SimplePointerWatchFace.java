@@ -61,8 +61,8 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
 
         private SimplePointerBitmapManager mBitmapManager;
 
-        private int mWeatherIconRes = R.drawable.paint_weather_no_data;
-        private int mTemperatureUnitRes = R.drawable.paint_temperature_unit;
+        private int mWeatherIconRes = R.drawable.weather_no_data;
+        private int mTemperatureUnitRes = R.drawable.temperature_unit;
         private int mTemperature = Integer.MAX_VALUE;
         protected PointF mPointScreenCenter = new PointF();//屏幕中心点
         private int mBatteryLevel;
@@ -147,9 +147,9 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
                     mWeatherIconRes = mBitmapManager.getOverseasWeatherResId(Integer.parseInt(weather));
                 }
                 if ("C".equals(temperatureUnit)) {
-                    mTemperatureUnitRes = R.drawable.paint_temperature_unit;
+                    mTemperatureUnitRes = R.drawable.temperature_unit;
                 } else {
-                    mTemperatureUnitRes = R.drawable.paint_temperature_unit_f;
+                    mTemperatureUnitRes = R.drawable.temperature_unit_f;
                 }
 
                 mTemperature = Integer.parseInt(temperature);
@@ -261,17 +261,18 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
             }
 
             int color = ContextCompat.getColor(mContext, R.color.scale_number);
-            bitmap = mBitmapManager.get(R.drawable.boneblack_sacle_number_12, color);
+            bitmap = mBitmapManager.getMerge(R.drawable.number_1, color, R.drawable.number_2, color, 0.6f);
             left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
             canvas.drawBitmap(bitmap, left, top, null);
 
-            bitmap = mBitmapManager.get(R.drawable.boneblack_scale_number_6, color);
+            bitmap = mBitmapManager.get(R.drawable.number_6, color, 0.667f);
             left = mPointScreenCenter.x - 1.0f * bitmap.getWidth() / 2;
             top = mPointScreenCenter.y + mRadiusOuter - bitmap.getHeight();
             canvas.drawBitmap(bitmap, left, top, null);
         }
 
         private void paintIconInfo(Canvas canvas) {
+            float scale = 0.44f;
             int color = ContextCompat.getColor(mContext, R.color.scale_paperclip);
             float margin = mMarginHorizontal * 3;
 
@@ -280,29 +281,29 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
             float top = mPointScreenCenter.y + mMarginIconText;
             Bitmap bitmap;
             if (mTemperature == Integer.MAX_VALUE) {
-                bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color);
+                bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color, scale);
                 canvas.drawBitmap(bitmap, left, top, null);
                 left += bitmap.getWidth();
-                bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a, color);
+                bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a, color, scale);
             } else {
                 if (mTemperature < 0) {
-                    bitmap = mBitmapManager.get(R.drawable.paint_sign_minus, color);
+                    bitmap = mBitmapManager.get(R.drawable.sign_minus, color, scale);
                     canvas.drawBitmap(bitmap, left - DimenUtil.dip2px(mContext, 2),
                             top + getResources().getDimension(R.dimen.number_height) / 2.2f, null);
                     left += bitmap.getWidth();
                 }
                 int temperature = Math.abs(mTemperature);
-                bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(temperature / 10), color);
+                bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(temperature / 10), color, scale);
                 canvas.drawBitmap(bitmap, left, top, null);
                 left += bitmap.getWidth();
-                bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(temperature % 10), color);
+                bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(temperature % 10), color, scale);
             }
             canvas.drawBitmap(bitmap, left, top, null);
             left += bitmap.getWidth();
-            bitmap = mBitmapManager.get(mTemperatureUnitRes, color);
+            bitmap = mBitmapManager.get(mTemperatureUnitRes, color, scale);
             canvas.drawBitmap(bitmap, left, top, null);
 
-            bitmap = mBitmapManager.get(mWeatherIconRes, color);
+            bitmap = mBitmapManager.get(mWeatherIconRes, color, scale * 1.6f);
             top = mPointScreenCenter.y - mMarginIconText - bitmap.getHeight();
             if (mTemperature < 0) {
                 left = margin * 2f;
@@ -314,22 +315,22 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
             //电量
             int units = mBatteryLevel % 10;//个位
             int tens = mBatteryLevel / 10;//十位
-            bitmap = mBitmapManager.get(R.drawable.paint_sign_percentage, color);
+            bitmap = mBitmapManager.get(R.drawable.sign_percentage, color, scale);
             left = (2 * mPointScreenCenter.x - bitmap.getWidth() - margin);
             top = mPointScreenCenter.y + mMarginIconText;
             canvas.drawBitmap(bitmap, left, top, null);
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color, scale);
             canvas.drawBitmap(bitmap, left -= bitmap.getWidth(), top, null);
             if (mBatteryLevel >= 10) {
-                bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color);
+                bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color, scale);
                 canvas.drawBitmap(bitmap, left -= bitmap.getWidth(), top, null);
                 if (mBatteryLevel == 100) {
-                    bitmap = mBitmapManager.get(R.drawable.paint_number_1, color);
+                    bitmap = mBitmapManager.get(R.drawable.number_1, color, scale);
                     canvas.drawBitmap(bitmap, left - bitmap.getWidth(), top, null);
                 }
             }
 
-            bitmap = mBitmapManager.get(R.drawable.paint_battary, color);
+            bitmap = mBitmapManager.get(R.drawable.icon_battary, color, scale * 1.6f);
             top = mPointScreenCenter.y - mMarginIconText - bitmap.getHeight();
             left = (2 * mPointScreenCenter.x - bitmap.getWidth() - 1.6f * margin);
             canvas.drawBitmap(bitmap, left, top, null);
@@ -347,6 +348,7 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
         }
 
         private void paintZhDate(Canvas canvas) {
+            float scale = 0.5f;
             Calendar instance = Calendar.getInstance();
             int month = instance.get(Calendar.MONTH) + 1;
             int day = instance.get(Calendar.DAY_OF_MONTH);
@@ -356,39 +358,41 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
             float offset = mPointScreenCenter.x + mTextOffset;
 
             float left = offset + mTextMarginLR;
-            Bitmap bitmap = mBitmapManager.get(R.drawable.paint_text_day, color);
+            Bitmap bitmap = mBitmapManager.get(R.drawable.text_day, color, scale);
             float top = mPointScreenCenter.y + (mRadiusInner - bitmap.getHeight()) / 1.8f;
             canvas.drawBitmap(bitmap, left, top, null);
 
             //星期
             left += (bitmap.getWidth() + DimenUtil.dip2px(mContext, 4));
-            bitmap = mBitmapManager.get(R.drawable.paint_text_week, color);//星期
+            bitmap = mBitmapManager.get(R.drawable.text_week, color, scale);//星期
             canvas.drawBitmap(bitmap, left, top, null);
             left += bitmap.getWidth();
-            bitmap = mBitmapManager.get(mBitmapManager.getWeekResId(), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getWeekResId(), color, scale);
             canvas.drawBitmap(bitmap, left, top, null);
 
             //号数
             int units = day % 10;//个位
             int tens = day / 10;//十位
             left = offset;
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color, scale);
             canvas.drawBitmap(bitmap, left -= bitmap.getWidth(), top, null);
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color, scale);
             canvas.drawBitmap(bitmap, left -= bitmap.getWidth(), top, null);
 
             //月份
-            bitmap = mBitmapManager.get(R.drawable.paint_text_month, color);
+            bitmap = mBitmapManager.get(R.drawable.text_month, color, scale);
             canvas.drawBitmap(bitmap, left -= (bitmap.getWidth() + mTextMarginLR), top, null);
             units = month % 10;//个位
             tens = month / 10;//十位
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color, scale);
             canvas.drawBitmap(bitmap, left -= (bitmap.getWidth() + mTextMarginLR), top, null);
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color, scale);
             canvas.drawBitmap(bitmap, left - bitmap.getWidth(), top, null);
         }
 
         private void paintEnDate(Canvas canvas) {
+            float scale = 0.5f;
+
             Calendar instance = Calendar.getInstance();
             int color = ContextCompat.getColor(mContext, R.color.scale_paperclip);
 
@@ -397,13 +401,13 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
             int units = day % 10;//个位
             int tens = day / 10;//十位
             float left = mPointScreenCenter.x;
-            Bitmap bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color);
+            Bitmap bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color, scale);
             float top = mPointScreenCenter.y + (mRadiusInner - bitmap.getHeight()) / 1.8f;
             canvas.drawBitmap(bitmap, left -= bitmap.getWidth(), top, null);
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color, scale);
             canvas.drawBitmap(bitmap, left -= bitmap.getWidth(), top, null);
 
-            bitmap = mBitmapManager.get(R.drawable.paint_number_ic_point, color);
+            bitmap = mBitmapManager.get(R.drawable.sign_point, color);
             float pointOffset = 1.0f * bitmap.getWidth() / 5;
             canvas.drawBitmap(bitmap, left -= (bitmap.getWidth() - pointOffset), top, null);
 
@@ -411,71 +415,71 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
             int month = instance.get(Calendar.MONTH) + 1;
             units = month % 10;//个位
             tens = month / 10;//十位
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color, scale);
             canvas.drawBitmap(bitmap, left -= (bitmap.getWidth() - pointOffset), top, null);
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color, scale);
             canvas.drawBitmap(bitmap, left - bitmap.getWidth(), top, null);
 
             left = mPointScreenCenter.x + getResources().getDimension(R.dimen.number_width);
             switch (instance.get(Calendar.DAY_OF_WEEK)) {
                 case 2:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_m, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_m, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_o, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_o, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     break;
                 case 3:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_t, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_t, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_u, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_u, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     break;
                 case 4:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_w, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_w, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_d, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_d, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     break;
                 case 5:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_t, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_t, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_h, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_h, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_u, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_u, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_r, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_r, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     break;
                 case 6:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_f, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_f, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_r, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_r, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_i, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_i, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     break;
                 case 7:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
                     bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a, color);
@@ -485,13 +489,13 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
                     canvas.drawBitmap(bitmap, left, top, null);
                     break;
                 default:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_u, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_u, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
                     left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color);
+                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color, scale);
                     canvas.drawBitmap(bitmap, left, top, null);
             }
         }
