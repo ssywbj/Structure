@@ -5,8 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Picture;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,10 +42,10 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
         private float mRadiusOuter;//刻度外半径长度
         private float mRadiusInner;//刻度内半径长度
         private float mMarginHorizontal, mMarginVertical;
-        private float mTextMarginLR, mTextOffset;
+        private float mTextOffset;
         private int mMarginIconText;//信息图标与其下方文案的留白
 
-        private Paint mPaintMinute, mPaintMinuteInner;
+        private Paint mPaintMinute;
         private final RectF mRectFMinute = new RectF();
         private final RectF mRectFMinuteInner = new RectF()/*分针内部小黑棒*/;
         private float mMinutePointerWidth/*分针宽度*/, mMinutePointerInnerWidth;
@@ -67,6 +69,10 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
         protected PointF mPointScreenCenter = new PointF();//屏幕中心点
         private int mBatteryLevel;
 
+        private final Picture mPicture = new Picture();
+        private float mScaleDate = 0.45f, mScalePoint;
+        private final PorterDuffXfermode mXfermode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+
         private final ContentObserver mContentObserver = new ContentObserver(null) {
             @Override
             public void onChange(boolean selfChange, Uri uri) {
@@ -87,7 +93,6 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
             mMarginIconText = DimenUtil.dip2px(mContext, 2);
             mMarginHorizontal = DimenUtil.dip2px(mContext, 3);
 
-            mTextMarginLR = DimenUtil.dip2px(mContext, 2);
             mTextOffset = DimenUtil.dip2px(mContext, 6);
 
             mMinutePointerWidth = DimenUtil.dip2px(mContext, 5.6f);
@@ -102,10 +107,6 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
             int shadowColor = Color.parseColor("#2E42FF");
             mPaintMinute.setShadowLayer(mMinutePointerWidth, 0, 0, shadowColor);//外围阴影效果
             mPaintMinute.setColor(Color.WHITE);
-            mPaintMinuteInner = new Paint();
-            mPaintMinuteInner.setAntiAlias(true);
-            mPaintMinuteInner.setStyle(Paint.Style.FILL);
-            mPaintMinuteInner.setColor(ContextCompat.getColor(mContext, R.color.basic_wallpaper_bg_black));
 
             mPaintSecond = new Paint(mPaintMinute);
             mPaintSecond.setShadowLayer(mSecondPointerWidth, 0, 0, Color.parseColor("#FF2E2E"));
@@ -117,6 +118,11 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
             mPaintCenterCircle.setStyle(Paint.Style.FILL);
             mPaintCenterCircle.setColor(Color.WHITE);
             mPaintCenterCircle.setShadowLayer(mCenterCircleRadius, 0, 0, shadowColor);//外围阴影效果
+
+            mScaleDate = 0.45f;
+            Bitmap bitmapNumber = mBitmapManager.get(R.drawable.alphabet_uppercase_a);
+            Bitmap bitmapPoint = mBitmapManager.get(R.drawable.sign_point);
+            mScalePoint = bitmapNumber.getHeight() * mScaleDate / bitmapPoint.getHeight();
         }
 
         private void queryWeatherInfo() {
@@ -224,6 +230,8 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
             mHour = DateUtil.getHour(mContext);
             mMinute = calendar.get(Calendar.MINUTE);
             mSecond = calendar.get(Calendar.SECOND);
+            mHourRatio = (mHour + mMinute / 60f) / 12;
+            mMinuteRatio = (mMinute + mSecond / 60f) / 60;
         }
 
         @Override
@@ -336,181 +344,166 @@ public class SimplePointerWatchFace extends AnimWallpaperService {
             canvas.drawBitmap(bitmap, left, top, null);
         }
 
-        private void paintDate(Canvas canvas) {
-            Locale locale = Locale.getDefault();
-            String language = locale.getLanguage();
-            //Log.d(mTAG, "language: " + language + ", country:" + locale.getCountry());//zh，CN；zh，HK
-            if ("zh".equals(language)) {
-                this.paintZhDate(canvas);
-            } else {
-                this.paintEnDate(canvas);
-            }
-        }
+        private void paintDate(Canvas cvs) {
+            String language = Locale.getDefault().getLanguage();
+            final boolean isChinese = "zh".equalsIgnoreCase(language);
 
-        private void paintZhDate(Canvas canvas) {
-            float scale = 0.5f;
-            Calendar instance = Calendar.getInstance();
-            int month = instance.get(Calendar.MONTH) + 1;
-            int day = instance.get(Calendar.DAY_OF_MONTH);
+            Canvas canvas = mPicture.beginRecording(0, 0);
+            Calendar calendar = Calendar.getInstance();
 
+            float left = 0;
             int color = ContextCompat.getColor(mContext, R.color.scale_paperclip);
+            //月份
+            int month = calendar.get(Calendar.MONTH) + 1;
+            Bitmap bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(month / 10), color, mScaleDate);
+            canvas.drawBitmap(bitmap, left, 0, null);
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(month % 10), color, mScaleDate);
+            canvas.drawBitmap(bitmap, left, 0, null);
+            left += bitmap.getWidth();
+            int offset = 0;
+            if (isChinese) {
+                bitmap = mBitmapManager.get(R.drawable.text_month, color, mScaleDate);
+            } else {
+                bitmap = mBitmapManager.get(R.drawable.sign_point, color, mScalePoint);
+                offset = DimenUtil.dip2px(mContext, 3);
+                left -= offset;
+            }
+            canvas.drawBitmap(bitmap, left, 0, null);
+            left += bitmap.getWidth();
+            left -= offset;
 
-            float offset = mPointScreenCenter.x + mTextOffset;
+            //号数
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(day / 10), color, mScaleDate);
+            canvas.drawBitmap(bitmap, left, 0, null);
+            left += bitmap.getWidth();
+            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(day % 10), color, mScaleDate);
+            canvas.drawBitmap(bitmap, left, 0, null);
+            left += bitmap.getWidth();
+            if (isChinese) {
+                bitmap = mBitmapManager.get(R.drawable.text_day, color, mScaleDate);
+                canvas.drawBitmap(bitmap, left, 0, null);
+                left += bitmap.getWidth();
+            }
 
-            float left = offset + mTextMarginLR;
-            Bitmap bitmap = mBitmapManager.get(R.drawable.text_day, color, scale);
-            float top = mPointScreenCenter.y + (mRadiusInner - bitmap.getHeight()) / 1.8f;
-            canvas.drawBitmap(bitmap, left, top, null);
+
+            left += mTextOffset;
 
             //星期
-            left += (bitmap.getWidth() + DimenUtil.dip2px(mContext, 4));
-            bitmap = mBitmapManager.get(R.drawable.text_week, color, scale);//星期
-            canvas.drawBitmap(bitmap, left, top, null);
-            left += bitmap.getWidth();
-            bitmap = mBitmapManager.get(mBitmapManager.getWeekResId(), color, scale);
-            canvas.drawBitmap(bitmap, left, top, null);
-
-            //号数
-            int units = day % 10;//个位
-            int tens = day / 10;//十位
-            left = offset;
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color, scale);
-            canvas.drawBitmap(bitmap, left -= bitmap.getWidth(), top, null);
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color, scale);
-            canvas.drawBitmap(bitmap, left -= bitmap.getWidth(), top, null);
-
-            //月份
-            bitmap = mBitmapManager.get(R.drawable.text_month, color, scale);
-            canvas.drawBitmap(bitmap, left -= (bitmap.getWidth() + mTextMarginLR), top, null);
-            units = month % 10;//个位
-            tens = month / 10;//十位
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color, scale);
-            canvas.drawBitmap(bitmap, left -= (bitmap.getWidth() + mTextMarginLR), top, null);
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color, scale);
-            canvas.drawBitmap(bitmap, left - bitmap.getWidth(), top, null);
-        }
-
-        private void paintEnDate(Canvas canvas) {
-            float scale = 0.5f;
-
-            Calendar instance = Calendar.getInstance();
-            int color = ContextCompat.getColor(mContext, R.color.scale_paperclip);
-
-            //号数
-            int day = instance.get(Calendar.DAY_OF_MONTH);
-            int units = day % 10;//个位
-            int tens = day / 10;//十位
-            float left = mPointScreenCenter.x;
-            Bitmap bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color, scale);
-            float top = mPointScreenCenter.y + (mRadiusInner - bitmap.getHeight()) / 1.8f;
-            canvas.drawBitmap(bitmap, left -= bitmap.getWidth(), top, null);
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color, scale);
-            canvas.drawBitmap(bitmap, left -= bitmap.getWidth(), top, null);
-
-            bitmap = mBitmapManager.get(R.drawable.sign_point, color);
-            float pointOffset = 1.0f * bitmap.getWidth() / 5;
-            canvas.drawBitmap(bitmap, left -= (bitmap.getWidth() - pointOffset), top, null);
-
-            //月份
-            int month = instance.get(Calendar.MONTH) + 1;
-            units = month % 10;//个位
-            tens = month / 10;//十位
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(units), color, scale);
-            canvas.drawBitmap(bitmap, left -= (bitmap.getWidth() - pointOffset), top, null);
-            bitmap = mBitmapManager.get(mBitmapManager.getNumberResId(tens), color, scale);
-            canvas.drawBitmap(bitmap, left - bitmap.getWidth(), top, null);
-
-            left = mPointScreenCenter.x + getResources().getDimension(R.dimen.number_width);
-            switch (instance.get(Calendar.DAY_OF_WEEK)) {
-                case 2:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_m, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_o, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    break;
-                case 3:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_t, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_u, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    break;
-                case 4:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_w, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_d, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    break;
-                case 5:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_t, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_h, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_u, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_r, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    break;
-                case 6:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_f, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_r, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_i, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    break;
-                case 7:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a, color);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_t, color);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    break;
-                default:
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_u, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
-                    left += bitmap.getWidth();
-                    bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color, scale);
-                    canvas.drawBitmap(bitmap, left, top, null);
+            if (isChinese) {
+                bitmap = mBitmapManager.get(R.drawable.text_week, color, mScaleDate);//星期
+                canvas.drawBitmap(bitmap, left, 0, null);
+                left += bitmap.getWidth();
+                bitmap = mBitmapManager.get(mBitmapManager.getWeekResId(), color, mScaleDate);
+                canvas.drawBitmap(bitmap, left, 0, null);
+            } else {
+                switch (calendar.get(Calendar.DAY_OF_WEEK)) {
+                    case 2:
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_m, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_o, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        break;
+                    case 3:
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_t, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_u, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        break;
+                    case 4:
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_w, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_e, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_d, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        break;
+                    case 5:
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_t, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_h, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_u, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_r, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        break;
+                    case 6:
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_f, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_r, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_i, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        break;
+                    case 7:
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_a, color);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_t, color);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        break;
+                    default:
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_s, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_u, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                        left += bitmap.getWidth();
+                        bitmap = mBitmapManager.get(R.drawable.alphabet_uppercase_n, color, mScaleDate);
+                        canvas.drawBitmap(bitmap, left, 0, null);
+                }
             }
+            left += bitmap.getWidth();
+            mPicture.endRecording();
+
+            cvs.save();
+            cvs.translate(mPointScreenCenter.x - left / 2, mPointScreenCenter.y + (mRadiusInner - bitmap.getHeight()) / 2);
+            cvs.drawPicture(mPicture);
+            cvs.restore();
         }
 
         private void paintPointer(Canvas canvas, float rateHour, float rateMinute, float rateSecond) {
             canvas.save();
             canvas.rotate(rateHour * 360, mPointScreenCenter.x, mPointScreenCenter.y);
+            int saveLayer = canvas.saveLayer(mRectFHour, null);
             canvas.drawRoundRect(mRectFHour, mHourPointerWidth, mHourPointerWidth, mPaintMinute);
-            canvas.drawRoundRect(mRectFHourInner, mHourPointerInnerWidth, mHourPointerInnerWidth, mPaintMinuteInner);
+            mPaintMinute.setXfermode(mXfermode);
+            canvas.drawRoundRect(mRectFHourInner, mHourPointerInnerWidth, mHourPointerInnerWidth, mPaintMinute);
+            mPaintMinute.setXfermode(null);
+            canvas.restoreToCount(saveLayer);
             canvas.restore();
 
             canvas.save();
             canvas.rotate(rateMinute * 360, mPointScreenCenter.x, mPointScreenCenter.y);
+            saveLayer = canvas.saveLayer(mRectFMinute, null);
             canvas.drawRoundRect(mRectFMinute, mMinutePointerWidth, mMinutePointerWidth, mPaintMinute);
-            canvas.drawRoundRect(mRectFMinuteInner, mMinutePointerInnerWidth, mMinutePointerInnerWidth, mPaintMinuteInner);
+            mPaintMinute.setXfermode(mXfermode);
+            canvas.drawRoundRect(mRectFMinuteInner, mMinutePointerInnerWidth, mMinutePointerInnerWidth, mPaintMinute);
+            mPaintMinute.setXfermode(null);
+            canvas.restoreToCount(saveLayer);
             canvas.restore();
 
             canvas.save();

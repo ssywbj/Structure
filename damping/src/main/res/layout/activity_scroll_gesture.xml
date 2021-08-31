@@ -72,8 +72,4 @@
         android:textAllCaps="false"
         android:textAppearance="@android:color/black"
         android:textSize="22sp" />
-
-    <com.suheng.damping.view.InfiniteLine2
-        android:layout_width="match_parent"
-        android:layout_height="80dp"/>
 </LinearLayout>
