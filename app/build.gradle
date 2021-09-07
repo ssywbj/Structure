@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.alibaba.arouter'//ARouter配置5(共5步)
+apply plugin: 'maven' //上传到maven仓库，步骤1（共2步）
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -97,4 +98,34 @@ import java.text.SimpleDateFormat
 
 static String getDate() {
     return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())
+}
+
+//上传到maven仓库，步骤2（共2步）
+//正式版：gradlew uploadArchives -PisReleaseVersion=true（手动配置gradle时，Arguments输入框填-PisReleaseVersion=true）
+//Alpha版：gradlew uploadArchives -PisReleaseVersion=false或gradlew uploadArchives（手动配置gradle时，Arguments输入框填-PisReleaseVersion=false或不填）
+uploadArchives {
+    repositories.mavenDeployer {
+        repository(url: "uploads.url") {
+            authentication(userName: "uploads.username", password: "uploads.password")
+            pom.groupId = "uploads.groupid"
+            if (project.getProperties().get("uploads.releaseVersion") == "true") {
+                pom.artifactId = "widgets"
+            } else {
+                pom.artifactId = "widgets-temp"
+            }
+            pom.version = android.defaultConfig.versionName
+        }
+    }
+}
+//https://www.jianshu.com/p/8018372d272c
+//https://fsilence.github.io/2017/04/26/gradle-maven/
+
+task tk1 {
+    println(project.getProperties().get("uploads.releaseVersion"))
+
+    if (project.getProperties().get("uploads.releaseVersion") == "true") {
+        println("widgets")
+    } else {
+        println("widgets-temp")
+    }
 }
