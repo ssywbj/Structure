@@ -31,10 +31,10 @@
         android:layout_margin="4dp"
         android:visibility="gone" />
 
-    <!--<com.suheng.structure.view.VectorView
+    <com.suheng.structure.view.VectorView
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:layout_marginTop="4dp" />-->
+        android:layout_marginTop="4dp" />
 
     <!--<com.suheng.structure.view.BezierView
         android:layout_width="match_parent"
@@ -46,9 +46,9 @@
         android:layout_height="180dp"
         android:visibility="gone" />-->
 
-    <com.suheng.structure.view.InfiniteLine2
+    <!--<com.suheng.structure.view.InfiniteLine2
         android:layout_width="match_parent"
-        android:layout_height="180dp" />
+        android:layout_height="180dp" />-->
 
     <TextView
         android:id="@+id/text_bold"
@@ -62,6 +62,21 @@
         android:text="粗体测试"
         android:textColor="@android:color/black"
         android:textSize="22sp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="PlayAnim"
+        android:onClick="onPlayAnim"
+        android:textAllCaps="false" />
+
+    <ImageView
+        android:id="@+id/image_svg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="4dp" />
 
     <!--<com.suheng.structure.view.InfiniteLine3
         android:layout_width="match_parent"

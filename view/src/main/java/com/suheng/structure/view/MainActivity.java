@@ -2,14 +2,26 @@ package com.suheng.structure.view;
 
 import android.app.Activity;
 import android.app.Application;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
+import com.suheng.structure.view.utils.XmlSaxParser;
+
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,6 +69,49 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });*/
+
+        ImageView imageView = findViewById(R.id.image_svg);
+
+        //mVectorDrawable = AnimatedVectorDrawableCompat.create(this, R.drawable.water_drop_anim);
+        //mVectorDrawable = AnimatedVectorDrawableCompat.create(this, R.drawable.search_anim);
+        mVectorDrawable = AnimatedVectorDrawableCompat.create(this, R.drawable.tt_search_anim);
+        if (mVectorDrawable != null) {
+            imageView.setImageDrawable(mVectorDrawable);
+            mVectorDrawable.registerAnimationCallback(new Animatable2Compat.AnimationCallback() {
+                @Override
+                public void onAnimationStart(Drawable drawable) {
+                    super.onAnimationStart(drawable);
+                    Log.d("Wbj", "-----svg anim start-----");
+                }
+
+                @Override
+                public void onAnimationEnd(Drawable drawable) {
+                    super.onAnimationEnd(drawable);
+                    Log.d("Wbj", "-----svg anim end-----");
+                }
+            });
+
+            //mVectorDrawable.start();
+        }
+
+    }
+
+    private AnimatedVectorDrawableCompat mVectorDrawable;
+
+    public void onPlayAnim(View view) {
+        if (mVectorDrawable == null || mVectorDrawable.isRunning()) {
+            return;
+        }
+        mVectorDrawable.start();
+
+        XmlSaxParser saxParser = new XmlSaxParser();
+        try {
+            saxParser.getChannelList(this, R.raw.xml_temp);
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            e.printStackTrace();
+        }
+
+        saxParser.getChannelList(this);
     }
 
     @Override

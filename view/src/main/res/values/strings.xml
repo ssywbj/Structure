@@ -16,4 +16,15 @@
     <string name="oct">Oct</string>
     <string name="nov">Nov</string>
     <string name="dec">Dec</string>
+
+    <integer name="svg_anim_duration">1000</integer>
+    <string name="w_drop_path_1" translatable="false">w_drop_path</string>
+    <string name="w_drop_path_2" translatable="false">w_drop_path_2</string>
+    <string name="w_drop_path_3" translatable="false">w_drop_path_3</string>
+    <string name="search_path_1" translatable="false">search_path</string>
+    <string name="search_path_2" translatable="false">search_path_2</string>
+    <string name="search_path_3" translatable="false">search_path_3</string>
+    <string name="tt_search_path_1" translatable="false">tt_search_path</string>
+    <string name="tt_search_path_2" translatable="false">tt_search_path_2</string>
+    <string name="tt_search_path_3" translatable="false">tt_search_path_3</string>
 </resources>

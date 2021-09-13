@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/search">
+
+    <target
+        android:name="@string/search_path_1"
+        android:animation="@animator/anim_start" />
+
+    <target
+        android:name="@string/search_path_2"
+        android:animation="@animator/anim_start" />
+
+    <target
+        android:name="@string/search_path_3"
+        android:animation="@animator/anim_start" />
+</animated-vector>
+
