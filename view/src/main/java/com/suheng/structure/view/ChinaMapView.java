@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
@@ -67,27 +66,26 @@ public class ChinaMapView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        //测量模式
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        if (mRectF.height() == 0 || mRectF.width() == 0) {
+            return;
+        }
 
         //测量大小
         mWidthSize = MeasureSpec.getSize(widthMeasureSpec);
         mHeightSize = MeasureSpec.getSize(heightMeasureSpec);
         Log.i(TAG, "widthSize: " + mWidthSize + ", heightSize: " + mHeightSize);
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        Log.i(TAG, "width: " + displayMetrics.widthPixels + ", height: " + displayMetrics.heightPixels);
 
-        if (!mRectF.isEmpty() && mRectF.height() != 0f && mRectF.width() != 0f) {
-            //拿来到显示比例
-            mScaleHeight = mHeightSize / mRectF.height();
-            mScaleWidth = mWidthSize / mRectF.width();
-        }
+        //拿来到显示比例
+        mScaleHeight = mHeightSize / mRectF.height();
+        mScaleWidth = mWidthSize / mRectF.width();
 
+        //测量模式
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         //xml文件中宽高wrap_content
         if (widthMode == MeasureSpec.AT_MOST || heightMode == MeasureSpec.AT_MOST) {
             //如果是横屏宽保留最大，高需要适配
-            if (mWidthSize < mHeightSize && mRectF.height() != 0f) {
+            if (mWidthSize < mHeightSize) {
                 setMeasuredDimension(mWidthSize, (int) (mRectF.height() * mScaleWidth));
             } else {
                 setMeasuredDimension(mWidthSize, mHeightSize);
