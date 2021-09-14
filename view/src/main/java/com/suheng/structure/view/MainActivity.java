@@ -16,12 +16,7 @@ import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
 import com.suheng.structure.view.utils.XmlSaxParser;
 
-import org.xml.sax.SAXException;
-
-import java.io.IOException;
 import java.lang.ref.WeakReference;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -106,12 +101,12 @@ public class MainActivity extends AppCompatActivity {
 
         XmlSaxParser saxParser = new XmlSaxParser();
         try {
-            saxParser.getChannelList(this, R.raw.xml_temp);
-        } catch (ParserConfigurationException | IOException | SAXException e) {
+            //saxParser.getChannelList(this, R.raw.xml_temp);
+            saxParser.getChannelList(this);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        saxParser.getChannelList(this);
     }
 
     @Override

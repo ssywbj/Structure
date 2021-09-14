@@ -90,13 +90,14 @@ public class XmlSaxParser extends DefaultHandler {
         xmlReader.parse(inputSource);
     }
 
-    public void getChannelList(Context context){
+    public void getChannelList(Context context) {
         XmlResourceParser parser = context.getResources().getXml(R.xml.xml_temp);
         try {
             while (parser.getEventType() != XmlPullParser.END_DOCUMENT) {
                 if (parser.getEventType() == XmlPullParser.START_TAG) {
-                    String tagName = parser.getName();// 获取标签的名字
-                    if (tagName.equals("item")) {
+                    String tagName = parser.getName(); //获取标签的名字
+                    Log.d(TAG, "tagName: " + tagName + ", " + parser.getColumnNumber() + ", " + parser.getAttributeCount());
+                    if ("item".equals(tagName)) {
                         String id = parser.getAttributeValue(null, "id"); //通过属性名来获取属性值
                         String url = parser.getAttributeValue(1); //通过属性索引来获取属性值
                         String name = parser.nextText(); //通过属性索引来获取属性值
@@ -104,11 +105,10 @@ public class XmlSaxParser extends DefaultHandler {
                     }
                 }
 
-                parser.next();// 获取解析下一个事件
+                parser.next(); //获取解析下一个事件
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }
