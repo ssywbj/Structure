@@ -72,6 +72,12 @@ public class InfiniteLine2 extends View {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        mWidth = getMeasuredWidth();
+    }
+
+    @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.d("Wbj", "onConfigurationChanged: " + newConfig);
@@ -195,7 +201,10 @@ public class InfiniteLine2 extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        mWidth = getMeasuredWidth();
+        if (mWidth <= 0) {
+            return;
+        }
+
         drawText(canvas, (mIndex - 1) * mWidth, mIndex - 1);
         drawText(canvas, mIndex * mWidth, mIndex);
         drawText(canvas, (mIndex + 1) * mWidth, mIndex + 1);

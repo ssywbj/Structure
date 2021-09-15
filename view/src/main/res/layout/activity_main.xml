@@ -36,10 +36,10 @@
         android:layout_height="250dp"
         android:layout_marginTop="4dp" />-->
 
-    <com.suheng.structure.view.ChinaMapView
+    <!--<com.suheng.structure.view.ChinaMapView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="4dp" />-->
 
     <!--<com.suheng.structure.view.BezierView
         android:layout_width="match_parent"
@@ -54,6 +54,10 @@
     <!--<com.suheng.structure.view.InfiniteLine2
         android:layout_width="match_parent"
         android:layout_height="180dp" />-->
+
+    <com.suheng.structure.view.ScrollerTrackerView
+        android:layout_width="match_parent"
+        android:layout_height="180dp" />
 
     <TextView
         android:id="@+id/text_bold"
