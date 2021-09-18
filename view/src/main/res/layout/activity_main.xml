@@ -55,9 +55,13 @@
         android:layout_width="match_parent"
         android:layout_height="180dp" />-->
 
-    <com.suheng.structure.view.ScrollerTrackerView
+    <!--<com.suheng.structure.view.ScrollerTrackerView
         android:layout_width="match_parent"
-        android:layout_height="180dp" />
+        android:layout_height="180dp" />-->
+
+    <com.suheng.structure.view.LetterSelectorLayout
+        android:layout_width="match_parent"
+        android:layout_height="360dp" />
 
     <TextView
         android:id="@+id/text_bold"
