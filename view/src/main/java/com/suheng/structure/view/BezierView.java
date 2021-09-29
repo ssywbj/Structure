@@ -71,19 +71,34 @@ public class BezierView extends View {
         super.onDraw(canvas);
         canvas.drawColor(ContextCompat.getColor(getContext(), android.R.color.holo_blue_light));
 
-        //连接线
-        mPointPath.moveTo(mStartPoint.x, mStartPoint.y);
-        mPointPath.lineTo(mControlPoint.x, mControlPoint.y);
-        mPointPath.lineTo(mEndPoint.x, mEndPoint.y);
-        //绘制起始点、控制点、终点的连线
+        //两条相交直线
+        mPointPath.moveTo(mStartPoint.x, mStartPoint.y); //起始点
+        mPointPath.lineTo(mControlPoint.x, mControlPoint.y); //控制点
+        mPointPath.lineTo(mEndPoint.x, mEndPoint.y); //终点
         mPaint.setColor(Color.BLUE);
         canvas.drawPath(mPointPath, mPaint);
 
-        //贝塞尔
-        mBezierPath.moveTo(mStartPoint.x, mStartPoint.y);
-        mBezierPath.quadTo(mControlPoint.x, mControlPoint.y, mEndPoint.x, mEndPoint.y);//两点坐标
-        //mBezierPath.rQuadTo(200, 300, 400, -200);//两点距离起始点的距离
-        //绘制贝塞尔
+        //二阶贝塞尔曲线
+        mBezierPath.moveTo(mStartPoint.x, mStartPoint.y); //起始点
+        mBezierPath.quadTo(mControlPoint.x, mControlPoint.y, mEndPoint.x, mEndPoint.y);//传入控制点和终点
+        //加一根二阶贝塞尔曲线：rQuadTo, 控制点(dx1, dy1)和终点(dx2, dy2)距离上一个终点的距离，以下等价于quadTo(200, 400, 400, 200)，
+        //即(200+0, 300+100, 200+200, 300-100)。
+        mBezierPath.rQuadTo(0, 100, 200, -100);
+        mPaint.setColor(Color.RED);
+        canvas.drawPath(mBezierPath, mPaint);
+
+        //三条相交直线
+        mPointPath.moveTo(400, 200); //起始点
+        mPointPath.lineTo(500, 50); //控制点
+        mPointPath.lineTo(600, 50); //控制点
+        mPointPath.lineTo(700, 350); //终点
+        mPaint.setColor(Color.BLUE);
+        canvas.drawPath(mPointPath, mPaint);
+
+        //三阶贝塞尔曲线
+        mBezierPath.moveTo(400, 200); //起始点
+        //mBezierPath.cubicTo(500, 50, 600, 50, 700, 350);//传入两控制点和终点，等价于rCubicTo(100, -150, 200, -150, 300, 150)
+        mBezierPath.rCubicTo(500 - 400, 50 - 200, 600 - 400, 50 - 200, 700 - 400, 350 - 200);
         mPaint.setColor(Color.RED);
         canvas.drawPath(mBezierPath, mPaint);
     }
