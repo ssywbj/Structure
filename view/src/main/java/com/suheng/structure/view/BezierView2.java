@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class BezierView2 extends View {
@@ -68,22 +69,31 @@ public class BezierView2 extends View {
         int waveHeight = 100;
 
         mPath.moveTo(-mOffsetX, getHeight() / 2f); //左移
+        //mPath.moveTo(-mWaveWidth + mOffsetX, getHeight() / 2f); //右移
         for (int i = -mWaveWidth; i < mWaveWidth + getWidth(); i += mWaveWidth) { //控制波浪的数量，至少两个，用于周期显示
             mPath.rQuadTo(mHalfWaveWidth / 2f, -waveHeight, mHalfWaveWidth, 0);
             mPath.rQuadTo(mHalfWaveWidth / 2f, waveHeight, mHalfWaveWidth, 0);
         }
-
-        /*mPath.moveTo(-mWaveWidth + mOffsetX, getHeight() / 2f); //右移
-        for (int i = -mWaveWidth; i < mWaveWidth + getWidth(); i += mWaveWidth) { //控制波浪的数量，至少两个，用于周期显示
-            mPath.rQuadTo(mHalfWaveWidth / 2f, -waveHeight, mHalfWaveWidth, 0);
-            mPath.rQuadTo(mHalfWaveWidth / 2f, waveHeight, mHalfWaveWidth, 0);
-        }*/
 
         mPath.lineTo(getWidth(), getHeight());
         mPath.lineTo(0, getHeight());
         mPath.close();
 
         canvas.drawPath(mPath, mPaint);
+    }
+
+    @Override
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        if (visibility == VISIBLE) {
+            if (mAnimator.isPaused()) {
+                mAnimator.resume();
+            }
+        } else {
+            if (mAnimator.isRunning()) {
+                mAnimator.pause();
+            }
+        }
     }
 
     @Override
