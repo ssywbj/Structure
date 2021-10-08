@@ -7,42 +7,43 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class BezierView2 extends View {
+public class BezierView3 extends View {
     private Paint mPaint;
     private Path mPath;
-    private  int mWaveWidth = 600, mWaveHeight = 100;
-    private  int mHalfWaveWidth;
+    private int mWaveWidth = 600, mWaveHeight = 50;
+    private int mHalfWaveWidth;
 
     private ValueAnimator mAnimator;
     private int mOffsetX;
+    private String mText;
 
-    public BezierView2(Context context) {
+    public BezierView3(Context context) {
         this(context, null);
     }
 
-    public BezierView2(Context context, @Nullable AttributeSet attrs) {
+    public BezierView3(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public BezierView2(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public BezierView3(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
 
     private void init() {
-        setBackgroundColor(Color.RED);
+        //setBackgroundColor(Color.RED);
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        mPaint.setColor(Color.BLUE);
-        mPaint.setAlpha(128);
         mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setStrokeWidth(5);
+        mPaint.setTextAlign(Paint.Align.CENTER);
+        mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 60, getResources().getDisplayMetrics()));
 
         mPath = new Path();
 
@@ -58,19 +59,33 @@ public class BezierView2 extends View {
         });
 
         mAnimator.setInterpolator(new LinearInterpolator());
-        mAnimator.setDuration(1500);
+        mAnimator.setDuration(1000);
         mAnimator.setRepeatCount(ValueAnimator.INFINITE);
         mAnimator.start();
+
+        mText = "贴";
+        mTextCentreY = (int) ((mPaint.descent() + mPaint.ascent()) / 2f);
     }
 
-    //https://www.jianshu.com/p/12fcc3fedbbc
+    private int mCentreX, mCentreY, mTextCentreY;
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mCentreX = w / 2;
+        mCentreY = h / 2;
+    }
+
+    //https://www.jianshu.com/p/c8e70e045133
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        mPath.reset();
+        mPaint.setColor(Color.BLUE);
+        canvas.drawText(mText, mCentreX, mCentreY - mTextCentreY, mPaint);
 
-        mPath.moveTo(-mOffsetX, getHeight() / 2f); //左移
-        //mPath.moveTo(-mWaveWidth + mOffsetX, getHeight() / 2f); //右移
+        mPath.reset();
+        mPath.moveTo(-mOffsetX, mCentreY); //左移
+        //mPath.moveTo(-mWaveWidth + mOffsetX, mTextCentreY); //右移
         for (int i = -mWaveWidth; i < mWaveWidth + getWidth(); i += mWaveWidth) { //控制波浪的数量，至少两个，用于周期显示
             mPath.rQuadTo(mHalfWaveWidth / 2f, -mWaveHeight, mHalfWaveWidth, 0);
             mPath.rQuadTo(mHalfWaveWidth / 2f, mWaveHeight, mHalfWaveWidth, 0);
@@ -80,7 +95,11 @@ public class BezierView2 extends View {
         mPath.lineTo(0, getHeight());
         mPath.close();
 
-        canvas.drawPath(mPath, mPaint);
+        canvas.clipPath(mPath);
+        canvas.drawCircle(mCentreX, mCentreY, mCentreY, mPaint);
+
+        mPaint.setColor(Color.WHITE);
+        canvas.drawText(mText, mCentreX, mCentreY - mTextCentreY, mPaint);
     }
 
     @Override
