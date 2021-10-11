@@ -123,10 +123,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />-->
 
-    <!--<com.suheng.structure.view.PorterDuffView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />-->
-
     <!--<com.suheng.structure.view.TimeDemoView
         android:layout_width="match_parent"
         android:layout_height="match_parent" />-->
