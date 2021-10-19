@@ -141,6 +141,7 @@ public class BezierView1 extends View {
         for (PointF point : mPointList2) {
             canvas.drawPoint(point.x, point.y, mPaint);
         }
+
     }
 
     public static float[] bezierPoint(float ratio, float x1, float y1, float x2, float y2) {

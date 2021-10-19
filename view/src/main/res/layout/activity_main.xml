@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="180dp" />
 
-    <com.suheng.structure.view.BezierView1
+    <com.suheng.structure.view.BezierView11
         android:layout_width="match_parent"
         android:layout_height="180dp" />
 
