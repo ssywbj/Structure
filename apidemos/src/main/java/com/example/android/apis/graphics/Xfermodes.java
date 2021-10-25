@@ -73,7 +73,7 @@ public class Xfermodes extends GraphicsActivity {
 
         private static final Xfermode[] sModes = {
                 new PorterDuffXfermode(PorterDuff.Mode.CLEAR),
-                new PorterDuffXfermode(PorterDuff.Mode.SRC), //显示源图
+                new PorterDuffXfermode(PorterDuff.Mode.SRC), //只绘制源图像
                 new PorterDuffXfermode(PorterDuff.Mode.DST), //只绘制目标图像
                 new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER), //在目标图像的上方绘制源图像
                 new PorterDuffXfermode(PorterDuff.Mode.DST_OVER), //在源图像的上方绘制目标图像

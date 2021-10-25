@@ -17,7 +17,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-public class GuaguakaView2 extends View {
+public class GuaguakaView1 extends View {
     private Bitmap mBitmapResult, mBitmapOver, mBitmapDst;
 
     private Canvas mCanvasDst; //透明画布
@@ -28,15 +28,15 @@ public class GuaguakaView2 extends View {
 
     private final RectF mRectF = new RectF();
 
-    public GuaguakaView2(Context context) {
+    public GuaguakaView1(Context context) {
         this(context, null);
     }
 
-    public GuaguakaView2(Context context, @Nullable AttributeSet attrs) {
+    public GuaguakaView1(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public GuaguakaView2(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public GuaguakaView1(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.init();
     }
@@ -46,10 +46,9 @@ public class GuaguakaView2 extends View {
         mBitmapOver = BitmapFactory.decodeResource(getResources(), R.mipmap.guaguaka_over);
 
         mPaintDst.setDither(true);
-        mPaintDst.setStrokeCap(Paint.Cap.ROUND);
-        mPaintDst.setStrokeJoin(Paint.Join.ROUND);
         mPaintDst.setStyle(Paint.Style.STROKE);
         mPaintDst.setStrokeWidth(40);
+        mPaintDst.setStrokeCap(Paint.Cap.ROUND);
 
         mPaint.setDither(true);
     }
@@ -96,19 +95,20 @@ public class GuaguakaView2 extends View {
                 mY = y;
                 return true;
             case MotionEvent.ACTION_MOVE:
+                //mPathDst.lineTo(x, y);
+                //invalidate();
+
                 float dx = Math.abs(x - mX);
                 float dy = Math.abs(y - mY);
                 if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-                    mPathDst.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2); //用贝塞尔曲线连接，让各线段平滑连接
+                    mPathDst.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2); //用贝塞尔曲线连接，解决线段的连接处不顺滑问题
                     mX = x;
                     mY = y;
-
                     invalidate();
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 mPathDst.lineTo(mX, mY);
-                mCanvasDst.drawPath(mPathDst, mPaintDst); //把刮卡过程保存在另一块透明的画布上
                 mPathDst.reset();
 
                 invalidate();
@@ -118,24 +118,22 @@ public class GuaguakaView2 extends View {
         return super.onTouchEvent(event);
     }
 
-    @Override
+    /*@Override
     public boolean performClick() {
         return super.performClick();
-    }
+    }*/
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        //此画布从下到上有三层：中奖结果、刮卡过程、彩票封面，其中刮卡过程和彩票封面设置图像相交模式为PorterDuff.Mode.SRC_OUT：只在源图像和目标图像不相交的地方绘制源图像
         canvas.drawBitmap(mBitmapResult, null, mRectF, null);
 
         int saveLayer = canvas.saveLayer(mRectF, null);
-        canvas.drawPath(mPathDst, mPaintDst); //显示刮卡过程，为目标图像
-        canvas.drawBitmap(mBitmapDst, null, mRectF, null); //因为ACTION_UP的时候Path被reset，会导致刮卡过程被重置，因此需要把刮卡过程不断地定格到画布上
-        //onTouchEvent为ACTION_UP的时候先把刮卡过程保存在另一块透明的画布上，onDraw的时候再把透明的画布所依托的Bitmap绘制上，这样会大大减少图像锯齿问题（可和GuaguakaView1对比）
+        mCanvasDst.drawPath(mPathDst, mPaintDst);
+        canvas.drawBitmap(mBitmapDst, null, mRectF, null);
 
         mPaint.setXfermode(mXfermode);
-        canvas.drawBitmap(mBitmapOver, null, mRectF, mPaint); //彩票封面为源图像
+        canvas.drawBitmap(mBitmapOver, null, mRectF, mPaint);
         mPaint.setXfermode(null);
         canvas.restoreToCount(saveLayer);
     }
