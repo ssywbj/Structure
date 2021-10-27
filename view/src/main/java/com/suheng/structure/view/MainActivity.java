@@ -2,16 +2,13 @@ package com.suheng.structure.view;
 
 import android.app.Activity;
 import android.app.Application;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
 import com.suheng.structure.view.utils.XmlSaxParser;
@@ -23,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_view_group);
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();
@@ -65,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });*/
 
-        ImageView imageView = findViewById(R.id.image_svg);
+        /*ImageView imageView = findViewById(R.id.image_svg);
 
         //mVectorDrawable = AnimatedVectorDrawableCompat.create(this, R.drawable.water_drop_anim);
         //mVectorDrawable = AnimatedVectorDrawableCompat.create(this, R.drawable.search_anim);
@@ -87,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
             //mVectorDrawable.start();
-        }
+        }*/
 
     }
 
