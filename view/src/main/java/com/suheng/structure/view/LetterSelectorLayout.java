@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.SystemClock;
 import android.util.ArrayMap;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -22,7 +21,7 @@ import java.util.Map;
 public class LetterSelectorLayout extends FrameLayout {
     private static final String TAG = LetterSelectorLayout.class.getSimpleName();
     private Paint mPaint;
-    private String[] mLetters = {"A", "B", "C", "D", "E", "F", "G"};
+    private final String[] mLetters = {"A", "B", "C", "D", "E", "F", "G"};
     private float mMargin;
 
     public LetterSelectorLayout(Context context) {
@@ -45,23 +44,22 @@ public class LetterSelectorLayout extends FrameLayout {
         mPaint.setColor(Color.BLACK);
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16, metrics));
-        mMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 18, metrics);
+        mMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 28, metrics);
         mPaint.setTextAlign(Paint.Align.CENTER);
-
-        mOffsetX = 20;
-        mOffsetY = 50;
     }
 
     private final ArrayMap<RectF, String> mArrayMap = new ArrayMap<>();
-    private int mOffsetX, mOffsetY;
+    private final RectF mRectFTotal = new RectF();
 
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
+        mArrayMap.clear();
 
         final String text = mLetters[0];
         Rect rect = new Rect();
         mPaint.getTextBounds(text, 0, text.length(), rect);
+
         RectF rectF = new RectF();
         rectF.left = mMargin;
         rectF.top = mMargin;
@@ -71,9 +69,8 @@ public class LetterSelectorLayout extends FrameLayout {
         Log.d(TAG, "draw: " + rect.toShortString() + ", " + rect.width() + "---" + rect.height() + "\n"
                 + rectF.toShortString() + ", " + rectF.width() + "---" + height + ", " + rectF.centerX() + "---" + rectF.centerY());
 
+        mRectFTotal.set(rectF);
 
-        canvas.save();
-        canvas.translate(mOffsetX, mOffsetY);
         final int cor = 255 / mLetters.length;
         for (int i = 0; i < mLetters.length; i++) {
             mPaint.setColor(Color.rgb(cor * i, cor * i, cor * i));
@@ -84,36 +81,41 @@ public class LetterSelectorLayout extends FrameLayout {
             //canvas.drawText("A", rectF.centerX(), rectF.bottom, mPaint);
 
             mArrayMap.put(new RectF(rectF.left, rectF.top, rectF.right, rectF.bottom), mLetters[i]);
+            Log.d(TAG, "draw+++++: " + rectF.bottom);
 
             rectF.top = rectF.bottom;
             rectF.bottom += height;
         }
-        canvas.restore();
 
+        mRectFTotal.bottom = rectF.top;
+        Log.d(TAG, "draw------: " + mRectFTotal.bottom + ", " + mArrayMap.size());
     }
 
     private String mSelectedLetter;
-    private boolean mIsMove;
-    private long mMoveTime;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float eventX = event.getX();
-        float eventY = event.getY();
+        float x = event.getX();
+        float y = event.getY();
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                mIsMove = false;
+                Log.d(TAG, "ACTION_DOWN, ACTION_DOWN, ACTION_DOWN");
+                if (!mRectFTotal.contains(x, y)) {
+                    return false;
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
-                mMoveTime = SystemClock.uptimeMillis();
+                if (!mRectFTotal.contains(x, y)) {
+                    return true;
+                }
+                Log.i(TAG, "ACTION_MOVE, ACTION_MOVE, ACTION_MOVE");
 
-                mIsMove = true;
                 for (Map.Entry<RectF, String> entry : mArrayMap.entrySet()) {
-                    if (entry.getKey().contains(eventX - mOffsetX, eventY - mOffsetY)) {
+                    if (entry.getKey().contains(x, y)) {
                         String value = entry.getValue();
                         if (value.equals(mSelectedLetter)) {
-
+                            return true;
                         } else {
                             mSelectedLetter = value;
                             Log.d(TAG, "move: selectedLetter-" + mSelectedLetter);
@@ -123,18 +125,12 @@ public class LetterSelectorLayout extends FrameLayout {
                 break;
             case MotionEvent.ACTION_UP:
                 Log.v(TAG, "ACTION_UP, ACTION_UP, ACTION_UP");
-                if (mIsMove) {
-                    mIsMove = false;
-                    break;
-                }
-
                 for (Map.Entry<RectF, String> entry : mArrayMap.entrySet()) {
-                    if (entry.getKey().contains(eventX - mOffsetX, eventY - mOffsetY)) {
+                    if (entry.getKey().contains(x, y)) {
                         Log.v(TAG, "click: selectedLetter-" + entry.getValue());
                         break;
                     }
                 }
-
                 break;
         }
 

@@ -7,15 +7,15 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class CustomLayout extends ViewGroup {
-    public static final String TAG = CustomLayout.class.getSimpleName();
+public class SlideMenuLayout extends ViewGroup {
+    public static final String TAG = SlideMenuLayout.class.getSimpleName();
     private TextView mTextLeft, mTextRight;
 
-    public CustomLayout(Context context) {
+    public SlideMenuLayout(Context context) {
         super(context);
     }
 
-    public CustomLayout(Context context, AttributeSet attrs) {
+    public SlideMenuLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         Log.d(TAG, "OSSwipeMenuLayout(Context context, AttributeSet attrs)");
     }
