@@ -56,9 +56,9 @@ public class DateTimePicker extends LinearLayout {
     public void init(String format) {
         mFormat = format;
         if (WheelView.isRtl()) {
-            LayoutInflater.from(mContext).inflate(R.layout.os_picker_date_layout_rtl, this, true);
+            LayoutInflater.from(mContext).inflate(R.layout.picker_date_layout_rtl, this, true);
         } else {
-            LayoutInflater.from(mContext).inflate(R.layout.os_picker_date_layout, this, true);
+            LayoutInflater.from(mContext).inflate(R.layout.picker_date_layout, this, true);
         }
 
         initAndSetMargins();
