@@ -51,3 +51,9 @@ rm ${apk_dir}/signed.apk ${apk_dir}/temp.apk
 
 adb install -r -t ${apk_dir}/"${project_name}".apk
 
+#反编译出apk资源，d：反编译apk文件，-s：不反编译dex文件，-f：如果目标文件夹存在，则删除后重新反编译
+#java -jar apktool.jar d -s -f /e/Workspace/Android/Structure/HelloEffects/apk/HelloEffects.apk
+#重新打包成apk，b：build，HelloEffects：刚反编译出的文件所在的目录，-o：指定新的文件名称，这里指定为newtest.apk
+#java -jar apktool.jar b HelloEffects -o newtest.apk
+#对新的Apk进行签名后才能安装使用，-keystore：指定签名文件——zhipu-keystore.jks，-storepass：签名文件密码——Zhipu@520，-keypass：签名密钥——Zhipu@520_，modules_apply密钥别名
+#jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore zhipu-keystore.jks -storepass Zhipu@520  -keypass Zhipu@520_ newtest.apk modules_apply
