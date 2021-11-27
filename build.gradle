@@ -4,10 +4,11 @@ apply from: "config.gradle"//若要引用config.gradle文件里的变量，还�
 buildscript {
     repositories {
         google()
-        jcenter()
+        //jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.android.tools.build:gradle:7.0.3'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -18,7 +19,21 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+
+        //https://stackoverflow.com/questions/66400264/jcenter-is-at-end-of-life-android-lint-warning-what-is-the-replacement
+        //https://jeroenmols.com/blog/2021/02/04/migratingjcenter/，依然依赖jcenter的库
+        jcenter() {
+            content {
+                includeModule("com.alibaba", "arouter-compiler")
+                includeModule("com.alibaba", "arouter-api")
+                includeModule("com.alibaba", "arouter-annotation")
+
+                includeModule("com.github.hotchemi", "permissionsdispatcher")
+                includeModule("com.github.hotchemi", "permissionsdispatcher-processor")
+            }
+        }
+
     }
 }
 

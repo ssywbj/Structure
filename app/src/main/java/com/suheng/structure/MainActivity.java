@@ -30,6 +30,7 @@ public class MainActivity extends BasicActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //https://www.jianshu.com/p/1ec4ab9f53d9
         ARouter.getInstance().inject(this);
         EventBus.getDefault().register(this);
 
