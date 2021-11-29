@@ -6,7 +6,7 @@
     android:background="@android:color/holo_red_dark"
     android:paddingTop="2dp"
     android:paddingBottom="4dp"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"

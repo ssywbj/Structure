@@ -1,12 +1,12 @@
-package com.suheng.structure.view.opengl;
+package com.suheng.structure.view.activity;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.suheng.structure.view.opengl.MyGLRenderer;
 
 public class OpenGLActivity extends AppCompatActivity {
 

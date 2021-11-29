@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/view_main_recycler_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:layout_height="wrap_content" />
 
     <!--<com.suheng.structure.view.Hexagon4ProgressBar
         android:layout_width="match_parent"
@@ -23,13 +20,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />-->
 
-    <ImageView
+    <!--<ImageView
         android:id="@+id/view_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_margin="4dp"
-        android:visibility="gone" />
+        android:visibility="gone" />-->
 
     <!--<com.suheng.structure.view.VectorView
         android:layout_width="match_parent"
@@ -41,13 +38,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp" />-->
 
-   <!-- <com.suheng.structure.view.BezierView
-        android:layout_width="match_parent"
-        android:layout_height="180dp" />
+    <!-- <com.suheng.structure.view.BezierView
+         android:layout_width="match_parent"
+         android:layout_height="180dp" />
 
-    <com.suheng.structure.view.BezierView11
-        android:layout_width="match_parent"
-        android:layout_height="180dp" />-->
+     <com.suheng.structure.view.BezierView11
+         android:layout_width="match_parent"
+         android:layout_height="180dp" />-->
 
     <!--<com.suheng.structure.view.BezierView2
         android:layout_width="match_parent"
@@ -79,11 +76,11 @@
         android:layout_width="match_parent"
         android:layout_height="180dp" />-->
 
-    <com.suheng.structure.view.LetterSelectorLayout
+    <!--<com.suheng.structure.view.LetterSelectorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" />-->
 
-    <TextView
+    <!--<TextView
         android:id="@+id/text_bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -94,23 +91,23 @@
         android:ellipsize="middle"
         android:text="粗体测试"
         android:textColor="@android:color/black"
-        android:textSize="22sp" />
+        android:textSize="22sp" />-->
 
-    <Button
+    <!--<Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="PlayAnim"
         android:onClick="onPlayAnim"
-        android:textAllCaps="false" />
+        android:textAllCaps="false" />-->
 
-    <ImageView
+    <!--<ImageView
         android:id="@+id/image_svg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_margin="4dp"
-        android:visibility="gone"/>
+        android:visibility="gone"/>-->
 
     <!--<com.suheng.structure.view.InfiniteLine3
         android:layout_width="match_parent"
@@ -159,4 +156,3 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"/>-->
-</LinearLayout>

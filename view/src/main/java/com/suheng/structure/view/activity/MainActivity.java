@@ -1,26 +1,56 @@
-package com.suheng.structure.view;
+package com.suheng.structure.view.activity;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
+import com.suheng.structure.view.R;
 import com.suheng.structure.view.utils.XmlSaxParser;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String ATY_PKG_PREFIX = "com.suheng.structure.view.activity.";
+    private static final ArrayMap<String, String> sArrayMap = new ArrayMap<>();
+
+    static {
+        sArrayMap.put("LetterSelect", ATY_PKG_PREFIX + "LetterSelectActivity");
+        sArrayMap.put("RecyclerView", ATY_PKG_PREFIX + "RecyclerViewActivity");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        RecyclerView recyclerView = findViewById(R.id.view_main_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());//设置Item增加、移除动画
+        List<String> arrayList = new ArrayList<>();
+        for (Map.Entry<String, String> stringEntry : sArrayMap.entrySet()) {
+            arrayList.add(stringEntry.getKey());
+        }
+        ContentAdapter adapter = new ContentAdapter(arrayList);
+        recyclerView.setAdapter(adapter);
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();
@@ -88,6 +118,65 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Log.isLoggable("wbj_maine", Log.INFO)) {
+            Log.i("wbj_maine", "INFO-, INFO-, INFO-");
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sArrayMap.clear();
+    }
+
+    private final class ContentAdapter extends RecyclerView.Adapter<ContentHolder> {
+
+        private final List<String> mDataList;
+
+        public ContentAdapter(List<String> dataList) {
+            mDataList = dataList;
+        }
+
+        @Override
+        public ContentHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new ContentHolder(View.inflate(parent.getContext(), R.layout.activity_main_adt, null));
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ContentHolder holder, int position) {
+            String item = mDataList.get(position);
+            holder.textName.setText(item);
+            if (position % 2 == 0) {
+                holder.itemView.setBackgroundColor(Color.parseColor("#CCCCCC"));
+            } else {
+                holder.itemView.setBackgroundColor(Color.parseColor("#AAAAAA"));
+            }
+
+            holder.textName.setOnClickListener(v -> {
+                Intent intent = new Intent();
+                intent.setClassName(getPackageName(), sArrayMap.get(item));
+                startActivity(intent);
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return mDataList == null ? 0 : mDataList.size();
+        }
+    }
+
+    private final static class ContentHolder extends RecyclerView.ViewHolder {
+        TextView textName;
+
+        ContentHolder(View view) {
+            super(view);
+            textName = view.findViewById(R.id.view_main_rvt_title);
+        }
+    }
+
     private AnimatedVectorDrawableCompat mVectorDrawable;
 
     public void onPlayAnim(View view) {
@@ -104,14 +193,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Log.isLoggable("wbj_maine", Log.INFO)) {
-            Log.i("wbj_maine", "INFO-, INFO-, INFO-");
-        }
     }
 
     private static WeakReference<Activity> mCurrentActivity;
