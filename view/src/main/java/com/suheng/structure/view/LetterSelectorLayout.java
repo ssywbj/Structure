@@ -20,19 +20,23 @@ import android.widget.FrameLayout;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LetterSelectorLayout extends FrameLayout {
     private static final String TAG = LetterSelectorLayout.class.getSimpleName();
     private static final String[] LETTERS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"
-            , "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+            , "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"/**/};
     private float mMarginTop, mMarginRight, mPadding, mBubbleOffsetX;
     private final ArrayMap<String, RectF> mArrayMap = new ArrayMap<>();
+    private final ArrayMap<RectF, String> mArrayMap2 = new ArrayMap<>();
     private final RectF mRectFTotal = new RectF();
     private Paint mPaint, mPaintSelected;
     private String mSelectedLetter;
     public float mLetterCentreY, mSelectedLetterCentreY;
     private Bitmap mBitmapBubble;
+    private boolean mIsOnTouch;
+    private boolean mIsVerticalCentre;
 
     public LetterSelectorLayout(Context context) {
         this(context, null);
@@ -58,12 +62,13 @@ public class LetterSelectorLayout extends FrameLayout {
         mPaint.setTextAlign(Paint.Align.CENTER);
         mPaint.setStrokeWidth(4);
         mLetterCentreY = (mPaint.descent() + mPaint.ascent()) / 2f;
+
         mPaintSelected = new Paint(mPaint);
         mPaintSelected.setTypeface(Typeface.DEFAULT_BOLD);
         mPaintSelected.setTextSize(mPaint.getTextSize() * 2);
         mSelectedLetterCentreY = (mPaintSelected.descent() + mPaintSelected.ascent()) / 2f;
 
-        mMarginTop = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14, metrics);
+        mMarginTop = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16, metrics);
         mMarginRight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 2, metrics);
         mPadding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, metrics);
         mBubbleOffsetX = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16, metrics);
@@ -96,44 +101,75 @@ public class LetterSelectorLayout extends FrameLayout {
         rectF.right = w - mMarginRight;
         rectF.left = rectF.right - rect.width() - mPadding * 2.2f;
 
-        float height = rectF.height();
-        Log.d(TAG, "draw: " + rect.toShortString() + ", " + rect.width() + "---" + rect.height() + "\n"
-                + rectF.toShortString() + ", " + rectF.width() + "---" + height + ", " + rectF.centerX() + "---" + rectF.centerY());
+        float unitHeight = rectF.height();
+        int length = LETTERS.length;
+        if (mIsVerticalCentre) {
+            float letterPanelHeight = unitHeight * length;
+            mMarginTop = (h - letterPanelHeight) / 2;
+            if (mMarginTop < unitHeight) {
+                mMarginTop = unitHeight;
+            }
+            rectF.top = mMarginTop;
+            rectF.bottom = rectF.top + unitHeight;
+        }
+
+        float remainHeight = h - mMarginTop;
+        int units = (int) (remainHeight / unitHeight);
+        Log.d(TAG, "draw, units: " + units + ", remainHeight: " + remainHeight + ", h: " + h);
+        mIsOverUnits = length > units;
+
+        /*Log.d(TAG, "draw: " + rect.toShortString() + ", " + rect.width() + "---" + rect.height() + "\n"
+                + rectF.toShortString() + ", " + rectF.width() + "---" + unitHeight + ", " + rectF.centerX() + "---" + rectF.centerY());*/
 
         mRectFTotal.set(rectF);
 
+        /*mArrayMap.clear();
         for (String letter : LETTERS) {
             mArrayMap.put(letter, new RectF(rectF.left, rectF.top, rectF.right, rectF.bottom));
             rectF.top = rectF.bottom;
-            rectF.bottom += height;
+            rectF.bottom += unitHeight;
+        }*/
+
+        mRectFList.clear();
+        mArrayMap2.clear();
+        int paintLen = mIsOverUnits ? units : length;
+        for (int i = 0; i < paintLen; i++) {
+            RectF f = new RectF(rectF.left, rectF.top, rectF.right, rectF.bottom);
+            mRectFList.add(f);
+            rectF.top = rectF.bottom;
+            rectF.bottom += unitHeight;
+
+            mArrayMap2.put(f, LETTERS[i]);
         }
 
         mRectFTotal.bottom = rectF.top;
     }
 
+    private final List<RectF> mRectFList = new ArrayList<>();
+    private boolean mIsOverUnits;
+
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
+
         final int cor = 255 / LETTERS.length;
-        for (int i = 0; i < LETTERS.length; i++) {
+        /*for (int i = 0; i < LETTERS.length; i++) {
             String letter = LETTERS[i];
             RectF rectF = mArrayMap.get(letter);
-            if (rectF == null) {
-                continue;
-            }
             mPaint.setColor(Color.rgb(cor * i, cor * i, cor * i));
             canvas.drawRect(rectF, mPaint);
 
             if (letter.equals(mSelectedLetter)) {
                 mPaint.setColor(Color.BLUE);
                 canvas.drawText(mSelectedLetter, rectF.centerX(), rectF.centerY() - mLetterCentreY, mPaint);
-                if (mBitmapBubble != null) {
-                    int width = mBitmapBubble.getWidth();
-                    float left = rectF.left - width - mBubbleOffsetX;
-                    float top = rectF.centerY() - mBitmapBubble.getHeight() / 2f;
+
+                int width = mBitmapBubble.getWidth();
+                float left = rectF.left - width - mBubbleOffsetX;
+                float top = rectF.centerY() - mBitmapBubble.getHeight() / 2f;
+
+                if (mIsOnTouch) {
                     canvas.drawBitmap(mBitmapBubble, left, top, null);
                     canvas.drawPoint(left + width / 2f, rectF.centerY(), mPaint);
-
                     canvas.drawText(mSelectedLetter, left + width / 2.3f, rectF.centerY() - mSelectedLetterCentreY, mPaintSelected);
                 }
             } else {
@@ -143,9 +179,35 @@ public class LetterSelectorLayout extends FrameLayout {
 
             mPaint.setColor(Color.RED);
             canvas.drawPoint(rectF.centerX(), rectF.centerY(), mPaint);
-        }
+        }*/
 
+        for (int i = 0; i < mRectFList.size(); i++) {
+            RectF rectF = mRectFList.get(i);
+            mPaint.setColor(Color.rgb(cor * i, cor * i, cor * i));
+            canvas.drawRect(rectF, mPaint);
+
+            String letter = mArrayMap2.get(rectF);
+            if (letter != null && letter.equals(mSelectedLetter)) {
+                mPaint.setColor(Color.BLUE);
+                canvas.drawText(mSelectedLetter, rectF.centerX(), rectF.centerY() - mLetterCentreY, mPaint);
+
+                int width = mBitmapBubble.getWidth();
+                float left = rectF.left - width - mBubbleOffsetX;
+                float top = rectF.centerY() - mBitmapBubble.getHeight() / 2f;
+
+                if (mIsOnTouch) {
+                    canvas.drawBitmap(mBitmapBubble, left, top, null);
+                    canvas.drawPoint(left + width / 2f, rectF.centerY(), mPaint);
+                    canvas.drawText(mSelectedLetter, left + width / 2.3f, rectF.centerY() - mSelectedLetterCentreY, mPaintSelected);
+                }
+            } else {
+                mPaint.setColor(Color.WHITE);
+                canvas.drawText(letter, rectF.centerX(), rectF.centerY() - mLetterCentreY, mPaint);
+            }
+        }
     }
+
+    private int mOverUnitsOffset;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -155,9 +217,56 @@ public class LetterSelectorLayout extends FrameLayout {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Log.d(TAG, "ACTION_DOWN, ACTION_DOWN, ACTION_DOWN");
-                if (!mRectFTotal.contains(x, y)) {
+                mIsOnTouch = true;
+                /*if (mRectFTotal.contains(x, y)) {
+                    for (Map.Entry<String, RectF> entry : mArrayMap.entrySet()) {
+                        RectF value = entry.getValue();
+                        if (value.contains(x, y)) {
+                            mSelectedLetter = entry.getKey();
+                            Log.d(TAG, "move: selectedLetter-" + mSelectedLetter);
+                            Log.v(TAG, "click: selectedLetter-" + entry.getValue());
+                            break;
+                        }
+                    }
+
+                    invalidate();
+                } else {
+                    return false;
+                }*/
+
+                if (mRectFTotal.contains(x, y)) {
+                    for (RectF rectF : mRectFList) {
+                        if (rectF.contains(x, y)) {
+                            mSelectedLetter = mArrayMap2.get(rectF);
+                            int index = mRectFList.indexOf(rectF);
+                            Log.i(TAG, "down: selectedLetter-" + index);
+                            if (index == 0) {
+                                Log.d(TAG, "down top: " + index);
+                            }
+
+                            if (index == mRectFList.size() - 1) {
+                                Log.d(TAG, "down bottom: " + index);
+
+                                /*if (mIsOverUnits && (mRectFList.size() + mOverUnitsOffset) < LETTERS.length) {
+                                    mOverUnitsOffset++;
+                                    int len = mRectFList.size() + mOverUnitsOffset;
+                                    for (int i = mOverUnitsOffset; i < len; i++) {
+                                        mArrayMap2.put(mRectFList.get(i - mOverUnitsOffset), LETTERS[i]);
+                                    }
+
+                                    mSelectedLetter = LETTERS[len - 1];
+                                }*/
+                            }
+
+                            break;
+                        }
+                    }
+
+                    invalidate();
+                } else {
                     return false;
                 }
+
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (!mRectFTotal.contains(x, y)) {
@@ -165,12 +274,12 @@ public class LetterSelectorLayout extends FrameLayout {
                 }
                 Log.i(TAG, "ACTION_MOVE, ACTION_MOVE, ACTION_MOVE");
 
-                for (Map.Entry<String, RectF> entry : mArrayMap.entrySet()) {
+                /*for (Map.Entry<String, RectF> entry : mArrayMap.entrySet()) {
                     if (entry.getValue().contains(x, y)) {
                         String key = entry.getKey();
                         if (key.equals(mSelectedLetter)) {
                             Log.v(TAG, "move, move, move, the same letter");
-                            return true;
+                            //return true;
                         } else {
                             mSelectedLetter = key;
                             Log.d(TAG, "move: selectedLetter-" + mSelectedLetter);
@@ -178,21 +287,49 @@ public class LetterSelectorLayout extends FrameLayout {
                             invalidate();
                         }
                     }
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                Log.v(TAG, "ACTION_UP, ACTION_UP, ACTION_UP");
-                for (Map.Entry<String, RectF> entry : mArrayMap.entrySet()) {
-                    RectF value = entry.getValue();
-                    if (value.contains(x, y)) {
-                        mSelectedLetter = entry.getKey();
-                        Log.d(TAG, "move: selectedLetter-" + mSelectedLetter);
+                }*/
 
-                        invalidate();
-                        Log.v(TAG, "click: selectedLetter-" + entry.getValue());
-                        break;
+                for (RectF rectF : mRectFList) {
+                    if (rectF.contains(x, y)) {
+                        String electedLetter = mArrayMap2.get(rectF);
+                        if (electedLetter != null && electedLetter.equals(mSelectedLetter)) {
+                            Log.v(TAG, "move, move, move, the same letter");
+                            //return true;
+                        } else {
+                            mSelectedLetter = electedLetter;
+                            Log.d(TAG, "move: selectedLetter-" + mSelectedLetter);
+
+                            invalidate();
+                        }
+                        int index = mRectFList.indexOf(rectF);
+                        Log.d(TAG, "move: selectedLetter-" + index);
+                        if (mIsOverUnits && index == 0) {
+                            Log.d(TAG, "move to top: " + index);
+                        }
+
+                        if (mIsOverUnits && index == mRectFList.size() - 1) {
+                            Log.d(TAG, "move to bottom: " + index);
+
+                            if ((mRectFList.size() + mOverUnitsOffset) < LETTERS.length) {
+                                mOverUnitsOffset++;
+                                int len = mRectFList.size() + mOverUnitsOffset;
+                                for (int i = mOverUnitsOffset; i < len; i++) {
+                                    mArrayMap2.put(mRectFList.get(i - mOverUnitsOffset), LETTERS[i]);
+                                }
+
+                                mSelectedLetter = LETTERS[len - 1];
+                            }
+                        }
+
                     }
                 }
+
+                invalidate();
+                break;
+            case MotionEvent.ACTION_UP:
+                //Log.v(TAG, "ACTION_UP, ACTION_UP, ACTION_UP");
+                invalidate();
+                mIsOnTouch = false;
                 break;
         }
 
@@ -203,6 +340,7 @@ public class LetterSelectorLayout extends FrameLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mArrayMap.clear();
+        mArrayMap2.clear();
         if (mBitmapBubble != null && !mBitmapBubble.isRecycled()) {
             mBitmapBubble.recycle();
         }

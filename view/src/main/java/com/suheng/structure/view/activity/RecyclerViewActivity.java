@@ -26,7 +26,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recycler_view);
+        setContentView(R.layout.activity_recycler_view2);
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view_rview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
@@ -36,9 +36,9 @@ public class RecyclerViewActivity extends AppCompatActivity {
             mArraylist.add(String.valueOf(i + 1));
         }
         recyclerView.setAdapter(adapter);
-        //recyclerView.setTranslationY(100);
-        //ViewGroup viewGroup = findViewById(R.id.recycler_view_root);
-        //viewGroup.bringChildToFront(recyclerView);
+        //LinearLayout中若Top View为TextView时，RecyclerView上移会跑到TextView上面，而若为Button时则会跑到Button
+        //下面。目前未知其中原理，只是猜想到Button会主动夺取焦点的原因。
+        recyclerView.setTranslationY(-100); //负数：RecyclerView上移，正数下移
     }
 
     @Override
