@@ -26,7 +26,7 @@ import java.util.List;
 public class LetterSelectorLayout extends FrameLayout {
     private static final String TAG = LetterSelectorLayout.class.getSimpleName();
     private static final String[] LETTERS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"
-            , "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"/**/};
+            , "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"/**/};
     private float mMarginTop, mMarginRight, mPadding, mBubbleOffsetX;
     private final ArrayMap<String, RectF> mArrayMap = new ArrayMap<>();
     private final ArrayMap<RectF, String> mArrayMap2 = new ArrayMap<>();
@@ -239,7 +239,7 @@ public class LetterSelectorLayout extends FrameLayout {
                         if (rectF.contains(x, y)) {
                             mSelectedLetter = mArrayMap2.get(rectF);
                             int index = mRectFList.indexOf(rectF);
-                            Log.i(TAG, "down: selectedLetter-" + index);
+                            Log.i(TAG, "down: selectedLetter-" + index + ", " + mSelectedLetter);
                             if (index == 0) {
                                 Log.d(TAG, "down top: " + index);
                             }
@@ -327,9 +327,13 @@ public class LetterSelectorLayout extends FrameLayout {
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                //Log.v(TAG, "ACTION_UP, ACTION_UP, ACTION_UP");
-                invalidate();
-                mIsOnTouch = false;
+                Log.v(TAG, "ACTION_UP, ACTION_UP, ACTION_UP");
+                if (mIsOnTouch) {
+                    postDelayed(() -> {
+                        mIsOnTouch = false;
+                        invalidate();
+                    }, 300);
+                }
                 break;
         }
 
