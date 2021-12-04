@@ -37,7 +37,6 @@ public class DampingActivity2 extends AppCompatActivity {
         for (int i = 0; i < 10; i++) {
             datas.add(String.valueOf(i));
         }
-        adapter.notifyDataSetChanged();
 
         DampingLayout dampingView = findViewById(R.id.damping_view);
         dampingView.setTextColor(Color.BLUE);

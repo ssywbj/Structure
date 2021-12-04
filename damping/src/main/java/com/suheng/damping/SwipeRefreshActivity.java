@@ -36,7 +36,6 @@ public class SwipeRefreshActivity extends AppCompatActivity implements SwipeRefr
         for (int i = 0; i < 20; i++) {
             datas.add(String.valueOf(i));
         }
-        adapter.notifyDataSetChanged();
 
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -53,12 +52,9 @@ public class SwipeRefreshActivity extends AppCompatActivity implements SwipeRefr
     public void onRefresh() {
         final SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         Toast.makeText(this, "Refreshing", Toast.LENGTH_SHORT).show();
-        swipeRefreshLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(false);
-                Toast.makeText(SwipeRefreshActivity.this, "Refresh Finish", Toast.LENGTH_SHORT).show();
-            }
+        swipeRefreshLayout.postDelayed(() -> {
+            swipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(SwipeRefreshActivity.this, "Refresh Finish", Toast.LENGTH_SHORT).show();
         }, 3000);
     }
 

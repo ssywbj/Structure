@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
             //mVectorDrawable.start();
         }*/
 
+        startActivity(new Intent(this, LetterSelectActivity.class));
     }
 
     @Override

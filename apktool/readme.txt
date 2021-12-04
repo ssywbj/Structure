@@ -22,3 +22,26 @@ java -jar apktool.jar d -f /e/Workspace/Android/Structure/wallpaper/myhealth/bui
 
 方法二
 使用集成框架：https://github.com/skylot/jadx
+ubuntu,https://lindevs.com/install-jadx-on-ubuntu/
+步骤如下：
+cd Programs(没有的话，建一个)
+查最新版本号
+JADX_VERSION=$(curl -s "https://api.github.com/repos/skylot/jadx/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+下载
+curl -Lo jadx.zip "https://github.com/skylot/jadx/releases/latest/download/jadx-${JADX_VERSION}.zip"
+解压
+unzip jadx.zip -d jadx
+配置路径
+echo 'export PATH=$PATH:~/Programs/jadx/bin' | sudo tee -a /etc/profile
+生效配置文件
+source /etc/profile
+验证是否安装成功
+jadx --version
+成功的话会输入版本号
+
+#录制终端
+script -t 2>time.txt session.typescript
+#结束录制
+exit
+#回放录制视频
+scriptreplay -t time.txt session.typescript

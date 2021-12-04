@@ -36,7 +36,6 @@ public class DampingActivity3 extends AppCompatActivity {
         for (int i = 0; i < 20; i++) {
             datas.add(String.valueOf(i));
         }
-        adapter.notifyDataSetChanged();
 
         DampingLayout dampingView = findViewById(R.id.damping_view);
         dampingView.setOnRefreshListener(() -> {

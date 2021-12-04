@@ -34,7 +34,6 @@ public class DampingViewActivity extends AppCompatActivity {
         for (int i = 0; i < 30; i++) {
             datas.add(String.valueOf(i));
         }
-        adapter.notifyDataSetChanged();
     }
 
     private static final class ContentAdapter extends RecyclerView.Adapter<ContentHolder> {

@@ -24,26 +24,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LetterSelectorLayout extends FrameLayout {
-    private static final String TAG = LetterSelectorLayout.class.getSimpleName();
-    private static final String[] LETTERS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"
+    public static final String TAG = LetterSelectorLayout.class.getSimpleName();
+    public static final String[] LETTERS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"
             , "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"/**/};
     private float mMarginTop, mMarginRight, mPadding, mBubbleOffsetX;
-    private final ArrayMap<String, RectF> mArrayMap = new ArrayMap<>();
-    private final ArrayMap<RectF, String> mArrayMap2 = new ArrayMap<>();
+    private final ArrayMap<RectF, String> mArrayMap = new ArrayMap<>();
     private final RectF mRectFTotal = new RectF();
     private Paint mPaint, mPaintSelected;
     private String mSelectedLetter;
-    public float mLetterCentreY, mSelectedLetterCentreY;
+    private int mSelectedPosition;
+    private float mLetterCentreY, mSelectedLetterCentreY;
     private Bitmap mBitmapBubble;
     private boolean mIsOnTouch;
     private boolean mIsVerticalCentre;
+    private List<String> mLetters;
+    private OnTouchLetterListener mOnTouchLetterListener;
+    private boolean mIsLastVisibleItemPosition;
 
     public LetterSelectorLayout(Context context) {
-        this(context, null);
+        super(context);
+        this.init();
     }
 
     public LetterSelectorLayout(Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, 0);
+        super(context, attrs);
+        this.init();
     }
 
     public LetterSelectorLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -52,7 +57,6 @@ public class LetterSelectorLayout extends FrameLayout {
     }
 
     private void init() {
-        setBackgroundColor(Color.GRAY);
         setWillNotDraw(false);
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
@@ -87,9 +91,14 @@ public class LetterSelectorLayout extends FrameLayout {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        Log.d("LetterSelectActivity", "onSizeChanged: ");
+        if (mLetters == null || mLetters.size() == 0) {
+            return;
+        }
+
         mArrayMap.clear();
 
-        final String text = LETTERS[0];
+        final String text = mLetters.get(0);
         Rect rect = new Rect();
         mPaint.getTextBounds(text, 0, text.length(), rect);
 
@@ -102,7 +111,7 @@ public class LetterSelectorLayout extends FrameLayout {
         rectF.left = rectF.right - rect.width() - mPadding * 2.2f;
 
         float unitHeight = rectF.height();
-        int length = LETTERS.length;
+        int length = mLetters.size();
         if (mIsVerticalCentre) {
             float letterPanelHeight = unitHeight * length;
             mMarginTop = (h - letterPanelHeight) / 2;
@@ -123,15 +132,8 @@ public class LetterSelectorLayout extends FrameLayout {
 
         mRectFTotal.set(rectF);
 
-        /*mArrayMap.clear();
-        for (String letter : LETTERS) {
-            mArrayMap.put(letter, new RectF(rectF.left, rectF.top, rectF.right, rectF.bottom));
-            rectF.top = rectF.bottom;
-            rectF.bottom += unitHeight;
-        }*/
-
         mRectFList.clear();
-        mArrayMap2.clear();
+        mArrayMap.clear();
         int paintLen = mIsOverUnits ? units : length;
         for (int i = 0; i < paintLen; i++) {
             RectF f = new RectF(rectF.left, rectF.top, rectF.right, rectF.bottom);
@@ -139,10 +141,12 @@ public class LetterSelectorLayout extends FrameLayout {
             rectF.top = rectF.bottom;
             rectF.bottom += unitHeight;
 
-            mArrayMap2.put(f, LETTERS[i]);
+            mArrayMap.put(f, mLetters.get(i));
         }
 
         mRectFTotal.bottom = rectF.top;
+
+        invalidate();
     }
 
     private final List<RectF> mRectFList = new ArrayList<>();
@@ -151,42 +155,17 @@ public class LetterSelectorLayout extends FrameLayout {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
+        if (mLetters == null || mLetters.size() == 0) {
+            return;
+        }
 
-        final int cor = 255 / LETTERS.length;
-        /*for (int i = 0; i < LETTERS.length; i++) {
-            String letter = LETTERS[i];
-            RectF rectF = mArrayMap.get(letter);
-            mPaint.setColor(Color.rgb(cor * i, cor * i, cor * i));
-            canvas.drawRect(rectF, mPaint);
-
-            if (letter.equals(mSelectedLetter)) {
-                mPaint.setColor(Color.BLUE);
-                canvas.drawText(mSelectedLetter, rectF.centerX(), rectF.centerY() - mLetterCentreY, mPaint);
-
-                int width = mBitmapBubble.getWidth();
-                float left = rectF.left - width - mBubbleOffsetX;
-                float top = rectF.centerY() - mBitmapBubble.getHeight() / 2f;
-
-                if (mIsOnTouch) {
-                    canvas.drawBitmap(mBitmapBubble, left, top, null);
-                    canvas.drawPoint(left + width / 2f, rectF.centerY(), mPaint);
-                    canvas.drawText(mSelectedLetter, left + width / 2.3f, rectF.centerY() - mSelectedLetterCentreY, mPaintSelected);
-                }
-            } else {
-                mPaint.setColor(Color.WHITE);
-                canvas.drawText(letter, rectF.centerX(), rectF.centerY() - mLetterCentreY, mPaint);
-            }
-
-            mPaint.setColor(Color.RED);
-            canvas.drawPoint(rectF.centerX(), rectF.centerY(), mPaint);
-        }*/
-
+        final int cor = 255 / mLetters.size();
         for (int i = 0; i < mRectFList.size(); i++) {
             RectF rectF = mRectFList.get(i);
             mPaint.setColor(Color.rgb(cor * i, cor * i, cor * i));
             canvas.drawRect(rectF, mPaint);
 
-            String letter = mArrayMap2.get(rectF);
+            String letter = mArrayMap.get(rectF);
             if (letter != null && letter.equals(mSelectedLetter)) {
                 mPaint.setColor(Color.BLUE);
                 canvas.drawText(mSelectedLetter, rectF.centerX(), rectF.centerY() - mLetterCentreY, mPaint);
@@ -207,10 +186,12 @@ public class LetterSelectorLayout extends FrameLayout {
         }
     }
 
-    private int mOverUnitsOffset;
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (mLetters == null || mLetters.size() == 0) {
+            return super.onTouchEvent(event);
+        }
+
         float x = event.getX();
         float y = event.getY();
 
@@ -218,55 +199,62 @@ public class LetterSelectorLayout extends FrameLayout {
             case MotionEvent.ACTION_DOWN:
                 Log.d(TAG, "ACTION_DOWN, ACTION_DOWN, ACTION_DOWN");
                 mIsOnTouch = true;
-                /*if (mRectFTotal.contains(x, y)) {
-                    for (Map.Entry<String, RectF> entry : mArrayMap.entrySet()) {
-                        RectF value = entry.getValue();
-                        if (value.contains(x, y)) {
-                            mSelectedLetter = entry.getKey();
-                            Log.d(TAG, "move: selectedLetter-" + mSelectedLetter);
-                            Log.v(TAG, "click: selectedLetter-" + entry.getValue());
-                            break;
-                        }
-                    }
-
-                    invalidate();
-                } else {
-                    return false;
-                }*/
 
                 if (mRectFTotal.contains(x, y)) {
                     for (RectF rectF : mRectFList) {
                         if (rectF.contains(x, y)) {
-                            mSelectedLetter = mArrayMap2.get(rectF);
-                            int index = mRectFList.indexOf(rectF);
-                            Log.i(TAG, "down: selectedLetter-" + index + ", " + mSelectedLetter);
-                            if (index == 0) {
-                                Log.d(TAG, "down top: " + index);
+                            int pst = mRectFList.indexOf(rectF);
+                            String selectedLetter = mArrayMap.get(rectF);
+                            Log.i(TAG, "down: selectedLetter-" + pst + ", " + selectedLetter);
+                            if (mIsLastVisibleItemPosition) {
+                                Log.i(TAG, "down: selectedLetter-" + pst + ", " + mSelectedPosition);
+                                if (pst > mSelectedPosition) {
+                                    return false;
+                                }
                             }
 
-                            if (index == mRectFList.size() - 1) {
-                                Log.d(TAG, "down bottom: " + index);
+                            this.setSelectedLetter(selectedLetter);
 
-                                /*if (mIsOverUnits && (mRectFList.size() + mOverUnitsOffset) < LETTERS.length) {
-                                    mOverUnitsOffset++;
-                                    int len = mRectFList.size() + mOverUnitsOffset;
-                                    for (int i = mOverUnitsOffset; i < len; i++) {
-                                        mArrayMap2.put(mRectFList.get(i - mOverUnitsOffset), LETTERS[i]);
+                            if (mOnTouchLetterListener != null) {
+                                mOnTouchLetterListener.onTouchLetter(mSelectedLetter, mSelectedPosition);
+                            }
+
+                            /*if (mIsOverUnits) {
+                                int letterIndex = mLetters.indexOf(mSelectedLetter);
+
+                                if (pst == 0) {
+                                    Log.d(TAG, "move to top, rect pst: " + pst + ", letter pst: " + letterIndex);
+                                    if (letterIndex > 0) {
+                                        int tmpPst = 0, topOffset = letterIndex - 1;
+                                        for (int i = topOffset; i < topOffset + mRectFList.size(); i++) {
+                                            mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
+                                            tmpPst++;
+                                        }
+
+                                        this.setSelectedLetter(mArrayMap.get(rectF));
                                     }
+                                }
 
-                                    mSelectedLetter = LETTERS[len - 1];
-                                }*/
-                            }
+                                if (pst == mRectFList.size() - 1) {
+                                    Log.d(TAG, "down bottom: " + pst + ", letter pst: " + letterIndex);
+                                    if (letterIndex < mLetters.size() - 1) {
+                                        int topLetterIndex = mLetters.indexOf(mArrayMap.get(mRectFList.get(0)));
+                                        int tmpPst = 0, topOffset = topLetterIndex + 1;
+                                        for (int i = topOffset; i < mRectFList.size() + topOffset; i++) {
+                                            mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
+                                            tmpPst++;
+                                        }
 
+                                        this.setSelectedLetter(mArrayMap.get(rectF));
+                                    }
+                                }
+                            }*/
                             break;
                         }
                     }
-
-                    invalidate();
                 } else {
                     return false;
                 }
-
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (!mRectFTotal.contains(x, y)) {
@@ -274,57 +262,48 @@ public class LetterSelectorLayout extends FrameLayout {
                 }
                 Log.i(TAG, "ACTION_MOVE, ACTION_MOVE, ACTION_MOVE");
 
-                /*for (Map.Entry<String, RectF> entry : mArrayMap.entrySet()) {
-                    if (entry.getValue().contains(x, y)) {
-                        String key = entry.getKey();
-                        if (key.equals(mSelectedLetter)) {
-                            Log.v(TAG, "move, move, move, the same letter");
-                            //return true;
-                        } else {
-                            mSelectedLetter = key;
-                            Log.d(TAG, "move: selectedLetter-" + mSelectedLetter);
-
-                            invalidate();
-                        }
-                    }
-                }*/
-
                 for (RectF rectF : mRectFList) {
                     if (rectF.contains(x, y)) {
-                        String electedLetter = mArrayMap2.get(rectF);
-                        if (electedLetter != null && electedLetter.equals(mSelectedLetter)) {
-                            Log.v(TAG, "move, move, move, the same letter");
-                            //return true;
-                        } else {
-                            mSelectedLetter = electedLetter;
-                            Log.d(TAG, "move: selectedLetter-" + mSelectedLetter);
+                        String selectedLetter = mArrayMap.get(rectF);
+                        int pst = mRectFList.indexOf(rectF);
+                        Log.d(TAG, "move: selectedLetter-" + pst + ", " + selectedLetter);
 
-                            invalidate();
-                        }
-                        int index = mRectFList.indexOf(rectF);
-                        Log.d(TAG, "move: selectedLetter-" + index);
-                        if (mIsOverUnits && index == 0) {
-                            Log.d(TAG, "move to top: " + index);
-                        }
+                        if (mIsOverUnits) {
+                            int letterIndex = mLetters.indexOf(selectedLetter);
 
-                        if (mIsOverUnits && index == mRectFList.size() - 1) {
-                            Log.d(TAG, "move to bottom: " + index);
-
-                            if ((mRectFList.size() + mOverUnitsOffset) < LETTERS.length) {
-                                mOverUnitsOffset++;
-                                int len = mRectFList.size() + mOverUnitsOffset;
-                                for (int i = mOverUnitsOffset; i < len; i++) {
-                                    mArrayMap2.put(mRectFList.get(i - mOverUnitsOffset), LETTERS[i]);
+                            if (pst == 0) {
+                                Log.d(TAG, "move to top, rect pst: " + pst + ", letter pst: " + letterIndex);
+                                if (letterIndex > 0) {
+                                    int tmpPst = 0, topOffset = letterIndex - 1;
+                                    for (int i = topOffset; i < topOffset + mRectFList.size(); i++) {
+                                        mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
+                                        tmpPst++;
+                                    }
                                 }
-
-                                mSelectedLetter = LETTERS[len - 1];
                             }
+
+                            if (pst == mRectFList.size() - 1) {
+                                Log.d(TAG, "down bottom: " + pst + ", letter pst: " + letterIndex);
+                                if (letterIndex < mLetters.size() - 1) {
+                                    int topLetterIndex = mLetters.indexOf(mArrayMap.get(mRectFList.get(0)));
+                                    int tmpPst = 0, topOffset = topLetterIndex + 1;
+                                    for (int i = topOffset; i < mRectFList.size() + topOffset; i++) {
+                                        mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
+                                        tmpPst++;
+                                    }
+                                }
+                            }
+                        }
+
+                        this.setSelectedLetter(mArrayMap.get(rectF));
+                        invalidate();
+
+                        if (mOnTouchLetterListener != null) {
+                            mOnTouchLetterListener.onTouchLetter(mSelectedLetter, mSelectedPosition);
                         }
 
                     }
                 }
-
-                invalidate();
                 break;
             case MotionEvent.ACTION_UP:
                 Log.v(TAG, "ACTION_UP, ACTION_UP, ACTION_UP");
@@ -344,10 +323,42 @@ public class LetterSelectorLayout extends FrameLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mArrayMap.clear();
-        mArrayMap2.clear();
         if (mBitmapBubble != null && !mBitmapBubble.isRecycled()) {
             mBitmapBubble.recycle();
         }
     }
 
+    public void setLetters(List<String> letters) {
+        mLetters = letters;
+    }
+
+    public void setSelectedLetter(String selectedLetter) {
+        if (mLetters == null || selectedLetter == null || selectedLetter.equals(mSelectedLetter)) {
+            return;
+        }
+
+        mSelectedLetter = selectedLetter;
+        mSelectedPosition = mLetters.indexOf(selectedLetter);
+        Log.v(TAG, "setSelectedLetter: " + selectedLetter + ", " + mSelectedPosition);
+        invalidate();
+    }
+
+    public void setSelectedPosition(int position) {
+        if (mLetters == null || position > mLetters.size() - 1) {
+            return;
+        }
+        this.setSelectedLetter(mLetters.get(position));
+    }
+
+    public void setLastVisibleItemPosition(int lastVisibleItemPosition) {
+        mIsLastVisibleItemPosition = (mLetters != null && lastVisibleItemPosition == (mLetters.size() - 1));
+    }
+
+    public void setOnTouchLetterListener(OnTouchLetterListener onTouchLetterListener) {
+        mOnTouchLetterListener = onTouchLetterListener;
+    }
+
+    public interface OnTouchLetterListener {
+        void onTouchLetter(String letter, int pst);
+    }
 }
