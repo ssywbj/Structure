@@ -40,6 +40,9 @@ public class LetterSelectorLayout extends FrameLayout {
     private List<String> mLetters;
     private OnTouchLetterListener mOnTouchLetterListener;
     private boolean mIsLastVisibleItemPosition;
+    private final List<RectF> mRectFList = new ArrayList<>();
+    private boolean mIsOverUnits;
+    private Runnable mRunnableScrollToBottom;
 
     public LetterSelectorLayout(Context context) {
         super(context);
@@ -149,9 +152,6 @@ public class LetterSelectorLayout extends FrameLayout {
         invalidate();
     }
 
-    private final List<RectF> mRectFList = new ArrayList<>();
-    private boolean mIsOverUnits;
-
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
@@ -216,39 +216,8 @@ public class LetterSelectorLayout extends FrameLayout {
                             this.setSelectedLetter(selectedLetter);
 
                             if (mOnTouchLetterListener != null) {
-                                mOnTouchLetterListener.onTouchLetter(mSelectedLetter, mSelectedPosition);
+                                mOnTouchLetterListener.onTouchLetter(selectedLetter, pst);
                             }
-
-                            /*if (mIsOverUnits) {
-                                int letterIndex = mLetters.indexOf(mSelectedLetter);
-
-                                if (pst == 0) {
-                                    Log.d(TAG, "move to top, rect pst: " + pst + ", letter pst: " + letterIndex);
-                                    if (letterIndex > 0) {
-                                        int tmpPst = 0, topOffset = letterIndex - 1;
-                                        for (int i = topOffset; i < topOffset + mRectFList.size(); i++) {
-                                            mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
-                                            tmpPst++;
-                                        }
-
-                                        this.setSelectedLetter(mArrayMap.get(rectF));
-                                    }
-                                }
-
-                                if (pst == mRectFList.size() - 1) {
-                                    Log.d(TAG, "down bottom: " + pst + ", letter pst: " + letterIndex);
-                                    if (letterIndex < mLetters.size() - 1) {
-                                        int topLetterIndex = mLetters.indexOf(mArrayMap.get(mRectFList.get(0)));
-                                        int tmpPst = 0, topOffset = topLetterIndex + 1;
-                                        for (int i = topOffset; i < mRectFList.size() + topOffset; i++) {
-                                            mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
-                                            tmpPst++;
-                                        }
-
-                                        this.setSelectedLetter(mArrayMap.get(rectF));
-                                    }
-                                }
-                            }*/
                             break;
                         }
                     }
@@ -326,11 +295,17 @@ public class LetterSelectorLayout extends FrameLayout {
         if (mBitmapBubble != null && !mBitmapBubble.isRecycled()) {
             mBitmapBubble.recycle();
         }
+
+        if (mRunnableScrollToBottom != null) {
+            getHandler().removeCallbacks(mRunnableScrollToBottom);
+        }
     }
 
     public void setLetters(List<String> letters) {
         mLetters = letters;
     }
+
+    boolean scrollToTop;
 
     public void setSelectedLetter(String selectedLetter) {
         if (mLetters == null || selectedLetter == null || selectedLetter.equals(mSelectedLetter)) {
@@ -338,9 +313,61 @@ public class LetterSelectorLayout extends FrameLayout {
         }
 
         mSelectedLetter = selectedLetter;
-        mSelectedPosition = mLetters.indexOf(selectedLetter);
+        int selectedPosition = mLetters.indexOf(selectedLetter);
         Log.v(TAG, "setSelectedLetter: " + selectedLetter + ", " + mSelectedPosition);
-        invalidate();
+
+        /*String topLetter = mArrayMap.get(mRectFList.get(0));
+        if (scrollToTop) {
+            if (selectedPosition < mSelectedPosition) {
+                Log.i(TAG, "setSelectedLetter ,to top up");
+                int topOffset = mLetters.indexOf(selectedLetter);
+                int tmpPst = 0;
+                for (int i = topOffset; i < topOffset + mRectFList.size(); i++) {
+                    mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
+                    tmpPst++;
+                }
+
+                invalidate();
+
+                return;
+            } else if (selectedPosition > mSelectedPosition) {
+                Log.i(TAG, "setSelectedLetter ,to top down");
+                scrollToTop = false;
+            }
+        } else {
+            scrollToTop = mSelectedLetter.equals(topLetter);
+        }*/
+
+        mSelectedPosition = selectedPosition;
+
+        if (mIsLastVisibleItemPosition) {
+            Log.v(TAG, "setSelectedLetter ,to bottom");
+            if (mIsOverUnits) {
+                if (mRunnableScrollToBottom == null) {
+                    mRunnableScrollToBottom = () -> {
+                        String letter = mArrayMap.get(mRectFList.get(mRectFList.size() - 1));
+                        if (letter != null && !letter.equals(mLetters.get(mLetters.size() - 1))) {
+                            int topLetterIndex = mLetters.indexOf(mArrayMap.get(mRectFList.get(0)));
+                            int tmpPst = 0, topOffset = topLetterIndex + 1;
+                            for (int i = topOffset; i < mRectFList.size() + topOffset; i++) {
+                                mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
+                                tmpPst++;
+                            }
+
+                            getHandler().postDelayed(mRunnableScrollToBottom, 40);
+                        }
+
+                        postInvalidate();
+                    };
+                }
+
+                getHandler().post(mRunnableScrollToBottom);
+            } else {
+                invalidate();
+            }
+        } else {
+            invalidate();
+        }
     }
 
     public void setSelectedPosition(int position) {

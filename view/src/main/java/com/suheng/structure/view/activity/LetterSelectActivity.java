@@ -32,16 +32,16 @@ public class LetterSelectActivity extends AppCompatActivity {
 
         LetterSelectorLayout letterSelectorLayout = findViewById(R.id.letter_selector_layout);
         letterSelectorLayout.setLetters(letterList);
-        letterSelectorLayout.setSelectedPosition(0);
+        //letterSelectorLayout.setSelectedPosition(0);
 
         RecyclerView recyclerView = findViewById(R.id.letter_layout_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         ContentAdapter contentAdapter = new ContentAdapter(letterList);
         recyclerView.setAdapter(contentAdapter);
+        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             recyclerView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
                 LinearLayoutManager linearLayoutManager = null;
                 if (layoutManager instanceof LinearLayoutManager) {
                     linearLayoutManager = (LinearLayoutManager) layoutManager;
@@ -64,7 +64,6 @@ public class LetterSelectActivity extends AppCompatActivity {
 
         letterSelectorLayout.setOnTouchLetterListener((letter, pst) -> {
             Log.i("LetterSelectActivity", "onTouchLetter: " + letter + ", " + pst);
-            RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
             if (layoutManager instanceof LinearLayoutManager) {
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;
                 linearLayoutManager.scrollToPositionWithOffset(pst, 0);
