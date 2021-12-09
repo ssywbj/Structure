@@ -1,6 +1,5 @@
 package com.suheng.structure.view.activity;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -57,7 +56,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
         @Override
         public ContentHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             //return new ContentHolder(parent.getContext(), R.layout.activity_main_adt);
-            return new ContentHolder(parent.getContext());
+            return new ContentHolder(parent);
         }
 
         @Override
@@ -85,8 +84,8 @@ public class RecyclerViewActivity extends AppCompatActivity {
     private final static class ContentHolder extends RecyclerAdapter.Holder {
         TextView textName;
 
-        ContentHolder(Context context) {
-            super(context, R.layout.activity_main_adt);
+        ContentHolder(ViewGroup viewGroup) {
+            super(viewGroup, R.layout.activity_main_adt);
             textName = itemView.findViewById(R.id.view_main_rvt_title);
 
             mIsSetOnClickListener = true;

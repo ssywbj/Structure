@@ -1,6 +1,5 @@
 package com.suheng.structure.view.activity;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -91,19 +90,20 @@ public class LetterSelectActivity extends AppCompatActivity {
         @NonNull
         @Override
         public ContentHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ContentHolder(parent.getContext());
+            return new ContentHolder(parent);
         }
     }
 
     private final static class ContentHolder extends RecyclerAdapter.Holder {
         TextView textName;
 
-        ContentHolder(Context context) {
-            super(context, R.layout.activity_main_adt);
+        ContentHolder(ViewGroup viewGroup) {
+            super(viewGroup, R.layout.activity_main_adt);
             textName = itemView.findViewById(R.id.view_main_rvt_title);
 
             mIsSetOnClickListener = true;
             mIsSetOnLongClickListener = true;
         }
     }
+
 }

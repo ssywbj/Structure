@@ -26,13 +26,19 @@ import java.util.List;
 public class LetterSelectorLayout extends FrameLayout {
     public static final String TAG = LetterSelectorLayout.class.getSimpleName();
     public static final String[] LETTERS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"
-            , "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"/**/};
+            , "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"
+            , "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"/**/};
+
     private float mMarginTop, mMarginRight, mPadding, mBubbleOffsetX;
+
     private final ArrayMap<RectF, String> mArrayMap = new ArrayMap<>();
     private final RectF mRectFTotal = new RectF();
+    private final List<RectF> mRectFList = new ArrayList<>();
+
     private Paint mPaint, mPaintSelected;
     private String mSelectedLetter;
-    private int mSelectedPosition;
+    private int mSelectedLetterPosition = -1;
+
     private float mLetterCentreY, mSelectedLetterCentreY;
     private Bitmap mBitmapBubble;
     private boolean mIsOnTouch;
@@ -40,7 +46,6 @@ public class LetterSelectorLayout extends FrameLayout {
     private List<String> mLetters;
     private OnTouchLetterListener mOnTouchLetterListener;
     private boolean mIsLastVisibleItemPosition;
-    private final List<RectF> mRectFList = new ArrayList<>();
     private boolean mIsOverUnits;
     private Runnable mRunnableScrollToBottom;
 
@@ -147,7 +152,8 @@ public class LetterSelectorLayout extends FrameLayout {
             mArrayMap.put(f, mLetters.get(i));
         }
 
-        mRectFTotal.bottom = rectF.top;
+        mRectFTotal.bottom = rectF.top /*+ mPadding * 1.5f*/;
+        //mRectFTotal.top = mRectFTotal.top - mPadding * 1.5f;
 
         invalidate();
     }
@@ -158,6 +164,9 @@ public class LetterSelectorLayout extends FrameLayout {
         if (mLetters == null || mLetters.size() == 0) {
             return;
         }
+
+        //mPaint.setColor(Color.RED);
+        //canvas.drawRect(mRectFTotal, mPaint);
 
         final int cor = 255 / mLetters.size();
         for (int i = 0; i < mRectFList.size(); i++) {
@@ -203,25 +212,16 @@ public class LetterSelectorLayout extends FrameLayout {
                 if (mRectFTotal.contains(x, y)) {
                     for (RectF rectF : mRectFList) {
                         if (rectF.contains(x, y)) {
-                            int pst = mRectFList.indexOf(rectF);
                             String selectedLetter = mArrayMap.get(rectF);
-                            Log.i(TAG, "down: selectedLetter-" + pst + ", " + selectedLetter);
-                            if (mIsLastVisibleItemPosition) {
-                                Log.i(TAG, "down: selectedLetter-" + pst + ", " + mSelectedPosition);
-                                if (pst > mSelectedPosition) {
-                                    return false;
-                                }
-                            }
+                            int selectedLetterPosition = mLetters.indexOf(selectedLetter);
+                            Log.d(TAG, "down: selected rectF: " + selectedLetterPosition + ", letter: " + selectedLetter);
 
-                            this.setSelectedLetter(selectedLetter);
-
-                            if (mOnTouchLetterListener != null) {
-                                mOnTouchLetterListener.onTouchLetter(selectedLetter, pst);
-                            }
+                            this.handleTouchedLetter(selectedLetter, selectedLetterPosition);
                             break;
                         }
                     }
                 } else {
+                    mIsOnTouch = false;
                     return false;
                 }
                 break;
@@ -234,43 +234,33 @@ public class LetterSelectorLayout extends FrameLayout {
                 for (RectF rectF : mRectFList) {
                     if (rectF.contains(x, y)) {
                         String selectedLetter = mArrayMap.get(rectF);
-                        int pst = mRectFList.indexOf(rectF);
-                        Log.d(TAG, "move: selectedLetter-" + pst + ", " + selectedLetter);
+                        int selectedLetterPosition = mLetters.indexOf(selectedLetter);
 
                         if (mIsOverUnits) {
-                            int letterIndex = mLetters.indexOf(selectedLetter);
+                            int rectPst = mRectFList.indexOf(rectF);
+                            Log.d(TAG, "move: selected rectF: " + rectPst + ", letter: " + selectedLetter);
 
-                            if (pst == 0) {
-                                Log.d(TAG, "move to top, rect pst: " + pst + ", letter pst: " + letterIndex);
-                                if (letterIndex > 0) {
-                                    int tmpPst = 0, topOffset = letterIndex - 1;
-                                    for (int i = topOffset; i < topOffset + mRectFList.size(); i++) {
-                                        mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
-                                        tmpPst++;
-                                    }
+                            if ((rectPst == 0) && (selectedLetterPosition > 0)) {
+                                int tmpPst = 0, topOffset = selectedLetterPosition - 1;
+                                for (int i = topOffset; i < topOffset + mRectFList.size(); i++) {
+                                    mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
+                                    tmpPst++;
                                 }
                             }
 
-                            if (pst == mRectFList.size() - 1) {
-                                Log.d(TAG, "down bottom: " + pst + ", letter pst: " + letterIndex);
-                                if (letterIndex < mLetters.size() - 1) {
-                                    int topLetterIndex = mLetters.indexOf(mArrayMap.get(mRectFList.get(0)));
-                                    int tmpPst = 0, topOffset = topLetterIndex + 1;
-                                    for (int i = topOffset; i < mRectFList.size() + topOffset; i++) {
-                                        mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
-                                        tmpPst++;
-                                    }
+                            if ((rectPst == mRectFList.size() - 1) && (selectedLetterPosition < mLetters.size() - 1)) {
+                                int topLetterIndex = mLetters.indexOf(mArrayMap.get(mRectFList.get(0)));
+                                int tmpPst = 0, topOffset = topLetterIndex + 1;
+                                for (int i = topOffset; i < mRectFList.size() + topOffset; i++) {
+                                    mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
+                                    tmpPst++;
                                 }
                             }
                         }
 
-                        this.setSelectedLetter(mArrayMap.get(rectF));
+                        this.handleTouchedLetter(selectedLetter, selectedLetterPosition);
+
                         invalidate();
-
-                        if (mOnTouchLetterListener != null) {
-                            mOnTouchLetterListener.onTouchLetter(mSelectedLetter, mSelectedPosition);
-                        }
-
                     }
                 }
                 break;
@@ -286,6 +276,24 @@ public class LetterSelectorLayout extends FrameLayout {
         }
 
         return true;
+    }
+
+    private void handleTouchedLetter(String selectedLetter, int selectedLetterPosition) {
+        if (mIsLastVisibleItemPosition) {
+            if (selectedLetterPosition < mSelectedLetterPosition) {
+                this.setSelectedLetter(selectedLetter);
+
+                if (mOnTouchLetterListener != null) {
+                    mOnTouchLetterListener.onTouchLetter(selectedLetter, selectedLetterPosition);
+                }
+            }
+        } else {
+            this.setSelectedLetter(selectedLetter);
+
+            if (mOnTouchLetterListener != null) {
+                mOnTouchLetterListener.onTouchLetter(selectedLetter, selectedLetterPosition);
+            }
+        }
     }
 
     @Override
@@ -305,76 +313,76 @@ public class LetterSelectorLayout extends FrameLayout {
         mLetters = letters;
     }
 
-    boolean scrollToTop;
-
     public void setSelectedLetter(String selectedLetter) {
+        Log.d(TAG, "setSelectedLetter, selected equal letter: " + selectedLetter + ", pst: " + mSelectedLetterPosition + ", to bottom:" + mIsLastVisibleItemPosition);
         if (mLetters == null || selectedLetter == null || selectedLetter.equals(mSelectedLetter)) {
             return;
         }
 
-        mSelectedLetter = selectedLetter;
-        int selectedPosition = mLetters.indexOf(selectedLetter);
-        Log.v(TAG, "setSelectedLetter: " + selectedLetter + ", " + mSelectedPosition);
+        int selectedLetterPosition = mLetters.indexOf(selectedLetter);
 
-        /*String topLetter = mArrayMap.get(mRectFList.get(0));
-        if (scrollToTop) {
-            if (selectedPosition < mSelectedPosition) {
-                Log.i(TAG, "setSelectedLetter ,to top up");
-                int topOffset = mLetters.indexOf(selectedLetter);
-                int tmpPst = 0;
-                for (int i = topOffset; i < topOffset + mRectFList.size(); i++) {
-                    mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
-                    tmpPst++;
-                }
-
-                invalidate();
-
-                return;
-            } else if (selectedPosition > mSelectedPosition) {
-                Log.i(TAG, "setSelectedLetter ,to top down");
-                scrollToTop = false;
-            }
-        } else {
-            scrollToTop = mSelectedLetter.equals(topLetter);
-        }*/
-
-        mSelectedPosition = selectedPosition;
-
-        if (mIsLastVisibleItemPosition) {
-            Log.v(TAG, "setSelectedLetter ,to bottom");
-            if (mIsOverUnits) {
-                if (mRunnableScrollToBottom == null) {
-                    mRunnableScrollToBottom = () -> {
-                        String letter = mArrayMap.get(mRectFList.get(mRectFList.size() - 1));
-                        if (letter != null && !letter.equals(mLetters.get(mLetters.size() - 1))) {
-                            int topLetterIndex = mLetters.indexOf(mArrayMap.get(mRectFList.get(0)));
-                            int tmpPst = 0, topOffset = topLetterIndex + 1;
-                            for (int i = topOffset; i < mRectFList.size() + topOffset; i++) {
-                                mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
-                                tmpPst++;
-                            }
-
-                            getHandler().postDelayed(mRunnableScrollToBottom, 40);
-                        }
-
-                        postInvalidate();
-                    };
-                }
-
-                getHandler().post(mRunnableScrollToBottom);
-            } else {
-                invalidate();
-            }
-        } else {
-            invalidate();
+        if (mIsOverUnits) {
+            this.handleOverUnitsPst(selectedLetter, selectedLetterPosition);
         }
+
+        mSelectedLetter = selectedLetter;
+        mSelectedLetterPosition = selectedLetterPosition;
+        Log.d(TAG, "setSelectedLetter, selectedLetter: " + selectedLetter + ", selectedLetterPosition: " + mSelectedLetterPosition);
+
+        invalidate();
     }
 
-    public void setSelectedPosition(int position) {
-        if (mLetters == null || position > mLetters.size() - 1) {
+    private void handleOverUnitsPst(String selectedLetter, int selectedLetterPosition) {
+        boolean isShowOnPanel = false;
+        for (RectF rectF : mRectFList) {
+            String letter = mArrayMap.get(rectF);
+            if (selectedLetter.equals(letter)) {
+                isShowOnPanel = true;
+                break;
+            }
+        }
+
+        if (isShowOnPanel) {
             return;
         }
-        this.setSelectedLetter(mLetters.get(position));
+
+        int index = mLetters.indexOf(selectedLetter);
+        if (mSelectedLetterPosition < selectedLetterPosition) {
+            Log.v(TAG, "setSelectedLetter, down scroll: " + selectedLetter + ", " + selectedLetterPosition + "--" + mSelectedLetterPosition);
+            int pst = mRectFList.size() - 1;
+            while (index >= 0 && pst >= 0) {
+                mArrayMap.put(mRectFList.get(pst), mLetters.get(index));
+                index--;
+                pst--;
+            }
+
+            /*if (mRunnableScrollToBottom == null) {
+                mRunnableScrollToBottom = () -> {
+                    String letter = mArrayMap.get(mRectFList.get(mRectFList.size() - 1));
+                    if (letter != null && !letter.equals(mLetters.get(mLetters.size() - 1))) {
+                        int topLetterIndex = mLetters.indexOf(mArrayMap.get(mRectFList.get(0)));
+                        int tmpPst = 0, topOffset = topLetterIndex + 1;
+                        for (int i = topOffset; i < mRectFList.size() + topOffset; i++) {
+                            mArrayMap.put(mRectFList.get(tmpPst), mLetters.get(i));
+                            tmpPst++;
+                        }
+
+                        getHandler().postDelayed(mRunnableScrollToBottom, 40);
+                    }
+
+                    postInvalidate();
+                };
+            }
+            getHandler().post(mRunnableScrollToBottom);*/
+        } else {
+            Log.i(TAG, "setSelectedLetter, up scroll: " + selectedLetter + ", " + selectedLetterPosition + "--" + mSelectedLetterPosition);
+            int pst = 0;
+            while (index < mLetters.size() && pst < mRectFList.size()) {
+                mArrayMap.put(mRectFList.get(pst), mLetters.get(index));
+                index++;
+                pst++;
+            }
+        }
     }
 
     public void setLastVisibleItemPosition(int lastVisibleItemPosition) {
