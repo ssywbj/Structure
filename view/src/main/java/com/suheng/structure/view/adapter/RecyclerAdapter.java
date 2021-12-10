@@ -72,6 +72,14 @@ public abstract class RecyclerAdapter<T, VH extends RecyclerAdapter.Holder> exte
         public Holder(ViewGroup viewGroup, int layoutId) {
             this(LayoutInflater.from(viewGroup.getContext()).inflate(layoutId, viewGroup, false));
         }
+
+        public void setSetOnClickListener(boolean setOnClickListener) {
+            mIsSetOnClickListener = setOnClickListener;
+        }
+
+        public void setSetOnLongClickListener(boolean setOnLongClickListener) {
+            mIsSetOnLongClickListener = setOnLongClickListener;
+        }
     }
 
 }

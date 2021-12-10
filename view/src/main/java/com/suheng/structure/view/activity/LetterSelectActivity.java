@@ -91,7 +91,8 @@ public class LetterSelectActivity extends AppCompatActivity {
         @NonNull
         @Override
         public ContentHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ContentHolder(parent);
+            ContentHolder contentHolder = new ContentHolder(parent);
+            return contentHolder;
         }
     }
 
