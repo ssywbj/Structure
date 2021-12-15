@@ -31,7 +31,7 @@ public class LetterSelectActivity extends AppCompatActivity {
 
         LetterSelectorLayout letterSelectorLayout = findViewById(R.id.letter_selector_layout);
         letterSelectorLayout.setLetters(letterList);
-        //letterSelectorLayout.setSelectedPosition(0);
+        letterSelectorLayout.setVerticalCentre(true);
 
         RecyclerView recyclerView = findViewById(R.id.letter_layout_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -50,13 +50,9 @@ public class LetterSelectActivity extends AppCompatActivity {
                 }
 
                 int fvip = linearLayoutManager.findFirstVisibleItemPosition();
-                int fcvip = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
                 int lvip = linearLayoutManager.findLastVisibleItemPosition();
-                int lcvip = linearLayoutManager.findLastCompletelyVisibleItemPosition();
-                Log.d(LetterSelectorLayout.TAG, "firstVisibleItemPosition: " + fvip + ", firstCompletelyVisibleItemPosition: "
-                        + fcvip + ", lastVisibleItemPosition: " + lvip + ", lastCompletelyVisibleItemPosition: " + lcvip);
-                //letterSelectorLayout.setSelectedPosition(fvip);
-                letterSelectorLayout.setLastVisibleItemPosition(lvip);
+                Log.d(LetterSelectorLayout.TAG, "firstVisibleItemPosition: " + fvip + ", lastVisibleItemPosition: " + lvip);
+                //letterSelectorLayout.setLastVisibleItemPosition(lvip);
                 letterSelectorLayout.setSelectedLetter(letterList.get(fvip));
             });
         }

@@ -131,7 +131,7 @@ public class LetterSelectorLayout extends FrameLayout {
         }
 
         float remainHeight = h - mMarginTop;
-        int units = (int) (remainHeight / unitHeight);
+        int units = (int) (remainHeight / unitHeight) - 1;
         Log.d(TAG, "draw, units: " + units + ", remainHeight: " + remainHeight + ", h: " + h);
         mIsOverUnits = length > units;
 
@@ -196,6 +196,17 @@ public class LetterSelectorLayout extends FrameLayout {
     }
 
     @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            if (mRectFTotal.contains(ev.getX(), ev.getY())) {
+                requestDisallowInterceptTouchEvent(true);
+                return true;
+            }
+        }
+        return super.onInterceptTouchEvent(ev);
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (mLetters == null || mLetters.size() == 0) {
             return super.onTouchEvent(event);
@@ -207,22 +218,20 @@ public class LetterSelectorLayout extends FrameLayout {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Log.d(TAG, "ACTION_DOWN, ACTION_DOWN, ACTION_DOWN");
-                mIsOnTouch = true;
-
-                if (mRectFTotal.contains(x, y)) {
-                    for (RectF rectF : mRectFList) {
-                        if (rectF.contains(x, y)) {
-                            String selectedLetter = mArrayMap.get(rectF);
-                            int selectedLetterPosition = mLetters.indexOf(selectedLetter);
-                            Log.d(TAG, "down: selected rectF: " + selectedLetterPosition + ", letter: " + selectedLetter);
-
-                            this.handleTouchedLetter(selectedLetter, selectedLetterPosition);
-                            break;
-                        }
-                    }
-                } else {
-                    mIsOnTouch = false;
+                if (!mRectFTotal.contains(x, y)) {
                     return false;
+                }
+
+                mIsOnTouch = true;
+                for (RectF rectF : mRectFList) {
+                    if (rectF.contains(x, y)) {
+                        String selectedLetter = mArrayMap.get(rectF);
+                        int selectedLetterPosition = mLetters.indexOf(selectedLetter);
+                        Log.d(TAG, "down: selected rectF: " + selectedLetterPosition + ", letter: " + selectedLetter);
+
+                        this.handleTouchedLetter(selectedLetter, selectedLetterPosition);
+                        break;
+                    }
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -391,6 +400,10 @@ public class LetterSelectorLayout extends FrameLayout {
 
     public void setOnTouchLetterListener(OnTouchLetterListener onTouchLetterListener) {
         mOnTouchLetterListener = onTouchLetterListener;
+    }
+
+    public void setVerticalCentre(boolean verticalCentre) {
+        mIsVerticalCentre = verticalCentre;
     }
 
     public interface OnTouchLetterListener {
