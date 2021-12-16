@@ -1,4 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--<com.suheng.structure.view.damping.DampingLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.suheng.structure.view.LetterSelectorLayout
+        android:id="@+id/letter_selector_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/letter_layout_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.suheng.structure.view.LetterSelectorLayout>
+
+</com.suheng.structure.view.damping.DampingLayout>-->
 <com.suheng.structure.view.LetterSelectorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/letter_selector_layout"
     android:layout_width="match_parent"
