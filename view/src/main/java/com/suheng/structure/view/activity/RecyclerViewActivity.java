@@ -1,7 +1,9 @@
 package com.suheng.structure.view.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.ArrayMap;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -20,7 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RecyclerViewActivity extends AppCompatActivity {
-    private final List<String> mArraylist = new ArrayList<>();
+    private static final String ATY_PKG_PREFIX = MainActivity.ATY_PKG_PREFIX;
+    private final ArrayMap<String, String> mStringArrayMap = new ArrayMap<>();
+    private final List<String> mStringList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,32 +34,36 @@ public class RecyclerViewActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recycler_view_rview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        ContentAdapter adapter = new ContentAdapter(mArraylist);
-        for (int i = 0; i < 7; i++) {
-            mArraylist.add(String.valueOf(i + 1));
+        ContentAdapter adapter = new ContentAdapter(mStringList);
+
+        /*for (int i = 0; i < 7; i++) {
+            STRING_LIST.add(String.valueOf(i + 1));
         }
-        recyclerView.setAdapter(adapter);
         //LinearLayout中若Top View为TextView时，RecyclerView上移会跑到TextView上面，而若为Button时则会跑到Button
         //下面。目前未知其中原理，只是猜想到Button会主动夺取焦点的原因。
-        recyclerView.setTranslationY(-100); //负数：RecyclerView上移，正数下移
+        recyclerView.setTranslationY(-100); //负数：RecyclerView上移，正数下移*/
+
+        mStringList.add("PictureManager");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "PictureManagerActivity");
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mArraylist.clear();
+        mStringArrayMap.clear();
+        mStringList.clear();
     }
 
     private final class ContentAdapter extends RecyclerAdapter<String, ContentHolder> {
 
-        protected ContentAdapter(List<String> dataList) {
+        private ContentAdapter(List<String> dataList) {
             super(dataList);
         }
 
         @NonNull
         @Override
         public ContentHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            //return new ContentHolder(parent.getContext(), R.layout.activity_main_adt);
             return new ContentHolder(parent);
         }
 
@@ -71,7 +79,12 @@ public class RecyclerViewActivity extends AppCompatActivity {
 
         @Override
         public void onItemClick(View view, String data, int pst) {
-            Toast.makeText(RecyclerViewActivity.this, String.valueOf(pst), Toast.LENGTH_SHORT).show();
+            String className = mStringArrayMap.get(mStringList.get(pst));
+            if (className != null && !className.isEmpty()) {
+                Intent intent = new Intent();
+                intent.setClassName(getPackageName(), className);
+                startActivity(intent);
+            }
         }
 
         @Override

@@ -3,15 +3,6 @@
     package="com.suheng.structure.view">
 
     <!--<uses-feature android:name="android.hardware.type.watch" />-->
-    <uses-feature
-        android:glEsVersion="0x00020000"
-        android:required="true" />
-
-    <supports-gl-texture android:name="GL_OES_compressed_ETC1_RGB8_texture" />
-    <supports-gl-texture android:name="GL_OES_compressed_paletted_texture" />
-
-    <uses-permission android:name="android.permission.VIBRATE" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -36,8 +27,20 @@
         <activity
             android:name=".activity.RecyclerViewActivity"
             android:label="RecyclerView" />
+        <activity
+            android:name=".activity.PictureManagerActivity"
+            android:label="PictureManager" />
         <activity android:name=".activity.OpenGLActivity" />
 
     </application>
+
+    <supports-gl-texture android:name="GL_OES_compressed_paletted_texture" />
+    <supports-gl-texture android:name="GL_OES_compressed_ETC1_RGB8_texture" />
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.VIBRATE" />
 
 </manifest>

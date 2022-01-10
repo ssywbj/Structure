@@ -1,4 +1,4 @@
-include ':apidemos'
+//include ':apidemos'
 include ':wallpaperpicker:watchhome'
 include ':contentprovider'
 include ':database'

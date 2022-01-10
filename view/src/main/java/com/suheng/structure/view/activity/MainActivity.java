@@ -25,17 +25,11 @@ import com.suheng.structure.view.utils.XmlSaxParser;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final String ATY_PKG_PREFIX = "com.suheng.structure.view.activity.";
-    private static final ArrayMap<String, String> sArrayMap = new ArrayMap<>();
-
-    static {
-        sArrayMap.put("LetterSelect", ATY_PKG_PREFIX + "LetterSelectActivity");
-        sArrayMap.put("RecyclerView", ATY_PKG_PREFIX + "RecyclerViewActivity");
-    }
+    public static final String ATY_PKG_PREFIX = "com.suheng.structure.view.activity.";
+    private final ArrayMap<String, String> mStringArrayMap = new ArrayMap<>();
+    private final List<String> mStringList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +39,13 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.view_main_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());//设置Item增加、移除动画
-        List<String> arrayList = new ArrayList<>();
-        for (Map.Entry<String, String> stringEntry : sArrayMap.entrySet()) {
-            arrayList.add(stringEntry.getKey());
-        }
-        ContentAdapter adapter = new ContentAdapter(arrayList);
+        ContentAdapter adapter = new ContentAdapter(mStringList);
         recyclerView.setAdapter(adapter);
+
+        mStringList.add("LetterSelect");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "LetterSelectActivity");
+        mStringList.add("RecyclerView");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "RecyclerViewActivity");
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();
@@ -115,8 +110,6 @@ public class MainActivity extends AppCompatActivity {
 
             //mVectorDrawable.start();
         }*/
-
-        startActivity(new Intent(this, LetterSelectActivity.class));
     }
 
     @Override
@@ -130,7 +123,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        sArrayMap.clear();
+        mStringArrayMap.clear();
+        mStringList.clear();
     }
 
     private final class ContentAdapter extends RecyclerView.Adapter<ContentHolder> {
@@ -157,9 +151,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             holder.textName.setOnClickListener(v -> {
-                Intent intent = new Intent();
-                intent.setClassName(getPackageName(), sArrayMap.get(item));
-                startActivity(intent);
+                String className = mStringArrayMap.get(mStringList.get(position));
+                if (className != null && !className.isEmpty()) {
+                    Intent intent = new Intent();
+                    intent.setClassName(getPackageName(), className);
+                    startActivity(intent);
+                }
             });
         }
 

@@ -16,7 +16,7 @@ import java.util.List;
 public abstract class RecyclerAdapter<T, VH extends RecyclerAdapter.Holder> extends RecyclerView.Adapter<VH> {
     private final List<T> mDataList;
 
-    protected RecyclerAdapter(List<T> dataList) {
+    public RecyclerAdapter(List<T> dataList) {
         mDataList = dataList;
     }
 
@@ -65,18 +65,16 @@ public abstract class RecyclerAdapter<T, VH extends RecyclerAdapter.Holder> exte
             return;
         }
 
-        if (holder != null) {
-            this.onBindViewHolder(holder, position, data);
+        this.onBindViewHolder(holder, position, data);
 
-            if (holder.mIsSetOnClickListener) {
-                View view = holder.itemView;
-                view.setOnClickListener(v -> this.onItemClick(view, data, position));
-            }
+        if (holder.mIsSetOnClickListener) {
+            View view = holder.itemView;
+            view.setOnClickListener(v -> this.onItemClick(view, data, position));
+        }
 
-            if (holder.mIsSetOnLongClickListener) {
-                View view = holder.itemView;
-                view.setOnLongClickListener(v -> this.onLongClick(view, data, position));
-            }
+        if (holder.mIsSetOnLongClickListener) {
+            View view = holder.itemView;
+            view.setOnLongClickListener(v -> this.onLongClick(view, data, position));
         }
     }
 
