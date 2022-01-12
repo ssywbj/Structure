@@ -3,7 +3,6 @@ package com.suheng.structure.view.activity;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -51,14 +50,14 @@ public class LetterSelectActivity extends AppCompatActivity {
 
                 int fvip = linearLayoutManager.findFirstVisibleItemPosition();
                 int lvip = linearLayoutManager.findLastVisibleItemPosition();
-                Log.d(LetterSelectorLayout.TAG, "firstVisibleItemPosition: " + fvip + ", lastVisibleItemPosition: " + lvip);
+                //Log.d(LetterSelectorLayout.TAG, "firstVisibleItemPosition: " + fvip + ", lastVisibleItemPosition: " + lvip);
                 //letterSelectorLayout.setLastVisibleItemPosition(lvip);
                 letterSelectorLayout.setSelectedLetter(letterList.get(fvip));
             });
         }
 
         letterSelectorLayout.setOnTouchLetterListener((letter, pst) -> {
-            Log.i("LetterSelectActivity", "onTouchLetter: " + letter + ", " + pst);
+            //Log.i("LetterSelectActivity", "onTouchLetter: " + letter + ", " + pst);
             RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
             if (layoutManager instanceof LinearLayoutManager) {
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;
