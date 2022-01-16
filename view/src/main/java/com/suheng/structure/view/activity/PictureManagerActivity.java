@@ -29,6 +29,8 @@ public class PictureManagerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_picture_manager);
 
         RecyclerView recyclerView = findViewById(R.id.view_picture_manager_recycler_view);
+        //recyclerView.setLayoutManager(new HoneycombLayoutManager());
+        //recyclerView.setLayoutManager(new MagicManager());
 
         mGridLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(mGridLayoutManager);
