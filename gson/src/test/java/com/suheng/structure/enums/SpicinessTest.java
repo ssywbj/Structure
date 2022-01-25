@@ -37,6 +37,32 @@ public class SpicinessTest {
             System.out.println("spn: " + spn);
         }
 
+
+        for (OzWitch value : OzWitch.values()) {
+            System.out.println("value: " + value + ", " + value.name() + ", " + value.ordinal() +
+                    ", description: " + value.getDescription());
+        }
+
+        this.change(OzWitch.EAST);
+        this.change(OzWitch.WEST);
     }
 
+    private void change(OzWitch ozWitch) {
+        switch (ozWitch) {
+            case WEST:
+                System.out.println("WEST, WEST, WEST");
+                return;
+            //break;
+            case NORTH:
+                System.out.println("NORTH, NORTH, NORTH");
+                return;
+            //break;
+            case EAST:
+                System.out.println("EAST, EAST, EAST");
+                //break;
+            /*case SOUTH:
+                System.out.println("SOUTH, SOUTH, SOUTH");
+                break;*/
+        }
+    }
 }
