@@ -27,4 +27,11 @@
         android:text="bottom"
         android:textSize="20sp"/>
 
+    <ImageView
+        android:id="@+id/recycler_view_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="4dp"
+        android:src="@drawable/number_5" />
 </LinearLayout>
