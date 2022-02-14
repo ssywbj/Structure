@@ -12,21 +12,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />-->
 
+    <com.suheng.structure.view.AnimImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp" />
+
     <com.suheng.structure.view.AnimImageView2
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:src="@drawable/vector_delete" />
+        android:layout_margin="4dp" />
 
-    <com.suheng.structure.view.AnimImageView2
+    <com.suheng.structure.view.AnimImageView3
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:src="@drawable/girl_gaitubao" />
 
-    <com.suheng.structure.view.AnimImageView
+    <com.suheng.structure.view.AnimImageView3
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
-        android:src="@drawable/number_5_big" />
+        android:src="@drawable/vector_delete" />
 </LinearLayout>

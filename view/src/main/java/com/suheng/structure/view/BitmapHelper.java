@@ -57,6 +57,7 @@ public class BitmapHelper {
         if (degrees % 360 != 0) {
             bitmap = rotate(bitmap, degrees);
         }
+
         return bitmap;
     }
 

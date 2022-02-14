@@ -45,8 +45,7 @@ public class AnimImageView extends View {
         mPaint.setFilterBitmap(true);
 
         mBitmapSrc = BitmapHelper.get(getContext(), R.drawable.vector_delete);
-        float left = 1, top = left;
-        mRectF.set(left, top, left + mBitmapSrc.getWidth(), top + mBitmapSrc.getHeight());
+        mRectF.set(0, 0, mBitmapSrc.getWidth(), mBitmapSrc.getHeight());
 
         mBitmapDst = Bitmap.createBitmap(mBitmapSrc.getWidth(), mBitmapSrc.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mBitmapDst);
@@ -56,7 +55,7 @@ public class AnimImageView extends View {
         paint.setColor(Color.RED);
         canvas.drawRect(mRectF, paint);
 
-        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, mRectF.height());
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, Math.max(mRectF.width(), mRectF.height()) / 2f);
         valueAnimator.setDuration(2000);
         valueAnimator.setInterpolator(new LinearInterpolator());
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -78,16 +77,17 @@ public class AnimImageView extends View {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (mBitmapSrc != null) {
+            setMeasuredDimension(mBitmapSrc.getWidth(), mBitmapSrc.getHeight());
+        }
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawBitmap(mBitmapSrc, null, mRectF, null);
-        /*int saveLayer = canvas.saveLayer(mRectFDst, mPaint);
-        canvas.drawBitmap(mBitmapDst, null, mRectFDst, mPaint);
-        mPaint.setXfermode(mXfermode);
-        canvas.drawBitmap(mBitmapSrc, null, mRectF, mPaint);
-        mPaint.setXfermode(null);
-        canvas.restoreToCount(saveLayer);*/
-
         canvas.save();
         canvas.clipPath(mPath);
         int saveLayer = canvas.saveLayer(mRectF, null);
