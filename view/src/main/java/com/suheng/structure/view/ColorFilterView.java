@@ -27,13 +27,13 @@ public class ColorFilterView extends View {
             0f, 0f, 1f, 0f, 0f,
             0f, 0f, 0f, 1f, 0f}); //原图
 
-    private final ColorFilter mColorFilter1 = new ColorMatrixColorFilter(new float[]{
+    public static final ColorFilter mColorFilter1 = new ColorMatrixColorFilter(new float[]{
             1.6f, 0f, 0f, 0f, 0f,
             0f, 1.6f, 0f, 0f, 0f,
             0f, 0f, 1.6f, 0f, 0f,
             0f, 0f, 0f, 1f, 0f}); //缩放运算---乘法 -- 颜色增强
 
-    private final ColorFilter mColorFilter7 = new ColorMatrixColorFilter(new float[]{
+    public static final ColorFilter mColorFilter7 = new ColorMatrixColorFilter(new float[]{
             0.4f, 0f, 0f, 0f, 0f,
             0f, 0.4f, 0f, 0f, 0f,
             0f, 0f, 0.4f, 0f, 0f,
