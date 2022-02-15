@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "RecyclerViewActivity");
         mStringList.add("AnimImageView");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "AnimImageViewActivity");
+        startActivity(new Intent(this, AnimImageViewActivity.class));
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();

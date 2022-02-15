@@ -1,13 +1,11 @@
 package com.suheng.structure.view.activity;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,16 +46,6 @@ public class RecyclerViewActivity extends AppCompatActivity {
         mStringList.add("PictureManager");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "PictureManagerActivity");
         recyclerView.setAdapter(adapter);
-
-        final ImageView imageView = findViewById(R.id.recycler_view_image_view);
-        int[][] states = new int[2][];
-        states[0] = new int[]{android.R.attr.state_selected};
-        states[1] = new int[]{};
-        int[] colors = new int[]{Color.BLUE, Color.BLACK};
-        ColorStateList colorStateList = new ColorStateList(states, colors);
-        imageView.setImageTintList(colorStateList);
-        findViewById(R.id.recycler_view_top).setOnClickListener(v -> imageView.setSelected(true));
-        findViewById(R.id.recycler_view_bottom).setOnClickListener(v -> imageView.setSelected(false));
     }
 
     @Override

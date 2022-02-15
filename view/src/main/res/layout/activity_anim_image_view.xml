@@ -4,14 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!--<com.suheng.structure.view.BezierView3
-        android:layout_width="wrap_content"
-        android:layout_height="60dp" />-->
-
-    <!--<com.suheng.structure.view.AnimImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />-->
-
     <com.suheng.structure.view.AnimImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,4 +25,38 @@
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:src="@drawable/vector_delete" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_selected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Selected"
+            android:textAllCaps="false" />
+
+        <com.suheng.structure.view.AnimImageView4
+            android:id="@+id/aiv4_selected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"/>
+
+        <com.suheng.structure.view.AnimImageView4
+            android:id="@+id/aiv4_unselected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"/>
+
+        <Button
+            android:id="@+id/btn_unselected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Unselected"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
 </LinearLayout>
