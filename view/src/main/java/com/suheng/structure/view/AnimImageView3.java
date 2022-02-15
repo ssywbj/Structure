@@ -5,12 +5,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.animation.LinearInterpolator;
@@ -57,20 +54,19 @@ public class AnimImageView3 extends AppCompatImageView {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setDither(true);
         paint.setFilterBitmap(true);
-        if (drawable instanceof BitmapDrawable) {
+        /*if (drawable instanceof BitmapDrawable) {
             ColorMatrix colorMatrix = new ColorMatrix();
             colorMatrix.setSaturation(0.2f); //0~1，0为全灰，1为原色
             ColorMatrixColorFilter matrixColorFilter = new ColorMatrixColorFilter(colorMatrix);
             paint.setColorFilter(matrixColorFilter);
             //paint.setColorFilter(ColorFilterView.mColorFilter1);
             canvas.drawBitmap(bitmapSrc, 0, 0, paint);
-        } else {
-            paint.setColor(Color.RED);
+        } else {*/
+            paint.setColor(Color.BLUE);
             canvas.drawBitmap(bitmapSrc.extractAlpha(), 0, 0, paint);
-        }
+        //}
 
         mValueAnimator = ValueAnimator.ofFloat(0, Math.max(mRectF.width(), mRectF.height()) / 2f);
-        //mValueAnimator = ValueAnimator.ofFloat(0, mRectF.width());
         mValueAnimator.setDuration(2000);
         mValueAnimator.setInterpolator(new LinearInterpolator());
         mValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

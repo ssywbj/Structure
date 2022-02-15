@@ -19,7 +19,7 @@ import androidx.annotation.Nullable;
 
 public class AnimImageView extends View {
     private Paint mPaint;
-    private Bitmap mBitmapSrc, mBitmapDst;
+    private Bitmap mBitmapSrc;
     private final RectF mRectF = new RectF();
     private final Xfermode mXfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
     private final Path mPath = new Path();
@@ -46,14 +46,6 @@ public class AnimImageView extends View {
 
         mBitmapSrc = BitmapHelper.get(getContext(), R.drawable.vector_delete);
         mRectF.set(0, 0, mBitmapSrc.getWidth(), mBitmapSrc.getHeight());
-
-        mBitmapDst = Bitmap.createBitmap(mBitmapSrc.getWidth(), mBitmapSrc.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(mBitmapDst);
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setDither(true);
-        paint.setFilterBitmap(true);
-        paint.setColor(Color.RED);
-        canvas.drawRect(mRectF, paint);
 
         ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, Math.max(mRectF.width(), mRectF.height()) / 2f);
         valueAnimator.setDuration(2000);
@@ -91,7 +83,7 @@ public class AnimImageView extends View {
         canvas.save();
         canvas.clipPath(mPath);
         int saveLayer = canvas.saveLayer(mRectF, null);
-        canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint);
+        canvas.drawColor(Color.RED);
         mPaint.setXfermode(mXfermode);
         canvas.drawBitmap(mBitmapSrc, null, mRectF, mPaint);
         mPaint.setXfermode(null);
