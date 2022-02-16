@@ -1,5 +1,7 @@
 package com.suheng.structure.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -23,8 +25,8 @@ import androidx.appcompat.widget.AppCompatImageView;
 public class AnimImageView4 extends AppCompatImageView {
     private final EaseCubicInterpolator mFirstPhaseInterpolator = new EaseCubicInterpolator(0.33f, 0, 0.66f, 1);
     private final EaseCubicInterpolator mSecondPhaseInterpolator = new EaseCubicInterpolator(0.33f, 0, 0, 1);
-    public static final int FIRST_PHASE_ANIM_DURATION = 1250;
-    public static final int COMPLETE_ANIM_DURATION = 2700;
+    public static final int FIRST_PHASE_ANIM_DURATION = 250;
+    public static final int COMPLETE_ANIM_DURATION = 700;
     public static final float END_SCALE = 1.08f;
     public static final float START_SCALE = 1f;
     private final RectF mRectF = new RectF();
@@ -35,6 +37,7 @@ public class AnimImageView4 extends AppCompatImageView {
     private final Xfermode mXfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
     private boolean mSelected;
     private int mAlpha;
+    private AnimatorListenerAdapter mAnimatorListenerAdapter;
 
     public AnimImageView4(Context context) {
         super(context);
@@ -79,6 +82,21 @@ public class AnimImageView4 extends AppCompatImageView {
                 }
             }
         });
+        mMaskAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                setSelected(false);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if (mAnimatorListenerAdapter != null) {
+                    mAnimatorListenerAdapter.onAnimationEnd(animation);
+                }
+            }
+        });
     }
 
     private void initAlphaAnimator() {
@@ -93,6 +111,21 @@ public class AnimImageView4 extends AppCompatImageView {
                     mAlpha = (int) object;
                     Log.d("Wbj", "onAnimationUpdate, mAlpha: " + mAlpha);
                     invalidate();
+                }
+            }
+        });
+        mAlphaAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                setSelected(false);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if (mAnimatorListenerAdapter != null) {
+                    mAnimatorListenerAdapter.onAnimationEnd(animation);
                 }
             }
         });
@@ -141,7 +174,7 @@ public class AnimImageView4 extends AppCompatImageView {
         if (imageTintList == null) {
             selectedColor = Color.BLUE;
         } else {
-            selectedColor = imageTintList.getColorForState(new int[]{android.R.attr.state_empty}, Color.GREEN);
+            selectedColor = imageTintList.getColorForState(new int[]{android.R.attr.state_selected}, Color.GREEN);
         }
         //int color = Color.RED;
         Log.d("Wbj", "init: " + selectedColor);
@@ -196,7 +229,7 @@ public class AnimImageView4 extends AppCompatImageView {
         if (mBitmapSrc == null) {
             return;
         }
-        Log.i("Wbj", "onDraw: " + canvas + ", " + mSelected);
+        Log.i("Wbj", "onDraw: " + canvas + ", " + mSelected + ", " + mAlpha);
 
         if (mSelected) {
             canvas.save();
@@ -213,7 +246,7 @@ public class AnimImageView4 extends AppCompatImageView {
         }
     }
 
-    @Override
+    /*@Override
     public void setSelected(boolean selected) {
         super.setSelected(selected);
         if (mBitmapSrc == null) {
@@ -239,6 +272,40 @@ public class AnimImageView4 extends AppCompatImageView {
         } else {
             mAlphaAnimator.start();
         }
+    }*/
+
+    public void setSelected(boolean selected, boolean needAnim, AnimatorListenerAdapter animatorListenerAdapter) {
+        if (needAnim) {
+            if (mBitmapSrc == null) {
+                this.getSourceImage();
+            }
+            if (mBitmapSrc == null) {
+                return;
+            }
+
+            if (mMaskAnimator != null && mMaskAnimator.isRunning()) {
+                return;
+            }
+            if (mAlphaAnimator != null && mAlphaAnimator.isRunning()) {
+                return;
+            }
+
+            Log.d("Wbj", "setSelected: " + selected);
+            mSelected = selected;
+            mAnimatorListenerAdapter = animatorListenerAdapter;
+
+            if (selected) {
+                mMaskAnimator.start();
+                //this.initPhaseAnimator();
+            } else {
+                mAlphaAnimator.start();
+            }
+        } else {
+            setSelected(selected);
+        }
     }
 
+    public void setSelected(boolean selected, boolean needAnim) {
+        this.setSelected(selected, needAnim, null);
+    }
 }
