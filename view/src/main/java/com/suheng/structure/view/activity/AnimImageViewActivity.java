@@ -1,10 +1,9 @@
 package com.suheng.structure.view.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -13,7 +12,6 @@ import com.suheng.structure.view.AnimImageView4;
 import com.suheng.structure.view.R;
 
 public class AnimImageViewActivity extends AppCompatActivity {
-    private AnimImageView4 mSelectedImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +28,7 @@ public class AnimImageViewActivity extends AppCompatActivity {
         ivSelected.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.vector_delete));
         ivSelected.setImageTintList(colorStateList);
         ivSelected.setSelected(true);
-        mSelectedImageView = ivSelected;
+        //mSelectedImageView = ivSelected;
 
         AnimImageView4 ivUnselected = findViewById(R.id.aiv4_unselected);
         ivUnselected.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.vector_delete));
@@ -47,38 +45,55 @@ public class AnimImageViewActivity extends AppCompatActivity {
             ivUnselected.setSelected(true);
         });*/
 
-        ivSelected.setOnClickListener(v -> {
-            if (mSelectedImageView == ivSelected) {
-                ivSelected.setSelected(true, true);
-            } else {
-                if (mSelectedImageView != null) {
-                    mSelectedImageView.setSelected(false, true);
-                }
-                ivSelected.setSelected(true, true, new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        mSelectedImageView = ivSelected;
-                    }
-                });
+        /*ivSelected.setOnClickListener(v -> {
+            if (AnimImageView4.sSelectedView != null && AnimImageView4.sSelectedView.isSelectedAnimRunning()) {
+                return;
             }
+
+            if (AnimImageView4.sSelectedView != ivSelected) {
+                if (AnimImageView4.sSelectedView != null) {
+                    AnimImageView4.sSelectedView.setSelectedAnim(false);
+                }
+            }
+            ivSelected.setSelectedAnim(true);
         });
         ivUnselected.setOnClickListener(v -> {
-            if (mSelectedImageView == ivUnselected) {
-                ivUnselected.setSelected(true, true);
-            } else {
-                if (mSelectedImageView != null) {
-                    mSelectedImageView.setSelected(false, true);
-                }
-                ivUnselected.setSelected(true, true, new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        mSelectedImageView = ivUnselected;
-                    }
-                });
+            if (AnimImageView4.sSelectedView != null && AnimImageView4.sSelectedView.isSelectedAnimRunning()) {
+                return;
             }
-        });
+
+            if (AnimImageView4.sSelectedView != ivUnselected) {
+                if (AnimImageView4.sSelectedView != null) {
+                    AnimImageView4.sSelectedView.setSelectedAnim(false);
+                }
+            }
+            ivUnselected.setSelectedAnim(true);
+        });*/
+
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AnimImageView4 animImageView4 = null;
+                if (v instanceof AnimImageView4) {
+                    animImageView4 = (AnimImageView4) v;
+                }
+                if (animImageView4 == null) {
+                    return;
+                }
+
+                if (AnimImageView4.sSelectedView != null && AnimImageView4.sSelectedView.isSelectedAnimRunning()) {
+                    return;
+                }
+                if (AnimImageView4.sSelectedView != animImageView4) {
+                    if (AnimImageView4.sSelectedView != null) {
+                        AnimImageView4.sSelectedView.setSelectedAnim(false);
+                    }
+                }
+                animImageView4.setSelectedAnim(true);
+            }
+        };
+        ivSelected.setOnClickListener(onClickListener);
+        ivUnselected.setOnClickListener(onClickListener);
     }
 
 }

@@ -32,12 +32,14 @@ public class AnimImageView4 extends AppCompatImageView {
     private final RectF mRectF = new RectF();
     private final Path mPath = new Path();
     private ValueAnimator mMaskAnimator, mAlphaAnimator;
+    private AnimatorSet mPhaseAnimator;
     private Paint mPaint;
     private Bitmap mBitmapSrc, mBitmapDst;
     private final Xfermode mXfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
     private boolean mSelected;
     private int mAlpha;
-    private AnimatorListenerAdapter mAnimatorListenerAdapter;
+    private boolean mIsSelectedAnimRunning;
+    public static AnimImageView4 sSelectedView;
 
     public AnimImageView4(Context context) {
         super(context);
@@ -58,10 +60,12 @@ public class AnimImageView4 extends AppCompatImageView {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setDither(true);
         mPaint.setFilterBitmap(true);
+
         this.getSourceImage();
 
         this.initMaskAnimator();
         this.initAlphaAnimator();
+        this.initPhaseAnimator();
     }
 
     private void initMaskAnimator() {
@@ -79,21 +83,6 @@ public class AnimImageView4 extends AppCompatImageView {
                     mPath.addCircle(mRectF.centerX(), mRectF.centerY(), radius, Path.Direction.CCW);
 
                     invalidate();
-                }
-            }
-        });
-        mMaskAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                setSelected(false);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                if (mAnimatorListenerAdapter != null) {
-                    mAnimatorListenerAdapter.onAnimationEnd(animation);
                 }
             }
         });
@@ -120,19 +109,10 @@ public class AnimImageView4 extends AppCompatImageView {
                 super.onAnimationStart(animation);
                 setSelected(false);
             }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                if (mAnimatorListenerAdapter != null) {
-                    mAnimatorListenerAdapter.onAnimationEnd(animation);
-                }
-            }
         });
     }
 
     private void initPhaseAnimator() {
-        AnimatorSet animatorSet = new AnimatorSet();
         ValueAnimator.AnimatorUpdateListener animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -152,8 +132,35 @@ public class AnimImageView4 extends AppCompatImageView {
         secondPhaseAnim.setDuration(COMPLETE_ANIM_DURATION - FIRST_PHASE_ANIM_DURATION);
         secondPhaseAnim.setInterpolator(mSecondPhaseInterpolator);
         secondPhaseAnim.addUpdateListener(animatorUpdateListener);
-        animatorSet.play(secondPhaseAnim).after(firstPhaseAnim);
-        animatorSet.start();
+
+        mPhaseAnimator = new AnimatorSet();
+        mPhaseAnimator.play(secondPhaseAnim).after(firstPhaseAnim);
+        mPhaseAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                mIsSelectedAnimRunning = true;
+                sSelectedView = AnimImageView4.this;
+                setSelected(false);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                mIsSelectedAnimRunning = false;
+                setSelected(true);
+                mPath.reset();
+                invalidate();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                super.onAnimationCancel(animation);
+                mIsSelectedAnimRunning = false;
+                mPath.reset();
+                invalidate();
+            }
+        });
     }
 
     private void getSourceImage() {
@@ -200,26 +207,23 @@ public class AnimImageView4 extends AppCompatImageView {
     }
 
     @Override
-    public void onVisibilityAggregated(boolean isVisible) {
-        super.onVisibilityAggregated(isVisible);
-        if (mMaskAnimator != null) {
-            if (isVisible) {
-                if (mMaskAnimator.isPaused()) {
-                    mMaskAnimator.resume();
-                }
-            } else {
-                if (mMaskAnimator.isRunning()) {
-                    mMaskAnimator.pause();
-                }
-            }
-        }
-    }
-
-    @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        sSelectedView = null;
         if (mMaskAnimator != null) {
             mMaskAnimator.cancel();
+        }
+        if (mPhaseAnimator != null) {
+            mPhaseAnimator.cancel();
+        }
+        if (mAlphaAnimator != null) {
+            mAlphaAnimator.cancel();
+        }
+        if (mBitmapSrc != null && !mBitmapSrc.isRecycled()) {
+            mBitmapSrc.recycle();
+        }
+        if (mBitmapDst != null && !mBitmapDst.isRecycled()) {
+            mBitmapSrc.recycle();
         }
     }
 
@@ -246,9 +250,15 @@ public class AnimImageView4 extends AppCompatImageView {
         }
     }
 
-    /*@Override
+    @Override
     public void setSelected(boolean selected) {
         super.setSelected(selected);
+        if (selected) {
+            sSelectedView = this;
+        }
+    }
+
+    public void setSelectedAnim(boolean selected) {
         if (mBitmapSrc == null) {
             this.getSourceImage();
         }
@@ -262,50 +272,31 @@ public class AnimImageView4 extends AppCompatImageView {
         if (mAlphaAnimator != null && mAlphaAnimator.isRunning()) {
             return;
         }
+        if (mPhaseAnimator != null && mPhaseAnimator.isRunning()) {
+            return;
+        }
 
         Log.d("Wbj", "setSelected: " + selected);
         mSelected = selected;
 
         if (selected) {
+            if (mMaskAnimator == null) {
+                this.initMaskAnimator();
+            }
             mMaskAnimator.start();
-            this.initPhaseAnimator();
+            if (mPhaseAnimator == null) {
+                this.initPhaseAnimator();
+            }
+            mPhaseAnimator.start();
         } else {
+            if (mAlphaAnimator == null) {
+                this.initAlphaAnimator();
+            }
             mAlphaAnimator.start();
-        }
-    }*/
-
-    public void setSelected(boolean selected, boolean needAnim, AnimatorListenerAdapter animatorListenerAdapter) {
-        if (needAnim) {
-            if (mBitmapSrc == null) {
-                this.getSourceImage();
-            }
-            if (mBitmapSrc == null) {
-                return;
-            }
-
-            if (mMaskAnimator != null && mMaskAnimator.isRunning()) {
-                return;
-            }
-            if (mAlphaAnimator != null && mAlphaAnimator.isRunning()) {
-                return;
-            }
-
-            Log.d("Wbj", "setSelected: " + selected);
-            mSelected = selected;
-            mAnimatorListenerAdapter = animatorListenerAdapter;
-
-            if (selected) {
-                mMaskAnimator.start();
-                //this.initPhaseAnimator();
-            } else {
-                mAlphaAnimator.start();
-            }
-        } else {
-            setSelected(selected);
         }
     }
 
-    public void setSelected(boolean selected, boolean needAnim) {
-        this.setSelected(selected, needAnim, null);
+    public boolean isSelectedAnimRunning() {
+        return mIsSelectedAnimRunning;
     }
 }
