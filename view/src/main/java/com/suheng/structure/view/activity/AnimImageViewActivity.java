@@ -81,11 +81,11 @@ public class AnimImageViewActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (AnimImageView4.sSelectedView != null && AnimImageView4.sSelectedView.isSelectedAnimRunning()) {
-                    return;
-                }
-                if (AnimImageView4.sSelectedView != animImageView4) {
-                    if (AnimImageView4.sSelectedView != null) {
+                if (AnimImageView4.sSelectedView != null) {
+                    if (AnimImageView4.sSelectedView.isSelectedAnimRunning()) {
+                        return;
+                    }
+                    if (AnimImageView4.sSelectedView != animImageView4) {
                         AnimImageView4.sSelectedView.setSelectedAnim(false);
                     }
                 }

@@ -61,8 +61,6 @@ public class AnimImageView4 extends AppCompatImageView {
         mPaint.setDither(true);
         mPaint.setFilterBitmap(true);
 
-        this.getSourceImage();
-
         this.initMaskAnimator();
         this.initAlphaAnimator();
         this.initPhaseAnimator();
