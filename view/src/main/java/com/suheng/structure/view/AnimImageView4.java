@@ -169,10 +169,12 @@ public class AnimImageView4 extends AppCompatImageView {
         }
         mBitmapSrc = BitmapHelper.drawableToBitmap(drawable);
         Log.d("Wbj", "init: " + mBitmapSrc);
-        if (mBitmapSrc == null) {
+        int width = getWidth();
+        int height = getHeight();
+        if (mBitmapSrc == null || width <= 0 || height <= 0 || mBitmapSrc.getWidth() <= 0 || mBitmapSrc.getHeight() <= 0) {
             return;
         }
-        mRectF.set(0, 0, mBitmapSrc.getWidth(), mBitmapSrc.getHeight());
+        mRectF.set(0, 0, width, height);
 
         ColorStateList imageTintList = getImageTintList();
         int selectedColor;
@@ -183,8 +185,10 @@ public class AnimImageView4 extends AppCompatImageView {
         }
         //int color = Color.RED;
         Log.d("Wbj", "init: " + selectedColor);
-        mBitmapDst = Bitmap.createBitmap(mBitmapSrc);
+        mBitmapDst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mBitmapDst);
+        float sx = 1.0f * width / mBitmapSrc.getWidth();
+        canvas.scale(sx, sx);
         Paint paint = new Paint(mPaint);
         /*if (drawable instanceof BitmapDrawable) {
             ColorMatrix colorMatrix = new ColorMatrix();
