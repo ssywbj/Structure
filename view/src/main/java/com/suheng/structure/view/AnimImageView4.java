@@ -39,7 +39,6 @@ public class AnimImageView4 extends AppCompatImageView {
     private boolean mSelected;
     private int mAlpha;
     private boolean mIsSelectedAnimRunning;
-    public static AnimImageView4 sSelectedView;
 
     public AnimImageView4(Context context) {
         super(context);
@@ -138,7 +137,6 @@ public class AnimImageView4 extends AppCompatImageView {
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
                 mIsSelectedAnimRunning = true;
-                sSelectedView = AnimImageView4.this;
                 setSelected(false);
             }
 
@@ -211,7 +209,6 @@ public class AnimImageView4 extends AppCompatImageView {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        sSelectedView = null;
         if (mMaskAnimator != null) {
             mMaskAnimator.cancel();
         }
@@ -249,14 +246,6 @@ public class AnimImageView4 extends AppCompatImageView {
             canvas.drawBitmap(mBitmapSrc, null, mRectF, mPaint);
             mPaint.setXfermode(null);
             canvas.restoreToCount(saveLayer);
-        }
-    }
-
-    @Override
-    public void setSelected(boolean selected) {
-        super.setSelected(selected);
-        if (selected) {
-            sSelectedView = this;
         }
     }
 

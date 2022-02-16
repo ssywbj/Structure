@@ -13,6 +13,8 @@ import com.suheng.structure.view.R;
 
 public class AnimImageViewActivity extends AppCompatActivity {
 
+    private AnimImageView4 mSelectedImageView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +30,7 @@ public class AnimImageViewActivity extends AppCompatActivity {
         ivSelected.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.vector_delete));
         ivSelected.setImageTintList(colorStateList);
         ivSelected.setSelected(true);
-        //mSelectedImageView = ivSelected;
+        mSelectedImageView = ivSelected;
 
         AnimImageView4 ivUnselected = findViewById(R.id.aiv4_unselected);
         ivUnselected.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.vector_delete));
@@ -81,15 +83,16 @@ public class AnimImageViewActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (AnimImageView4.sSelectedView != null) {
-                    if (AnimImageView4.sSelectedView.isSelectedAnimRunning()) {
+                if (mSelectedImageView != null) {
+                    if (mSelectedImageView.isSelectedAnimRunning()) {
                         return;
                     }
-                    if (AnimImageView4.sSelectedView != animImageView4) {
-                        AnimImageView4.sSelectedView.setSelectedAnim(false);
+                    if (mSelectedImageView != animImageView4) {
+                        mSelectedImageView.setSelectedAnim(false);
                     }
                 }
                 animImageView4.setSelectedAnim(true);
+                mSelectedImageView = animImageView4;
             }
         };
         ivSelected.setOnClickListener(onClickListener);
