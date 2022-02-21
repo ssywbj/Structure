@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ViewStub
+        android:id="@+id/lil_stub_left_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout="@layout/view_list_item_layout_left_image" />
+
+    <TextView
+        android:id="@+id/lil_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/background_dark"
+        android:textSize="16sp" />
+
+    <ViewStub
+        android:id="@+id/lil_stub_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout="@layout/view_list_item_layout_subtitle" />
+
+    <ViewStub
+        android:id="@+id/lil_stub_right_image"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout="@layout/view_list_item_layout_right_image" />
+
+    <ViewStub
+        android:id="@+id/lil_stub_describe_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout="@layout/view_list_item_layout_describe_title" />
+
+    <ViewStub
+        android:id="@+id/lil_stub_describe_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout="@layout/view_list_item_layout_describe_subtitle" />
+
+    <!--<ImageView
+        android:id="@+id/lil_right_image"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/vector_delete" />-->
+
+</merge>

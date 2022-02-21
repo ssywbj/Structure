@@ -32,6 +32,7 @@
             android:label="PictureManager" />
         <activity android:name=".activity.OpenGLActivity" />
         <activity android:name=".activity.AnimImageViewActivity" />
+        <activity android:name=".activity.ListItemLayoutActivity" />
 
     </application>
 
