@@ -48,9 +48,8 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "RecyclerViewActivity");
         mStringList.add("AnimImageView");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "AnimImageViewActivity");
-        startActivity(new Intent(this, AnimImageViewActivity.class));
-        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ListItemLayoutActivity");
         mStringList.add("ListItemLayout");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ListItemLayoutActivity");
         startActivity(new Intent(this, ListItemLayoutActivity.class));
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);

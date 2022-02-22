@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,22 +12,155 @@
         <com.suheng.structure.view.ListItemLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="2dp" />
+            android:layout_margin="1dp"
+            app:lil_left_image="@drawable/vector_delete"
+            app:lil_sub_seekbar="true"
+            app:lil_title="Title" />
 
         <com.suheng.structure.view.ListItemLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="2dp" />
+            android:layout_margin="1dp"
+            app:lil_left_image="@drawable/vector_delete"
+            app:lil_sub_progressbar="true"
+            app:lil_subtitle="Subtitle"
+            app:lil_title="Title" />
 
         <com.suheng.structure.view.ListItemLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="2dp" />
+            android:layout_margin="1dp"
+            app:lil_right_layout_type="image"
+            app:lil_title="Title" />
 
         <com.suheng.structure.view.ListItemLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="2dp" />
+            android:layout_margin="1dp"
+            app:lil_right_layout_type="radio"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_describe_title="@string/app_name"
+            app:lil_right_layout_type="image"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_describe_subtitle="@android:string/dialog_alert_title"
+            app:lil_describe_title="@string/app_name"
+            app:lil_right_layout_type="image"
+            app:lil_subtitle="Subtitle"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_right_layout_type="toggle_switch"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_left_image="@drawable/vector_delete"
+            app:lil_right_layout_type="image"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_left_image="@drawable/vector_delete"
+            app:lil_right_layout_type="toggle_switch"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_describe_title="@string/app_name"
+            app:lil_left_image="@drawable/vector_delete"
+            app:lil_left_image_dimen="h1"
+            app:lil_right_layout_type="image"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_right_layout_type="image"
+            app:lil_subtitle="Subtitle"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_right_layout_type="toggle_switch"
+            app:lil_subtitle="Subtitle"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_right_image="@android:drawable/ic_menu_camera"
+            app:lil_right_layout_type="image"
+            app:lil_subtitle="Subtitle"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_left_image="@drawable/vector_delete"
+            app:lil_subtitle="Subtitle"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_left_image="@drawable/vector_delete"
+            app:lil_right_layout_type="image"
+            app:lil_subtitle="Subtitle"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_left_image="@drawable/vector_delete"
+            app:lil_right_layout_type="toggle_switch"
+            app:lil_subtitle="Subtitle"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_left_image="@drawable/vector_delete"
+            app:lil_right_image="@android:drawable/ic_menu_camera"
+            app:lil_right_layout_type="image"
+            app:lil_subtitle="Subtitle"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_left_image="@drawable/vector_delete"
+            app:lil_right_image="@android:drawable/ic_menu_camera"
+            app:lil_right_layout_type="image"
+            app:lil_subtitle="Subtitle"
+            app:lil_title="Title" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
