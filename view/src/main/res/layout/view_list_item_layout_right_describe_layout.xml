@@ -9,6 +9,7 @@
         android:id="@+id/lil_describe_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
         android:textColor="@android:color/holo_blue_dark"
         android:textSize="13sp" />
 
@@ -16,5 +17,6 @@
         android:id="@+id/lil_stub_describe_subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
         android:layout="@layout/view_list_item_layout_describe_subtitle" />
 </LinearLayout>

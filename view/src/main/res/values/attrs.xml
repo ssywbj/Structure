@@ -29,7 +29,9 @@
             <enum name="image" value="2" />
             <enum name="radio" value="3" />
             <enum name="toggle_switch" value="4" />
+            <enum name="red_dot" value="5" />
         </attr>
         <attr name="lil_right_image" format="reference" />
+        <attr name="lil_right_show_divide_line" format="boolean" />
     </declare-styleable>
 </resources>

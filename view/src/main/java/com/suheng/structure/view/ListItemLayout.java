@@ -16,18 +16,20 @@ import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 
 public class ListItemLayout extends RelativeLayout {
     private String mTitle, mSubtitle, mDescribeTitle, mDescribeSubtitle;
 
     private Drawable mLeftDrawable, mRightDrawable;
     private int mLeftDrawableDimen, mRightLayoutType;
-    private boolean mIsSubProgressbar, mIsSubSeekbar;
+    private boolean mIsSubProgressbar, mIsSubSeekbar, mIsShowRightDivideLine;
 
     public ListItemLayout(Context context) {
         super(context);
@@ -72,6 +74,9 @@ public class ListItemLayout extends RelativeLayout {
             } else if (index == R.styleable.ListItemLayout_lil_sub_seekbar) {
                 mIsSubSeekbar = typedArray.getBoolean(index, false);
                 Log.w("Wbj", "ListItemLayout, isSubSeekbar: " + mIsSubSeekbar);
+            } else if (index == R.styleable.ListItemLayout_lil_right_show_divide_line) {
+                mIsShowRightDivideLine = typedArray.getBoolean(index, false);
+                Log.w("Wbj", "ListItemLayout, isShowRightDivideLine: " + mIsShowRightDivideLine);
             }
         }
         typedArray.recycle();
@@ -88,16 +93,19 @@ public class ListItemLayout extends RelativeLayout {
         setBackgroundColor(Color.WHITE);
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
+
         int paddingStart = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, metrics);
         int paddingEnd = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 22, metrics);
         int paddingTop = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, metrics);
         setPadding(paddingStart, paddingTop, paddingEnd, paddingTop);
 
+        setMinimumHeight((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, metrics));
+
         inflate(getContext(), R.layout.view_list_item_layout, this);
 
         ImageView leftImage = null;
         if (mLeftDrawable != null) {
-            leftImage = (ImageView) ((ViewStub) findViewById(R.id.lil_stub_left_image)).inflate();
+            leftImage = (ImageView) ((ViewStub) findViewById(R.id.lil_stub_left_layout)).inflate();
             RelativeLayout.LayoutParams leftImageLayoutParams = (LayoutParams) leftImage.getLayoutParams();
             leftImageLayoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
             leftImageLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_START);
@@ -113,8 +121,9 @@ public class ListItemLayout extends RelativeLayout {
             leftImage.setImageDrawable(mLeftDrawable);
         }
 
+        View titleLayout = null;
         if (!TextUtils.isEmpty(mTitle)) {
-            View titleLayout = ((ViewStub) findViewById(R.id.lil_stub_title_layout)).inflate();
+            titleLayout = ((ViewStub) findViewById(R.id.lil_stub_title_layout)).inflate();
             RelativeLayout.LayoutParams titleLayoutLayoutParams = (LayoutParams) titleLayout.getLayoutParams();
             if (leftImage == null) {
                 titleLayoutLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_START);
@@ -144,8 +153,8 @@ public class ListItemLayout extends RelativeLayout {
 
             if (mIsSubSeekbar) {
                 SeekBar seekbar = (SeekBar) ((ViewStub) titleLayout.findViewById(R.id.lil_stub_sub_seekbar)).inflate();
-                paddingStart = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, metrics);
-                seekbar.setPadding(paddingStart, 0, paddingStart, 0);
+                int paddingLeft = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, metrics);
+                seekbar.setPadding(paddingLeft, 0, paddingLeft, 0);
                 LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) seekbar.getLayoutParams();
                 if (subtitle == null) {
                     layoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, metrics);
@@ -154,43 +163,71 @@ public class ListItemLayout extends RelativeLayout {
             }
         }
 
-        ImageView rightImage = null;
-        View layoutRight = null;
-        if (mRightLayoutType == 2) {
-            rightImage = (ImageView) ((ViewStub) findViewById(R.id.lil_stub_right_image)).inflate();
-            if (mRightDrawable == null) {
-                rightImage.setImageResource(R.drawable.vector_delete);
-            } else {
-                rightImage.setImageDrawable(mRightDrawable);
+        if (mRightLayoutType != 0) {
+            View layoutRight = ((ViewStub) findViewById(R.id.lil_stub_right_layout)).inflate();
+            layoutRight.setVisibility(VISIBLE);
+
+            if (mIsShowRightDivideLine) {
+                ((ViewStub) findViewById(R.id.lil_stub_right_divide_line)).inflate();
             }
-            layoutRight = rightImage;
-        } else if (mRightLayoutType == 3) {
-            layoutRight = ((ViewStub) findViewById(R.id.lil_stub_right_radio)).inflate();
-        } else if (mRightLayoutType == 4) {
-            layoutRight = ((ViewStub) findViewById(R.id.lil_stub_right_switch)).inflate();
-        }
-        if (layoutRight != null) {
+
+            if (mRightLayoutType == 2) {
+                ImageView rightImage = (ImageView) ((ViewStub) findViewById(R.id.lil_stub_right_image)).inflate();
+                if (mRightDrawable == null) {
+                    rightImage.setImageResource(R.drawable.ic_next);
+                } else {
+                    rightImage.setImageDrawable(mRightDrawable);
+                }
+
+                if (!TextUtils.isEmpty(mDescribeTitle)) {
+                    View describeLayout = ((ViewStub) findViewById(R.id.lil_stub_describe_layout)).inflate();
+
+                    TextView describeTitle = findViewById(R.id.lil_describe_title);
+                    describeTitle.setText(mDescribeTitle);
+
+                    TextView describeSubtitle = null;
+                    if (!TextUtils.isEmpty(mDescribeSubtitle)) {
+                        describeSubtitle = (TextView) ((ViewStub) findViewById(R.id.lil_stub_describe_subtitle)).inflate();
+                        describeSubtitle.setText(mDescribeSubtitle);
+                    }
+
+                    TextView finalDescribeSubtitle = describeSubtitle;
+                    rightImage.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) describeLayout.getLayoutParams();
+                            int width = getWidth();
+                            if (width <= 0) {
+                                return;
+                            }
+                            int maxPixels = (width - paddingStart - paddingEnd) / 2 - rightImage.getWidth()
+                                    - layoutParams.rightMargin - layoutParams.leftMargin;
+                            describeTitle.setMaxWidth(maxPixels);
+                            if (finalDescribeSubtitle != null) {
+                                finalDescribeSubtitle.setMaxWidth(maxPixels);
+                            }
+                        }
+                    });
+
+                }
+            } else if (mRightLayoutType == 3) {
+                RadioButton radioButton = (RadioButton) ((ViewStub) findViewById(R.id.lil_stub_right_radio)).inflate();
+            } else if (mRightLayoutType == 4) {
+                SwitchCompat switchCompat = (SwitchCompat) ((ViewStub) findViewById(R.id.lil_stub_right_switch)).inflate();
+            }
+
             RelativeLayout.LayoutParams rightImageLayoutParams = (LayoutParams) layoutRight.getLayoutParams();
             rightImageLayoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
             rightImageLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
             layoutRight.setLayoutParams(rightImageLayoutParams);
-        }
 
-        if (rightImage != null && !TextUtils.isEmpty(mDescribeTitle)) {
-            View describeLayout = ((ViewStub) findViewById(R.id.lil_stub_describe_layout)).inflate();
-            RelativeLayout.LayoutParams describeLayoutLayoutParams = (LayoutParams) describeLayout.getLayoutParams();
-            describeLayoutLayoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-            describeLayoutLayoutParams.addRule(RelativeLayout.START_OF, rightImage.getId());
-            describeLayout.setLayoutParams(describeLayoutLayoutParams);
-
-            TextView describeTitle = describeLayout.findViewById(R.id.lil_describe_title);
-            describeTitle.setText(mDescribeTitle);
-
-            if (!TextUtils.isEmpty(mDescribeSubtitle)) {
-                TextView describeSubtitle = (TextView) ((ViewStub) describeLayout.findViewById(R.id.lil_stub_describe_subtitle)).inflate();
-                describeSubtitle.setText(mDescribeSubtitle);
+            if (titleLayout != null) {
+                RelativeLayout.LayoutParams titleLayoutLayoutParams = (LayoutParams) titleLayout.getLayoutParams();
+                titleLayoutLayoutParams.addRule(RelativeLayout.START_OF, layoutRight.getId());
+                titleLayout.setLayoutParams(titleLayoutLayoutParams);
             }
         }
+
     }
 
     private Path mPath;

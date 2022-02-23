@@ -4,40 +4,22 @@
     android:layout_height="wrap_content">
 
     <ViewStub
-        android:id="@+id/lil_stub_left_image"
+        android:id="@+id/lil_stub_left_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginEnd="16dp"
-        android:layout="@layout/view_list_item_layout_left_image" />
+        android:layout="@layout/view_list_item_layout_left_layout" />
+
+    <ViewStub
+        android:id="@+id/lil_stub_right_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout="@layout/view_list_item_layout_right_layout" />
 
     <ViewStub
         android:id="@+id/lil_stub_title_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout="@layout/view_list_item_layout_title_layout" />
 
-    <ViewStub
-        android:id="@+id/lil_stub_describe_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="2dp"
-        android:layout="@layout/view_list_item_layout_describe_layout" />
-
-    <ViewStub
-        android:id="@+id/lil_stub_right_image"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout="@layout/view_list_item_layout_right_image" />
-
-    <ViewStub
-        android:id="@+id/lil_stub_right_radio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout="@layout/view_list_item_layout_right_radio" />
-
-    <ViewStub
-        android:id="@+id/lil_stub_right_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout="@layout/view_list_item_layout_right_switch" />
 </merge>
