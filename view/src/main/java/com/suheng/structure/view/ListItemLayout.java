@@ -1,7 +1,9 @@
 package com.suheng.structure.view;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -91,6 +93,13 @@ public class ListItemLayout extends RelativeLayout {
 
     private void init() {
         setBackgroundColor(Color.WHITE);
+        int[][] states = new int[2][];
+        states[0] = new int[]{android.R.attr.state_pressed};
+        states[1] = new int[]{};
+        int[] colors = new int[]{Color.RED, Color.BLUE};
+        ColorStateList colorStateList = new ColorStateList(states, colors);
+        setBackgroundTintList(colorStateList);
+        setClickable(true);
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
 
@@ -233,18 +242,21 @@ public class ListItemLayout extends RelativeLayout {
     private Path mPath;
     private RectF rectF;
 
-    /*@Override
+    @Override
     public void draw(Canvas canvas) {
-        if (mPath == null) {
+        /*if (mPath == null) {
             mPath = new Path();
             rectF = new RectF();
         }
         mPath.reset();
         rectF.set(0, 0, getWidth(), getHeight());
         float rx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
-        mPath.addRoundRect(rectF, rx, rx, Path.Direction.CCW);
-        canvas.clipPath(mPath);
+        //mPath.addRoundRect(rectF, rx, rx, Path.Direction.CCW);
+        //float[] radii = new float[]{0, 0, 0, 0, rx, rx, rx, rx};
+        float[] radii = new float[]{rx, rx, rx, rx, 0, 0, 0, 0};
+        mPath.addRoundRect(rectF, radii, Path.Direction.CCW);
+        canvas.clipPath(mPath);*/
         super.draw(canvas);
-    }*/
+    }
 
 }
