@@ -2,7 +2,9 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#CCCCCC"
+    android:padding="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -60,6 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="1dp"
+            android:background="@android:color/holo_purple"
             app:lil_right_layout_type="image"
             app:lil_title="TitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitle1111111111" />
 
@@ -67,6 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="1dp"
+            app:lil_corners_angle_type="round"
             app:lil_right_layout_type="radio"
             app:lil_title="TitleTitleTitleTitleTitleTitle" />
 
@@ -74,11 +78,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="1dp"
+            app:lil_corners_angle_type="top_corners_round"
             app:lil_describe_title="@string/app_name"
             app:lil_right_layout_type="image"
             app:lil_title="TitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitle22222" />
 
         <com.suheng.structure.view.ListItemLayout
+            android:id="@+id/list_item_layout4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:lil_right_layout_type="toggle_switch"
+            app:lil_title="Title" />
+
+        <com.suheng.structure.view.ListItemLayout
+            android:id="@+id/list_item_layout5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="1dp"
@@ -87,13 +101,6 @@
             app:lil_right_layout_type="image"
             app:lil_subtitle="SubtitleSubtitleSubtitleSubtitleSubtitleSubtitle"
             app:lil_title="TitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitle333333" />
-
-        <com.suheng.structure.view.ListItemLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="1dp"
-            app:lil_right_layout_type="toggle_switch"
-            app:lil_title="Title" />
 
         <com.suheng.structure.view.ListItemLayout
             android:layout_width="match_parent"

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="174dp"
     android:height="120dp"
     android:viewportWidth="580"
-    android:viewportHeight="400">
+    android:viewportHeight="400"
+    android:shape="rectangle">
 
     <path
         android:name="@string/search_path_1"
@@ -22,4 +23,4 @@
         android:pathData="M 369.09091 197.37216 L 380.90909 208.28125"
         android:strokeWidth="1.5"
         android:strokeColor="#000" />
-</vector>
+</shape>

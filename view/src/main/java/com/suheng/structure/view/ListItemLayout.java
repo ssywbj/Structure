@@ -26,12 +26,19 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 
+import java.util.Arrays;
+
 public class ListItemLayout extends RelativeLayout {
     private String mTitle, mSubtitle, mDescribeTitle, mDescribeSubtitle;
 
     private Drawable mLeftDrawable, mRightDrawable;
-    private int mLeftDrawableDimen, mRightLayoutType;
+    private int mLeftDrawableDimen, mRightLayoutType, mCornersAngleType;
     private boolean mIsSubProgressbar, mIsSubSeekbar, mIsShowRightDivideLine;
+
+    private Path mPath;
+    private RectF mRectF;
+    private float[] mRadii;
+    private float mRadius;
 
     public ListItemLayout(Context context) {
         super(context);
@@ -79,6 +86,9 @@ public class ListItemLayout extends RelativeLayout {
             } else if (index == R.styleable.ListItemLayout_lil_right_show_divide_line) {
                 mIsShowRightDivideLine = typedArray.getBoolean(index, false);
                 Log.w("Wbj", "ListItemLayout, isShowRightDivideLine: " + mIsShowRightDivideLine);
+            } else if (index == R.styleable.ListItemLayout_lil_corners_angle_type) {
+                mCornersAngleType = typedArray.getInt(index, 0);
+                Log.w("Wbj", "ListItemLayout, cornersAngleType: " + mCornersAngleType);
             }
         }
         typedArray.recycle();
@@ -92,14 +102,20 @@ public class ListItemLayout extends RelativeLayout {
     }
 
     private void init() {
-        setBackgroundColor(Color.WHITE);
-        int[][] states = new int[2][];
-        states[0] = new int[]{android.R.attr.state_pressed};
-        states[1] = new int[]{};
-        int[] colors = new int[]{Color.RED, Color.BLUE};
-        ColorStateList colorStateList = new ColorStateList(states, colors);
-        setBackgroundTintList(colorStateList);
         setClickable(true);
+        mRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
+
+        Drawable background = getBackground();
+        if (background == null) {
+            int backgroundColor = Color.WHITE;
+            int[][] states = new int[2][];
+            states[0] = new int[]{android.R.attr.state_pressed};
+            states[1] = new int[]{};
+            int[] colors = new int[]{Color.parseColor("#EEEEEE"), backgroundColor};
+            ColorStateList colorStateList = new ColorStateList(states, colors);
+            setBackgroundTintList(colorStateList);
+            setBackgroundColor(backgroundColor);
+        }
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
 
@@ -239,24 +255,54 @@ public class ListItemLayout extends RelativeLayout {
 
     }
 
-    private Path mPath;
-    private RectF rectF;
-
     @Override
     public void draw(Canvas canvas) {
-        /*if (mPath == null) {
+        if (mPath == null) {
             mPath = new Path();
-            rectF = new RectF();
+            mRectF = new RectF();
+            mRadii = new float[8];
+        }
+        if (mCornersAngleType == 1) {
+            Arrays.fill(mRadii, mRadius);
+        } else if (mCornersAngleType == 2) {
+            Arrays.fill(mRadii, 0, 4, mRadius);
+            Arrays.fill(mRadii, 4, mRadii.length, 0);
+        } else if (mCornersAngleType == 3) {
+            Arrays.fill(mRadii, 0, 4, 0);
+            Arrays.fill(mRadii, 4, mRadii.length, mRadius);
+        } else {
+            Arrays.fill(mRadii, 0);
         }
         mPath.reset();
-        rectF.set(0, 0, getWidth(), getHeight());
-        float rx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
-        //mPath.addRoundRect(rectF, rx, rx, Path.Direction.CCW);
-        //float[] radii = new float[]{0, 0, 0, 0, rx, rx, rx, rx};
-        float[] radii = new float[]{rx, rx, rx, rx, 0, 0, 0, 0};
-        mPath.addRoundRect(rectF, radii, Path.Direction.CCW);
-        canvas.clipPath(mPath);*/
+        mRectF.set(0, 0, getWidth(), getHeight());
+        mPath.addRoundRect(mRectF, mRadii, Path.Direction.CCW);
+        canvas.clipPath(mPath);
+
         super.draw(canvas);
+    }
+
+    public void resetCornersRadius() {
+        mCornersAngleType = 0;
+
+        invalidate();
+    }
+
+    public void cornersRound() {
+        mCornersAngleType = 1;
+
+        invalidate();
+    }
+
+    public void topCornersRound() {
+        mCornersAngleType = 2;
+
+        invalidate();
+    }
+
+    public void bottomCornersRound() {
+        mCornersAngleType = 3;
+
+        invalidate();
     }
 
 }
