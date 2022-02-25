@@ -11,11 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
-import android.graphics.Xfermode;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -25,8 +21,8 @@ import androidx.appcompat.widget.AppCompatImageView;
 public class AnimImageView4 extends AppCompatImageView {
     private final EaseCubicInterpolator mFirstPhaseInterpolator = new EaseCubicInterpolator(0.33f, 0, 0.66f, 1);
     private final EaseCubicInterpolator mSecondPhaseInterpolator = new EaseCubicInterpolator(0.33f, 0, 0, 1);
-    public static final int FIRST_PHASE_ANIM_DURATION = 250;
-    public static final int COMPLETE_ANIM_DURATION = 700;
+    public static final int FIRST_PHASE_ANIM_DURATION = 1250;
+    public static final int COMPLETE_ANIM_DURATION = 1700;
     public static final float END_SCALE = 1.08f;
     public static final float START_SCALE = 1f;
     private final RectF mRectF = new RectF();
@@ -34,8 +30,7 @@ public class AnimImageView4 extends AppCompatImageView {
     private ValueAnimator mMaskAnimator, mAlphaAnimator;
     private AnimatorSet mPhaseAnimator;
     private Paint mPaint;
-    private Bitmap mBitmapSrc, mBitmapDst;
-    private final Xfermode mXfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
+    private Bitmap mBitmapSrc;
     private boolean mSelected;
     private int mAlpha;
     private boolean mIsSelectedAnimRunning;
@@ -95,7 +90,7 @@ public class AnimImageView4 extends AppCompatImageView {
                 Object object = animation.getAnimatedValue();
                 if ((object instanceof Integer) && !mRectF.isEmpty()) {
                     mAlpha = (int) object;
-                    Log.d("Wbj", "onAnimationUpdate, mAlpha: " + mAlpha);
+                    //Log.d("Wbj", "onAnimationUpdate, mAlpha: " + mAlpha);
                     invalidate();
                 }
             }
@@ -160,13 +155,9 @@ public class AnimImageView4 extends AppCompatImageView {
     }
 
     private void getSourceImage() {
-        Drawable drawable = getDrawable();
-        Log.d("Wbj", "init: " + drawable);
-        if (drawable == null) {
-            return;
-        }
-        mBitmapSrc = BitmapHelper.drawableToBitmap(drawable);
-        Log.d("Wbj", "init: " + mBitmapSrc);
+        setDrawingCacheEnabled(true);
+        mBitmapSrc = getDrawingCache();
+        Log.d("Wbj", "src bitmap: " + mBitmapSrc);
         int width = getWidth();
         int height = getHeight();
         if (mBitmapSrc == null || width <= 0 || height <= 0 || mBitmapSrc.getWidth() <= 0 || mBitmapSrc.getHeight() <= 0) {
@@ -181,24 +172,8 @@ public class AnimImageView4 extends AppCompatImageView {
         } else {
             selectedColor = imageTintList.getColorForState(new int[]{android.R.attr.state_selected}, Color.GREEN);
         }
-        //int color = Color.RED;
-        Log.d("Wbj", "init: " + selectedColor);
-        mBitmapDst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(mBitmapDst);
-        float sx = 1.0f * width / mBitmapSrc.getWidth();
-        canvas.scale(sx, sx);
-        Paint paint = new Paint(mPaint);
-        /*if (drawable instanceof BitmapDrawable) {
-            ColorMatrix colorMatrix = new ColorMatrix();
-            colorMatrix.setSaturation(0.2f); //0~1，0为全灰，1为原色
-            ColorMatrixColorFilter matrixColorFilter = new ColorMatrixColorFilter(colorMatrix);
-            paint.setColorFilter(matrixColorFilter);
-            //paint.setColorFilter(ColorFilterView.mColorFilter1);
-            canvas.drawBitmap(bitmapSrc, 0, 0, paint);
-        } else {*/
-        paint.setColor(selectedColor);
-        canvas.drawBitmap(mBitmapSrc.extractAlpha(), 0, 0, paint);
-        //}
+        //color = Color.RED;
+        mPaint.setColor(selectedColor);
 
         if (mMaskAnimator == null) {
             this.initMaskAnimator();
@@ -218,12 +193,7 @@ public class AnimImageView4 extends AppCompatImageView {
         if (mAlphaAnimator != null) {
             mAlphaAnimator.cancel();
         }
-        if (mBitmapSrc != null && !mBitmapSrc.isRecycled()) {
-            mBitmapSrc.recycle();
-        }
-        if (mBitmapDst != null && !mBitmapDst.isRecycled()) {
-            mBitmapSrc.recycle();
-        }
+        setDrawingCacheEnabled(false); //会自动回收getDrawingCache()对应的bitmap
     }
 
     @Override
@@ -237,14 +207,11 @@ public class AnimImageView4 extends AppCompatImageView {
         if (mSelected) {
             canvas.save();
             canvas.clipPath(mPath);
-            canvas.drawBitmap(mBitmapDst, null, mRectF, null);
+            canvas.drawBitmap(mBitmapSrc.extractAlpha(), null, mRectF, mPaint);
             canvas.restore();
         } else {
             int saveLayer = canvas.saveLayerAlpha(mRectF, mAlpha, Canvas.ALL_SAVE_FLAG);
-            canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint);
-            mPaint.setXfermode(mXfermode);
-            canvas.drawBitmap(mBitmapSrc, null, mRectF, mPaint);
-            mPaint.setXfermode(null);
+            canvas.drawBitmap(mBitmapSrc.extractAlpha(), null, mRectF, mPaint);
             canvas.restoreToCount(saveLayer);
         }
     }
