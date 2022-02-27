@@ -1,4 +1,4 @@
-package com.suheng.structure.view;
+package com.suheng.structure.view.bezier;
 
 import android.animation.ValueAnimator;
 import android.content.Context;

@@ -1,4 +1,4 @@
-package com.suheng.structure.view;
+package com.suheng.structure.view.bezier;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

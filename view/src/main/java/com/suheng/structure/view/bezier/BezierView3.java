@@ -1,14 +1,11 @@
-package com.suheng.structure.view;
+package com.suheng.structure.view.bezier;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -17,7 +14,7 @@ import android.view.animation.LinearInterpolator;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class BezierView4 extends View {
+public class BezierView3 extends View {
     private Paint mPaint;
     private Path mPath;
     private int mWaveWidth = 600, mWaveHeight = 50;
@@ -27,25 +24,25 @@ public class BezierView4 extends View {
     private int mOffsetX;
     private String mText;
 
-    public BezierView4(Context context) {
+    public BezierView3(Context context) {
         this(context, null);
     }
 
-    public BezierView4(Context context, @Nullable AttributeSet attrs) {
+    public BezierView3(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public BezierView4(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public BezierView3(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
 
     private void init() {
+        //setBackgroundColor(Color.RED);
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setTextAlign(Paint.Align.CENTER);
-        mPaint.setDither(true);
         mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 60, getResources().getDisplayMetrics()));
 
         mPath = new Path();
@@ -77,17 +74,6 @@ public class BezierView4 extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         mCentreX = w / 2;
         mCentreY = h / 2;
-
-        if (mBitmapCircle != null) {
-            if (!mBitmapCircle.isRecycled()) {
-                mBitmapCircle.recycle();
-            }
-
-            mBitmapCircle = null;
-        }
-
-        mPaint.setColor(Color.BLUE);
-        mBitmapCircle = this.createCircleBitmap(mCentreY);
     }
 
     //https://www.jianshu.com/p/c8e70e045133
@@ -109,33 +95,11 @@ public class BezierView4 extends View {
         mPath.lineTo(0, getHeight());
         mPath.close();
 
-        int radius = mCentreY;
-        int saveLayer = canvas.saveLayer(mCentreX - radius, mCentreY - radius
-                , mCentreX + radius, mCentreY + radius, null, Canvas.ALL_SAVE_FLAG);
-
-        canvas.drawPath(mPath, mPaint);
-
-        mPaint.setXfermode(mXfermodeCircle);
-        canvas.drawBitmap(mBitmapCircle, mCentreX - radius, mCentreY - radius, mPaint);
-        //canvas.drawCircle(mCentreX, mCentreY, radius, mPaint);
+        canvas.clipPath(mPath);
+        canvas.drawCircle(mCentreX, mCentreY, mCentreY, mPaint);
 
         mPaint.setColor(Color.WHITE);
-        mPaint.setXfermode(mXfermodeText);
         canvas.drawText(mText, mCentreX, mCentreY - mTextCentreY, mPaint);
-
-        mPaint.setXfermode(null);
-        canvas.restoreToCount(saveLayer);
-    }
-
-    private final PorterDuffXfermode mXfermodeCircle = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
-    private final PorterDuffXfermode mXfermodeText = new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP);
-    private Bitmap mBitmapCircle;
-
-    private Bitmap createCircleBitmap(int radius) {
-        Bitmap bitmap = Bitmap.createBitmap(radius * 2, radius * 2, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        canvas.drawCircle(radius, radius, radius, mPaint);
-        return bitmap;
     }
 
     @Override
@@ -159,5 +123,6 @@ public class BezierView4 extends View {
             mAnimator.cancel();
         }
     }
+
 
 }

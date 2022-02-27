@@ -33,6 +33,8 @@
         <activity android:name=".activity.OpenGLActivity" />
         <activity android:name=".activity.AnimImageViewActivity" />
         <activity android:name=".activity.ListItemLayoutActivity" />
+        <activity android:name=".activity.StickDotActivity" />
+        <activity android:name=".activity.HeartActivity" />
 
     </application>
 

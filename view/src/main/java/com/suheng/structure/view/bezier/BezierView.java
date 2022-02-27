@@ -1,4 +1,4 @@
-package com.suheng.structure.view;
+package com.suheng.structure.view.bezier;
 
 import android.content.Context;
 import android.graphics.Canvas;
