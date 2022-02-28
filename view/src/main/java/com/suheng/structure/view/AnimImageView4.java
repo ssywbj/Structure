@@ -155,6 +155,9 @@ public class AnimImageView4 extends AppCompatImageView {
     }
 
     private void getSourceImage() {
+        //https://www.jianshu.com/p/a936b158ed49
+        //https://stackoverflow.com/questions/65828719/how-to-use-pixelcopy-api-in-android-java-to-get-bitmap-from-view
+        //https://juejin.cn/post/6931267559383629838
         setDrawingCacheEnabled(true);
         mBitmapSrc = getDrawingCache();
         Log.d("Wbj", "src bitmap: " + mBitmapSrc);
