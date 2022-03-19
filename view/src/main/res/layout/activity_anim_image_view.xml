@@ -43,13 +43,13 @@
             android:id="@+id/aiv4_selected"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_margin="4dp"/>
+            android:layout_margin="4dp" />
 
         <com.suheng.structure.view.AnimImageView4
             android:id="@+id/aiv4_unselected"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"/>
+            android:layout_margin="4dp" />
 
         <Button
             android:id="@+id/btn_unselected"
@@ -57,6 +57,47 @@
             android:layout_height="wrap_content"
             android:text="Unselected"
             android:textAllCaps="false" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/aiv5_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <com.suheng.structure.view.AnimImageView5
+            android:id="@+id/aiv5_one"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/icon_alarm" />
+
+        <com.suheng.structure.view.AnimImageView5
+            android:id="@+id/aiv5_two"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/icon_folder" />
+
+        <com.suheng.structure.view.AnimImageView5
+            android:id="@+id/aiv5_three"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/icon_calendar" />
+
+        <com.suheng.structure.view.AnimImageView5
+            android:id="@+id/aiv5_four"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/icon_alarm" />
     </LinearLayout>
 
 </LinearLayout>

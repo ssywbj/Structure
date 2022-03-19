@@ -4,14 +4,20 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.suheng.structure.view.AnimImageView4;
+import com.suheng.structure.view.AnimImageView5;
+import com.suheng.structure.view.EaseCubicInterpolator;
 import com.suheng.structure.view.R;
 
 public class AnimImageViewActivity extends AppCompatActivity {
+    private static final int FIRST_PHASE_ANIM_DURATION = 1300;
+    private static final int COMPLETE_ANIM_DURATION = 1700;
+    private final EaseCubicInterpolator mFirstPhaseInterpolator = new EaseCubicInterpolator(0.33f, 0, 0.66f, 1);
 
     private AnimImageView4 mSelectedImageView;
 
@@ -97,6 +103,55 @@ public class AnimImageViewActivity extends AppCompatActivity {
         };
         ivSelected.setOnClickListener(onClickListener);
         ivUnselected.setOnClickListener(onClickListener);
+
+        this.initAnim5Layout(colorStateList);
+    }
+
+    private void initAnim5Layout(ColorStateList colorStateList) {
+        int defSelectedIndex = 0;
+        ViewGroup aiv5Layout = findViewById(R.id.aiv5_layout);
+        int childCount = aiv5Layout.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = aiv5Layout.getChildAt(i);
+            if (!(view instanceof AnimImageView5)) {
+                continue;
+            }
+
+            AnimImageView5 imageView5 = (AnimImageView5) view;
+            imageView5.setImageTintList(colorStateList);
+            if (defSelectedIndex == 0) {
+                view.setSelected(true);
+                defSelectedIndex = 1;
+            }
+
+            imageView5.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (imageView5.isSelected() || imageView5.isSelectedAnimRunning()) {
+                        return;
+                    }
+
+                    for (int i = 0; i < childCount; i++) {
+                        View view = aiv5Layout.getChildAt(i);
+                        if (!(view instanceof AnimImageView5)) {
+                            return;
+                        }
+
+                        AnimImageView5 viewTmp = (AnimImageView5) view;
+                        if (viewTmp.isSelectedAnimRunning()) {
+                            viewTmp.cancelSelectedAnimRunning();
+                        } else {
+                            if (viewTmp.isSelected()) {
+                                viewTmp.setSelectedAnim(false);
+                            }
+                        }
+                    }
+
+                    imageView5.setSelectedAnim(true);
+                }
+            });
+
+        }
     }
 
 }
