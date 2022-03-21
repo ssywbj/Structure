@@ -4,9 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#CCCCCC"
-    android:padding="2dp">
+    android:padding="6dp">
 
     <LinearLayout
+        android:id="@+id/list_item_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -61,7 +62,7 @@
         <com.suheng.structure.view.ListItemLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="1dp"
+            android:layout_margin="4dp"
             android:background="@android:color/holo_purple"
             app:lil_right_layout_type="image"
             app:lil_title="TitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitle1111111111" />
@@ -69,43 +70,52 @@
         <com.suheng.structure.view.ListItemLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="1dp"
+            android:layout_marginTop="4dp"
             app:lil_corners_angle_type="round"
             app:lil_right_layout_type="radio"
             app:lil_title="TitleTitleTitleTitleTitleTitle" />
 
-        <com.suheng.structure.view.ListItemLayout
+        <!--<LinearLayout
+            android:id="@+id/list_item_layout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="1dp"
-            app:lil_corners_angle_type="top_corners_round"
-            app:lil_describe_title="@string/app_name"
-            app:lil_right_layout_type="image"
-            app:lil_title="TitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitle22222" />
+            android:orientation="vertical">-->
+
+            <com.suheng.structure.view.ListItemLayout
+                android:id="@+id/list_item_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:lil_corners_angle_type="top_corners_round"
+                app:lil_describe_title="@string/app_name"
+                app:lil_right_layout_type="image"
+                android:layout_marginTop="10dp"
+                app:lil_title="TitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitle22222" />
+
+            <com.suheng.structure.view.ListItemLayout
+                android:id="@+id/list_item_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:lil_corners_angle_type="bottom_corners_round"
+                app:lil_right_layout_type="toggle_switch"
+                app:lil_title="Title" />
+
+            <com.suheng.structure.view.ListItemLayout
+                android:id="@+id/list_item_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:visibility="gone"
+                app:lil_describe_subtitle="lil_describe_subtitle"
+                app:lil_describe_title="DescribeTitleDescri"
+                app:lil_right_layout_type="image"
+                app:lil_subtitle="SubtitleSubtitleSub"
+                app:lil_title="TitleTitleTitleTitleT" />
+       <!-- </LinearLayout>-->
 
         <com.suheng.structure.view.ListItemLayout
-            android:id="@+id/list_item_layout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="1dp"
-            app:lil_right_layout_type="toggle_switch"
-            app:lil_title="Title" />
-
-        <com.suheng.structure.view.ListItemLayout
-            android:id="@+id/list_item_layout5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="1dp"
-            app:lil_describe_subtitle="lil_describe_subtitlelil_describe_subtitlelil_describe_subtitlelil_describe_subtitle"
-            app:lil_describe_title="DescribeTitleDescribeTitleDescribeTitleDescribeTitleDescribeTitle"
-            app:lil_right_layout_type="image"
-            app:lil_subtitle="SubtitleSubtitleSubtitleSubtitleSubtitleSubtitle"
-            app:lil_title="TitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitle333333" />
-
-        <com.suheng.structure.view.ListItemLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="1dp"
+            android:layout_marginTop="10dp"
             app:lil_left_image="@drawable/medium_default"
             app:lil_right_layout_type="image"
             app:lil_title="Title" />
@@ -189,6 +199,7 @@
             app:lil_right_show_divide_line="true"
             app:lil_subtitle="SubtitleSubtitleSubtitleSubtitleSubtitleSubtitleSubtitle"
             app:lil_title="Title" />
+
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

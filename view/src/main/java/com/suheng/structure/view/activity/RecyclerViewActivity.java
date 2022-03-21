@@ -46,6 +46,9 @@ public class RecyclerViewActivity extends AppCompatActivity {
         mStringList.add("PictureManager");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "PictureManagerActivity");
         recyclerView.setAdapter(adapter);
+
+        //recyclerView.setLayoutAnimation();
+        //recyclerView.scheduleLayoutAnimation();
     }
 
     @Override

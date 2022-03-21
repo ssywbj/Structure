@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.suheng.structure.view.ListItemLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/list_item_switch"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:lil_corners_angle_type="bottom_corners_round"
+    app:lil_right_layout_type="toggle_switch"
+    app:lil_title="Title" />
+
+

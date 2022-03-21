@@ -27,4 +27,6 @@
     <string name="tt_search_path_1" translatable="false">tt_search_path</string>
     <string name="tt_search_path_2" translatable="false">tt_search_path_2</string>
     <string name="tt_search_path_3" translatable="false">tt_search_path_3</string>
+
+    <integer name="anim_duration_medium">300</integer>
 </resources>

@@ -281,7 +281,7 @@ public class ListItemLayout extends RelativeLayout {
         super.draw(canvas);
     }
 
-    public void resetCornersRadius() {
+    public void cornersRight() {
         mCornersAngleType = 0;
 
         invalidate();
