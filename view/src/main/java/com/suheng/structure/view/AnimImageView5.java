@@ -35,7 +35,7 @@ public class AnimImageView5 extends AppCompatImageView {
     private AnimatorSet mPhaseAnimator;
     private Paint mPaint;
     private Bitmap mBitmapSrc, mBitmapDst;
-    private boolean mIsCancelPhaseAnimator;
+    private boolean mIsSelected, mIsCancelPhaseAnimator;
     private int mAlpha;
     private AnimatorListenerAdapter mAnimatorListenerAdapter;
 
@@ -78,15 +78,6 @@ public class AnimImageView5 extends AppCompatImageView {
                 }
             }
         });
-        mMaskAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                super.onAnimationCancel(animation);
-                //Log.d("Wbj", "mMaskAnimator, onAnimationCancel");
-                mPath.reset();
-                invalidate();
-            }
-        });
     }
 
     private void initAlphaAnimator() {
@@ -108,6 +99,7 @@ public class AnimImageView5 extends AppCompatImageView {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
+                mIsSelected = false;
                 setSelected(false);
             }
         });
@@ -140,8 +132,9 @@ public class AnimImageView5 extends AppCompatImageView {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
-                setSelected(true);
+                setSelected(false);
                 mIsCancelPhaseAnimator = false;
+                mIsSelected = true;
 
                 if (mAnimatorListenerAdapter != null) {
                     mAnimatorListenerAdapter.onAnimationStart(animation);
@@ -166,9 +159,9 @@ public class AnimImageView5 extends AppCompatImageView {
                 super.onAnimationCancel(animation);
                 //Log.d("Wbj", "onAnimationCancel: " + this);
                 mIsCancelPhaseAnimator = true;
-                if (mMaskAnimator != null && mMaskAnimator.isRunning()) {
-                    mMaskAnimator.cancel();
-                }
+                mIsSelected = false;
+                mPath.reset();
+                invalidate();
 
                 if (mAnimatorListenerAdapter != null) {
                     mAnimatorListenerAdapter.onAnimationCancel(animation);
@@ -248,7 +241,7 @@ public class AnimImageView5 extends AppCompatImageView {
             return;
         }
 
-        if (isSelected()) {
+        if (mIsSelected) {
             canvas.save();
             canvas.clipPath(mPath);
             canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint);

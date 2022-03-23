@@ -95,7 +95,6 @@
                 android:id="@+id/list_item_4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:lil_corners_angle_type="bottom_corners_round"
                 app:lil_right_layout_type="toggle_switch"
                 app:lil_title="Title" />
 
@@ -103,8 +102,19 @@
                 android:id="@+id/list_item_5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:lil_left_image="@drawable/large_default"
+                app:lil_left_image_dimen="h1"
+                app:lil_right_layout_type="toggle_switch"
+                app:lil_title="Toggle_switch" />
+
+            <com.suheng.structure.view.ListItemLayout
+                android:id="@+id/list_item_6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:visibility="gone"
+                app:lil_corners_angle_type="bottom_corners_round"
                 app:lil_describe_subtitle="lil_describe_subtitle"
                 app:lil_describe_title="DescribeTitleDescri"
                 app:lil_right_layout_type="image"

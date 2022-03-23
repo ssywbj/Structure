@@ -96,6 +96,7 @@ public class ListItemLayoutActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //LayoutInflater.from(ListItemLayoutActivity.this).inflate(R.layout.view_list_item_switch, itemLayout1, true);
                 findViewById(R.id.list_item_5).setVisibility(View.VISIBLE);
+                findViewById(R.id.list_item_6).setVisibility(View.VISIBLE);
             }
         });
 
@@ -105,6 +106,7 @@ public class ListItemLayoutActivity extends AppCompatActivity {
                 int childCount = itemLayout1.getChildCount();
                 //itemLayout1.removeViewAt(childCount - 1);
                 findViewById(R.id.list_item_5).setVisibility(View.GONE);
+                findViewById(R.id.list_item_6).setVisibility(View.GONE);
                 //itemLayout1.getChildAt(childCount - 1).setVisibility(View.GONE);
             }
         });

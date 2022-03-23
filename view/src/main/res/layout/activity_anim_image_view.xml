@@ -100,4 +100,43 @@
             android:src="@drawable/icon_alarm" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/aiv6_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <com.suheng.structure.view.AnimImageView6
+            android:id="@+id/aiv6_one"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+
+        <!--<com.suheng.structure.view.AnimImageView6
+            android:id="@+id/aiv6_two"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/icon_folder" />
+
+        <com.suheng.structure.view.AnimImageView6
+            android:id="@+id/aiv6_three"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/icon_calendar" />
+
+        <com.suheng.structure.view.AnimImageView6
+            android:id="@+id/aiv6_four"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/icon_alarm" />-->
+    </LinearLayout>
 </LinearLayout>
