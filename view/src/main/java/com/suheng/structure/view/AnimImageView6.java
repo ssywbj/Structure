@@ -36,10 +36,11 @@ public class AnimImageView6 extends View {
     private ValueAnimator mMaskAnimator, mAlphaAnimator;
     private AnimatorSet mPhaseAnimator;
     private Paint mPaint;
-    private Bitmap mBitmapSrc, mBitmapDst, mBitmapTrans;
+    private Bitmap mBitmapSrc, mBitmapDst, mBitmapTransparent;
     private boolean mIsSelected = true, mIsCancelPhaseAnimator;
     private int mAlpha;
     private AnimatorListenerAdapter mAnimatorListenerAdapter;
+    private final Xfermode mXfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
 
     public AnimImageView6(Context context) {
         super(context);
@@ -114,11 +115,11 @@ public class AnimImageView6 extends View {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 Object value = animation.getAnimatedValue();
-                /*if (value instanceof Float) {
+                if (value instanceof Float) {
                     float scale = (float) value;
                     setScaleX(scale);
                     setScaleY(scale);
-                }*/
+                }
             }
         };
         ValueAnimator firstPhaseAnim = ValueAnimator.ofFloat(START_SCALE, END_SCALE);
@@ -201,7 +202,7 @@ public class AnimImageView6 extends View {
         } else {
             selectedColor = imageTintList.getColorForState(new int[]{android.R.attr.state_selected}, Color.GREEN);
         }*/
-        selectedColor = Color.RED;
+        selectedColor = Color.argb((int) (255 * 0.8), 0xFF, 0, 0);
         mBitmapDst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         float sx = 1.0f * width / mBitmapSrc.getWidth();
         Canvas canvas = new Canvas(mBitmapDst);
@@ -219,11 +220,10 @@ public class AnimImageView6 extends View {
         canvas.drawBitmap(mBitmapSrc.extractAlpha(), 0, 0, paint);
         //}
 
-        mBitmapTrans = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas2 = new Canvas(mBitmapTrans);
+        mBitmapTransparent = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas2 = new Canvas(mBitmapTransparent);
         canvas2.scale(sx, sx);
-        paint.setColor(Color.BLUE);
-        canvas2.drawBitmap(mBitmapSrc.extractAlpha(), 0, 0, paint);
+        canvas.drawColor(Color.TRANSPARENT);
 
         if (mMaskAnimator == null) {
             this.initMaskAnimator();
@@ -249,9 +249,10 @@ public class AnimImageView6 extends View {
         if (mBitmapDst != null && !mBitmapDst.isRecycled()) {
             mBitmapDst.recycle();
         }
+        if (mBitmapTransparent != null && !mBitmapTransparent.isRecycled()) {
+            mBitmapTransparent.recycle();
+        }
     }
-
-    private final Xfermode mXfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -260,33 +261,24 @@ public class AnimImageView6 extends View {
             return;
         }
 
-
         if (mIsSelected) {
-            //canvas.drawBitmap(mBitmapSrc, null, mRectF, mPaint);
+            int saveLayer = canvas.saveLayer(mRectF, null, Canvas.ALL_SAVE_FLAG);
+            canvas.drawBitmap(mBitmapSrc, null, mRectF, null); //原图：未选中态的图片
+            canvas.clipPath(mPath); //画布裁剪成圆形
 
-            int saveLayer = canvas.saveLayer(mRectF, null);
-            canvas.drawBitmap(mBitmapSrc, null, mRectF, mPaint);
+            //镂空：避免选中色有透明度做遮罩圆形渐变时，能看到下方图标的颜色，产生颜色叠加效果，形成视觉偏差
             mPaint.setXfermode(mXfermode);
-            canvas.clipPath(mPath);
-            canvas.drawBitmap(mBitmapTrans, null, mRectF, mPaint);
+            canvas.drawBitmap(mBitmapTransparent, null, mRectF, mPaint);
             mPaint.setXfermode(null);
+
+            //裁出的镂空部分用选中状态图片填上
+            canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint);
             canvas.restoreToCount(saveLayer);
         } else {
             int saveLayer = canvas.saveLayerAlpha(mRectF, mAlpha, Canvas.ALL_SAVE_FLAG);
             canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint);
             canvas.restoreToCount(saveLayer);
         }
-
-        /*if (mIsSelected) {
-            canvas.save();
-            canvas.clipPath(mPath);
-            canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint);
-            canvas.restore();
-        } else {
-            int saveLayer = canvas.saveLayerAlpha(mRectF, mAlpha, Canvas.ALL_SAVE_FLAG);
-            canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint);
-            canvas.restoreToCount(saveLayer);
-        }*/
     }
 
     public void setSelectedAnim(boolean selected, AnimatorListenerAdapter animatorListenerAdapter) {

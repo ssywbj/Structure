@@ -15,11 +15,30 @@ android {
         vectorDrawables.useSupportLibrary = true//兼容不支持SVG的机型
     }
 
-    buildTypes {
+    signingConfigs {
         release {
-            minifyEnabled false
+            storeFile file('../zhipu-keystore.jks')
+            storePassword 'Zhipu@520'
+            keyAlias = 'modules_apply'
+            keyPassword 'Zhipu@520_'
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        release {
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            minifyEnabled false //代码混淆
+            shrinkResources false //资源压缩
+            zipAlignEnabled false
+        }
+
     }
 
 }
