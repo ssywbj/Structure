@@ -30,6 +30,9 @@
         <activity
             android:name=".activity.PictureManagerActivity"
             android:label="PictureManager" />
+        <activity
+            android:name=".activity.RecyclerTitleActivity"
+            android:label="RecyclerTitle" />
         <activity android:name=".activity.OpenGLActivity" />
         <activity android:name=".activity.AnimImageViewActivity" />
         <activity android:name=".activity.ListItemLayoutActivity" />
