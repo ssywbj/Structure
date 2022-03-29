@@ -48,9 +48,6 @@ public class RecyclerViewActivity extends AppCompatActivity {
         mStringList.add("PictureTitle");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "RecyclerTitleActivity");
         recyclerView.setAdapter(adapter);
-
-        //recyclerView.setLayoutAnimation();
-        //recyclerView.scheduleLayoutAnimation();
     }
 
     @Override

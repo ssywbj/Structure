@@ -1,6 +1,5 @@
 package com.suheng.structure.view.activity;
 
-import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
@@ -22,7 +21,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
-import com.suheng.structure.view.EaseCubicInterpolator;
 import com.suheng.structure.view.R;
 import com.suheng.structure.view.utils.XmlSaxParser;
 
@@ -124,61 +122,6 @@ public class MainActivity extends AppCompatActivity {
 
             //mVectorDrawable.start();
         }*/
-
-        LayoutTransition layoutTransition = new LayoutTransition();
-        /*layoutTransition.setInterpolator(LayoutTransition.APPEARING, new DecelerateInterpolator());
-        layoutTransition.setInterpolator(LayoutTransition.DISAPPEARING, new DecelerateInterpolator());*/
-        layoutTransition.setInterpolator(LayoutTransition.APPEARING, new EaseCubicInterpolator(0.25f, 0, 0, 1));
-        layoutTransition.setInterpolator(LayoutTransition.DISAPPEARING, new EaseCubicInterpolator(0.25f, 0, 0, 1));
-        layoutTransition.addTransitionListener(new LayoutTransition.TransitionListener() {
-            @Override
-            public void startTransition(LayoutTransition transition, ViewGroup container, View view, int transitionType) {
-                /*Log.d("Wbi", "startTransition, view: " + view + ", transitionType: " + transitionType + ", " + container.getChildCount()
-                        + "====" + viewGroup.getChildCount());
-                if (transitionType == LayoutTransition.APPEARING) {
-                    int childCount = viewGroup.getChildCount();
-                    int index = childCount - 1;
-                    if (index < 0) {
-                        return;
-                    }
-
-                    View child = viewGroup.getChildAt(index);
-                    if (child instanceof ListItemLayout) {
-                        ListItemLayout listItemLayout = (ListItemLayout) child;
-                        if (index == 0) {
-                            listItemLayout.topCornersRound();
-                        } else {
-                            listItemLayout.cornersRight();
-                        }
-                    }
-                }*/
-            }
-
-            @Override
-            public void endTransition(LayoutTransition transition, ViewGroup container, View view, int transitionType) {
-                /*Log.v("Wbi", "endTransition, view: " + view + ", transitionType: " + transitionType + ", " + container.getChildCount()
-                        + "====" + viewGroup.getChildCount());
-                if (transitionType == LayoutTransition.DISAPPEARING) {
-                    int childCount = viewGroup.getChildCount();
-                    int index = childCount - 1;
-                    if (index < 0) {
-                        return;
-                    }
-
-                    View child = viewGroup.getChildAt(index);
-                    if (child instanceof ListItemLayout) {
-                        ListItemLayout listItemLayout = (ListItemLayout) child;
-                        if (index == 0) {
-                            listItemLayout.cornersRound();
-                        } else {
-                            listItemLayout.bottomCornersRound();
-                        }
-                    }
-                }*/
-            }
-        });
-        layoutTransition.setDuration(300);
-        //recyclerView.setLayoutTransition(layoutTransition);
 
         int resId = R.anim.layout_animation_fall_down;
         LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(this, resId);

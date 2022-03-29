@@ -31,7 +31,8 @@ public class RecyclerTitleActivity extends AppCompatActivity {
 
         mRecyclerView = findViewById(R.id.recycler_title_rview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        DefaultItemAnimator defaultItemAnimator = new DefaultItemAnimator();
+        mRecyclerView.setItemAnimator(defaultItemAnimator);
         ContentAdapter adapter = new ContentAdapter(mStringList);
 
         ItemBean itemBean = new ItemBean(ItemBean.TYPE_TITLE, "标题1");
@@ -64,6 +65,7 @@ public class RecyclerTitleActivity extends AppCompatActivity {
         int resId = R.anim.layout_animation_fall_down;
         LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(this, resId);
         mRecyclerView.setLayoutAnimation(animation);
+        //mRecyclerView.setLayoutTransition(new LayoutTransition());
     }
 
     @Override
@@ -118,12 +120,36 @@ public class RecyclerTitleActivity extends AppCompatActivity {
                 /*int resId = R.anim.layout_animation_fall_down;
                 LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(RecyclerTitleActivity.this, resId);
                 mRecyclerView.setLayoutAnimation(animation);*/
-
-                mRecyclerView.scheduleLayoutAnimation();
+                /*mRecyclerView.scheduleLayoutAnimation();
                 RecyclerView.Adapter<?> adapter = mRecyclerView.getAdapter();
                 if (adapter != null) {
                     adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+                }*/
+
+                RecyclerView.Adapter<?> adapter = mRecyclerView.getAdapter();
+
+                if (adapter != null) {
+                    if ("标题1".equals(data.getTitle())) {
+                        mStringList.add(2, new ItemBean("3333333333333"));
+                        mStringList.add(2, new ItemBean("2222222222222"));
+                        mStringList.add(2, new ItemBean("1111111111111"));
+                        //adapter.notifyItemInserted(2);
+                        adapter.notifyItemRangeInserted(2, 3);
+                    } else if ("标题2".equals(data.getTitle())) {
+                        mStringList.remove(2);
+                        mStringList.remove(2);
+                        mStringList.remove(2);
+                        //adapter.notifyItemRemoved(2);
+                        adapter.notifyItemRangeRemoved(2, 3);
+                    }
+
+                    adapter.notifyItemRangeChanged(0, adapter.getItemCount());
                 }
+
+                if (adapter instanceof RecyclerAdapter) {
+                    RecyclerAdapter<?, ? extends RecyclerAdapter.Holder> recyclerAdapter = (RecyclerAdapter<?, ? extends RecyclerAdapter.Holder>) adapter;
+                }
+
             }
         }
     }
@@ -181,4 +207,49 @@ public class RecyclerTitleActivity extends AppCompatActivity {
             return mContent;
         }
     }
+
+    //https://www.jianshu.com/p/b375d552db63
+    class MyItemAnimator extends DefaultItemAnimator {
+
+        @Override
+        public boolean animateRemove(RecyclerView.ViewHolder viewHolder) {
+            return false;
+        }
+
+        @Override
+        public boolean animateAdd(RecyclerView.ViewHolder viewHolder) {
+            return false;
+        }
+
+        @Override
+        public boolean animateMove(RecyclerView.ViewHolder viewHolder, int i, int i1, int i2, int i3) {
+            return false;
+        }
+
+        @Override
+        public boolean animateChange(RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder viewHolder1, int i, int i1, int i2, int i3) {
+            return false;
+        }
+
+        @Override
+        public void runPendingAnimations() {
+
+        }
+
+        @Override
+        public void endAnimation(@NonNull RecyclerView.ViewHolder viewHolder) {
+
+        }
+
+        @Override
+        public void endAnimations() {
+
+        }
+
+        @Override
+        public boolean isRunning() {
+            return false;
+        }
+    }
+
 }
