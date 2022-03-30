@@ -3,12 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="6dp"
+    android:minHeight="60dp"
     android:paddingEnd="6dp">
 
     <TextView
         android:id="@+id/recycler_title_rview_adt_content"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
         android:gravity="center_vertical"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
