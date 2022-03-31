@@ -32,10 +32,14 @@ public class RecyclerTitleActivity extends AppCompatActivity {
 
         mRecyclerView = findViewById(R.id.recycler_title_rview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        MyDefaultItemAnimator defaultItemAnimator = new MyDefaultItemAnimator();
-        /*defaultItemAnimator.setAddDuration(2000);
-        defaultItemAnimator.setRemoveDuration(2000);*/
-        mRecyclerView.setItemAnimator(defaultItemAnimator);
+
+        mRecyclerView.setItemAnimator(new MyDefaultItemAnimator());
+        //mRecyclerView.setItemAnimator(new OriginItemAnimator());
+        //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        //mRecyclerView.setItemAnimator(new WidthItemAnimator());
+        //mRecyclerView.setItemAnimator(new HeightItemAnimator());
+        //mRecyclerView.setItemAnimator(new Height3ItemAnimator());
+
         ContentAdapter adapter = new ContentAdapter(mStringList);
 
         ItemBean itemBean = new ItemBean(ItemBean.TYPE_TITLE, "标题1");
@@ -134,11 +138,12 @@ public class RecyclerTitleActivity extends AppCompatActivity {
                 int index = 3;
                 if (adapter != null) {
                     if ("标题1".equals(data.getTitle())) {
-                        /*mStringList.add(2, new ItemBean("3333333333333"));
-                        mStringList.add(2, new ItemBean("2222222222222"));
-                        mStringList.add(2, new ItemBean("1111111111111"));
-                        adapter.notifyItemRangeInserted(2, 3);*/
-                        mStringList.add(index, new ItemBean("11111111111112222222222222222"));
+                        /*mStringList.add(index, new ItemBean("3333333333333333333333333333333333333"));
+                        mStringList.add(index, new ItemBean("2222222222222222222222222222222222222"));
+                        mStringList.add(index, new ItemBean("1111111111111111111111111111111111111"));
+                        adapter.notifyItemRangeInserted(index, 3);*/
+
+                        mStringList.add(index, new ItemBean("1111111111111111111111111111111111111"));
                         adapter.notifyItemInserted(index);
                     } else if ("标题2".equals(data.getTitle())) {
                         /*mStringList.remove(2);

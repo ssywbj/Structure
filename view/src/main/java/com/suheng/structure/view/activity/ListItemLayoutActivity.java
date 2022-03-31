@@ -5,10 +5,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.PathInterpolator;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.suheng.structure.view.EaseCubicInterpolator;
 import com.suheng.structure.view.ListItemLayout;
 import com.suheng.structure.view.R;
 
@@ -27,10 +27,10 @@ public class ListItemLayoutActivity extends AppCompatActivity {
         itemLayout1.setLayoutAnimation(animation);*/
 
         LayoutTransition layoutTransition = new LayoutTransition();
-        /*layoutTransition.setInterpolator(LayoutTransition.APPEARING, new LinearInterpolator());
-        layoutTransition.setInterpolator(LayoutTransition.DISAPPEARING, new LinearInterpolator());*/
-        layoutTransition.setInterpolator(LayoutTransition.CHANGE_APPEARING, new EaseCubicInterpolator(0.25f, 0, 0, 1));
-        layoutTransition.setInterpolator(LayoutTransition.DISAPPEARING, new EaseCubicInterpolator(0.25f, 0, 0, 1));
+        layoutTransition.setInterpolator(LayoutTransition.APPEARING, new PathInterpolator(0.25f, 0, 0, 1));
+        layoutTransition.setInterpolator(LayoutTransition.DISAPPEARING, new PathInterpolator(0.25f, 0, 0, 1));
+        /*layoutTransition.setInterpolator(LayoutTransition.CHANGE_APPEARING, new EaseCubicInterpolator(0.25f, 0, 0, 1));
+        layoutTransition.setInterpolator(LayoutTransition.DISAPPEARING, new EaseCubicInterpolator(0.25f, 0, 0, 1));*/
 
         layoutTransition.addTransitionListener(new LayoutTransition.TransitionListener() {
             @Override

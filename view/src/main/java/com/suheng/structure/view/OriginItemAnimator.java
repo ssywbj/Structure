@@ -1,5 +1,3 @@
-package com.suheng.structure.view;
-
 /*
  * Copyright (C) 2017 The Android Open Source Project
  *
@@ -16,11 +14,12 @@ package com.suheng.structure.view;
  * limitations under the License.
  */
 
+package com.suheng.structure.view;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 
@@ -31,8 +30,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class MyDefaultItemAnimator extends SimpleItemAnimator {
+public class OriginItemAnimator extends SimpleItemAnimator {
     private static final boolean DEBUG = false;
 
     private static TimeInterpolator sDefaultInterpolator;
@@ -82,6 +80,7 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
             this.toY = toY;
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "ChangeInfo{"
@@ -93,11 +92,6 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
                     + ", toY=" + toY
                     + '}';
         }
-    }
-
-    public MyDefaultItemAnimator() {
-        setAddDuration(2000);
-        setRemoveDuration(2000);
     }
 
     @Override
@@ -191,9 +185,6 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
     @Override
     public boolean animateRemove(final ViewHolder holder) {
         resetAnimation(holder);
-
-        holder.itemView.setTranslationY(0);
-
         mPendingRemovals.add(holder);
         return true;
     }
@@ -202,7 +193,7 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
         final View view = holder.itemView;
         final ViewPropertyAnimator animation = view.animate();
         mRemoveAnimations.add(holder);
-        animation.setDuration(getRemoveDuration()).alpha(0).translationY(-view.getMeasuredHeight()).setListener(
+        animation.setDuration(getRemoveDuration()).alpha(0).setListener(
                 new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationStart(Animator animator) {
@@ -213,9 +204,6 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
                     public void onAnimationEnd(Animator animator) {
                         animation.setListener(null);
                         view.setAlpha(1);
-
-                        view.setTranslationY(0);
-
                         dispatchRemoveFinished(holder);
                         mRemoveAnimations.remove(holder);
                         dispatchFinishedWhenDone();
@@ -225,58 +213,17 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
 
     @Override
     public boolean animateAdd(final ViewHolder holder) {
-        /*resetAnimation(holder);
-        holder.itemView.setAlpha(0);
-
-        holder.itemView.setTranslationY(-holder.itemView.getMeasuredHeight());
-
-        mPendingAdditions.add(holder);
-        return true;*/
-
-        final View view = holder.itemView;
-        int measuredHeight = view.getMeasuredHeight();
-        view.setVisibility(View.GONE);
-        //view.setAlpha(0);
-        Log.v("Wbj", "animateAdd: " + measuredHeight + ", " + view.getHeight());
-        /*ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        layoutParams.height = 0;
-        view.setLayoutParams(layoutParams);*/
-        Log.v("Wbj", "animateAdd: " + view.getMeasuredHeight() + ", " + view.getHeight() + ", " + view.getTag() + ", " +
-                view.getLeft() + "===" + view.getTop() + "===" + view.getRight() + "===" + view.getBottom());
-        view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getTop());
-
-        ValueAnimator valueAnimator = ValueAnimator.ofInt(0, view.getMeasuredHeight());
-        valueAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getTop());
-                view.setVisibility(View.VISIBLE);
-            }
-        });
-        valueAnimator.setDuration(200);
-        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int value = (int) animation.getAnimatedValue();
-                //view.setAlpha(1.0f * value / measuredHeight);
-                view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getTop() + value);
-            }
-        });
-        valueAnimator.start();
-
         resetAnimation(holder);
+        holder.itemView.setAlpha(0);
         mPendingAdditions.add(holder);
-
         return true;
     }
 
     void animateAddImpl(final ViewHolder holder) {
         final View view = holder.itemView;
         final ViewPropertyAnimator animation = view.animate();
-        //mAddAnimations.add(holder);
-
-        /*animation.alpha(1).translationY(0).setDuration(getAddDuration())
+        mAddAnimations.add(holder);
+        animation.alpha(1).setDuration(getAddDuration())
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationStart(Animator animator) {
@@ -286,8 +233,6 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
                     @Override
                     public void onAnimationCancel(Animator animator) {
                         view.setAlpha(1);
-
-                        view.setTranslationY(0);
                     }
 
                     @Override
@@ -297,30 +242,11 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
                         mAddAnimations.remove(holder);
                         dispatchFinishedWhenDone();
                     }
-                }).start();*/
-
-        Log.d("Wbj", "animateAddImpl: " + view.getMeasuredHeight() + ", " + view.getHeight() + ", " + view.getTop() + "===" + view.getBottom());
-
-        /*ObjectAnimator animator = ObjectAnimator.ofInt(view, "bottom", view.getMeasuredHeight());
-        animator.setDuration(300);
-        animator.start();*/
-        /*view.setAlpha(0);
-        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        //layoutParams.height = 20;
-        view.setLayoutParams(layoutParams);*/
-
-        //view.setVisibility(View.GONE);
-        dispatchAddStarting(holder);
-
-        animation.setListener(null);
-        dispatchAddFinished(holder);
-        //mAddAnimations.remove(holder);
-        dispatchFinishedWhenDone();
+                }).start();
     }
 
     @Override
-    public boolean animateMove(final ViewHolder holder, int fromX, int fromY,
-                               int toX, int toY) {
+    public boolean animateMove(final ViewHolder holder, int fromX, int fromY, int toX, int toY) {
         final View view = holder.itemView;
         fromX += holder.itemView.getTranslationX();
         fromY += holder.itemView.getTranslationY();
@@ -383,8 +309,7 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
     }
 
     @Override
-    public boolean animateChange(ViewHolder oldHolder, ViewHolder newHolder,
-                                 int fromX, int fromY, int toX, int toY) {
+    public boolean animateChange(ViewHolder oldHolder, ViewHolder newHolder, int fromX, int fromY, int toX, int toY) {
         if (oldHolder == newHolder) {
             // Don't know how to run change animations when the same view holder is re-used.
             // run a move animation to handle position changes.

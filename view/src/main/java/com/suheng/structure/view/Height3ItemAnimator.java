@@ -1,5 +1,3 @@
-package com.suheng.structure.view;
-
 /*
  * Copyright (C) 2017 The Android Open Source Project
  *
@@ -16,8 +14,11 @@ package com.suheng.structure.view;
  * limitations under the License.
  */
 
+package com.suheng.structure.view;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.util.Log;
@@ -31,8 +32,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class MyDefaultItemAnimator extends SimpleItemAnimator {
+public class Height3ItemAnimator extends SimpleItemAnimator {
     private static final boolean DEBUG = false;
 
     private static TimeInterpolator sDefaultInterpolator;
@@ -82,6 +82,7 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
             this.toY = toY;
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "ChangeInfo{"
@@ -95,9 +96,9 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
         }
     }
 
-    public MyDefaultItemAnimator() {
-        setAddDuration(2000);
-        setRemoveDuration(2000);
+    public Height3ItemAnimator() {
+        setAddDuration(300);
+        setRemoveDuration(getAddDuration());
     }
 
     @Override
@@ -191,19 +192,17 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
     @Override
     public boolean animateRemove(final ViewHolder holder) {
         resetAnimation(holder);
-
-        holder.itemView.setTranslationY(0);
-
         mPendingRemovals.add(holder);
         return true;
     }
 
     private void animateRemoveImpl(final ViewHolder holder) {
         final View view = holder.itemView;
-        final ViewPropertyAnimator animation = view.animate();
+        //final ViewPropertyAnimator animation = view.animate();
         mRemoveAnimations.add(holder);
-        animation.setDuration(getRemoveDuration()).alpha(0).translationY(-view.getMeasuredHeight()).setListener(
-                new AnimatorListenerAdapter() {
+        /*animation.setDuration(getRemoveDuration()).alpha(0).translationYBy(-view.getMeasuredHeight()).translationY(-view.getMeasuredHeight())
+                .setInterpolator(new EaseCubicInterpolator(0.25f, 0, 0, 1))
+                .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationStart(Animator animator) {
                         dispatchRemoveStarting(holder);
@@ -213,103 +212,177 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
                     public void onAnimationEnd(Animator animator) {
                         animation.setListener(null);
                         view.setAlpha(1);
-
                         view.setTranslationY(0);
-
                         dispatchRemoveFinished(holder);
                         mRemoveAnimations.remove(holder);
                         dispatchFinishedWhenDone();
                     }
-                }).start();
+                }).start();*/
+
+        View itemView = holder.itemView;
+        final int left = itemView.getLeft();
+        final int top = itemView.getTop();
+        final int right = itemView.getRight();
+        final int measuredHeight = itemView.getMeasuredHeight();
+        Log.d("Wbj", "animateRemoveImpl: " + measuredHeight + ", " + itemView.getHeight() + ", " +
+                left + "===" + top + "===" + right + "===" + itemView.getBottom());
+
+        ObjectAnimator animator = ObjectAnimator.ofFloat(view, "alpha", 0);
+        ValueAnimator.AnimatorUpdateListener animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                Object animatedValue = animation.getAnimatedValue();
+                if (animatedValue instanceof Float) {
+                    float alpha = (float) animatedValue;
+                    int height = (int) (alpha * measuredHeight);
+                    Log.i("Wbj", "animateRemoveImpl, height: " + height + ", alpha: " + alpha);
+                    view.layout(left, top, right, top + height);
+                }
+            }
+        };
+        AnimatorListenerAdapter animatorListenerAdapter = new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                dispatchRemoveStarting(holder);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                Log.i("Wbj", "animateRemoveImpl, onAnimationEnd: " + this);
+                animator.removeListener(this);
+                animator.removeUpdateListener(animatorUpdateListener);
+                view.setAlpha(1);
+                view.layout(left, top, right, top + measuredHeight);
+                dispatchRemoveFinished(holder);
+                mRemoveAnimations.remove(holder);
+                dispatchFinishedWhenDone();
+            }
+        };
+        animator.addUpdateListener(animatorUpdateListener);
+        animator.addListener(animatorListenerAdapter);
+        Log.i("Wbj", "animateRemoveImpl, animatorListenerAdapter: " + animatorListenerAdapter);
+        animator.setInterpolator(new EaseCubicInterpolator(0.25f, 0, 0, 1));
+        animator.setDuration(getRemoveDuration());
+        animator.start();
     }
 
     @Override
     public boolean animateAdd(final ViewHolder holder) {
-        /*resetAnimation(holder);
-        holder.itemView.setAlpha(0);
+        View itemView = holder.itemView;
+        final int left = itemView.getLeft();
+        final int top = itemView.getTop();
+        final int right = itemView.getRight();
+        final int measuredHeight = itemView.getMeasuredHeight();
+        Log.d("Wbj", "animateAddImpl: " + measuredHeight + ", " + itemView.getHeight() + ", " +
+                left + "===" + top + "===" + right + "===" + itemView.getBottom());
+        itemView.setAlpha(0);
+        itemView.layout(left, top, right, top);
 
-        holder.itemView.setTranslationY(-holder.itemView.getMeasuredHeight());
-
-        mPendingAdditions.add(holder);
-        return true;*/
-
-        final View view = holder.itemView;
-        int measuredHeight = view.getMeasuredHeight();
-        view.setVisibility(View.GONE);
-        //view.setAlpha(0);
-        Log.v("Wbj", "animateAdd: " + measuredHeight + ", " + view.getHeight());
-        /*ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        layoutParams.height = 0;
-        view.setLayoutParams(layoutParams);*/
-        Log.v("Wbj", "animateAdd: " + view.getMeasuredHeight() + ", " + view.getHeight() + ", " + view.getTag() + ", " +
-                view.getLeft() + "===" + view.getTop() + "===" + view.getRight() + "===" + view.getBottom());
-        view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getTop());
-
-        ValueAnimator valueAnimator = ValueAnimator.ofInt(0, view.getMeasuredHeight());
-        valueAnimator.addListener(new AnimatorListenerAdapter() {
+        ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
+        ValueAnimator.AnimatorUpdateListener animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                Object animatedValue = animation.getAnimatedValue();
+                if (animatedValue instanceof Float) {
+                    float alpha = (float) animatedValue;
+                    int height = (int) (alpha * measuredHeight);
+                    Log.i("Wbj", "animateAddImpl, height: " + height + ", alpha: " + alpha);
+                    itemView.layout(left, top, right, top + height);
+                    itemView.setAlpha(alpha);
+                }
+            }
+        };
+        AnimatorListenerAdapter animatorListenerAdapter = new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
-                view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getTop());
-                view.setVisibility(View.VISIBLE);
+                itemView.layout(left, top, right, top);
             }
-        });
-        valueAnimator.setDuration(200);
-        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
             @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int value = (int) animation.getAnimatedValue();
-                //view.setAlpha(1.0f * value / measuredHeight);
-                view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getTop() + value);
+            public void onAnimationCancel(Animator animator) {
+                itemView.setAlpha(1);
+                itemView.layout(left, top, right, top + measuredHeight);
             }
-        });
-        valueAnimator.start();
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                Log.i("Wbj", "animateAddImpl, onAnimationEnd: " + this);
+                animator.removeListener(this);
+                animator.removeUpdateListener(animatorUpdateListener);
+
+            }
+        };
+        animator.addUpdateListener(animatorUpdateListener);
+        animator.addListener(animatorListenerAdapter);
+        Log.i("Wbj", "animateAddImpl, animatorListenerAdapter: " + animatorListenerAdapter);
+        //animator.setInterpolator(new EaseCubicInterpolator(0.25f, 0, 0, 1));
+        //animator.setDuration(getAddDuration());
+        animator.setDuration(200);
+        animator.start();
 
         resetAnimation(holder);
         mPendingAdditions.add(holder);
-
         return true;
     }
 
     void animateAddImpl(final ViewHolder holder) {
-        final View view = holder.itemView;
-        final ViewPropertyAnimator animation = view.animate();
+        final View itemView = holder.itemView;
+        final ViewPropertyAnimator animation = itemView.animate();
         //mAddAnimations.add(holder);
 
-        /*animation.alpha(1).translationY(0).setDuration(getAddDuration())
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-                        dispatchAddStarting(holder);
-                    }
+        final int left = itemView.getLeft();
+        final int top = itemView.getTop();
+        final int right = itemView.getRight();
+        final int measuredHeight = itemView.getMeasuredHeight();
+        Log.d("Wbj", "animateAddImpl: " + measuredHeight + ", " + itemView.getHeight() + ", " +
+                left + "===" + top + "===" + right + "===" + itemView.getBottom());
 
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-                        view.setAlpha(1);
+        /*ObjectAnimator animator = ObjectAnimator.ofFloat(itemView, "alpha", 1);
+        ValueAnimator.AnimatorUpdateListener animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                Object animatedValue = animation.getAnimatedValue();
+                if (animatedValue instanceof Float) {
+                    float alpha = (float) animatedValue;
+                    int height = (int) (alpha * measuredHeight);
+                    Log.i("Wbj", "animateAddImpl, height: " + height + ", alpha: " + alpha);
+                    itemView.layout(left, top, right, top + height);
+                }
+            }
+        };
+        AnimatorListenerAdapter animatorListenerAdapter = new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                itemView.layout(left, top, right, top);
+            }
 
-                        view.setTranslationY(0);
-                    }
+            @Override
+            public void onAnimationCancel(Animator animator) {
+                itemView.setAlpha(1);
+                itemView.layout(left, top, right, top + measuredHeight);
+            }
 
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        animation.setListener(null);
-                        dispatchAddFinished(holder);
-                        mAddAnimations.remove(holder);
-                        dispatchFinishedWhenDone();
-                    }
-                }).start();*/
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                Log.i("Wbj", "animateAddImpl, onAnimationEnd: " + this);
+                animator.removeListener(this);
+                animator.removeUpdateListener(animatorUpdateListener);
 
-        Log.d("Wbj", "animateAddImpl: " + view.getMeasuredHeight() + ", " + view.getHeight() + ", " + view.getTop() + "===" + view.getBottom());
-
-        /*ObjectAnimator animator = ObjectAnimator.ofInt(view, "bottom", view.getMeasuredHeight());
-        animator.setDuration(300);
+            }
+        };
+        animator.addUpdateListener(animatorUpdateListener);
+        animator.addListener(animatorListenerAdapter);
+        Log.i("Wbj", "animateAddImpl, animatorListenerAdapter: " + animatorListenerAdapter);
+        animator.setInterpolator(new EaseCubicInterpolator(0.25f, 0, 0, 1));
+        animator.setDuration(getAddDuration());
         animator.start();*/
-        /*view.setAlpha(0);
-        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        //layoutParams.height = 20;
-        view.setLayoutParams(layoutParams);*/
 
-        //view.setVisibility(View.GONE);
         dispatchAddStarting(holder);
 
         animation.setListener(null);
@@ -319,8 +392,7 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
     }
 
     @Override
-    public boolean animateMove(final ViewHolder holder, int fromX, int fromY,
-                               int toX, int toY) {
+    public boolean animateMove(final ViewHolder holder, int fromX, int fromY, int toX, int toY) {
         final View view = holder.itemView;
         fromX += holder.itemView.getTranslationX();
         fromY += holder.itemView.getTranslationY();
@@ -383,8 +455,7 @@ public class MyDefaultItemAnimator extends SimpleItemAnimator {
     }
 
     @Override
-    public boolean animateChange(ViewHolder oldHolder, ViewHolder newHolder,
-                                 int fromX, int fromY, int toX, int toY) {
+    public boolean animateChange(ViewHolder oldHolder, ViewHolder newHolder, int fromX, int fromY, int toX, int toY) {
         if (oldHolder == newHolder) {
             // Don't know how to run change animations when the same view holder is re-used.
             // run a move animation to handle position changes.
