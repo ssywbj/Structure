@@ -1,5 +1,8 @@
 package com.suheng.structure.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
@@ -15,6 +18,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewStub;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -38,7 +42,10 @@ public class ListItemLayout extends RelativeLayout {
     private Path mPath;
     private RectF mRectF;
     private float[] mRadii;
-    private float mRadius;
+    private float mRadius, mAnimRadius;
+
+    private boolean mIsSettingFixedHeight;
+    private int mSettingFixedHeight;
 
     public ListItemLayout(Context context) {
         super(context);
@@ -103,7 +110,7 @@ public class ListItemLayout extends RelativeLayout {
 
     private void init() {
         setClickable(true);
-        mRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
+        mRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, getResources().getDisplayMetrics());
 
         Drawable background = getBackground();
         if (background == null) {
@@ -256,6 +263,20 @@ public class ListItemLayout extends RelativeLayout {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (mIsSettingFixedHeight) {
+            setMeasuredDimension(widthMeasureSpec, mSettingFixedHeight);
+        }
+    }
+
+    public void setSettingFixedHeight(int settingFixedHeight) {
+        mSettingFixedHeight = settingFixedHeight;
+        mIsSettingFixedHeight = true;
+        requestLayout();
+    }
+
+    @Override
     public void draw(Canvas canvas) {
         if (mPath == null) {
             mPath = new Path();
@@ -270,6 +291,9 @@ public class ListItemLayout extends RelativeLayout {
         } else if (mCornersAngleType == 3) {
             Arrays.fill(mRadii, 0, 4, 0);
             Arrays.fill(mRadii, 4, mRadii.length, mRadius);
+        } else if (mCornersAngleType == 4) {
+            Arrays.fill(mRadii, 0, 4, mRadius);
+            Arrays.fill(mRadii, 4, mRadii.length, mAnimRadius);
         } else {
             Arrays.fill(mRadii, 0);
         }
@@ -291,6 +315,28 @@ public class ListItemLayout extends RelativeLayout {
         mCornersAngleType = 1;
 
         invalidate();
+    }
+
+    public void cornersRoundWithAnim() {
+        mCornersAngleType = 4;
+
+        ValueAnimator animator = ValueAnimator.ofFloat(0, mRadius);
+        animator.setDuration(150);
+        animator.setInterpolator(new LinearInterpolator());
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mAnimRadius = (float) animation.getAnimatedValue();
+                invalidate();
+            }
+        });
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+            }
+        });
+        animator.start();
     }
 
     public void topCornersRound() {
