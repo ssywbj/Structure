@@ -108,6 +108,13 @@ public class ListItemLayout extends RelativeLayout {
         this.init();
     }
 
+    private ImageView mViewLeftImage;
+
+    @Nullable
+    public ImageView getViewLeftImage() {
+        return mViewLeftImage;
+    }
+
     private void init() {
         setClickable(true);
         mRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, getResources().getDisplayMetrics());
@@ -135,10 +142,9 @@ public class ListItemLayout extends RelativeLayout {
 
         inflate(getContext(), R.layout.view_list_item_layout, this);
 
-        ImageView leftImage = null;
         if (mLeftDrawable != null) {
-            leftImage = (ImageView) ((ViewStub) findViewById(R.id.lil_stub_left_layout)).inflate();
-            RelativeLayout.LayoutParams leftImageLayoutParams = (LayoutParams) leftImage.getLayoutParams();
+            mViewLeftImage = (ImageView) ((ViewStub) findViewById(R.id.lil_stub_left_layout)).inflate();
+            RelativeLayout.LayoutParams leftImageLayoutParams = (LayoutParams) mViewLeftImage.getLayoutParams();
             leftImageLayoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
             leftImageLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_START);
             int dimension;
@@ -149,18 +155,18 @@ public class ListItemLayout extends RelativeLayout {
             }
             leftImageLayoutParams.width = dimension;
             leftImageLayoutParams.height = dimension;
-            leftImage.setLayoutParams(leftImageLayoutParams);
-            leftImage.setImageDrawable(mLeftDrawable);
+            mViewLeftImage.setLayoutParams(leftImageLayoutParams);
+            mViewLeftImage.setImageDrawable(mLeftDrawable);
         }
 
         View titleLayout = null;
         if (!TextUtils.isEmpty(mTitle)) {
             titleLayout = ((ViewStub) findViewById(R.id.lil_stub_title_layout)).inflate();
             RelativeLayout.LayoutParams titleLayoutLayoutParams = (LayoutParams) titleLayout.getLayoutParams();
-            if (leftImage == null) {
+            if (mViewLeftImage == null) {
                 titleLayoutLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_START);
             } else {
-                titleLayoutLayoutParams.addRule(RelativeLayout.END_OF, leftImage.getId());
+                titleLayoutLayoutParams.addRule(RelativeLayout.END_OF, mViewLeftImage.getId());
             }
             titleLayoutLayoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
             titleLayout.setLayoutParams(titleLayoutLayoutParams);

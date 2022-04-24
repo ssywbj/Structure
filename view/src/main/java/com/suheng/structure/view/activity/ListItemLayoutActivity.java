@@ -4,12 +4,20 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.LayoutTransition;
 import android.animation.ValueAnimator;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.Shader;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.PathInterpolator;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -164,6 +172,48 @@ public class ListItemLayoutActivity extends AppCompatActivity {
             }
         });
 
+        ListItemLayout listItemLayout = findViewById(R.id.list_item_5);
+        ImageView viewLeftImage = listItemLayout.getViewLeftImage();
+        if (viewLeftImage != null) {
+            this.loadImage(viewLeftImage);
+        }
     }
 
+    private void loadImage(ImageView imageView) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(getResources(), R.drawable.beauty2, options);
+        //xml 里面设定image width height ==100dp。这里将dp 转化为px。这里不xml 代码了
+        int size = (int) (38 * getResources().getDisplayMetrics().density);
+        System.out.println("size: " + size);
+        int widthSampleSize = options.outWidth / size;
+        int heiSampleSize = options.outHeight / size;
+        options.inSampleSize = Math.min(widthSampleSize, heiSampleSize);
+        options.inSampleSize = Math.max(options.inSampleSize, 1);
+        options.inJustDecodeBounds = false;
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.beauty2, options);
+        Bitmap target = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+        BitmapShader shader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        Paint paint = new Paint();
+        paint.setShader(shader);
+        //draw into target bitmap
+        Canvas canvas = new Canvas(target);
+        float r = Math.min(target.getWidth(), target.getHeight());
+        r /= 2;
+        //绘制一个圆形图片。经典的使用场景是头像
+        canvas.drawCircle(r, r, r, paint);
+        canvas.drawBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.ic_next)
+                , null, new RectF(10, 10, 20, 20), null);
+        //display the resule
+        imageView.setImageBitmap(target);
+
+        bitmap.recycle();
+//        target.recycle();
+ /*          target = Bitmap.createBitmap(target.getWidth(), target.getHeight(), target.getConfig());
+        canvas.setBitmap(target);
+        RectF rect = new RectF(0, 0, target.getWidth(), target.getHeight());
+        //绘制一个圆角矩形
+        canvas.drawRoundRect(rect, 400, 400, paint);*/
+        //imageView1.setImageBitmap(target);
+    }
 }

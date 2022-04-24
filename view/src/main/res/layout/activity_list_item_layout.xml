@@ -113,7 +113,6 @@
             android:id="@+id/list_item_5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             app:lil_left_image="@drawable/large_default"
             app:lil_left_image_dimen="h1"
             app:lil_right_layout_type="toggle_switch"
