@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         mStringList.add("CircleToHeart");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "HeartActivity");
 
-        //startActivity(new Intent(this, ListItemLayoutActivity.class));
+        //startActivity(new Intent(this, PictureManagerActivity.class));
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();

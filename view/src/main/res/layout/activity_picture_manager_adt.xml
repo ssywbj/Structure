@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="1dp">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/view_picture_manager_list_text"
+    <com.suheng.structure.view.PictureView
+        android:id="@+id/afwl_image_view"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@android:color/holo_blue_dark"
-        android:gravity="center"
-        android:textColor="@android:color/black"
-        android:textSize="16sp" />
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop" />
 </RelativeLayout>
