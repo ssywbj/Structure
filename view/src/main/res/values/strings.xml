@@ -29,4 +29,5 @@
     <string name="tt_search_path_3" translatable="false">tt_search_path_3</string>
 
     <integer name="anim_duration_medium">300</integer>
+    <string name="picture_bottom_number">共 %d 张图片</string>
 </resources>

@@ -58,9 +58,13 @@ public abstract class RecyclerAdapter<T, VH extends RecyclerAdapter.Holder> exte
         return new RecyclerAdapter.Holder(parent.getContext(), 1);
     }*/
 
+    public T getItem(int position) {
+        return (mDataList == null || position < 0 || position >= mDataList.size()) ? null : mDataList.get(position);
+    }
+
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
-        T data = mDataList.get(position);
+        T data = getItem(position);
         if (data == null) {
             return;
         }

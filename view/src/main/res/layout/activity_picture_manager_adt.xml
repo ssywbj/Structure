@@ -4,7 +4,7 @@
     android:layout_height="wrap_content">
 
     <com.suheng.structure.view.PictureView
-        android:id="@+id/afwl_image_view"
+        android:id="@+id/apma_image_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scaleType="centerCrop" />

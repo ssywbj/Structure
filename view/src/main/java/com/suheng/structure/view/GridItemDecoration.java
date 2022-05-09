@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -25,10 +24,16 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
+        outRect.set(mSpace, mSpace, mSpace, mSpace);
+    }
+
+    /*@Override
+    public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        super.getItemOffsets(outRect, view, parent, state);
         int right = 0, left = 0, top = 0;
         int spanCount = mLayoutManager.getSpanCount();
         int position = parent.getChildAdapterPosition(view);
-        Log.d("Wbj", "position: " + position + ", spanCount: " + spanCount);
+        //Log.d("Wbj", "position: " + position + ", spanCount: " + spanCount);
         if (position / spanCount > 0) {
             top = mSpace;
         }
@@ -46,18 +51,18 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             right = left;
         }
         //https://juejin.cn/post/6844904116859174926
-        /*int column = position % spanCount;
+        *//*int column = position % spanCount;
         left = column * mSpace / spanCount; //column * (列间距 * (1f / 列数))
-        right = mSpace - (column + 1) * mSpace / spanCount; //列间距 - (column + 1) * (列间距 * (1f /列数))*/
+        right = mSpace - (column + 1) * mSpace / spanCount; //列间距 - (column + 1) * (列间距 * (1f /列数))*//*
         outRect.set(left, top, right, 0);
 
-        Log.i("Wbj", "outRect: " + outRect.left + ", " + outRect.right);
-    }
+        //Log.i("Wbj", "outRect: " + outRect.left + ", " + outRect.right);
+    }*/
 
     @Override
     public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         super.onDraw(c, parent, state);
-        c.drawColor(mColor);
+        //c.drawColor(mColor);
         //mDivider.draw(c);
 
         /*drawVertical(c, parent);
