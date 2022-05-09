@@ -26,6 +26,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -49,7 +50,7 @@ public class PictureManagerActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.view_picture_manager_recycler_view);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
-        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         Drawable drawable = AppCompatResources.getDrawable(this, R.drawable.recycler_view_linear_divide_line);
         if (drawable != null) {
             DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
@@ -65,14 +66,20 @@ public class PictureManagerActivity extends AppCompatActivity {
         itemDecoration4.setDrawable(drawable);
         recyclerView.addItemDecoration(itemDecoration4);*/
 
-        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+        /*gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                int itemViewType = mContentAdapter.getItemViewType(position);
+                RecyclerView.Adapter<?> adapter = recyclerView.getAdapter();
+                if (adapter == null) {
+                    return 1;
+                }
+
+                int itemViewType = adapter.getItemViewType(position);
                 return (itemViewType == ContentAdapter.VIEW_TYPE_FOOTER) || (itemViewType == ContentAdapter.VIEW_TYPE_TITLE)
-                        ? gridLayoutManager.getSpanCount() : 1;
+                        || (itemViewType == RefreshRecyclerView.WrapperAdapter.VIEW_TYPE_HEADER) ? gridLayoutManager.getSpanCount() : 1;
             }
         });
+        recyclerView.setLayoutManager(gridLayoutManager);*/
 
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mContentAdapter = new ContentAdapter(mDataList));
