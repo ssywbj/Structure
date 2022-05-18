@@ -54,8 +54,18 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ListItemLayoutActivity");
         mStringList.add("StickDot");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "StickDotActivity");
-        mStringList.add("CircleToHeart");
-        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "HeartActivity");
+        mStringList.add("Shader");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ShaderActivity");
+        mStringList.add("ColorFilter");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ColorFilterActivity");
+        mStringList.add("GuaguaLe");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "GuaguaLeActivity");
+        mStringList.add("ChinaMap");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ChinaMapActivity");
+        mStringList.add("Bezier");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "BezierActivity");
+        mStringList.add("FontView");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "FontViewActivity");
 
         //startActivity(new Intent(this, PictureManagerActivity.class));
 

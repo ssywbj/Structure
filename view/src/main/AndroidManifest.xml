@@ -43,6 +43,12 @@
             android:exported="true" />
         <activity android:name=".activity.StickDotActivity" />
         <activity android:name=".activity.HeartActivity" />
+        <activity android:name=".activity.ShaderActivity" />
+        <activity android:name=".activity.ColorFilterActivity" />
+        <activity android:name=".activity.ChinaMapActivity" />
+        <activity android:name=".activity.GuaguaLeActivity" />
+        <activity android:name=".activity.BezierActivity" />
+        <activity android:name=".activity.FontViewActivity" />
 
     </application>
 

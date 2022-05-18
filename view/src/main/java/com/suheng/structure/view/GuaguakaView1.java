@@ -108,6 +108,7 @@ public class GuaguakaView1 extends View {
                 }
                 break;
             case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
                 mPathDst.lineTo(mX, mY);
                 mPathDst.reset();
 

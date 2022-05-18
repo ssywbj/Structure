@@ -107,6 +107,7 @@ public class GuaguakaView2 extends View {
                 }
                 break;
             case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
                 mPathDst.lineTo(mX, mY);
                 mCanvasDst.drawPath(mPathDst, mPaintDst); //把刮卡过程保存在另一块透明的画布上
                 mPathDst.reset();
