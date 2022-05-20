@@ -12,37 +12,31 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.widget.OverScroller;
 
 import androidx.annotation.Nullable;
 
-/**
- * Scroller用法
- * 1.初始化Scroller
- * 2.调用startScroll()开始滚动
- * 3.执行invalidate()刷新界面
- * 4.重写View的computeScroll()并在其内部实现与滚动相关的业务逻辑
- * 5.再次执行invalidate()刷新界面
- */
-public class ScrollerTrackerView extends View {
-    private static final String TAG = ScrollerTrackerView.class.getSimpleName();
+public class ScrollerTrackerView2 extends View {
+    private static final String TAG = ScrollerTrackerView2.class.getSimpleName();
     private int mIndex = 0;
     private Paint mPaint;
     private int mWidth;
     private OverScroller mScroller;
-    private int mDownX;
-    private int mOffsetX;
+    private int mDownX, mOffsetX, mScrollOffsetX;
 
-    public ScrollerTrackerView(Context context) {
+    private VelocityTracker mVelocityTracker;
+
+    public ScrollerTrackerView2(Context context) {
         this(context, null);
     }
 
-    public ScrollerTrackerView(Context context, @Nullable AttributeSet attrs) {
+    public ScrollerTrackerView2(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public ScrollerTrackerView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ScrollerTrackerView2(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
@@ -56,7 +50,9 @@ public class ScrollerTrackerView extends View {
         mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, metrics));
 
         mScroller = new OverScroller(getContext());
-
+        //https://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2012/1114/558.html
+        //https://juejin.cn/post/6844903791066628110
+        mVelocityTracker = VelocityTracker.obtain();
     }
 
     @Override
@@ -67,28 +63,43 @@ public class ScrollerTrackerView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (mVelocityTracker == null) {
+            mVelocityTracker = VelocityTracker.obtain();
+        }
+        mVelocityTracker.addMovement(event);
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mDownX = (int) event.getX();
                 break;
             case MotionEvent.ACTION_MOVE:
-                int scrollOffsetX = (int) (mDownX - event.getX()) + mOffsetX;
-                this.smoothScrollTo(scrollOffsetX);
+                mScrollOffsetX = (int) (mDownX - event.getX()) + mOffsetX;
+                this.smoothScrollTo(mScrollOffsetX);
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                int ddx = (int) (event.getX() - mDownX);
-                boolean isScrollToOtherIndex = Math.abs(ddx) >= mWidth / 4;
-                if (isScrollToOtherIndex) { //当滑动超过1/4的宽度时再去判断是左滑还是右滑
-                    if (ddx < 0) { //手势向左滑，带出右侧视图
-                        mIndex++;
-                    } else if (ddx > 0) { //手势向右滑，带出左侧视图
-                        mIndex--;
+                //计算速度
+                mVelocityTracker.computeCurrentVelocity(1000);
+                float velocityX = mVelocityTracker.getXVelocity();
+                Log.v(TAG, "fling, velocityX：" + velocityX);
+
+                if (Math.abs(velocityX) > 5000) {
+                    mScroller.fling(mScrollOffsetX, 0, (int) -velocityX, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0);
+                } else {
+                    int ddx = (int) (event.getX() - mDownX);
+                    boolean isScrollToOtherIndex = Math.abs(ddx) >= mWidth / 4;
+                    if (isScrollToOtherIndex) { //当滑动超过1/4的宽度时再去判断是左滑还是右滑
+                        if (ddx < 0) { //手势向左滑，带出右侧视图
+                            mIndex++;
+                        } else if (ddx > 0) { //手势向右滑，带出左侧视图
+                            mIndex--;
+                        }
                     }
+                    mOffsetX = mIndex * mWidth;
+                    Log.v(TAG, "ACTION_UP, index: " + mIndex + ", mOffsetX: " + mOffsetX + ", ddx:" + ddx);
                 }
-                mOffsetX = mIndex * mWidth;
-                Log.v(TAG, "ACTION_UP, index: " + mIndex + ", mOffsetX: " + mOffsetX + ", ddx:" + ddx);
-                this.smoothScrollTo(mOffsetX);
+
+                mVelocityTracker.clear(); //清除监视器事件
                 break;
         }
         return true;
@@ -97,7 +108,7 @@ public class ScrollerTrackerView extends View {
     private void smoothScrollTo(int offsetX) {
         int startX = mScroller.getFinalX(); //getFinal: 获取Scroller最终停止位置的位置
         int dx = offsetX - startX;
-        Log.d(TAG, "offsetX: " + offsetX + ", startX: " + startX + ", dx: " + dx);
+        //Log.d(TAG, "offsetX: " + offsetX + ", startX: " + startX + ", dx: " + dx);
 
         //startScroll：Scroller开始滚动，start：开始滚动的位置，d：滚动的距离，duration：滚动时长
         mScroller.startScroll(startX, 0, dx, 0, 500);
@@ -111,12 +122,12 @@ public class ScrollerTrackerView extends View {
         boolean isComputeScroll = mScroller.computeScrollOffset(); //Scroller计算当前时间点对应的滚动位置并返回动画是否还在进行
         if (isComputeScroll) {
             int currX = mScroller.getCurrX(); //Scroller获取computeScrollOffset执行时的滚动x值
-            Log.i(TAG, "computeScroll, currX: " + currX);
+            //Log.i(TAG, "computeScroll, currX: " + currX);
             scrollTo(currX, 0);
             invalidate();
         } else {
             //Scroller.isFinished()：Scroller根据当前的时间点判断动画是否已结束
-            Log.d(TAG, "computeScroll is over, isFinished: " + mScroller.isFinished());
+            //Log.d(TAG, "computeScroll is over, isFinished: " + mScroller.isFinished());
         }
     }
 
@@ -144,6 +155,7 @@ public class ScrollerTrackerView extends View {
         if (!mScroller.isFinished()) {
             mScroller.abortAnimation(); //Scroller停止滚动
         }
+        mVelocityTracker.recycle(); //回收速度监控器
     }
 
     private void drawText(Canvas canvas, int startX, int index) {

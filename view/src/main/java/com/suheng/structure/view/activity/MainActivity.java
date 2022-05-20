@@ -66,8 +66,10 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "BezierActivity");
         mStringList.add("FontView");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "FontViewActivity");
+        mStringList.add("Scroll+VelocityTracker");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ScrollTrackerActivity");
 
-        //startActivity(new Intent(this, PictureManagerActivity.class));
+        //startActivity(new Intent(this, ScrollTrackerActivity.class));
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();

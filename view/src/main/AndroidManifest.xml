@@ -49,6 +49,7 @@
         <activity android:name=".activity.GuaguaLeActivity" />
         <activity android:name=".activity.BezierActivity" />
         <activity android:name=".activity.FontViewActivity" />
+        <activity android:name=".activity.ScrollTrackerActivity" />
 
     </application>
 
