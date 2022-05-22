@@ -21,27 +21,14 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Scroller;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-/**
- * Scroller用法
- * 1.初始化Scroller
- * 2.调用startScroll()开始滚动
- * 3.执行invalidate()刷新界面
- * 4.重写View的computeScroll()并在其内部实现与滚动相关的业务逻辑
- * 5.再次执行invalidate()刷新界面
- */
 public class InfiniteLine2 extends View {
-    private int mIndex = 0;
     private Paint mPaint;
     private int mWidth;
-    private Scroller mScroller;
-    private int mDownX, mLastMoveX;
 
     public InfiniteLine2(Context context) {
         this(context, null);
@@ -58,7 +45,6 @@ public class InfiniteLine2 extends View {
 
     private void init() {
         setBackgroundColor(Color.GRAY);
-        mScroller = new Scroller(getContext());
 
         mPaint = new Paint();
         mPaint.setColor(Color.BLACK);
@@ -93,12 +79,11 @@ public class InfiniteLine2 extends View {
     protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
         if (visibility == VISIBLE) {
-            boolean checked = this.isBoldTextAdjustment();
-            if (checked) {
-                Log.d("Wbj", "粗休");
+            boolean boldTextAdjustment = this.isBoldTextAdjustment();
+            Log.d("Wbj", "粗体：" + boldTextAdjustment + ", : " + this.isBoldTextAdjustment2());
+            if (boldTextAdjustment) {
                 mPaint.setTypeface(Typeface.DEFAULT_BOLD);
             } else {
-                Log.d("Wbj", "非粗体");
                 mPaint.setTypeface(Typeface.DEFAULT);
             }
         }
@@ -122,55 +107,6 @@ public class InfiniteLine2 extends View {
             return configuration.fontWeightAdjustment == boldTextAdjustment; //Android S新特性：粗体文字
         } else {
             return false;
-        }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                mDownX = (int) event.getX();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                int dx = (int) (mDownX - event.getX()) + mLastMoveX;
-                smoothScrollTo(dx, 0);
-                break;
-            case MotionEvent.ACTION_UP:
-                int ddx = (int) (event.getX() - mDownX);
-                if (ddx < 0 && Math.abs(ddx) > 100) {
-                    mIndex++;
-                } else if (ddx > 0 && Math.abs(ddx) > 100) {
-                    mIndex--;
-                }
-                smoothScrollTo(mWidth * mIndex, 0);
-                mLastMoveX = mIndex * mWidth;
-                break;
-        }
-        return true;
-    }
-
-    //调用此方法滚动到目标位置
-    public void smoothScrollTo(int fx, int fy) {
-        int dx = fx - mScroller.getFinalX();
-        int dy = fy - mScroller.getFinalY();
-        Log.d("Wbj", "fx: " + fx + ", fy: " + fy + "----dx: " + dx + ", dy: " + dy);
-        Log.d("Wbj", "final, x: " + mScroller.getFinalX() + ", y: " + mScroller.getFinalY());
-        smoothScrollBy(dx, dy);
-    }
-
-    //调用此方法设置滚动的相对偏移
-    public void smoothScrollBy(int dx, int dy) {
-        //设置mScroller的滚动偏移量
-        mScroller.startScroll(mScroller.getFinalX(), mScroller.getFinalY(), dx, dy, 500);
-        invalidate();//这里必须调用invalidate()才能保证computeScroll()会被调用，否则不一定会刷新界面，看不到滚动效果
-    }
-
-    @Override
-    public void computeScroll() {
-        super.computeScroll();
-        if (mScroller.computeScrollOffset()) {//判断View的滚动是否在继续
-            scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
-            invalidate();
         }
     }
 
@@ -205,9 +141,7 @@ public class InfiniteLine2 extends View {
             return;
         }
 
-        drawText(canvas, (mIndex - 1) * mWidth, mIndex - 1);
-        drawText(canvas, mIndex * mWidth, mIndex);
-        drawText(canvas, (mIndex + 1) * mWidth, mIndex + 1);
+        drawText(canvas);
 
         //中间镂空的矩形：start
         //Xfermode: https://www.jianshu.com/p/d11892bbe055
@@ -284,13 +218,11 @@ public class InfiniteLine2 extends View {
         return bitmap;
     }
 
-    private void drawText(Canvas canvas, int startX, int index) {
+    private void drawText(Canvas canvas) {
         canvas.save();
-        canvas.translate(startX, 0);
-        String text = "粗体测试：" + index;
+        String text = "粗体测试＋Ellipsize";
         canvas.drawText(getEllipsizeText(text, mPaint).toString(), 0, 100, mPaint);
         canvas.restore();
-        Log.d("Wbj", "页数：" + index);
     }
 
     private TextPaint mTextPaint;
@@ -302,7 +234,7 @@ public class InfiniteLine2 extends View {
         }
         paint.getTextBounds(origin, 0, origin.length(), mRect);
         return TextUtils.ellipsize(origin, mTextPaint
-                , mRect.width() * 0.8f, TextUtils.TruncateAt.MIDDLE);
+                , mRect.width() * 0.7f, TextUtils.TruncateAt.MIDDLE);
     }
 
 }

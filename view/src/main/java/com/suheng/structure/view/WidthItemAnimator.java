@@ -22,6 +22,7 @@ import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
+import android.view.animation.PathInterpolator;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
@@ -199,7 +200,7 @@ public class WidthItemAnimator extends SimpleItemAnimator {
         final ViewPropertyAnimator animation = view.animate();
         mRemoveAnimations.add(holder);
         animation.setDuration(getRemoveDuration()).alpha(0).translationX(-view.getMeasuredWidth())
-                .setInterpolator(new EaseCubicInterpolator(0.25f, 0, 0, 1))
+                .setInterpolator(new PathInterpolator(0.25f, 0, 0, 1))
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationStart(Animator animator) {
@@ -232,7 +233,7 @@ public class WidthItemAnimator extends SimpleItemAnimator {
         final View view = holder.itemView;
         final ViewPropertyAnimator animation = view.animate();
         mAddAnimations.add(holder);
-        animation.alpha(1).translationX(0).setDuration(getAddDuration()).setInterpolator(new EaseCubicInterpolator(0.25f, 0, 0, 1))
+        animation.alpha(1).translationX(0).setDuration(getAddDuration()).setInterpolator(new PathInterpolator(0.25f, 0, 0, 1))
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationStart(Animator animator) {

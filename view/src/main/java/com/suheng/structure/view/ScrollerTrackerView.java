@@ -4,9 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.text.TextPaint;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -149,21 +146,9 @@ public class ScrollerTrackerView extends View {
     private void drawText(Canvas canvas, int startX, int index) {
         canvas.save();
         canvas.translate(startX, 0);
-        String text = "粗体测试：" + index;
-        canvas.drawText(getEllipsizeText(text, mPaint).toString(), 10, 100, mPaint);
+        String text = "页面：" + index;
+        canvas.drawText(text, 10, 100, mPaint);
         canvas.restore();
-    }
-
-    private TextPaint mTextPaint;
-    private final Rect mRect = new Rect();
-
-    private CharSequence getEllipsizeText(String origin, Paint paint) {
-        if (mTextPaint == null) {
-            mTextPaint = new TextPaint(paint);
-        }
-        paint.getTextBounds(origin, 0, origin.length(), mRect);
-        return TextUtils.ellipsize(origin, mTextPaint
-                , mRect.width() * 0.8f, TextUtils.TruncateAt.MIDDLE);
     }
 
 }

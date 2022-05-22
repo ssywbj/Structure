@@ -14,13 +14,14 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.animation.PathInterpolator;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
 public class AnimImageView4 extends AppCompatImageView {
-    private final EaseCubicInterpolator mFirstPhaseInterpolator = new EaseCubicInterpolator(0.33f, 0, 0.66f, 1);
-    private final EaseCubicInterpolator mSecondPhaseInterpolator = new EaseCubicInterpolator(0.33f, 0, 0, 1);
+    private final PathInterpolator mFirstPhaseInterpolator = new PathInterpolator(0.33f, 0, 0.66f, 1);
+    private final PathInterpolator mSecondPhaseInterpolator = new PathInterpolator(0.33f, 0, 0, 1);
     public static final int FIRST_PHASE_ANIM_DURATION = 1250;
     public static final int COMPLETE_ANIM_DURATION = 1700;
     public static final float END_SCALE = 1.08f;

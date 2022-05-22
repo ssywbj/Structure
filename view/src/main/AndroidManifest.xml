@@ -50,6 +50,7 @@
         <activity android:name=".activity.BezierActivity" />
         <activity android:name=".activity.FontViewActivity" />
         <activity android:name=".activity.ScrollTrackerActivity" />
+        <activity android:name=".activity.InfiniteLineActivity" />
 
     </application>
 

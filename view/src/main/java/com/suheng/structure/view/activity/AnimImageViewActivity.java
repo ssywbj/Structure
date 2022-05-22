@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.PathInterpolator;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -12,13 +13,12 @@ import androidx.core.content.ContextCompat;
 import com.suheng.structure.view.AnimImageView4;
 import com.suheng.structure.view.AnimImageView5;
 import com.suheng.structure.view.AnimImageView6;
-import com.suheng.structure.view.EaseCubicInterpolator;
 import com.suheng.structure.view.R;
 
 public class AnimImageViewActivity extends AppCompatActivity {
     private static final int FIRST_PHASE_ANIM_DURATION = 1300;
     private static final int COMPLETE_ANIM_DURATION = 1700;
-    private final EaseCubicInterpolator mFirstPhaseInterpolator = new EaseCubicInterpolator(0.33f, 0, 0.66f, 1);
+    private final PathInterpolator mFirstPhaseInterpolator = new PathInterpolator(0.33f, 0, 0.66f, 1);
 
     private AnimImageView4 mSelectedImageView;
 

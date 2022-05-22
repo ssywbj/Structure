@@ -24,6 +24,7 @@ import android.animation.ValueAnimator;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
+import android.view.animation.PathInterpolator;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
@@ -263,7 +264,7 @@ public class Height2ItemAnimator extends SimpleItemAnimator {
         animator.addUpdateListener(animatorUpdateListener);
         animator.addListener(animatorListenerAdapter);
         Log.i("Wbj", "animateRemoveImpl, animatorListenerAdapter: " + animatorListenerAdapter);
-        animator.setInterpolator(new EaseCubicInterpolator(0.25f, 0, 0, 1));
+        animator.setInterpolator(new PathInterpolator(0.25f, 0, 0, 1));
         animator.setDuration(getRemoveDuration());
         animator.start();
     }
@@ -379,7 +380,7 @@ public class Height2ItemAnimator extends SimpleItemAnimator {
         animator.addUpdateListener(animatorUpdateListener);
         animator.addListener(animatorListenerAdapter);
         Log.i("Wbj", "animateAddImpl, animatorListenerAdapter: " + animatorListenerAdapter);
-        animator.setInterpolator(new EaseCubicInterpolator(0.25f, 0, 0, 1));
+        animator.setInterpolator(new PathInterpolator(0.25f, 0, 0, 1));
         animator.setDuration(getAddDuration());
         animator.start();
     }

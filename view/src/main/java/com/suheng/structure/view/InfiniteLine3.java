@@ -23,7 +23,7 @@ public class InfiniteLine3 extends View {
     public static final int SECONDS_SCALE = 60;
     public static final int PER_SCREEN_SECONDS = 5;
     private Paint mPaint, mPaintText;
-    private Rect mRectText = new Rect();
+    private final Rect mRectText = new Rect();
     private float mTextWidth, mTextOffset;
     private int mPageIndex;
     private ValueAnimator mTranslateAnim;

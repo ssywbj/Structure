@@ -68,8 +68,10 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "FontViewActivity");
         mStringList.add("Scroll+VelocityTracker");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ScrollTrackerActivity");
+        mStringList.add("InfiniteLine");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "InfiniteLineActivity");
 
-        //startActivity(new Intent(this, ScrollTrackerActivity.class));
+        startActivity(new Intent(this, InfiniteLineActivity.class));
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();

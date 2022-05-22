@@ -14,6 +14,7 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.animation.PathInterpolator;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -63,7 +64,7 @@ public class AnimImageView5 extends AppCompatImageView {
     private void initMaskAnimator() {
         mMaskAnimator = ValueAnimator.ofFloat(0, 0);
         mMaskAnimator.setDuration(FIRST_PHASE_ANIM_DURATION);
-        mMaskAnimator.setInterpolator(new EaseCubicInterpolator(0.01f, 0, 0.1f, 1));
+        mMaskAnimator.setInterpolator(new PathInterpolator(0.01f, 0, 0.1f, 1));
         mMaskAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -83,7 +84,7 @@ public class AnimImageView5 extends AppCompatImageView {
     private void initAlphaAnimator() {
         mAlphaAnimator = ValueAnimator.ofInt(255, 0);
         mAlphaAnimator.setDuration(FIRST_PHASE_ANIM_DURATION);
-        mAlphaAnimator.setInterpolator(new EaseCubicInterpolator(0.01f, 0, 0.1f, 1));
+        mAlphaAnimator.setInterpolator(new PathInterpolator(0.01f, 0, 0.1f, 1));
         mAlphaAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -119,11 +120,11 @@ public class AnimImageView5 extends AppCompatImageView {
         };
         ValueAnimator firstPhaseAnim = ValueAnimator.ofFloat(START_SCALE, END_SCALE);
         firstPhaseAnim.setDuration(FIRST_PHASE_ANIM_DURATION);
-        firstPhaseAnim.setInterpolator(new EaseCubicInterpolator(0.01f, 0, 0.1f, 1));
+        firstPhaseAnim.setInterpolator(new PathInterpolator(0.01f, 0, 0.1f, 1));
         firstPhaseAnim.addUpdateListener(animatorUpdateListener);
         ValueAnimator secondPhaseAnim = ValueAnimator.ofFloat(END_SCALE, START_SCALE);
         secondPhaseAnim.setDuration(COMPLETE_ANIM_DURATION - FIRST_PHASE_ANIM_DURATION);
-        secondPhaseAnim.setInterpolator(new EaseCubicInterpolator(0.33f, 0, 0, 1));
+        secondPhaseAnim.setInterpolator(new PathInterpolator(0.33f, 0, 0, 1));
         secondPhaseAnim.addUpdateListener(animatorUpdateListener);
 
         mPhaseAnimator = new AnimatorSet();
