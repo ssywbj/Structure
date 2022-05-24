@@ -24,12 +24,12 @@ import androidx.annotation.Nullable;
  * 带有遮罩层效果的ImageView
  */
 public class AnimImageView6 extends View {
-    private static final int FIRST_PHASE_ANIM_DURATION = 1300;
+    /*private static final int FIRST_PHASE_ANIM_DURATION = 1300;
     private static final int COMPLETE_ANIM_DURATION = 2700;
-    private static final float END_SCALE = 1.35f;
-    /*private static final int FIRST_PHASE_ANIM_DURATION = 130;
+    private static final float END_SCALE = 1.35f;*/
+    private static final int FIRST_PHASE_ANIM_DURATION = 130;
     private static final int COMPLETE_ANIM_DURATION = 700;
-    private static final float END_SCALE = 1.15f;*/
+    private static final float END_SCALE = 1.15f;
     private static final float START_SCALE = 1f;
     private final RectF mRectF = new RectF();
     private final RectF mRectFTmp = new RectF();
@@ -68,8 +68,9 @@ public class AnimImageView6 extends View {
 
     private void initMaskAnimator() {
         mMaskAnimator = ValueAnimator.ofFloat(0, 0);
-        mMaskAnimator.setDuration(FIRST_PHASE_ANIM_DURATION);
-        mMaskAnimator.setInterpolator(new PathInterpolator(0.01f, 0, 0.1f, 1));
+        mMaskAnimator.setDuration(250);
+        //mMaskAnimator.setInterpolator(new PathInterpolator(0.01f, 0, 0.1f, 1));
+        mMaskAnimator.setInterpolator(new PathInterpolator(0.2f, 0, 0.8f, 1));
         mMaskAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -182,7 +183,9 @@ public class AnimImageView6 extends View {
         if (drawable == null) {
             return;
         }*/
-        mBitmapSrc = BitmapHelper.get(getContext(), R.drawable.icon_alarm, Color.BLACK, 1.0f * 36 / 24);
+        int selectedColor;
+        selectedColor = Color.argb((int) (255 * 0.8), 0xFF, 0, 0);
+        mBitmapSrc = BitmapHelper.get(getContext(), R.drawable.icon_calendar, selectedColor, 1.0f * 36 / 24);
         int width = mBitmapSrc.getWidth();
         int height = mBitmapSrc.getHeight();
         if (mBitmapSrc == null || width <= 0 || height <= 0 || mBitmapSrc.getWidth() <= 0 || mBitmapSrc.getHeight() <= 0) {
@@ -191,7 +194,7 @@ public class AnimImageView6 extends View {
         mRectF.set(0, 0, width, height);
         mRectFTmp.set(0, 0, width * 0.8f, height * 0.8f);
 
-        int selectedColor;
+
         /*//ColorStateList imageTintList = getImageTintList();
         int[][] states = new int[2][];
         states[0] = new int[]{android.R.attr.state_selected};
@@ -204,7 +207,8 @@ public class AnimImageView6 extends View {
             selectedColor = imageTintList.getColorForState(new int[]{android.R.attr.state_selected}, Color.GREEN);
         }*/
         selectedColor = Color.argb((int) (255 * 0.8), 0xFF, 0, 0);
-        mBitmapDst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        //mBitmapDst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        mBitmapDst = BitmapHelper.get(getContext(), R.drawable.icon_alarm, Color.BLACK, 1.0f * 36 / 24);
         float sx = 1.0f * width / mBitmapSrc.getWidth();
         Canvas canvas = new Canvas(mBitmapDst);
         canvas.scale(sx, sx);
@@ -218,7 +222,7 @@ public class AnimImageView6 extends View {
             canvas.drawBitmap(bitmapSrc, 0, 0, paint);
         } else {*/
         paint.setColor(selectedColor);
-        canvas.drawBitmap(mBitmapSrc.extractAlpha(), 0, 0, paint);
+        //canvas.drawBitmap(mBitmapSrc.extractAlpha(), 0, 0, paint);
         //}
 
         mBitmapTransparent = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -229,7 +233,9 @@ public class AnimImageView6 extends View {
         if (mMaskAnimator == null) {
             this.initMaskAnimator();
         }
-        mMaskAnimator.setFloatValues(0, Math.max(mRectF.width(), mRectF.height()) / 2f);
+        //mMaskAnimator.setFloatValues(0, Math.max(mRectF.width(), mRectF.height()) / 2f);
+        float radius = (float) Math.sqrt(Math.pow(1.0 * mRectF.width() / 2, 2) + Math.pow(1.0 * mRectF.height() / 2, 2));
+        mMaskAnimator.setFloatValues(0, radius);
     }
 
     @Override
@@ -272,12 +278,10 @@ public class AnimImageView6 extends View {
             mPaint.setXfermode(mXfermode);
             canvas.drawBitmap(mBitmapTransparent, null, mRectF, mPaint);
             mPaint.setXfermode(null);
-
-            //裁出的镂空部分用选中状态图片填上
         } else {
             saveLayer = canvas.saveLayerAlpha(mRectF, mAlpha, Canvas.ALL_SAVE_FLAG);
         }
-        canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint);
+        canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint); //mIsSelected为true时，裁出的镂空部分用选中状态图片填上
         canvas.restoreToCount(saveLayer);
     }
 

@@ -53,6 +53,7 @@
         <activity android:name=".activity.InfiniteLineActivity" />
         <activity android:name=".activity.HexagonProgressBarActivity" />
         <activity android:name=".activity.SVGActivity" />
+        <activity android:name=".activity.DrawableActivity" />
 
     </application>
 
