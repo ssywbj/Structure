@@ -27,7 +27,7 @@ public class Hexagon1ProgressBar extends View {
     private float mAnimatorValue;
     private float mCircleLength;
 
-    private Matrix mMatrix = new Matrix();
+    private final Matrix mMatrix = new Matrix();
     private Bitmap mBitmap;
 
     public Hexagon1ProgressBar(Context context) {

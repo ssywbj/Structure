@@ -70,8 +70,12 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ScrollTrackerActivity");
         mStringList.add("InfiniteLine");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "InfiniteLineActivity");
+        mStringList.add("HexagonProgressBar");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "HexagonProgressBarActivity");
+        mStringList.add("SVG+Clip");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "SVGActivity");
 
-        startActivity(new Intent(this, InfiniteLineActivity.class));
+        //startActivity(new Intent(this, InfiniteLineActivity.class));
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();
@@ -94,48 +98,6 @@ public class MainActivity extends AppCompatActivity {
         Log.i("wbj_main", "INFO, INFO, INFO");
         Log.w("wbj_main", "WARN, WARN, WARN");
         Log.e("wbj_main", "ERROR, ERROR, ERROR");
-
-        /*DateTimePicker picker = findViewById(R.id.datePicker);
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 16);
-        calendar.set(Calendar.MINUTE, 30);
-        picker.init(calendar, DateTimePicker.FORMAT_H_M);
-        picker.setOnDateChangeListener(new DateTimePicker.OnDateTimeChangeListener() {
-            @Override
-            public void onChange(DateTimePicker picker, Calendar calendar) {
-            }
-        });*/
-
-        /*textView.post(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        });*/
-
-        /*ImageView imageView = findViewById(R.id.image_svg);
-
-        //mVectorDrawable = AnimatedVectorDrawableCompat.create(this, R.drawable.water_drop_anim);
-        //mVectorDrawable = AnimatedVectorDrawableCompat.create(this, R.drawable.search_anim);
-        mVectorDrawable = AnimatedVectorDrawableCompat.create(this, R.drawable.tt_search_anim);
-        if (mVectorDrawable != null) {
-            imageView.setImageDrawable(mVectorDrawable);
-            mVectorDrawable.registerAnimationCallback(new Animatable2Compat.AnimationCallback() {
-                @Override
-                public void onAnimationStart(Drawable drawable) {
-                    super.onAnimationStart(drawable);
-                    Log.d("Wbj", "-----svg anim start-----");
-                }
-
-                @Override
-                public void onAnimationEnd(Drawable drawable) {
-                    super.onAnimationEnd(drawable);
-                    Log.d("Wbj", "-----svg anim end-----");
-                }
-            });
-
-            //mVectorDrawable.start();
-        }*/
 
         int resId = R.anim.layout_animation_fall_down;
         LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(this, resId);

@@ -8,6 +8,8 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+
 public class ClipView extends View {
 
     public ClipView(Context context) {
@@ -17,6 +19,11 @@ public class ClipView extends View {
     public ClipView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
+
+    public ClipView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
 
     @Override
     public void draw(Canvas canvas) {

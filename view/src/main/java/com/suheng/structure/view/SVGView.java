@@ -22,7 +22,6 @@ import android.graphics.drawable.VectorDrawable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 import androidx.annotation.DrawableRes;
@@ -35,7 +34,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-public class SVGView extends View {
+public class SVGView extends ClipView {
     private static final String TAG = SVGView.class.getSimpleName();
     private final PointF mPointCenter = new PointF();
     private final Paint mPaint = new Paint();

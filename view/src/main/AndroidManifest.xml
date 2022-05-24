@@ -51,6 +51,8 @@
         <activity android:name=".activity.FontViewActivity" />
         <activity android:name=".activity.ScrollTrackerActivity" />
         <activity android:name=".activity.InfiniteLineActivity" />
+        <activity android:name=".activity.HexagonProgressBarActivity" />
+        <activity android:name=".activity.SVGActivity" />
 
     </application>
 

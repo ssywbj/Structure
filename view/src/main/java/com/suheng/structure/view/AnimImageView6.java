@@ -262,8 +262,9 @@ public class AnimImageView6 extends View {
             return;
         }
 
+        int saveLayer;
         if (mIsSelected) {
-            int saveLayer = canvas.saveLayer(mRectF, null, Canvas.ALL_SAVE_FLAG);
+            saveLayer = canvas.saveLayer(mRectF, null, Canvas.ALL_SAVE_FLAG);
             canvas.drawBitmap(mBitmapSrc, null, mRectF, null); //原图：未选中态的图片
             canvas.clipPath(mPath); //画布裁剪成圆形
 
@@ -273,13 +274,11 @@ public class AnimImageView6 extends View {
             mPaint.setXfermode(null);
 
             //裁出的镂空部分用选中状态图片填上
-            canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint);
-            canvas.restoreToCount(saveLayer);
         } else {
-            int saveLayer = canvas.saveLayerAlpha(mRectF, mAlpha, Canvas.ALL_SAVE_FLAG);
-            canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint);
-            canvas.restoreToCount(saveLayer);
+            saveLayer = canvas.saveLayerAlpha(mRectF, mAlpha, Canvas.ALL_SAVE_FLAG);
         }
+        canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint);
+        canvas.restoreToCount(saveLayer);
     }
 
     public void setSelectedAnim(boolean selected, AnimatorListenerAdapter animatorListenerAdapter) {
