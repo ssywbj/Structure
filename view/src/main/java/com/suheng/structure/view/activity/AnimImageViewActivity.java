@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 import com.suheng.structure.view.AnimImageView4;
 import com.suheng.structure.view.AnimImageView5;
 import com.suheng.structure.view.AnimImageView6;
+import com.suheng.structure.view.AnimImageView7;
 import com.suheng.structure.view.R;
 
 public class AnimImageViewActivity extends AppCompatActivity {
@@ -107,6 +108,7 @@ public class AnimImageViewActivity extends AppCompatActivity {
 
         this.initAnim5Layout(colorStateList);
         this.initAnim6Layout(colorStateList);
+        this.initAnim7Layout();
     }
 
     private void initAnim5Layout(ColorStateList colorStateList) {
@@ -178,7 +180,7 @@ public class AnimImageViewActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     /*if (imageView6.isSelected() || imageView6.isSelectedAnimRunning()) {
                         return;
-                    }*/
+                    }
 
                     for (int i = 0; i < childCount; i++) {
                         View view = aiv5Layout.getChildAt(i);
@@ -194,9 +196,55 @@ public class AnimImageViewActivity extends AppCompatActivity {
                                 viewTmp.setSelectedAnim(false);
                             }
                         }
-                    }
+                    }*/
 
                     imageView6.setSelectedAnim(true);
+                }
+            });
+
+        }
+    }
+
+    private void initAnim7Layout() {
+        int defSelectedIndex = 0;
+        ViewGroup aiv5Layout = findViewById(R.id.aiv7_layout);
+        int childCount = aiv5Layout.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = aiv5Layout.getChildAt(i);
+            if (!(view instanceof AnimImageView7)) {
+                continue;
+            }
+
+            AnimImageView7 imageView7 = (AnimImageView7) view;
+            if (defSelectedIndex == 0) {
+                view.setSelected(true);
+                defSelectedIndex = 1;
+            }
+
+            imageView7.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    /*if (imageView7.isSelected() || imageView7.isSelectedAnimRunning()) {
+                        return;
+                    }
+
+                    for (int i = 0; i < childCount; i++) {
+                        View view = aiv5Layout.getChildAt(i);
+                        if (!(view instanceof AnimImageView6)) {
+                            continue;
+                        }
+
+                        AnimImageView6 viewTmp = (AnimImageView6) view;
+                        if (viewTmp.isSelectedAnimRunning()) {
+                            viewTmp.cancelSelectedAnimRunning();
+                        } else {
+                            if (viewTmp.isSelected()) {
+                                viewTmp.setSelectedAnim(false);
+                            }
+                        }
+                    }*/
+
+                    imageView7.setSelectedAnim(true);
                 }
             });
 

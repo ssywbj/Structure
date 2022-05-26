@@ -15,6 +15,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.Xfermode;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.PathInterpolator;
 
@@ -23,7 +24,7 @@ import androidx.annotation.Nullable;
 /**
  * 带有遮罩层效果的ImageView
  */
-public class AnimImageView6 extends View {
+public class AnimImageView7 extends View {
     /*private static final int FIRST_PHASE_ANIM_DURATION = 1300;
     private static final int COMPLETE_ANIM_DURATION = 2700;*/
     private static final int FIRST_PHASE_ANIM_DURATION = 130;
@@ -42,17 +43,17 @@ public class AnimImageView6 extends View {
     private AnimatorListenerAdapter mAnimatorListenerAdapter;
     private final Xfermode mXfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
 
-    public AnimImageView6(Context context) {
+    public AnimImageView7(Context context) {
         super(context);
         this.init();
     }
 
-    public AnimImageView6(Context context, @Nullable AttributeSet attrs) {
+    public AnimImageView7(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.init();
     }
 
-    public AnimImageView6(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public AnimImageView7(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.init();
     }
@@ -65,9 +66,13 @@ public class AnimImageView6 extends View {
         this.getSourceImage();
     }
 
+    private int mMaskAlpha = 255;
+    float mRadius;
+
     private void initMaskAnimator() {
         mMaskAnimator = ValueAnimator.ofFloat(0, 0);
         mMaskAnimator.setDuration(250);
+        //mMaskAnimator.setInterpolator(new PathInterpolator(0.01f, 0, 0.1f, 1));
         mMaskAnimator.setInterpolator(new PathInterpolator(0.2f, 0, 0.8f, 1));
         mMaskAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -77,7 +82,10 @@ public class AnimImageView6 extends View {
                     float radius = (float) object;
                     mPath.reset();
                     mPath.addCircle(mRectF.centerX(), mRectF.centerY(), radius, Path.Direction.CCW);
-                    //Log.i("Wbj", "mMaskAnimator, onAnimationUpdate: " + radius + ", " + this);
+                    float fraction = 1 - animation.getAnimatedFraction();
+                    mMaskAlpha = (int) (255 * fraction);
+                    Log.i("Wbj", "mMaskAnimator, onAnimationUpdate: " + radius + ", fraction: " + fraction
+                            + ", fraction2: " + (radius / mRadius) + ", fraction3: " + animation.getAnimatedFraction() + ", maskAlpha: " + mMaskAlpha);
 
                     invalidate();
                 }
@@ -181,7 +189,9 @@ public class AnimImageView6 extends View {
         if (drawable == null) {
             return;
         }*/
-        mBitmapSrc = BitmapHelper.get(getContext(), R.drawable.icon_alarm, Color.BLACK, 1.0f * 36 / 24);
+        int selectedColor;
+        selectedColor = Color.argb((int) (255 * 0.8), 0xFF, 0, 0);
+        mBitmapSrc = BitmapHelper.get(getContext(), R.drawable.icon_calendar, selectedColor, 1.0f * 36 / 24);
         int width = mBitmapSrc.getWidth();
         int height = mBitmapSrc.getHeight();
         if (mBitmapSrc == null || width <= 0 || height <= 0 || mBitmapSrc.getWidth() <= 0 || mBitmapSrc.getHeight() <= 0) {
@@ -190,7 +200,6 @@ public class AnimImageView6 extends View {
         mRectF.set(0, 0, width, height);
         mRectFTmp.set(0, 0, width * 0.8f, height * 0.8f);
 
-        int selectedColor;
         /*//ColorStateList imageTintList = getImageTintList();
         int[][] states = new int[2][];
         states[0] = new int[]{android.R.attr.state_selected};
@@ -203,14 +212,9 @@ public class AnimImageView6 extends View {
             selectedColor = imageTintList.getColorForState(new int[]{android.R.attr.state_selected}, Color.GREEN);
         }*/
         selectedColor = Color.argb((int) (255 * 0.8), 0xFF, 0, 0);
-        mBitmapDst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        //mBitmapDst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        mBitmapDst = BitmapHelper.get(getContext(), R.drawable.icon_alarm, Color.BLACK, 1.0f * 36 / 24);
         float sx = 1.0f * width / mBitmapSrc.getWidth();
-        Canvas canvas = new Canvas(mBitmapDst);
-        canvas.scale(sx, sx);
-        Paint paint = new Paint(mPaint);
-        paint.setColor(selectedColor);
-        canvas.drawBitmap(mBitmapSrc.extractAlpha(), 0, 0, paint);
-
         mBitmapTransparent = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas2 = new Canvas(mBitmapTransparent);
         canvas2.scale(sx, sx);
@@ -219,8 +223,8 @@ public class AnimImageView6 extends View {
         if (mMaskAnimator == null) {
             this.initMaskAnimator();
         }
-        float radius = (float) Math.sqrt(Math.pow(1.0 * mRectF.width() / 2, 2) + Math.pow(1.0 * mRectF.height() / 2, 2));
-        mMaskAnimator.setFloatValues(0, radius);
+        mRadius = (float) Math.sqrt(Math.pow(1.0 * mRectF.width() / 2, 2) + Math.pow(1.0 * mRectF.height() / 2, 2));
+        mMaskAnimator.setFloatValues(0, mRadius);
     }
 
     @Override
@@ -256,7 +260,8 @@ public class AnimImageView6 extends View {
         int saveLayer;
         if (mIsSelected) {
             saveLayer = canvas.saveLayer(mRectF, null, Canvas.ALL_SAVE_FLAG);
-            canvas.drawBitmap(mBitmapSrc, null, mRectF, null); //原图：未选中态的图片
+            mPaint.setAlpha(mMaskAlpha);
+            canvas.drawBitmap(mBitmapSrc, null, mRectF, mPaint); //原图：未选中态的图片
             canvas.clipPath(mPath); //画布裁剪成圆形
 
             //镂空：避免选中色有透明度做遮罩圆形渐变时，能看到下方图标的颜色，产生颜色叠加效果，形成视觉偏差
@@ -266,7 +271,10 @@ public class AnimImageView6 extends View {
         } else {
             saveLayer = canvas.saveLayerAlpha(mRectF, mAlpha, Canvas.ALL_SAVE_FLAG);
         }
-        canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint);
+
+        mPaint.setAlpha(255);
+        canvas.drawBitmap(mBitmapDst, null, mRectF, mPaint); //mIsSelected为true时，裁出的镂空部分用选中状态图片填上
+
         canvas.restoreToCount(saveLayer);
     }
 
