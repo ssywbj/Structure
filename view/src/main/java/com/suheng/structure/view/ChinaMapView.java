@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableWrapper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -15,7 +17,9 @@ import androidx.annotation.Nullable;
 import androidx.core.graphics.PathParser;
 
 import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -135,6 +139,14 @@ public class ChinaMapView extends View {
     private final RectF rectF = new RectF();
 
     private void getPathList() {
+        try {
+            Drawable fromXml = DrawableWrapper.createFromXml(getResources(), getResources().getXml(R.xml.chinahigh));
+            Log.i(TAG, "fromXml: " + fromXml.getIntrinsicWidth() + ", " + fromXml.getIntrinsicHeight());
+        } catch (IOException | XmlPullParserException e) {
+            Log.e(TAG, "fromXml error", e);
+        }
+
+
         XmlResourceParser parser = getResources().getXml(R.xml.chinahigh);
         try {
             PathBean pathBean;
@@ -144,6 +156,15 @@ public class ChinaMapView extends View {
             while (parser.getEventType() != XmlPullParser.END_DOCUMENT) {
                 if (parser.getEventType() == XmlPullParser.START_TAG) {
                     String tagName = parser.getName();
+                    Log.i(TAG, "start tagName: " + tagName);
+                    if ("vector".equals(tagName)) {
+                        String width = parser.getAttributeValue(NAME_SPACE, "width");
+                        String height = parser.getAttributeValue(NAME_SPACE, "height");
+                        String viewportWidth = parser.getAttributeValue(NAME_SPACE, "viewportWidth");
+                        String viewportHeight = parser.getAttributeValue(NAME_SPACE, "viewportHeight");
+                        Log.d(TAG, "vector: " + width + ", " + height + ", " + viewportWidth + ", " + viewportHeight);
+                    }
+
                     if ("path".equals(tagName)) {
                         pathBean = new PathBean();
 
@@ -158,7 +179,7 @@ public class ChinaMapView extends View {
 
                         rectF.setEmpty();
                         path.computeBounds(rectF, true);
-                        Log.i(TAG, "rectF: " + rectF.toShortString());
+                        Log.d(TAG, "path, computeBounds: " + rectF.toShortString());
                         left = ((left == -1) ? rectF.left : Math.min(left, rectF.left));
                         top = ((top == -1) ? rectF.top : Math.min(top, rectF.top));
                         right = ((right == -1) ? rectF.right : Math.max(right, rectF.right));
@@ -166,11 +187,16 @@ public class ChinaMapView extends View {
                     }
                 }
 
+                /*if (parser.getEventType() == XmlPullParser.END_TAG) {
+                    String tagName = parser.getName();
+                    Log.v(TAG, "end tagName: " + tagName);
+                }*/
+
                 parser.next();
             }
 
             mRectF = new RectF(left, top, right, bottom);
-            Log.i(TAG, "mRectF: " + mRectF.toShortString());
+            Log.i(TAG, "path, RectF: " + mRectF.toShortString() + ", width: " + mRectF.width() + ", " + mRectF.height());
 
             mListSize = mPathBeans.size();
             if (mListSize > 0) {
@@ -182,7 +208,7 @@ public class ChinaMapView extends View {
         }
     }
 
-    static class PathBean {
+    public static class PathBean {
         private String mName;
         private String mFillColor;
         private String mStrokeColor;

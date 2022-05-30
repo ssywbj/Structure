@@ -22,9 +22,8 @@
 
     <ImageView
         android:id="@+id/image_svg2"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="2dp"
-        android:src="@drawable/tt_search_colors" />
+        android:layout_marginTop="2dp" />
 </LinearLayout>
