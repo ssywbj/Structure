@@ -76,6 +76,14 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "SVGActivity");
         mStringList.add("Drawable");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "DrawableActivity");
+        mStringList.add("Spring");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "SpringAnimActivity");
+        mStringList.add("Fling");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "FlingAnimActivity");
+        mStringList.add("Gesture");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ScrollGestureActivity");
+        mStringList.add("Damping");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "DampingActivity");
 
         //startActivity(new Intent(this, SVGActivity.class));
 

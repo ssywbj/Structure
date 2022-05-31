@@ -1,4 +1,4 @@
-package com.suheng.damping;
+package com.suheng.structure.view.activity;
 
 import android.os.Bundle;
 import android.view.View;
@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.SpringAnimation;
 import androidx.dynamicanimation.animation.SpringForce;
+
+import com.suheng.structure.view.R;
 
 public class SpringAnimActivity extends AppCompatActivity {
 

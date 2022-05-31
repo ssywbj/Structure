@@ -1,4 +1,4 @@
-package com.suheng.damping.view;
+package com.suheng.structure.view.damping;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -85,6 +85,7 @@ public class DampingView extends NestedScrollView {
                 }
                 break;
             case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
                 this.restoreAnim(); //回移动画
                 mChildView.layout(mRect.left, mRect.top, mRect.right, mRect.bottom); //子控件回到初始位置
 

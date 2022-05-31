@@ -1,4 +1,4 @@
-package com.suheng.damping;
+package com.suheng.structure.view.activity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -7,16 +7,16 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.OverScroller;
-import android.widget.Scroller;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.suheng.structure.view.R;
 
 public class ScrollGestureActivity extends AppCompatActivity {
     public static final String TAG = ScrollGestureActivity.class.getSimpleName();
 
     private GestureDetector mGestureDetector;
     private OverScroller mOverScroller;
-    private Scroller mScroller;
 
     private View mLayoutRoot;
 
@@ -26,10 +26,9 @@ public class ScrollGestureActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scroll_gesture);
         mLayoutRoot = findViewById(R.id.aty_root);
 
-        //this.initGestureDetector();
+        this.initGestureDetector();
 
         mOverScroller = new OverScroller(this);
-        mScroller = new Scroller(this);
     }
 
     private void initGestureDetector() {
@@ -79,44 +78,6 @@ public class ScrollGestureActivity extends AppCompatActivity {
                 return mGestureDetector.onTouchEvent(event);
             }
         });
-    }
-
-    private int mDownY;
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int currentY = (int) event.getY();
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                mDownY = currentY;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                int dx = mDownY - currentY;
-                mDownY = currentY;
-                this.smoothScrollTo(dx, 0);
-                break;
-            case MotionEvent.ACTION_UP:
-                //int ddx = (int) (event.getX() - mDownX);
-                //smoothScrollTo(mWidth * mIndex, 0);
-                break;
-        }
-        return true;
-    }
-
-    //调用此方法滚动到目标位置
-    public void smoothScrollTo(int fx, int fy) {
-        int dx = fx - mScroller.getFinalX();
-        int dy = fy - mScroller.getFinalY();
-        Log.d("Wbj", "fx: " + fx + ", fy: " + fy + "----dx: " + dx + ", dy: " + dy);
-        Log.d("Wbj", "final, x: " + mScroller.getFinalX() + ", y: " + mScroller.getFinalY());
-        this.smoothScrollBy(dx, dy);
-    }
-
-    //调用此方法设置滚动的相对偏移
-    public void smoothScrollBy(int dx, int dy) {
-        //设置mScroller的滚动偏移量
-        mScroller.startScroll(mScroller.getFinalX(), mScroller.getFinalY(), dx, dy, 500);
-        mLayoutRoot.invalidate();//这里必须调用invalidate()才能保证computeScroll()会被调用，否则不一定会刷新界面，看不到滚动效果
     }
 
 }

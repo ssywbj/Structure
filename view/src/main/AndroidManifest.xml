@@ -54,6 +54,10 @@
         <activity android:name=".activity.HexagonProgressBarActivity" />
         <activity android:name=".activity.SVGActivity" />
         <activity android:name=".activity.DrawableActivity" />
+        <activity android:name=".activity.SpringAnimActivity" />
+        <activity android:name=".activity.FlingAnimActivity" />
+        <activity android:name=".activity.ScrollGestureActivity" />
+        <activity android:name=".activity.DampingActivity" />
 
     </application>
 

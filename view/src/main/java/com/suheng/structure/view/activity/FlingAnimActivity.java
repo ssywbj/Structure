@@ -1,4 +1,4 @@
-package com.suheng.damping;
+package com.suheng.structure.view.activity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -9,6 +9,8 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.FlingAnimation;
+
+import com.suheng.structure.view.R;
 
 public class FlingAnimActivity extends AppCompatActivity {
 
