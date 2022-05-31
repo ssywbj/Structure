@@ -1,6 +1,7 @@
 package com.suheng.structure.view.activity;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -15,9 +16,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
-import androidx.annotation.DrawableRes;
+import androidx.annotation.XmlRes;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.PathParser;
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
@@ -73,7 +73,15 @@ public class SVGActivity extends AppCompatActivity {
 
         this.getPathList();
 
-        imageView2.setImageBitmap(get(this, R.drawable.tt_search_colors, 1));
+        try {
+            Drawable fromXml = DrawableWrapper.createFromXml(getResources(), getResources().getXml(R.xml.tt_search_colors));
+            Log.i(TAG, "fromXml: " + fromXml.getIntrinsicWidth() + ", " + fromXml.getIntrinsicHeight());
+            //imageView2.setImageDrawable(fromXml);
+        } catch (IOException | XmlPullParserException e) {
+            Log.e(TAG, "fromXml error", e);
+        }
+
+        imageView2.setImageBitmap(get(this, R.xml.tt_search_colors, 1));
     }
 
     private static final String NAME_SPACE = "http://schemas.android.com/apk/res/android";
@@ -83,13 +91,6 @@ public class SVGActivity extends AppCompatActivity {
     private static final String TAG = "Wbj";
 
     private void getPathList() {
-        try {
-            Drawable fromXml = DrawableWrapper.createFromXml(getResources(), getResources().getXml(R.xml.tt_search_colors));
-            Log.i(TAG, "fromXml: " + fromXml.getIntrinsicWidth() + ", " + fromXml.getIntrinsicHeight());
-        } catch (IOException | XmlPullParserException e) {
-            Log.e(TAG, "fromXml error", e);
-        }
-
         XmlResourceParser parser = getResources().getXml(R.xml.tt_search_colors);
         try {
             ChinaMapView.PathBean pathBean;
@@ -153,20 +154,24 @@ public class SVGActivity extends AppCompatActivity {
         }
     }
 
-    public Bitmap get(Context context, @DrawableRes int resId/*, int color*/, float scale) {
-        Drawable drawable = ContextCompat.getDrawable(context, resId);
+
+    public Bitmap get(Context context, @XmlRes int xmlId, float scale) {
+        Drawable drawable = null;
+        Resources resources = context.getResources();
+        try {
+            drawable = DrawableWrapper.createFromXml(resources, resources.getXml(xmlId));
+        } catch (IOException | XmlPullParserException e) {
+            Log.e(TAG, "drawable from xml error", e);
+        }
+
         if (drawable == null) {
             return null;
         }
 
         int intrinsicWidth = drawable.getIntrinsicWidth();
         int intrinsicHeight = drawable.getIntrinsicHeight();
-        float density = getResources().getDisplayMetrics().density;
-        float densityDpi = getResources().getDisplayMetrics().densityDpi;
-        Log.i(TAG, "get: " + intrinsicWidth + ", " + intrinsicHeight + ", " + density + ", " + densityDpi);
-        //Bitmap bitmap = Bitmap.createBitmap((int) (intrinsicWidth * scale), (int) (intrinsicHeight * scale), Bitmap.Config.ARGB_8888);
-        //Bitmap bitmap = Bitmap.createBitmap((int) (mRectF.width() * density), (int) (mRectF.height() * density), Bitmap.Config.ARGB_8888);
-        Bitmap bitmap = Bitmap.createBitmap((int) mRectF.width(), (int) mRectF.height(), Bitmap.Config.ARGB_8888);
+        Log.i(TAG, "drawable from xml: " + intrinsicWidth + ", " + intrinsicHeight);
+        Bitmap bitmap = Bitmap.createBitmap((int) (intrinsicWidth * scale), (int) (intrinsicHeight * scale), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG));
         for (ChinaMapView.PathBean pathBean : mPathBeans) {
@@ -177,7 +182,10 @@ public class SVGActivity extends AppCompatActivity {
         drawable.draw(canvas);
 
         return bitmap;
+    }
 
+    public Bitmap get(Context context, @XmlRes int xmlId) {
+        return this.get(context, xmlId, 1);
     }
 
 }
