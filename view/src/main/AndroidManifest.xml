@@ -58,6 +58,7 @@
         <activity android:name=".activity.FlingAnimActivity" />
         <activity android:name=".activity.ScrollGestureActivity" />
         <activity android:name=".activity.DampingActivity" />
+        <activity android:name=".activity.SVGDemoActivity" />
 
     </application>
 

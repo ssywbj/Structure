@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "InfiniteLineActivity");
         mStringList.add("HexagonProgressBar");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "HexagonProgressBarActivity");
-        mStringList.add("SVG+Clip");
+        mStringList.add("SVG");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "SVGActivity");
         mStringList.add("Drawable");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "DrawableActivity");

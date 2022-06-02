@@ -2,28 +2,28 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
     android:padding="2dp">
 
-    <com.suheng.structure.view.SVGView
-        android:layout_width="match_parent"
-        android:layout_height="160dp" />
+    <Button
+        android:id="@+id/btn_svg_demo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="SVG Demo"
+        android:textAllCaps="false"
+        android:textColor="@android:color/black"
+        android:textSize="20sp" />
 
-    <com.suheng.structure.view.VectorView
-        android:layout_width="match_parent"
-        android:layout_height="160dp"
-        android:layout_marginTop="2dp" />
-
-    <ImageView
-        android:id="@+id/image_svg"
-        android:layout_width="match_parent"
-        android:layout_height="160dp"
-        android:layout_marginTop="2dp" />
-
-    <ImageView
-        android:id="@+id/image_svg2"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="2dp" />
+    <Button
+        android:id="@+id/btn_china_map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:padding="8dp"
+        android:text="ChinaMap"
+        android:textAllCaps="false"
+        android:textColor="@android:color/black"
+        android:textSize="20sp" />
 </LinearLayout>
