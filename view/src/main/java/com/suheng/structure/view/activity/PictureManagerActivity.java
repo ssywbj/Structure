@@ -26,7 +26,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -50,7 +49,6 @@ public class PictureManagerActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.view_picture_manager_recycler_view);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         Drawable drawable = AppCompatResources.getDrawable(this, R.drawable.recycler_view_linear_divide_line);
         if (drawable != null) {
             DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
@@ -66,7 +64,7 @@ public class PictureManagerActivity extends AppCompatActivity {
         itemDecoration4.setDrawable(drawable);
         recyclerView.addItemDecoration(itemDecoration4);*/
 
-        /*gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 RecyclerView.Adapter<?> adapter = recyclerView.getAdapter();
@@ -75,11 +73,12 @@ public class PictureManagerActivity extends AppCompatActivity {
                 }
 
                 int itemViewType = adapter.getItemViewType(position);
-                return (itemViewType == ContentAdapter.VIEW_TYPE_FOOTER) || (itemViewType == ContentAdapter.VIEW_TYPE_TITLE)
-                        || (itemViewType == RefreshRecyclerView.WrapperAdapter.VIEW_TYPE_HEADER) ? gridLayoutManager.getSpanCount() : 1;
+                return ((itemViewType == ContentAdapter.VIEW_TYPE_FOOTER) || (itemViewType == ContentAdapter.VIEW_TYPE_TITLE))
+                        ? gridLayoutManager.getSpanCount() : 1;
             }
         });
-        recyclerView.setLayoutManager(gridLayoutManager);*/
+        recyclerView.setLayoutManager(gridLayoutManager);
+        //recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mContentAdapter = new ContentAdapter(mDataList));
@@ -180,7 +179,8 @@ public class PictureManagerActivity extends AppCompatActivity {
             Log.d("Wbj", "没有数据了");
         }
 
-        mContentAdapter.notifyItemRangeChanged(0, imageInfoList.size());
+        //mContentAdapter.notifyItemRangeChanged(0, imageInfoList.size());
+        mContentAdapter.notifyDataSetChanged();
     }
 
     private void updateContentLength(int contentLength) {
