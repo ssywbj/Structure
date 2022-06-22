@@ -1,14 +1,18 @@
 package com.suheng.structure.view.activity;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.TouchDelegate;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.renderscript.Toolkit;
 import com.suheng.structure.view.R;
 
 public class BlurActivity extends AppCompatActivity {
@@ -21,6 +25,9 @@ public class BlurActivity extends AppCompatActivity {
         View rootLayout = findViewById(R.id.root_layout);
         View parentDelegate = findViewById(R.id.layout_delegate);
         View textDelegate = findViewById(R.id.text_delegate);
+        //https://www.codeleading.com/article/53194019795/
+        //https://developer.android.com/guide/topics/renderscript/migrate#scripts
+        //https://github.com/android/renderscript-intrinsics-replacement-toolkit
         /*parentDelegate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +93,20 @@ public class BlurActivity extends AppCompatActivity {
                 rootLayout.setTouchDelegate(new TouchDelegate(outRect, textDelegate3));
             }
         });
-    }
 
+        Toolkit toolkit = Toolkit.INSTANCE;
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.girl_gaitubao);
+        ImageView imageView = findViewById(R.id.image_blur);
+
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            imageView.setRenderEffect(RenderEffect.createBlurEffect(20, 20, Shader.TileMode.MIRROR));
+            imageView.setImageBitmap(bitmap);
+        } else {
+            imageView.setImageBitmap(Toolkit.INSTANCE.blur(bitmap, 20));
+        }*/
+
+        //imageView.setImageBitmap(bitmap);
+        imageView.setImageBitmap(toolkit.blur(bitmap, 20));
+    }
 
 }
