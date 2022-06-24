@@ -5,46 +5,48 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/layout_delegate"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@android:color/holo_red_light"
+        android:padding="10dp">
 
         <TextView
             android:id="@+id/text_delegate"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@android:color/holo_red_light"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="@android:color/holo_blue_dark"
             android:gravity="center"
+            android:padding="4dp"
             android:text="Delegate1"
             android:textColor="@android:color/black"
             android:textSize="18sp" />
 
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/layout_text_delegate3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@android:color/holo_red_light"
+        android:padding="10dp">
+
         <TextView
-            android:id="@+id/text_delegate2"
+            android:id="@+id/text_delegate3"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:background="@android:color/holo_blue_dark"
             android:gravity="center"
+            android:padding="4dp"
             android:text="Delegate2"
             android:textColor="@android:color/black"
             android:textSize="18sp" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/text_delegate3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:background="@android:color/holo_blue_dark"
-        android:gravity="center"
-        android:padding="2dp"
-        android:text="Delegate3"
-        android:textColor="@android:color/black"
-        android:textSize="18sp" />
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/image_blur"
