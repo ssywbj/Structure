@@ -5,7 +5,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -29,6 +34,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.renderscript.Toolkit;
 import com.suheng.structure.view.GridItemDecoration;
 import com.suheng.structure.view.R;
 import com.suheng.structure.view.adapter.RecyclerAdapter;
@@ -41,6 +47,8 @@ public class PictureManagerActivity extends AppCompatActivity {
     private static final int READ_EXTERNAL_STORAGE_CODE = 11;
     private ContentAdapter mContentAdapter;
     private final List<ImageInfo> mDataList = new ArrayList<>();
+
+    private final Rect mRect = new Rect();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +109,86 @@ public class PictureManagerActivity extends AppCompatActivity {
         } else {
             this.queryPictures();
         }
+
+        ImageView imageSub = findViewById(R.id.fob_image_sub);
+        imageSub.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap bitmap = FobRecyclerFrg.loadViewBitmap(recyclerView);
+                //Bitmap bitmap = FobRecyclerFrg.loadViewBitmap(recyclerView, mRect);
+
+                /*int[] location1 = new int[2];
+                imageSub.getLocationOnScreen(location1);
+                int x = location1[0];
+                int y = location1[1];
+                Log.d("Wbj", "getLocationOnScreen, x: " + x + ", y:" + y);
+                bitmap = Bitmap.createBitmap(bitmap, x, y, imageSub.getWidth(), imageSub.getHeight());
+
+                imageSub.setBackground(null);
+                imageSub.setBackground(new BitmapDrawable(getResources(), bitmap));*/
+            }
+        });
+        imageSub.post(new Runnable() {
+            @Override
+            public void run() {
+                //imageSub.getHitRect(mRect);
+                /*mRect.right += 120;
+                mRect.bottom += 120;*/
+                mRect.set(6, 6, imageSub.getMeasuredWidth() + 6, imageSub.getMeasuredHeight() + 6);
+                Log.d("Wbj", "run: " + mRect.toString() + ", : " + imageSub.getMeasuredWidth() + ", : " + imageSub.getMeasuredHeight());
+            }
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                imageSub.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Bitmap bitmap = FobRecyclerFrg.loadViewBitmap(recyclerView);
+                        //Bitmap bitmap = FobRecyclerFrg.loadViewBitmap(recyclerView, mRect);
+                        //imageSub.setBackground(new BitmapDrawable(getResources(), bitmap));
+
+                        int[] location1 = new int[2];
+                        imageSub.getLocationOnScreen(location1);
+                        int x = location1[0];
+                        int y = location1[1];
+                        Log.d("Wbj", "getLocationOnScreen, x: " + x + ", y:" + y);
+                        bitmap = Bitmap.createBitmap(bitmap, x, y, imageSub.getWidth(), imageSub.getHeight());
+
+                        imageSub.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, 15)));
+                    }
+                });
+
+            }
+        });
+    }
+
+    private Bitmap getDownscaledBitmapForView(View view, Rect crop, float downscaleFactor) throws  NullPointerException {
+        View screenView = view.getRootView();
+        //View screenView = view;
+
+        int width = (int) (crop.width() * downscaleFactor);
+        int height = (int) (crop.height() * downscaleFactor);
+
+        float dx = -crop.left * downscaleFactor;
+        float dy = -crop.top * downscaleFactor;
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Matrix matrix = new Matrix();
+        matrix.preScale(downscaleFactor, downscaleFactor);
+        matrix.postTranslate(dx, dy);
+        canvas.setMatrix(matrix);
+        screenView.draw(canvas);
+
+        return bitmap;
     }
 
     @Override

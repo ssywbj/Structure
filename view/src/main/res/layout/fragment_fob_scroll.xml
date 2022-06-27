@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?><!--Transsion Top Secret-->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fob_scroll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/root_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/layout_delegate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@android:color/holo_red_light"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/text_delegate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@android:color/holo_blue_dark"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="Delegate1"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/layout_text_delegate3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@android:color/holo_red_light"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/text_delegate3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@android:color/holo_blue_dark"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="Delegate2"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+        </FrameLayout>
+
+        <!--<ImageView
+            android:id="@+id/image_blur"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_margin="2dp" />-->
+
+        <ImageView
+            android:id="@+id/image_blur"
+            android:layout_width="match_parent"
+            android:layout_height="60dp" />
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

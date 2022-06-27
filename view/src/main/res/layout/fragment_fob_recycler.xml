@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--Transsion Top Secret-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/view_picture_manager_recycler_view"
+        android:id="@+id/fob_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
