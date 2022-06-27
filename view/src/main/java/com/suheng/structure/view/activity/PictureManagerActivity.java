@@ -48,7 +48,8 @@ public class PictureManagerActivity extends AppCompatActivity {
     private ContentAdapter mContentAdapter;
     private final List<ImageInfo> mDataList = new ArrayList<>();
 
-    private final Rect mRect = new Rect();
+    private final Rect mRectBlur = new Rect();
+    private final Rect mRectBlurred = new Rect();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +57,7 @@ public class PictureManagerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_picture_manager);
 
         RecyclerView recyclerView = findViewById(R.id.view_picture_manager_recycler_view);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         Drawable drawable = AppCompatResources.getDrawable(this, R.drawable.recycler_view_linear_divide_line);
         if (drawable != null) {
             DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
@@ -131,11 +132,28 @@ public class PictureManagerActivity extends AppCompatActivity {
         imageSub.post(new Runnable() {
             @Override
             public void run() {
-                //imageSub.getHitRect(mRect);
-                /*mRect.right += 120;
-                mRect.bottom += 120;*/
-                mRect.set(6, 6, imageSub.getMeasuredWidth() + 6, imageSub.getMeasuredHeight() + 6);
-                Log.d("Wbj", "run: " + mRect.toString() + ", : " + imageSub.getMeasuredWidth() + ", : " + imageSub.getMeasuredHeight());
+                int[] location = new int[2];
+                imageSub.getLocationOnScreen(location);
+                int x = location[0];
+                int y = location[1];
+                int[] location1 = new int[2];
+                recyclerView.getLocationOnScreen(location1);
+                int x1 = location1[0];
+                int y1 = location1[1];
+                Log.d("Wbj", "getLocationOnScreen, x: " + x + ", y:" + y + ", x1:" + x1 + ", y1:" + y1);
+
+                Log.d("Wbj", "run: " + imageSub.getMeasuredWidth() + ", " + imageSub.getMeasuredHeight()
+                        + "------" + recyclerView.getMeasuredWidth() + ", " + recyclerView.getMeasuredHeight());
+
+                mRectBlur.left = x;
+                mRectBlur.top = y;
+                mRectBlur.right = mRectBlur.left + imageSub.getMeasuredWidth();
+                mRectBlur.bottom = mRectBlur.top + imageSub.getMeasuredHeight();
+
+                mRectBlurred.left = x1;
+                mRectBlurred.top = y1;
+                mRectBlurred.right = mRectBlurred.left + recyclerView.getMeasuredWidth();
+                mRectBlurred.bottom = mRectBlurred.top + recyclerView.getMeasuredHeight();
             }
         });
 
@@ -155,22 +173,53 @@ public class PictureManagerActivity extends AppCompatActivity {
                         //Bitmap bitmap = FobRecyclerFrg.loadViewBitmap(recyclerView, mRect);
                         //imageSub.setBackground(new BitmapDrawable(getResources(), bitmap));
 
-                        int[] location1 = new int[2];
-                        imageSub.getLocationOnScreen(location1);
-                        int x = location1[0];
-                        int y = location1[1];
-                        Log.d("Wbj", "getLocationOnScreen, x: " + x + ", y:" + y);
-                        bitmap = Bitmap.createBitmap(bitmap, x, y, imageSub.getWidth(), imageSub.getHeight());
-
+                        bitmap = Bitmap.createBitmap(bitmap, Math.abs(mRectBlur.left - mRectBlurred.left), Math.abs(mRectBlur.top - mRectBlurred.top)
+                                , imageSub.getWidth(), imageSub.getHeight());
                         imageSub.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, 15)));
+                        //imageSub.setBackground(new BitmapDrawable(getResources(), bitmap));
                     }
                 });
 
             }
         });
+
+        /*ViewTreeObserver viewTreeObserver = imageSub.getViewTreeObserver();
+        viewTreeObserver.addOnDrawListener(new ViewTreeObserver.OnDrawListener() {
+            @Override
+            public void onDraw() {
+                Log.d("Wbj", "ViewTreeObserver, onDraw, onDraw");
+                *//*Bitmap bitmap = FobRecyclerFrg.loadViewBitmap(recyclerView);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, imageSub.getWidth(), imageSub.getHeight());
+                //imageSub.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, 15)));
+                imageSub.setBackground(new BitmapDrawable(getResources(), bitmap));*//*
+            }
+        });
+        viewTreeObserver.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                Log.v("Wbj", "ViewTreeObserver, onPreDraw, onPreDraw: " + this);
+                *//*Bitmap bitmap = FobRecyclerFrg.loadViewBitmap(recyclerView);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, imageSub.getWidth(), imageSub.getHeight());
+                //imageSub.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, 15)));
+                imageSub.setBackground(new BitmapDrawable(getResources(), bitmap));*//*
+                return true;
+            }
+        });*/
+        /*viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Log.d("Wbj", "ViewTreeObserver, onGlobalLayout, onGlobalLayout");
+            }
+        });*/
+        /*viewTreeObserver.addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                Log.i("Wbj", "ViewTreeObserver, onScrollChanged, onScrollChanged");
+            }
+        });*/
     }
 
-    private Bitmap getDownscaledBitmapForView(View view, Rect crop, float downscaleFactor) throws  NullPointerException {
+    private Bitmap getDownscaledBitmapForView(View view, Rect crop, float downscaleFactor) throws NullPointerException {
         View screenView = view.getRootView();
         //View screenView = view;
 
@@ -206,7 +255,7 @@ public class PictureManagerActivity extends AppCompatActivity {
         //Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, null, null, sortOrder);
 
         String absolutePath = "/storage/emulated/0/DCIM/Camera/20161209_120251.jpg";//查询某一张图片
-        absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();//查询某个目录下的所有图片
+        absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath();//查询某个目录下的所有图片
         String selection = MediaStore.Images.Media.DATA + " like ?";//查询条件
         String[] selectionArgs = {absolutePath + "%"};//查询目录
         Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, selection, selectionArgs, sortOrder); //columns传空表示查询所有字段
