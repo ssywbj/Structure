@@ -103,25 +103,19 @@ public class FobRecyclerFrg extends FobBaseFrg {
         return mRecyclerView;
     }
 
-    public static Bitmap loadViewBitmap(View view) {
-        if (view == null) {
-            return null;
-        }
-        Bitmap screenshot = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_4444);
-        Canvas canvas = new Canvas(screenshot);
+    private static Bitmap loadViewBitmap(View view) {
+        Bitmap viewBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(viewBitmap);
         view.draw(canvas);
-        return screenshot;
+        return viewBitmap;
     }
 
     public static Bitmap loadViewBitmap(View view, Rect rect) {
-        if (view == null) {
-            return null;
-        }
         int width = view.getWidth();
         int height = view.getHeight();
         Bitmap screenshot = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
         Canvas canvas = new Canvas(screenshot);
-        Log.d("Wbj", "loadViewBitmap, width: " + width + ", height: " + height+ ", canvas.getWidth: " + canvas.getWidth()+ ", canvas.getHeight: " + canvas.getHeight());
+        Log.d("Wbj", "loadViewBitmap, width: " + width + ", height: " + height + ", canvas.getWidth: " + canvas.getWidth() + ", canvas.getHeight: " + canvas.getHeight());
         //canvas.clipRect(rect);
         view.draw(canvas);
         return screenshot;

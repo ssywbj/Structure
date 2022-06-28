@@ -12,6 +12,7 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -40,6 +41,7 @@ import com.suheng.structure.view.R;
 import com.suheng.structure.view.adapter.RecyclerAdapter;
 import com.suheng.structure.view.utils.DateUtil;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +52,7 @@ public class PictureManagerActivity extends AppCompatActivity {
 
     private final Rect mRectBlur = new Rect();
     private final Rect mRectBlurred = new Rect();
+    private BitmapDrawable mBlurBg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +60,7 @@ public class PictureManagerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_picture_manager);
 
         RecyclerView recyclerView = findViewById(R.id.view_picture_manager_recycler_view);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
         Drawable drawable = AppCompatResources.getDrawable(this, R.drawable.recycler_view_linear_divide_line);
         if (drawable != null) {
             DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
@@ -115,7 +118,7 @@ public class PictureManagerActivity extends AppCompatActivity {
         imageSub.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bitmap bitmap = FobRecyclerFrg.loadViewBitmap(recyclerView);
+                Bitmap bitmap = loadViewBitmap(recyclerView);
                 //Bitmap bitmap = FobRecyclerFrg.loadViewBitmap(recyclerView, mRect);
 
                 /*int[] location1 = new int[2];
@@ -154,6 +157,10 @@ public class PictureManagerActivity extends AppCompatActivity {
                 mRectBlurred.top = y1;
                 mRectBlurred.right = mRectBlurred.left + recyclerView.getMeasuredWidth();
                 mRectBlurred.bottom = mRectBlurred.top + recyclerView.getMeasuredHeight();
+
+                boolean intersects = Rect.intersects(mRectBlur, mRectBlurred);
+                boolean contains = mRectBlurred.contains(mRectBlur);
+                Log.d("Wbj", "rect, intersects: " + intersects + ", contains:" + contains);
             }
         });
 
@@ -169,13 +176,44 @@ public class PictureManagerActivity extends AppCompatActivity {
                 imageSub.post(new Runnable() {
                     @Override
                     public void run() {
-                        Bitmap bitmap = FobRecyclerFrg.loadViewBitmap(recyclerView);
+                        Bitmap viewBitmap = loadViewBitmap(recyclerView);
                         //Bitmap bitmap = FobRecyclerFrg.loadViewBitmap(recyclerView, mRect);
-                        //imageSub.setBackground(new BitmapDrawable(getResources(), bitmap));
-
-                        bitmap = Bitmap.createBitmap(bitmap, Math.abs(mRectBlur.left - mRectBlurred.left), Math.abs(mRectBlur.top - mRectBlurred.top)
+                        Bitmap bitmap = Bitmap.createBitmap(viewBitmap, Math.abs(mRectBlur.left - mRectBlurred.left), Math.abs(mRectBlur.top - mRectBlurred.top)
                                 , imageSub.getWidth(), imageSub.getHeight());
-                        imageSub.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, 15)));
+
+                        Bitmap blurBitmap = Toolkit.INSTANCE.blur(bitmap, 15);
+                        if (mBlurBg == null) {
+                            mBlurBg = new BitmapDrawable(getResources(), blurBitmap);
+                            imageSub.setBackground(mBlurBg);
+                            Log.d("Wbj", "run, 1111111111: " + mBlurBg);
+                        } else {
+                            Log.d("Wbj", "run, blurBitmap: " + mBlurBg.getBitmap());
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                Log.d("Wbj", "run, 22222222: " + blurBitmap);
+                                mBlurBg.setBitmap(blurBitmap);
+                            } else {
+                                Bitmap bgBitmap = mBlurBg.getBitmap();
+                                if (bgBitmap != null) {
+                                    ByteBuffer byteBuffer = ByteBuffer.allocate(blurBitmap.getByteCount());
+                                    blurBitmap.copyPixelsToBuffer(byteBuffer);
+                                    Log.d("Wbj", "run, 333333333: " + bgBitmap);
+                                    bgBitmap.eraseColor(Color.TRANSPARENT);
+                                    bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
+                                } /*else {
+                                    mBlurBg = new BitmapDrawable(getResources(), blurBitmap);
+                                    imageSub.setBackground(mBlurBg);
+                                }*/
+
+                                //imageSub.setBackground(new BitmapDrawable(getResources(), blurBitmap));
+                            }
+                        }
+                        //imageSub.setImageBitmap(blurBitmap);
+                        if (!bitmap.isRecycled()) {
+                            bitmap.recycle();
+                        }
+                        /*if (!viewBitmap.isRecycled()) {
+                            viewBitmap.recycle();
+                        }*/
                         //imageSub.setBackground(new BitmapDrawable(getResources(), bitmap));
                     }
                 });
@@ -219,6 +257,25 @@ public class PictureManagerActivity extends AppCompatActivity {
         });*/
     }
 
+    Canvas canvas;
+    Bitmap viewBitmap;
+
+    private Bitmap loadViewBitmap(View view) {
+        if (viewBitmap == null) {
+            viewBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        }
+        Log.d("Wbj", "loadViewBitmap, : " + viewBitmap);
+        if (canvas == null) {
+            canvas = new Canvas();
+        }
+        viewBitmap.eraseColor(Color.TRANSPARENT);
+        viewBitmap.setWidth(view.getWidth());
+        viewBitmap.setHeight(view.getHeight());
+        canvas.setBitmap(viewBitmap);
+        view.draw(canvas);
+        return viewBitmap;
+    }
+
     private Bitmap getDownscaledBitmapForView(View view, Rect crop, float downscaleFactor) throws NullPointerException {
         View screenView = view.getRootView();
         //View screenView = view;
@@ -255,7 +312,7 @@ public class PictureManagerActivity extends AppCompatActivity {
         //Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, null, null, sortOrder);
 
         String absolutePath = "/storage/emulated/0/DCIM/Camera/20161209_120251.jpg";//查询某一张图片
-        absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath();//查询某个目录下的所有图片
+        absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();//查询某个目录下的所有图片
         String selection = MediaStore.Images.Media.DATA + " like ?";//查询条件
         String[] selectionArgs = {absolutePath + "%"};//查询目录
         Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, selection, selectionArgs, sortOrder); //columns传空表示查询所有字段
