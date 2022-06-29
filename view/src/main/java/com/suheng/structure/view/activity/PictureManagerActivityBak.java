@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -25,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
@@ -44,10 +44,8 @@ import com.suheng.structure.view.utils.DateUtil;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-public class PictureManagerActivity extends AppCompatActivity {
+public class PictureManagerActivityBak extends AppCompatActivity {
     private static final int READ_EXTERNAL_STORAGE_CODE = 11;
     private ContentAdapter mContentAdapter;
     private final List<ImageInfo> mDataList = new ArrayList<>();
@@ -55,78 +53,13 @@ public class PictureManagerActivity extends AppCompatActivity {
     private final Rect mRectBlur = new Rect();
     private final Rect mRectBlurred = new Rect();
     private BitmapDrawable mBlurBg;
-    RecyclerView recyclerView;
-    ImageView imageSub;
-
-    private static final int EXECUTOR_THREADS = Runtime.getRuntime().availableProcessors() <= 3 ?
-            1 : Runtime.getRuntime().availableProcessors() / 2;
-    private static final ExecutorService ASYNC_BLUR_EXECUTOR = Executors.newFixedThreadPool(EXECUTOR_THREADS);
-
-    private final Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            Log.d("Wbj", "mRunnable: " + Thread.currentThread().getName());
-
-            int width = imageSub.getWidth();
-            int height = imageSub.getHeight();
-            Log.d("Wbj", "run, 1111111111: " + viewBitmap + ", width: " + width + ", height: " + height);
-            if (viewBitmap == null || width == 0 || height == 0) {
-                return;
-            }
-
-            Bitmap bitmap = Bitmap.createBitmap(viewBitmap, Math.abs(mRectBlur.left - mRectBlurred.left)
-                    , Math.abs(mRectBlur.top - mRectBlurred.top), width, height);
-
-            Bitmap blurBitmap = Toolkit.INSTANCE.blur(bitmap, 15);
-            if (mBlurBg == null) {
-                Log.d("Wbj", "run, 1111111111: " + mBlurBg);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mBlurBg = new BitmapDrawable(getResources(), blurBitmap);
-                        imageSub.setBackground(mBlurBg);
-                    }
-                });
-            } else {
-                Log.d("Wbj", "run, blurBitmap: " + mBlurBg.getBitmap());
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    Log.d("Wbj", "run, 22222222: " + blurBitmap);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mBlurBg.setBitmap(blurBitmap);
-                        }
-                    });
-                } else {
-                    Bitmap bgBitmap = mBlurBg.getBitmap();
-                    if (bgBitmap != null) {
-                        ByteBuffer byteBuffer = ByteBuffer.allocate(blurBitmap.getByteCount());
-                        blurBitmap.copyPixelsToBuffer(byteBuffer);
-                        Log.d("Wbj", "run, 333333333: " + bgBitmap);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                bgBitmap.eraseColor(Color.TRANSPARENT);
-                                bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
-                            }
-                        });
-
-                    }
-                }
-            }
-
-            if (!bitmap.isRecycled()) {
-                bitmap.recycle();
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture_manager);
 
-        recyclerView = findViewById(R.id.view_picture_manager_recycler_view);
+        RecyclerView recyclerView = findViewById(R.id.view_picture_manager_recycler_view);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
         Drawable drawable = AppCompatResources.getDrawable(this, R.drawable.recycler_view_linear_divide_line);
         if (drawable != null) {
@@ -170,7 +103,7 @@ public class PictureManagerActivity extends AppCompatActivity {
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                ActivityCompat.requestPermissions(PictureManagerActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_CODE);
+                                ActivityCompat.requestPermissions(PictureManagerActivityBak.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_CODE);
                             }
                         })
                         .show();
@@ -240,34 +173,50 @@ public class PictureManagerActivity extends AppCompatActivity {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                viewBitmap = loadViewBitmap(recyclerView);
-                ASYNC_BLUR_EXECUTOR.submit(mRunnable);
+                imageSub.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Bitmap viewBitmap = loadViewBitmap(recyclerView);
+                        //Bitmap bitmap = FobRecyclerFrg.loadViewBitmap(recyclerView, mRect);
+                        Bitmap bitmap = Bitmap.createBitmap(viewBitmap, Math.abs(mRectBlur.left - mRectBlurred.left), Math.abs(mRectBlur.top - mRectBlurred.top)
+                                , imageSub.getWidth(), imageSub.getHeight());
 
-                /*Bitmap blurBitmap = Toolkit.INSTANCE.blur(bitmap, 15);
-                if (mBlurBg == null) {
-                    mBlurBg = new BitmapDrawable(getResources(), blurBitmap);
-                    imageSub.setBackground(mBlurBg);
-                    Log.d("Wbj", "run, 1111111111: " + mBlurBg);
-                } else {
-                    Log.d("Wbj", "run, blurBitmap: " + mBlurBg.getBitmap());
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        Log.d("Wbj", "run, 22222222: " + blurBitmap);
-                        mBlurBg.setBitmap(blurBitmap);
-                    } else {
-                        Bitmap bgBitmap = mBlurBg.getBitmap();
-                        if (bgBitmap != null) {
-                            ByteBuffer byteBuffer = ByteBuffer.allocate(blurBitmap.getByteCount());
-                            blurBitmap.copyPixelsToBuffer(byteBuffer);
-                            Log.d("Wbj", "run, 333333333: " + bgBitmap);
-                            bgBitmap.eraseColor(Color.TRANSPARENT);
-                            bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
+                        Bitmap blurBitmap = Toolkit.INSTANCE.blur(bitmap, 15);
+                        if (mBlurBg == null) {
+                            mBlurBg = new BitmapDrawable(getResources(), blurBitmap);
+                            imageSub.setBackground(mBlurBg);
+                            Log.d("Wbj", "run, 1111111111: " + mBlurBg);
+                        } else {
+                            Log.d("Wbj", "run, blurBitmap: " + mBlurBg.getBitmap());
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                Log.d("Wbj", "run, 22222222: " + blurBitmap);
+                                mBlurBg.setBitmap(blurBitmap);
+                            } else {
+                                Bitmap bgBitmap = mBlurBg.getBitmap();
+                                if (bgBitmap != null) {
+                                    ByteBuffer byteBuffer = ByteBuffer.allocate(blurBitmap.getByteCount());
+                                    blurBitmap.copyPixelsToBuffer(byteBuffer);
+                                    Log.d("Wbj", "run, 333333333: " + bgBitmap);
+                                    bgBitmap.eraseColor(Color.TRANSPARENT);
+                                    bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
+                                } /*else {
+                                    mBlurBg = new BitmapDrawable(getResources(), blurBitmap);
+                                    imageSub.setBackground(mBlurBg);
+                                }*/
+
+                                //imageSub.setBackground(new BitmapDrawable(getResources(), blurBitmap));
+                            }
                         }
+                        //imageSub.setImageBitmap(blurBitmap);
+                        if (!bitmap.isRecycled()) {
+                            bitmap.recycle();
+                        }
+                        /*if (!viewBitmap.isRecycled()) {
+                            viewBitmap.recycle();
+                        }*/
+                        //imageSub.setBackground(new BitmapDrawable(getResources(), bitmap));
                     }
-                }
-
-                if (!bitmap.isRecycled()) {
-                    bitmap.recycle();
-                }*/
+                });
 
             }
         });
@@ -311,36 +260,41 @@ public class PictureManagerActivity extends AppCompatActivity {
     Canvas canvas;
     Bitmap viewBitmap;
 
-    @Nullable
-    private synchronized Bitmap loadViewBitmap(View view) {
-        int width = view.getWidth();
-        int height = view.getHeight();
-        if (width == 0 || height == 0) {
-            return null;
-        }
-
+    private Bitmap loadViewBitmap(View view) {
         if (viewBitmap == null) {
-            viewBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
+            viewBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
         }
         Log.d("Wbj", "loadViewBitmap, : " + viewBitmap);
         if (canvas == null) {
             canvas = new Canvas();
         }
         viewBitmap.eraseColor(Color.TRANSPARENT);
-        //viewBitmap.setWidth(view.getWidth());
-        //viewBitmap.setHeight(view.getHeight());
+        viewBitmap.setWidth(view.getWidth());
+        viewBitmap.setHeight(view.getHeight());
         canvas.setBitmap(viewBitmap);
         view.draw(canvas);
-
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            PixelCopy.request(getWindow(), viewBitmap, new PixelCopy.OnPixelCopyFinishedListener() {
-                @Override
-                public void onPixelCopyFinished(int copyResult) {
-                    Log.d("Wbj", "onPixelCopyFinished, : " + copyResult + ", :" + Thread.currentThread().getName());
-                }
-            }, new Handler());
-        }*/
         return viewBitmap;
+    }
+
+    private Bitmap getDownscaledBitmapForView(View view, Rect crop, float downscaleFactor) throws NullPointerException {
+        View screenView = view.getRootView();
+        //View screenView = view;
+
+        int width = (int) (crop.width() * downscaleFactor);
+        int height = (int) (crop.height() * downscaleFactor);
+
+        float dx = -crop.left * downscaleFactor;
+        float dy = -crop.top * downscaleFactor;
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Matrix matrix = new Matrix();
+        matrix.preScale(downscaleFactor, downscaleFactor);
+        matrix.postTranslate(dx, dy);
+        canvas.setMatrix(matrix);
+        screenView.draw(canvas);
+
+        return bitmap;
     }
 
     @Override
@@ -476,7 +430,7 @@ public class PictureManagerActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull RecyclerAdapter.Holder holder, int pst, ImageInfo data) {
+        public void onBindViewHolder(@NonNull Holder holder, int pst, ImageInfo data) {
             if (holder instanceof FooterHolder) {
                 ((FooterHolder) holder).mTextCount.setText(getString(R.string.picture_bottom_number, data.getContentLength()));
             }
@@ -489,7 +443,7 @@ public class PictureManagerActivity extends AppCompatActivity {
 
             if (holder instanceof ContentHolder) {
                 ContentHolder contentHolder = (ContentHolder) holder;
-                Glide.with(PictureManagerActivity.this).load(data.getPath()).into(contentHolder.mImageView);
+                Glide.with(PictureManagerActivityBak.this).load(data.getPath()).into(contentHolder.mImageView);
             }
         }
     }
