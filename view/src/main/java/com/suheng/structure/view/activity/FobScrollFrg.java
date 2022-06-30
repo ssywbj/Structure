@@ -87,14 +87,18 @@ public class FobScrollFrg extends FobBaseFrg {
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.girl_gaitubao);
         ImageView imageView = view.findViewById(R.id.image_blur);
+        ImageView imageView2 = view.findViewById(R.id.image_blur2);
         int radius = 20;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            imageView.setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR));
-            //imageView.setImageBitmap(bitmap);
-            imageView.setBackground(new BitmapDrawable(getResources(), bitmap));
+            RenderEffect blurEffect = RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR);
+            imageView.setRenderEffect(blurEffect);
+            imageView.setImageBitmap(bitmap);
+
+            imageView2.setRenderEffect(blurEffect);
+            imageView2.setBackground(new BitmapDrawable(getResources(), bitmap));
         } else {
-            //imageView.setImageBitmap(Toolkit.INSTANCE.blur(bitmap, 20));
-            imageView.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, radius)));
+            imageView.setImageBitmap(Toolkit.INSTANCE.blur(bitmap, radius));
+            imageView2.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, radius)));
         }
     }
 

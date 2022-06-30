@@ -2,13 +2,10 @@ package com.suheng.structure.view.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.RenderEffect;
-import android.graphics.Shader;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,14 +14,15 @@ import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.renderscript.Toolkit;
 import com.suheng.structure.view.R;
 
 import java.util.ArrayList;
@@ -47,63 +45,73 @@ public class BlurActivity extends AppCompatActivity {
         if (actionBar != null) {
             Log.d("Wbj", "getActionBarHeight: " + actionBar.getHeight());
         }*/
-
-        View view = findViewById(R.id.blur_foot_bar);
+        ViewGroup barTabLayout = findViewById(R.id.foot_bar_tab_layout);
+        ViewPager2 viewPager = findViewById(R.id.fragment_container);
 
         List<FobBaseFrg> frgs = new ArrayList<>();
         frgs.add(new FobRecyclerFrg());
         frgs.add(new FobScrollFrg());
-        ViewPager viewPager = findViewById(R.id.fragment_container);
-        viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
+        viewPager.setAdapter(new FragmentStateAdapter(this) {
             @NonNull
             @Override
-            public Fragment getItem(int position) {
+            public Fragment createFragment(int position) {
                 return frgs.get(position);
             }
 
             @Override
-            public int getCount() {
+            public int getItemCount() {
                 return frgs.size();
             }
         });
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
+                Log.d("Wbj", "onPageSelected, position: " + position);
+                super.onPageSelected(position);
+                int childCount = barTabLayout.getChildCount();
+                for (int i = 0; i < childCount; i++) {
+                    View child = barTabLayout.getChildAt(i);
+                    child.setSelected(i == position);
+                }
+
                 //mFootBar.setItemSelectState(position);
                 int item = position % frgs.size();
                 viewPager.setCurrentItem(item);
                 FobBaseFrg fobBaseFrg = frgs.get(item);
                 //mFootBar.toggleDynamicBlur(fobBaseFrg.getBlurredView());
             }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
         });
 
-        int radius = 15;
-        Bitmap srcBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.girl_gaitubao);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            view.setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR));
-            view.setBackground(new BitmapDrawable(getResources(), srcBitmap));
-        } else {
-            Bitmap blurBitmap = Toolkit.INSTANCE.blur(srcBitmap, radius);
-            view.setBackground(new BitmapDrawable(getResources(), blurBitmap));
+        int[][] states = new int[2][];
+        states[0] = new int[]{android.R.attr.state_selected};
+        states[1] = new int[]{};
+        int[] colors = new int[]{Color.BLACK, Color.LTGRAY};
+        ColorStateList colorStateList = new ColorStateList(states, colors);
+        int childCount = barTabLayout.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View child = barTabLayout.getChildAt(i);
+            if (child instanceof TextView) {
+                TextView textView = (TextView) child;
+                textView.setTextColor(colorStateList);
+            }
+
+            child.setSelected(i == 0);
+            child.setTag(i);
+
+            child.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Object tag = child.getTag();
+                    if (tag instanceof Integer) {
+                        int index = (int) tag;
+                        if (index < frgs.size()) {
+                            viewPager.setCurrentItem(index);
+                        }
+                    }
+                }
+            });
         }
-
-        view.post(new Runnable() {
-            @Override
-            public void run() {
-                getViewLocation(view);
-            }
-        });
-
     }
-
 
     public static int getStatusBarHeight(Context context) {
         int height = 0;
@@ -128,11 +136,7 @@ public class BlurActivity extends AppCompatActivity {
         } else {
             boolean menu = ViewConfiguration.get(activity).hasPermanentMenuKey();
             boolean back = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
-            if (menu || back) {
-                return false;
-            } else {
-                return true;
-            }
+            return !menu && !back;
         }
     }
 

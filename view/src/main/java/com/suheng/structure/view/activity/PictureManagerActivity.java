@@ -65,7 +65,7 @@ public class PictureManagerActivity extends AppCompatActivity {
     private final Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            Log.d("Wbj", "mRunnable: " + Thread.currentThread().getName());
+            Log.d("Wbj", "thread name: " + Thread.currentThread().getName());
 
             int width = imageSub.getWidth();
             int height = imageSub.getHeight();
@@ -241,9 +241,16 @@ public class PictureManagerActivity extends AppCompatActivity {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 viewBitmap = loadViewBitmap(recyclerView);
-                ASYNC_BLUR_EXECUTOR.submit(mRunnable);
+                //ASYNC_BLUR_EXECUTOR.submit(mRunnable);
 
-                /*Bitmap blurBitmap = Toolkit.INSTANCE.blur(bitmap, 15);
+                int width = imageSub.getWidth();
+                int height = imageSub.getHeight();
+                if (viewBitmap == null || width == 0 || height == 0) {
+                    return;
+                }
+                Bitmap bitmap = Bitmap.createBitmap(viewBitmap, Math.abs(mRectBlur.left - mRectBlurred.left)
+                        , Math.abs(mRectBlur.top - mRectBlurred.top), width, height);
+                Bitmap blurBitmap = Toolkit.INSTANCE.blur(bitmap, 15);
                 if (mBlurBg == null) {
                     mBlurBg = new BitmapDrawable(getResources(), blurBitmap);
                     imageSub.setBackground(mBlurBg);
@@ -267,7 +274,7 @@ public class PictureManagerActivity extends AppCompatActivity {
 
                 if (!bitmap.isRecycled()) {
                     bitmap.recycle();
-                }*/
+                }
 
             }
         });
@@ -327,8 +334,8 @@ public class PictureManagerActivity extends AppCompatActivity {
             canvas = new Canvas();
         }
         viewBitmap.eraseColor(Color.TRANSPARENT);
-        //viewBitmap.setWidth(view.getWidth());
-        //viewBitmap.setHeight(view.getHeight());
+        viewBitmap.setWidth(view.getWidth());
+        viewBitmap.setHeight(view.getHeight());
         canvas.setBitmap(viewBitmap);
         view.draw(canvas);
 

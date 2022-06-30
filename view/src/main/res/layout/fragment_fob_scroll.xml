@@ -53,16 +53,34 @@
                 android:textSize="18sp" />
         </FrameLayout>
 
-        <!--<ImageView
-            android:id="@+id/image_blur"
-            android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:layout_margin="2dp" />-->
-
         <ImageView
             android:id="@+id/image_blur"
             android:layout_width="match_parent"
-            android:layout_height="60dp" />
+            android:layout_height="200dp"
+            android:layout_margin="2dp" />
+
+        <ImageView
+            android:id="@+id/image_blur2"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="2dp"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@drawable/iz0rltfp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="三星堆位于四川省广汉市三星堆镇。1980年至1981年间考古学界把三星堆遗址第二期起连续几期文化遗存称为三星堆文化 [1]  ，其文化年代下限存在争议 [2]  。
+三星堆文化基于1933年至1980年、1981年的若干次考古调查和发掘所获资料，以及在1980年以后的多次发掘中，三星堆遗址考古获得了更加丰富的资料，极大地丰富了三星堆文化的内涵。
+三星堆遗址古文化在四川地区分布较广，又具有一群区别于其他任何考古学文化的特殊器型，发掘者将这一考古学文化命名为“三星堆文化”。
+三星堆文化研究涉及面极广，在考古学、历史学、民族学、文化学、艺术以及自然科学等领域都有不少学者加入研究行列，在各个方面都取得了重要进展，新成果不断问世，同时在一些主要问题上也存在不少分歧。 [3]
+考古认为三星堆文化可能是夏文化与三峡地区土著文化联盟进入成都平原征服当地原有文化后形成的。"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="20sp" />
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>
