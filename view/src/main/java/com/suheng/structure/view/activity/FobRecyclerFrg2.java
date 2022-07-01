@@ -1,8 +1,6 @@
 package com.suheng.structure.view.activity;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -12,6 +10,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -19,10 +18,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -38,38 +38,39 @@ import com.suheng.structure.view.utils.DynamicBlur;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PictureManagerActivity extends AppCompatActivity {
+public class FobRecyclerFrg2 extends FobBaseFrg {
     private static final int READ_EXTERNAL_STORAGE_CODE = 11;
     private ContentAdapter mContentAdapter;
     private final List<ImageInfo> mDataList = new ArrayList<>();
+    private RecyclerView mRecyclerView;
     private DynamicBlur mDynamicBlur;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_picture_manager);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_picture_manager, container, false);
+    }
 
-        RecyclerView recyclerView = findViewById(R.id.view_picture_manager_recycler_view);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
-        Drawable drawable = AppCompatResources.getDrawable(this, R.drawable.recycler_view_linear_divide_line);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mRecyclerView = view.findViewById(R.id.view_picture_manager_recycler_view);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 4);
+        Drawable drawable = AppCompatResources.getDrawable(getContext(), R.drawable.recycler_view_linear_divide_line);
         if (drawable != null) {
-            DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+            DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
             itemDecoration.setDrawable(drawable);
-            //recyclerView.addItemDecoration(itemDecoration);
         }
         //final int space = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
         int space = 2;
         GridItemDecoration itemDecoration = new GridItemDecoration(gridLayoutManager, space);
         itemDecoration.setColor(Color.RED);
-        recyclerView.addItemDecoration(itemDecoration);
-        /*GridItemDecoration4 itemDecoration4 = new GridItemDecoration4(this, gridLayoutManager, space);
-        itemDecoration4.setDrawable(drawable);
-        recyclerView.addItemDecoration(itemDecoration4);*/
+        mRecyclerView.addItemDecoration(itemDecoration);
 
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                RecyclerView.Adapter<?> adapter = recyclerView.getAdapter();
+                RecyclerView.Adapter<?> adapter = mRecyclerView.getAdapter();
                 if (adapter == null) {
                     return 1;
                 }
@@ -79,32 +80,21 @@ public class PictureManagerActivity extends AppCompatActivity {
                         ? gridLayoutManager.getSpanCount() : 1;
             }
         });
-        recyclerView.setLayoutManager(gridLayoutManager);
-        //recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(gridLayoutManager);
 
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mContentAdapter = new ContentAdapter(mDataList));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(mContentAdapter = new ContentAdapter(mDataList));
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                new AlertDialog.Builder(this)
-                        .setTitle("Apply permission")
-                        .setMessage("Need read permission")
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                ActivityCompat.requestPermissions(PictureManagerActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_CODE);
-                            }
-                        })
-                        .show();
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_CODE);
-            }
-        } else {
-            this.queryPictures();
-        }
+        ActivityResultLauncher<String> activityResult = registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+                result -> {
+                    if (result.equals(true)) {
+                        this.queryPictures();
+                    } else {
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    }
+                });
+        activityResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -146,12 +136,12 @@ public class PictureManagerActivity extends AppCompatActivity {
             }
         });*/
 
-        mDynamicBlur = new DynamicBlur(this);
-        mDynamicBlur.setViewBlurredAndBlur(recyclerView, findViewById(R.id.fob_image_sub));
+        mDynamicBlur = new DynamicBlur(getContext());
+        //mDynamicBlur.setViewBlurredAndBlur(mRecyclerView, view.findViewById(R.id.fob_image_sub));
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         mDataList.clear();
     }
@@ -168,7 +158,7 @@ public class PictureManagerActivity extends AppCompatActivity {
         absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();//查询某个目录下的所有图片
         String selection = MediaStore.Images.Media.DATA + " like ?";//查询条件
         String[] selectionArgs = {absolutePath + "%"};//查询目录
-        Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, selection, selectionArgs, sortOrder); //columns传空表示查询所有字段
+        Cursor cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, selection, selectionArgs, sortOrder); //columns传空表示查询所有字段
         if (cursor.moveToFirst()) {
             do {
                 String imagePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
@@ -196,7 +186,7 @@ public class PictureManagerActivity extends AppCompatActivity {
              * 前一项比较，如果是同一日期则直接加在集合后面，如果是不同日期则先加入日期Title项再加入数据项。
              */
             for (ImageInfo currentImage : imageInfoList) {
-                currentImage.setDate(DateUtils.formatDateTime(this, currentImage.getDateModified(), DateUtils.FORMAT_SHOW_YEAR));
+                currentImage.setDate(DateUtils.formatDateTime(getContext(), currentImage.getDateModified(), DateUtils.FORMAT_SHOW_YEAR));
                 if (mDataList.size() > 0) {
                     isNotSameDay = !DateUtil.isSameDay(mDataList.get(mDataList.size() - 1).getDateModified()
                             , currentImage.getDateModified());//mDataList.get(size - 1)：取出前一项数据
@@ -252,9 +242,14 @@ public class PictureManagerActivity extends AppCompatActivity {
             if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 this.queryPictures();
             } else {
-                Toast.makeText(this, "reject permission", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "reject permission", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    public View getBlurredView() {
+        return mRecyclerView;
     }
 
     private class ContentAdapter extends RecyclerAdapter<ImageInfo, RecyclerAdapter.Holder> {
@@ -283,7 +278,7 @@ public class PictureManagerActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull RecyclerAdapter.Holder holder, int pst, ImageInfo data) {
+        public void onBindViewHolder(@NonNull Holder holder, int pst, ImageInfo data) {
             if (holder instanceof FooterHolder) {
                 ((FooterHolder) holder).mTextCount.setText(getString(R.string.picture_bottom_number, data.getContentLength()));
             }
@@ -296,7 +291,7 @@ public class PictureManagerActivity extends AppCompatActivity {
 
             if (holder instanceof ContentHolder) {
                 ContentHolder contentHolder = (ContentHolder) holder;
-                Glide.with(PictureManagerActivity.this).load(data.getPath()).into(contentHolder.mImageView);
+                Glide.with(FobRecyclerFrg2.this).load(data.getPath()).into(contentHolder.mImageView);
             }
         }
     }

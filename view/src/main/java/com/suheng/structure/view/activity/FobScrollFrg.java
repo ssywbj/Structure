@@ -100,6 +100,7 @@ public class FobScrollFrg extends FobBaseFrg {
             imageView.setImageBitmap(Toolkit.INSTANCE.blur(bitmap, radius));
             imageView2.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, radius)));
         }
+
     }
 
     @Override

@@ -49,7 +49,8 @@ public class BlurActivity extends AppCompatActivity {
         ViewPager2 viewPager = findViewById(R.id.fragment_container);
 
         List<FobBaseFrg> frgs = new ArrayList<>();
-        frgs.add(new FobRecyclerFrg());
+        //frgs.add(new FobRecyclerFrg());
+        frgs.add(new FobRecyclerFrg2());
         frgs.add(new FobScrollFrg());
         viewPager.setAdapter(new FragmentStateAdapter(this) {
             @NonNull
