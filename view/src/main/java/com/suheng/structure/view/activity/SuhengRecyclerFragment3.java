@@ -59,15 +59,14 @@ public class SuhengRecyclerFragment3 extends SuhengBaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mRecyclerView = view.findViewById(R.id.view_picture_manager_recycler_view);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 4);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), SuhengRecyclerFragment2.SPAN_COUNT);
         Drawable drawable = AppCompatResources.getDrawable(mContext, R.drawable.recycler_view_linear_divide_line);
         if (drawable != null) {
             DividerItemDecoration itemDecoration = new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL);
             itemDecoration.setDrawable(drawable);
         }
         //final int space = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
-        int space = 2;
-        GridItemDecoration itemDecoration = new GridItemDecoration(gridLayoutManager, space);
+        GridItemDecoration itemDecoration = new GridItemDecoration(gridLayoutManager, SuhengRecyclerFragment2.SPAN_SPACE);
         itemDecoration.setColor(Color.RED);
         mRecyclerView.addItemDecoration(itemDecoration);
 
