@@ -1,7 +1,7 @@
 package com.suheng.structure.view.activity;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -33,17 +33,24 @@ import com.suheng.structure.view.GridItemDecoration;
 import com.suheng.structure.view.R;
 import com.suheng.structure.view.adapter.RecyclerAdapter;
 import com.suheng.structure.view.utils.DateUtil;
-import com.suheng.structure.view.utils.DynamicBlur;
+import com.suheng.structure.view.utils.RealBlur;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FobRecyclerFrg2 extends FobBaseFrg {
-    private static final int READ_EXTERNAL_STORAGE_CODE = 11;
+public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
     private ContentAdapter mContentAdapter;
     private final List<ImageInfo> mDataList = new ArrayList<>();
     private RecyclerView mRecyclerView;
-    private DynamicBlur mDynamicBlur;
+    //private DynamicBlur mDynamicBlur;
+
+    private Context mContext;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
 
     @Nullable
     @Override
@@ -56,13 +63,13 @@ public class FobRecyclerFrg2 extends FobBaseFrg {
         super.onViewCreated(view, savedInstanceState);
         mRecyclerView = view.findViewById(R.id.view_picture_manager_recycler_view);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 4);
-        Drawable drawable = AppCompatResources.getDrawable(getContext(), R.drawable.recycler_view_linear_divide_line);
+        Drawable drawable = AppCompatResources.getDrawable(mContext, R.drawable.recycler_view_linear_divide_line);
         if (drawable != null) {
-            DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+            DividerItemDecoration itemDecoration = new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL);
             itemDecoration.setDrawable(drawable);
         }
         //final int space = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
-        int space = 2;
+        int space = 1;
         GridItemDecoration itemDecoration = new GridItemDecoration(gridLayoutManager, space);
         itemDecoration.setColor(Color.RED);
         mRecyclerView.addItemDecoration(itemDecoration);
@@ -90,24 +97,10 @@ public class FobRecyclerFrg2 extends FobBaseFrg {
                     if (result.equals(true)) {
                         this.queryPictures();
                     } else {
-
+                        Toast.makeText(getContext(), "reject permission", Toast.LENGTH_SHORT).show();
                     }
                 });
         activityResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (mDynamicBlur != null) {
-                    mDynamicBlur.updateBlurViewBackground();
-                }
-            }
-        });
 
         /*ViewTreeObserver viewTreeObserver = imageSub.getViewTreeObserver();
         viewTreeObserver.addOnDrawListener(new ViewTreeObserver.OnDrawListener() {
@@ -136,8 +129,27 @@ public class FobRecyclerFrg2 extends FobBaseFrg {
             }
         });*/
 
-        mDynamicBlur = new DynamicBlur(getContext());
+        //mDynamicBlur = new DynamicBlur(getContext());
         //mDynamicBlur.setViewBlurredAndBlur(mRecyclerView, view.findViewById(R.id.fob_image_sub));
+
+        if (mContext instanceof BlurActivity) {
+            BlurActivity activity = (BlurActivity) mContext;
+            RealBlur realBlur = activity.getDynamicBlur();
+            realBlur.setViewBlurredAndBlur(mRecyclerView, activity.getViewBlur());
+
+            mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                }
+
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    realBlur.updateBlurViewBackground();
+                }
+            });
+        }
     }
 
     @Override
@@ -158,7 +170,7 @@ public class FobRecyclerFrg2 extends FobBaseFrg {
         absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();//查询某个目录下的所有图片
         String selection = MediaStore.Images.Media.DATA + " like ?";//查询条件
         String[] selectionArgs = {absolutePath + "%"};//查询目录
-        Cursor cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, selection, selectionArgs, sortOrder); //columns传空表示查询所有字段
+        Cursor cursor = mContext.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, selection, selectionArgs, sortOrder); //columns传空表示查询所有字段
         if (cursor.moveToFirst()) {
             do {
                 String imagePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
@@ -236,18 +248,6 @@ public class FobRecyclerFrg2 extends FobBaseFrg {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == READ_EXTERNAL_STORAGE_CODE) {
-            if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                this.queryPictures();
-            } else {
-                Toast.makeText(getContext(), "reject permission", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    @Override
     public View getBlurredView() {
         return mRecyclerView;
     }
@@ -291,7 +291,8 @@ public class FobRecyclerFrg2 extends FobBaseFrg {
 
             if (holder instanceof ContentHolder) {
                 ContentHolder contentHolder = (ContentHolder) holder;
-                Glide.with(FobRecyclerFrg2.this).load(data.getPath()).into(contentHolder.mImageView);
+                Glide.with(SuhengRecyclerFragment2.this).load(data.getPath()).into(contentHolder.mImageView);
+                //Glide.with(SuhengRecyclerFragment2.this).load(R.drawable.beauty2).into(contentHolder.mImageView);
             }
         }
     }

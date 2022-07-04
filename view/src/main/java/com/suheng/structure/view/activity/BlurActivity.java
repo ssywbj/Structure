@@ -24,11 +24,18 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.suheng.structure.view.R;
+import com.suheng.structure.view.utils.RealBlur;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BlurActivity extends AppCompatActivity {
+    private RealBlur mRealBlur;
+    private final SuhengRecyclerFragment2 mFobRecyclerFrg2 = new SuhengRecyclerFragment2();
+    private final SuhengRecyclerFragment3 mFobRecyclerFrg3 = new SuhengRecyclerFragment3();
+    private final SuhengScrollFragment mSuhengScrollFragment = new SuhengScrollFragment();
+    private SuhengBaseFragment mFrgCurrent;
+    private View mViewBlur;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +52,17 @@ public class BlurActivity extends AppCompatActivity {
         if (actionBar != null) {
             Log.d("Wbj", "getActionBarHeight: " + actionBar.getHeight());
         }*/
+        mRealBlur = new RealBlur(this);
+
+        mViewBlur = findViewById(R.id.foot_bar_root);
         ViewGroup barTabLayout = findViewById(R.id.foot_bar_tab_layout);
         ViewPager2 viewPager = findViewById(R.id.fragment_container);
 
-        List<FobBaseFrg> frgs = new ArrayList<>();
+        List<SuhengBaseFragment> frgs = new ArrayList<>();
         //frgs.add(new FobRecyclerFrg());
-        frgs.add(new FobRecyclerFrg2());
-        frgs.add(new FobScrollFrg());
+        frgs.add(mFobRecyclerFrg2);
+        frgs.add(mFobRecyclerFrg3);
+        frgs.add(mSuhengScrollFragment);
         viewPager.setAdapter(new FragmentStateAdapter(this) {
             @NonNull
             @Override
@@ -78,10 +89,12 @@ public class BlurActivity extends AppCompatActivity {
                 //mFootBar.setItemSelectState(position);
                 int item = position % frgs.size();
                 viewPager.setCurrentItem(item);
-                FobBaseFrg fobBaseFrg = frgs.get(item);
+                SuhengBaseFragment suhengBaseFragment = frgs.get(item);
                 //mFootBar.toggleDynamicBlur(fobBaseFrg.getBlurredView());
             }
         });
+        viewPager.setCurrentItem(0);
+        mFrgCurrent = mFobRecyclerFrg2;
 
         int[][] states = new int[2][];
         states[0] = new int[]{android.R.attr.state_selected};
@@ -112,6 +125,20 @@ public class BlurActivity extends AppCompatActivity {
                 }
             });
         }
+
+        this.setViewBlurred(mFrgCurrent.getBlurredView());
+    }
+
+    public void setViewBlurred(View viewBlurred) {
+        mRealBlur.setViewBlurredAndBlur(viewBlurred, mViewBlur);
+    }
+
+    public View getViewBlur() {
+        return mViewBlur;
+    }
+
+    public RealBlur getDynamicBlur() {
+        return mRealBlur;
     }
 
     public static int getStatusBarHeight(Context context) {

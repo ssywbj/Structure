@@ -22,7 +22,7 @@ import androidx.annotation.Nullable;
 import com.google.android.renderscript.Toolkit;
 import com.suheng.structure.view.R;
 
-public class FobScrollFrg extends FobBaseFrg {
+public class SuhengScrollFragment extends SuhengBaseFragment {
 
     private View mBlurredView;
 
@@ -101,6 +101,7 @@ public class FobScrollFrg extends FobBaseFrg {
             imageView2.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, radius)));
         }
 
+        //((NestedScrollView) mBlurredView).setFillViewport(true);
     }
 
     @Override

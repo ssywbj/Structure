@@ -27,7 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class FobRecyclerFrg extends FobBaseFrg {
+public class SuhengRecyclerFragment extends SuhengBaseFragment {
     private Bitmap mBitmapBlur;
     private RecyclerView mRecyclerView;
     private ImageView mImageSub;
