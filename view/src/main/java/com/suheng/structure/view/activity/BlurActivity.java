@@ -129,7 +129,7 @@ public class BlurActivity extends AppCompatActivity {
         }
 
         this.setViewBlurred(mFrgCurrent.getBlurredView());
-        this.setViewContainerBg();
+        //this.setViewContainerBg();
 
         /*View viewCover = findViewById(R.id.foot_bar_cover);
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.girl_gaitubao);

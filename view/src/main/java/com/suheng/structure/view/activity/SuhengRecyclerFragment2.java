@@ -6,6 +6,10 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Path;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Region;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -33,7 +37,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.renderscript.Toolkit;
 import com.suheng.structure.view.GridItemDecoration;
 import com.suheng.structure.view.R;
 import com.suheng.structure.view.adapter.RecyclerAdapter;
@@ -152,20 +155,60 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
             topViewBlur.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Bitmap bitmap = Bitmap.createBitmap(mRecyclerView.getWidth(), mRecyclerView.getHeight(), Bitmap.Config.ARGB_4444);
-                    Canvas canvas = new Canvas(bitmap);
-                    mRecyclerView.draw(canvas);
-
                     int[] location = new int[2];
-                    viewBlur.getLocationOnScreen(location);
+                    topViewBlur.getLocationOnScreen(location);
                     int x = location[0];
                     int y = location[1];
+                    Rect rectBlur = new Rect();
+                    rectBlur.left = x;
+                    rectBlur.top = y;
+                    rectBlur.right = rectBlur.left + viewBlur.getWidth();
+                    rectBlur.bottom = rectBlur.top + viewBlur.getHeight();
+                    Log.d("Wbj", "onClick, rectBlur: " + rectBlur.toString());
                     mRecyclerView.getLocationOnScreen(location);
                     int x1 = location[0];
                     int y1 = location[1];
 
+                    //https://static.kancloud.cn/the_road_of_android/alg_android/2696890
+                    //Bitmap blurBitmap = Bitmap.createBitmap(viewBlur.getWidth(), viewBlur.getHeight(), Bitmap.Config.ARGB_4444);
+                    Bitmap bitmap = Bitmap.createBitmap(mRecyclerView.getWidth(), mRecyclerView.getHeight(), Bitmap.Config.ARGB_4444);
+                    Canvas canvas = new Canvas(bitmap);
+                    Path path = new Path();
+                    RectF clipRect = new RectF();
+                    clipRect.set(0, 0, topViewBlur.getWidth(), topViewBlur.getHeight());
+                    Log.d("Wbj", "onClick, clipRect: " + clipRect.toString() + ", " + mRecyclerView.getHeight() + "---" + canvas.getHeight());
+                    path.addRect(clipRect, Path.Direction.CCW);
+                    canvas.clipPath(path, Region.Op.REPLACE);
+                    canvas.drawColor(Color.GREEN);
+                    //canvas.scale(1.0f * mRecyclerView.getWidth() / viewBlur.getWidth(), 1.0f * mRecyclerView.getHeight() / viewBlur.getHeight());
+//                    canvas.translate(0,200);
+                    /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Rect outRect = new Rect();
+                        mRecyclerView.getClipBounds(rectBlur);
+                    }*/
+                    /*mRecyclerView.setClipToOutline(false);
+                    mRecyclerView.setOutlineProvider(new ViewOutlineProvider() {
+                        @Override
+                        public void getOutline(View view, Outline outline) {
+                            outline.canClip();
+                            outline.setRect(rectBlur);
+                            mRecyclerView.draw(canvas);
+                            topViewBlur.setBackground(new BitmapDrawable(getResources(), blurBitmap));
+                        }
+                    });*/
+                    //mRecyclerView.draw(canvas);
+                    topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
+                    /*Bitmap blurredBitmap = Toolkit.INSTANCE.blur(blurBitmap, 25);
+                    if (!blurBitmap.isRecycled()) {
+                        blurBitmap.recycle();
+                    }*/
+
+                    /*Bitmap bitmap = Bitmap.createBitmap(mRecyclerView.getWidth(), mRecyclerView.getHeight(), Bitmap.Config.ARGB_4444);
+                    Canvas canvas = new Canvas(bitmap);
+                    mRecyclerView.draw(canvas);
                     Bitmap blurBitmap = Bitmap.createBitmap(bitmap, Math.abs(x - x1)
                             , Math.abs(y - y1), viewBlur.getWidth(), viewBlur.getHeight());
+
                     if (!bitmap.isRecycled()) {
                         bitmap.recycle();
                     }
@@ -174,7 +217,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                         blurBitmap.recycle();
                     }
 
-                    topViewBlur.setBackground(new BitmapDrawable(getResources(), blurredBitmap));
+                    topViewBlur.setBackground(new BitmapDrawable(getResources(), blurredBitmap));*/
                 }
             });
         }

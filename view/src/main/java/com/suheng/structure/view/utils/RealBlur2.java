@@ -21,7 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class RealBlur implements Runnable {
+public class RealBlur2 implements Runnable {
 
     private ExecutorService mThreadPool;
     private final Rect mRectBlur = new Rect();
@@ -32,7 +32,7 @@ public class RealBlur implements Runnable {
     private int mRadius = 20;
     private ViewTreeObserver.OnDrawListener mOnDrawListener;
 
-    public RealBlur(Context context) {
+    public RealBlur2(Context context) {
         this.init();
     }
 
@@ -113,9 +113,9 @@ public class RealBlur implements Runnable {
                 }
             }
 
-            /*if (mThreadPool != null && !mThreadPool.isShutdown()) {
+            if (mThreadPool != null && !mThreadPool.isShutdown()) {
                 mThreadPool.shutdownNow();
-            }*/
+            }
 
             mBlurBg = null;
             mViewBlurred = null;
@@ -128,8 +128,6 @@ public class RealBlur implements Runnable {
         this.updateViewBlurred(viewBlurred);
     }
 
-    private Bitmap mViewBitmap;
-
     public void updateBlurViewBackground(boolean isAsync) {
         if (isAsync) {
             if (mThreadPool == null) {
@@ -139,40 +137,14 @@ public class RealBlur implements Runnable {
                 mThreadPool = Executors.newFixedThreadPool(executorThreads);
             }
 
-            /*if (mViewBitmap != null) {
-                if (!mViewBitmap.isRecycled()) {
-                    mViewBitmap.recycle();
-                }
-                mViewBitmap = null;
-            }*/
-
-            /*int width = mViewBlurred.getWidth();
-            int height = mViewBlurred.getHeight();
-            if (width == 0 || height == 0) {
-                return;
-            }
-            mViewBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
-            Canvas canvas = new Canvas(mViewBitmap);
-            if (mViewBlur.getHandler() != null) {
-                mViewBlur.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mViewBlurred.draw(canvas);
-                        mThreadPool.execute(RealBlur.this);
-                        Log.d("Wbj", "loadViewBitmap, bitmap: " + mViewBitmap + ", : " + Thread.currentThread().getName());
-                    }
-                });
-            }*/
-
-            mViewBitmap = this.loadViewBitmap();
-            mThreadPool.execute(this);
+            mThreadPool.submit(this);
         } else {
             this.run();
         }
     }
 
     @Nullable
-    private synchronized Bitmap loadViewBitmap() {
+    private Bitmap loadViewBitmap() {
         int width = mViewBlurred.getWidth();
         int height = mViewBlurred.getHeight();
         if (width == 0 || height == 0) {
@@ -187,7 +159,7 @@ public class RealBlur implements Runnable {
     }
 
     @Override
-    public synchronized void run() {
+    public void run() {
         boolean intersects = Rect.intersects(mRectBlur, mRectBlurred);
         boolean contains = mRectBlurred.contains(mRectBlur);
         Log.d("Wbj", "rect, intersects: " + intersects + ", contains:" + contains);
@@ -196,19 +168,17 @@ public class RealBlur implements Runnable {
             return;
         }
 
+        Bitmap viewBitmap = this.loadViewBitmap();
         int width = mViewBlur.getWidth();
         int height = mViewBlur.getHeight();
-        if (mViewBitmap == null || width == 0 || height == 0) {
+        if (viewBitmap == null || width == 0 || height == 0) {
             return;
         }
 
-        Bitmap blurBitmap = Bitmap.createBitmap(mViewBitmap, Math.abs(mRectBlur.left - mRectBlurred.left)
+        Bitmap blurBitmap = Bitmap.createBitmap(viewBitmap, Math.abs(mRectBlur.left - mRectBlurred.left)
                 , Math.abs(mRectBlur.top - mRectBlurred.top), width, height);
-        if (mViewBitmap != null) {
-            if (!mViewBitmap.isRecycled()) {
-                mViewBitmap.recycle();
-            }
-            mViewBitmap = null;
+        if (!viewBitmap.isRecycled()) {
+            viewBitmap.recycle();
         }
 
         if (mBlurBg == null) {
@@ -223,15 +193,15 @@ public class RealBlur implements Runnable {
                 mBlurBg = new BitmapDrawable(mViewBlur.getResources(), blurredBitmap);
             }
 
-            if (mViewBlur.getHandler() != null) {
-                mViewBlur.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mViewBlur.setBackground(mBlurBg);
-                        Log.d("Wbj", "run, 1111111111: " + mBlurBg + ", thread: " + Thread.currentThread().getName());
-                    }
-                });
-            }
+            mViewBlur.setBackground(mBlurBg);
+            Log.d("Wbj", "run, 1111111111: " + mBlurBg + ", thread: " + Thread.currentThread().getName());
+            /*mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mViewBlur.setBackground(mBlurBg);
+                    Log.d("Wbj", "run, 1111111111: " + mBlurBg+ ", thread: " + Thread.currentThread().getName());
+                }
+            });*/
         } else {
             Bitmap bgBitmap = mBlurBg.getBitmap();
             if (bgBitmap == null || bgBitmap.isRecycled()) {
@@ -246,19 +216,20 @@ public class RealBlur implements Runnable {
                     bgBitmap.recycle();
                 }
 
-                /*if (mViewBlur.getHandler() != null) {
-                    mViewBlur.getHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d("Wbj", "run, 22222222: " + blurBitmap + ", thread: " + Thread.currentThread().getName());
-                            mViewBlur.setRenderEffect(RenderEffect.createBlurEffect(mRadius, mRadius, Shader.TileMode.CLAMP));
-                            mBlurBg.setBitmap(blurBitmap);
-                            if (!bgBitmap.isRecycled()) {
-                                bgBitmap.recycle();
-                            }
+                /*mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d("Wbj", "run, 22222222: " + blurBitmap + ", thread: " + Thread.currentThread().getName());
+                        mViewBlur.setRenderEffect(RenderEffect.createBlurEffect(mRadius, mRadius, Shader.TileMode.CLAMP));
+                        //mViewBlur.setRenderEffect(blurEffect);
+                        mBlurBg.setBitmap(blurBitmap);
+                        //RenderEffect blurEffect = RenderEffect.createBlurEffect(mRadius, mRadius, Shader.TileMode.CLAMP);
+                        //mViewBlur.setBackground(new BitmapDrawable(mViewBlur.getResources(), blurBitmap));
+                        if (!bgBitmap.isRecycled()) {
+                            bgBitmap.recycle();
                         }
-                    });
-                }*/
+                    }
+                });*/
             } else {
                 Bitmap blurredBitmap = Toolkit.INSTANCE.blur(blurBitmap, mRadius);
                 try {
@@ -267,17 +238,6 @@ public class RealBlur implements Runnable {
                     Log.d("Wbj", "run, 333333333: " + bgBitmap + ", thread: " + Thread.currentThread().getName());
                     bgBitmap.eraseColor(Color.TRANSPARENT);
                     bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
-
-                    /*if (mViewBlur.getHandler() != null) {
-                        mViewBlur.getHandler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.d("Wbj", "run, 333333333: " + bgBitmap + ", thread: " + Thread.currentThread().getName());
-                                bgBitmap.eraseColor(Color.TRANSPARENT);
-                                bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
-                            }
-                        });
-                    }*/
                 } catch (Exception e) {
                     Log.e("Wbj", "copy blur bitmap fail!", e);
                 } finally {
@@ -288,6 +248,19 @@ public class RealBlur implements Runnable {
                         blurredBitmap.recycle();
                     }
                 }
+
+                /*mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d("Wbj", "run, 333333333: " + bgBitmap + ", thread: " + Thread.currentThread().getName());
+                        bgBitmap.eraseColor(Color.TRANSPARENT);
+                        bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
+
+                        if (!blurBitmap.isRecycled()) {
+                            blurBitmap.recycle();
+                        }
+                    }
+                });*/
             }
 
         }
@@ -306,12 +279,16 @@ public class RealBlur implements Runnable {
             return null;
         }
 
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
-        Canvas canvas = new Canvas();
-        canvas.setBitmap(bitmap);
-        Log.d("Wbj", "loadViewBitmap: " + bitmap);
-        view.draw(canvas);
-        return bitmap;
+        if (mViewBlurredBitmap == null) {
+            mViewBlurredBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
+            mCanvas.setBitmap(mViewBlurredBitmap);
+        }
+        Log.d("Wbj", "loadViewBitmap, : " + mViewBlurredBitmap);
+        mViewBlurredBitmap.eraseColor(Color.TRANSPARENT);
+        //mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        //mCanvas.clipRect(mRectBlur);
+        view.draw(mCanvas);
+        return mViewBlurredBitmap;
     }*/
 
 }
