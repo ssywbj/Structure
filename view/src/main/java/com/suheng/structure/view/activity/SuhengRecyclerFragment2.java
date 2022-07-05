@@ -3,7 +3,10 @@ package com.suheng.structure.view.activity;
 import android.Manifest;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -29,6 +33,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.renderscript.Toolkit;
 import com.suheng.structure.view.GridItemDecoration;
 import com.suheng.structure.view.R;
 import com.suheng.structure.view.adapter.RecyclerAdapter;
@@ -44,8 +49,6 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
     private ContentAdapter mContentAdapter;
     private final List<ImageInfo> mDataList = new ArrayList<>();
     private RecyclerView mRecyclerView;
-    //private DynamicBlur mDynamicBlur;
-
     private Context mContext;
 
     @Override
@@ -103,42 +106,13 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                 });
         activityResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        /*ViewTreeObserver viewTreeObserver = imageSub.getViewTreeObserver();
-        viewTreeObserver.addOnDrawListener(new ViewTreeObserver.OnDrawListener() {
-            @Override
-            public void onDraw() {
-                Log.d("Wbj", "ViewTreeObserver, onDraw, onDraw");
-            }
-        });
-        viewTreeObserver.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                Log.v("Wbj", "ViewTreeObserver, onPreDraw, onPreDraw: " + this);
-                return true;
-            }
-        });*/
-        /*viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                Log.d("Wbj", "ViewTreeObserver, onGlobalLayout, onGlobalLayout");
-            }
-        });*/
-        /*viewTreeObserver.addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-            @Override
-            public void onScrollChanged() {
-                Log.i("Wbj", "ViewTreeObserver, onScrollChanged, onScrollChanged");
-            }
-        });*/
-
-        //mDynamicBlur = new DynamicBlur(getContext());
-        //mDynamicBlur.setViewBlurredAndBlur(mRecyclerView, view.findViewById(R.id.fob_image_sub));
-
         if (mContext instanceof BlurActivity) {
             BlurActivity activity = (BlurActivity) mContext;
             RealBlur realBlur = activity.getDynamicBlur();
-            realBlur.setViewBlurredAndBlur(mRecyclerView, activity.getViewBlur());
+            View viewBlur = activity.getViewBlur();
+            realBlur.setViewBlurredAndBlur(mRecyclerView, viewBlur);
 
-            mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            /*mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
@@ -149,8 +123,62 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                     super.onScrolled(recyclerView, dx, dy);
                     realBlur.updateBlurViewBackground(true);
                 }
+            });*/
+
+            ViewTreeObserver viewTreeObserver = mRecyclerView.getViewTreeObserver();
+            viewTreeObserver.addOnDrawListener(new ViewTreeObserver.OnDrawListener() {
+                @Override
+                public void onDraw() {
+                    Log.d("Wbj", "onDraw: " + mRecyclerView);
+                    //realBlur.updateBlurViewBackground(true);
+                }
+            });
+            viewTreeObserver.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    Log.d("Wbj", "onPreDraw: " + mRecyclerView);
+                    realBlur.updateBlurViewBackground(true);
+                    return true;
+                }
+            });
+            viewTreeObserver.addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+                @Override
+                public void onScrollChanged() {
+                    Log.d("Wbj", "onScrollChanged: " + mRecyclerView);
+                }
+            });
+
+            View topViewBlur = view.findViewById(R.id.frg_fob_image_blur);
+            topViewBlur.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Bitmap bitmap = Bitmap.createBitmap(mRecyclerView.getWidth(), mRecyclerView.getHeight(), Bitmap.Config.ARGB_4444);
+                    Canvas canvas = new Canvas(bitmap);
+                    mRecyclerView.draw(canvas);
+
+                    int[] location = new int[2];
+                    viewBlur.getLocationOnScreen(location);
+                    int x = location[0];
+                    int y = location[1];
+                    mRecyclerView.getLocationOnScreen(location);
+                    int x1 = location[0];
+                    int y1 = location[1];
+
+                    Bitmap blurBitmap = Bitmap.createBitmap(bitmap, Math.abs(x - x1)
+                            , Math.abs(y - y1), viewBlur.getWidth(), viewBlur.getHeight());
+                    if (!bitmap.isRecycled()) {
+                        bitmap.recycle();
+                    }
+                    Bitmap blurredBitmap = Toolkit.INSTANCE.blur(blurBitmap, 25);
+                    if (!blurBitmap.isRecycled()) {
+                        blurBitmap.recycle();
+                    }
+
+                    topViewBlur.setBackground(new BitmapDrawable(getResources(), blurredBitmap));
+                }
             });
         }
+
     }
 
     @Override

@@ -5,11 +5,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Shader;
-import android.graphics.drawable.ShapeDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -153,9 +149,9 @@ public class BlurActivity extends AppCompatActivity {
         int color = Color.WHITE;
         int newColor = Color.argb((int) (255 * alpha), Color.red(color), Color.green(color), Color.blue(color));
 
-        //viewCover.setBackgroundColor(newColor);
+        viewCover.setBackgroundColor(newColor);
 
-        ShapeDrawable shapeDrawable = new ShapeDrawable();
+        /*ShapeDrawable shapeDrawable = new ShapeDrawable();
         Paint paint = shapeDrawable.getPaint();
         viewCover.post(new Runnable() {
             @Override
@@ -169,7 +165,7 @@ public class BlurActivity extends AppCompatActivity {
         Log.d("Wbj", "supportNavigationBar: " + supportNavigationBar);
         if (supportNavigationBar) {
             getWindow().setNavigationBarColor(color);
-        }
+        }*/
     }
 
     public void setViewBlurred(View viewBlurred) {

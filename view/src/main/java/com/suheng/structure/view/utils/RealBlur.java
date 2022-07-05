@@ -29,7 +29,7 @@ public class RealBlur implements Runnable {
     private BitmapDrawable mBlurBg;
     private View mViewBlurred;
     private View mViewBlur;
-    private int mRadius = 15;
+    private int mRadius = 20;
     private ViewTreeObserver.OnDrawListener mOnDrawListener;
 
     public RealBlur(Context context) {

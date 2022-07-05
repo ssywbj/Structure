@@ -58,7 +58,7 @@ public class SuhengRecyclerFragment3 extends SuhengBaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mRecyclerView = view.findViewById(R.id.view_picture_manager_recycler_view);
+        mRecyclerView = view.findViewById(R.id.frg_fob_recycler3);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), SuhengRecyclerFragment2.SPAN_COUNT);
         Drawable drawable = AppCompatResources.getDrawable(mContext, R.drawable.recycler_view_linear_divide_line);
         if (drawable != null) {

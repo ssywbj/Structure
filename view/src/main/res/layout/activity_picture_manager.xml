@@ -9,9 +9,9 @@
         android:layout_height="match_parent" />
 
     <ImageView
-        android:id="@+id/fob_image_sub"
-        android:layout_width="108dp"
-        android:layout_height="240dp"
-        android:background="@android:color/holo_purple"
-        android:visibility="gone" />
+        android:id="@+id/frg_fob_image_blur"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_gravity="top"
+        android:background="@android:color/holo_purple" />
 </FrameLayout>

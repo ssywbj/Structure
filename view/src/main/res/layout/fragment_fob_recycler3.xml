@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/view_picture_manager_recycler_view"
+        android:id="@+id/frg_fob_recycler3"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </FrameLayout>
