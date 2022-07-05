@@ -194,6 +194,7 @@ public class SuhengRecyclerFragment3 extends SuhengBaseFragment {
         ImageInfo.getImageInfo().setContentLength(itemFooter.getContentLength());
     }
 
+    @Nullable
     @Override
     public View getBlurredView() {
         return null;

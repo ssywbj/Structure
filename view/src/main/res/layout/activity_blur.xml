@@ -15,11 +15,10 @@
         android:layout_height="60dp"
         android:layout_gravity="bottom">
 
-        <!--<View
-            android:id="@+id/foot_bar_discover"
+        <View
+            android:id="@+id/foot_bar_cover"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/holo_purple" />-->
+            android:layout_height="match_parent" />
 
         <LinearLayout
             android:id="@+id/foot_bar_tab_layout"

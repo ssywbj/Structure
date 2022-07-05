@@ -6,7 +6,7 @@
     <TextView
         android:id="@+id/apmaf_text_count"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="100dp"
         android:gravity="center_horizontal"
         android:paddingTop="10dp"
         android:textColor="@android:color/black"

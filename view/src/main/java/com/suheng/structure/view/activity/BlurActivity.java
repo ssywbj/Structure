@@ -5,7 +5,11 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Shader;
+import android.graphics.drawable.ShapeDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +19,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -55,6 +60,7 @@ public class BlurActivity extends AppCompatActivity {
         mRealBlur = new RealBlur(this);
 
         mViewBlur = findViewById(R.id.foot_bar_root);
+        //mViewBlur = findViewById(R.id.foot_bar_cover);
         ViewGroup barTabLayout = findViewById(R.id.foot_bar_tab_layout);
         ViewPager2 viewPager = findViewById(R.id.fragment_container);
 
@@ -127,6 +133,43 @@ public class BlurActivity extends AppCompatActivity {
         }
 
         this.setViewBlurred(mFrgCurrent.getBlurredView());
+        this.setViewContainerBg();
+
+        /*View viewCover = findViewById(R.id.foot_bar_cover);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.girl_gaitubao);
+        int radius = 13;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            RenderEffect blurEffect = RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.CLAMP);
+            viewCover.setRenderEffect(blurEffect);
+            viewCover.setBackground(new BitmapDrawable(getResources(), bitmap));
+        } else {
+            viewCover.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, radius)));
+        }*/
+    }
+
+    private void setViewContainerBg() {
+        View viewCover = findViewById(R.id.foot_bar_cover);
+        float alpha = 0.9f;
+        int color = Color.WHITE;
+        int newColor = Color.argb((int) (255 * alpha), Color.red(color), Color.green(color), Color.blue(color));
+
+        //viewCover.setBackgroundColor(newColor);
+
+        ShapeDrawable shapeDrawable = new ShapeDrawable();
+        Paint paint = shapeDrawable.getPaint();
+        viewCover.post(new Runnable() {
+            @Override
+            public void run() { //为适配底部导航栏，开启高斯模糊后的背景为透明度0.9到1的颜色渐变
+                paint.setShader(new LinearGradient(0, 0, 0, viewCover.getMeasuredHeight(), newColor, color, Shader.TileMode.CLAMP));
+                viewCover.setBackground(shapeDrawable);
+            }
+        });
+
+        boolean supportNavigationBar = isSupportNavigationBar(this);
+        Log.d("Wbj", "supportNavigationBar: " + supportNavigationBar);
+        if (supportNavigationBar) {
+            getWindow().setNavigationBarColor(color);
+        }
     }
 
     public void setViewBlurred(View viewBlurred) {
@@ -151,18 +194,23 @@ public class BlurActivity extends AppCompatActivity {
     }
 
     /**
-     * 虚拟操作拦（home等）是否显示
+     * 判断是否支持虚拟导航栏
      */
-    public static boolean isNavigationBarShow(Activity activity) {
+    public static boolean isSupportNavigationBar(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            Display display = activity.getWindowManager().getDefaultDisplay();
+            WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            if (wm == null) {
+                return false;
+            }
+
+            Display display = wm.getDefaultDisplay();
             Point size = new Point();
             Point realSize = new Point();
             display.getSize(size);
             display.getRealSize(realSize);
-            return realSize.y != size.y;
+            return realSize.y != size.y || realSize.x != size.x;
         } else {
-            boolean menu = ViewConfiguration.get(activity).hasPermanentMenuKey();
+            boolean menu = ViewConfiguration.get(context).hasPermanentMenuKey();
             boolean back = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
             return !menu && !back;
         }
@@ -172,7 +220,7 @@ public class BlurActivity extends AppCompatActivity {
      * 获取虚拟操作拦（home等）高度
      */
     public static int getNavigationBarHeight(Activity activity) {
-        if (!isNavigationBarShow(activity)) {
+        if (!isSupportNavigationBar(activity)) {
             return 0;
         }
 

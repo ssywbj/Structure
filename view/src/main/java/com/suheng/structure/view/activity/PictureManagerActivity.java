@@ -114,7 +114,7 @@ public class PictureManagerActivity extends AppCompatActivity {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if (mRealBlur != null) {
-                    mRealBlur.updateBlurViewBackground();
+                    mRealBlur.updateBlurViewBackground(true);
                 }
             }
         });

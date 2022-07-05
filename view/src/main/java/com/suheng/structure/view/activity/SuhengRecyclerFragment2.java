@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
-    public static final int SPAN_COUNT = 2;
+    public static final int SPAN_COUNT = 3;
     public static final int SPAN_SPACE = 1;
     private ContentAdapter mContentAdapter;
     private final List<ImageInfo> mDataList = new ArrayList<>();
@@ -147,7 +147,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
-                    realBlur.updateBlurViewBackground();
+                    realBlur.updateBlurViewBackground(true);
                 }
             });
         }
