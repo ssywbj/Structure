@@ -150,26 +150,31 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                 }
             });*/
 
-            RectF clipRect = new RectF();
-
             viewTreeObserver.addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
                 @Override
                 public void onScrollChanged() {
                     Log.d("Wbj", "viewTreeObserver, onScrollChanged: " + mRecyclerView);
                     //realBlur.updateBlurViewBackground(false);
 
-                    //if (canvas == null) {
-                    //Bitmap bitmap = Bitmap.createBitmap(topViewBlur.getWidth(), topViewBlur.getHeight(), Bitmap.Config.ARGB_4444);
-                    //Canvas   canvas = new Canvas(bitmap);
-                        if (clipRect.isEmpty()) {
-                            clipRect.set(0, 0, topViewBlur.getWidth(), topViewBlur.getHeight());
-                        }
-                        float sy = 1.0f * mRecyclerView.getHeight() / topViewBlur.getHeight();
-                        Log.d("Wbj", "onClick, clipRect: " + clipRect.toShortString() + ", " + mRecyclerView.getHeight()
-                                + "---" + topViewBlur.getHeight() + ", sy: " + sy);
-                        //canvas.scale(1, sy);
+                    int width = mRecyclerView.getWidth();
+                    int height = mRecyclerView.getHeight();
+                    if (width == 0 || height == 0) {
+                        return;
+                    }
+
+                    if (canvas == null) {
+                        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
+                        canvas = new Canvas(bitmap);
+                        clipRect.set(0, 0, topViewBlur.getWidth(), topViewBlur.getHeight());
                         //canvas.clipRect(clipRect);
-                    //}
+                        //float sy = 1.0f * mRecyclerView.getHeight() / topViewBlur.getHeight();
+                        //Log.d("Wbj", "onClick, clipRect: " + clipRect.toShortString() + ", " + mRecyclerView.getHeight() + "---" + topViewBlur.getHeight() + ", sy: " + sy);
+                    }
+
+                    //bitmap.eraseColor(Color.TRANSPARENT);
+                    //mRecyclerView.draw(canvas);
+                    //topViewBlur.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, 20)));
+                    //topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
 
                     /*int[] location = new int[2];
                     topViewBlur.getLocationOnScreen(location);
@@ -181,44 +186,25 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                     rectBlur.right = rectBlur.left + topViewBlur.getWidth();
                     rectBlur.bottom = rectBlur.top + topViewBlur.getHeight();*/
 
-                    int[] location = new int[2];
+                    /*int[] location = new int[2];
                     topViewBlur.getLocationInWindow(location);
                     int x = location[0];
                     int y = location[1];
                     Rect rectBlur = new Rect();
                     rectBlur.left = x;
-                    rectBlur.top = y+topViewBlur.getHeight();
+                    rectBlur.top = y + topViewBlur.getHeight();
                     rectBlur.right = rectBlur.left + topViewBlur.getWidth();
                     rectBlur.bottom = rectBlur.top + topViewBlur.getHeight();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         Bitmap bitmap = Bitmap.createBitmap(topViewBlur.getWidth(), topViewBlur.getHeight(), Bitmap.Config.ARGB_4444);
-                        PixelCopy.request(activity.getWindow(),rectBlur, bitmap, new PixelCopy.OnPixelCopyFinishedListener() {
+                        PixelCopy.request(activity.getWindow(), rectBlur, bitmap, new PixelCopy.OnPixelCopyFinishedListener() {
                             @Override
                             public void onPixelCopyFinished(int copyResult) {
                                 Log.d("Wbj", "onPixelCopyFinished, copyResult: " + copyResult);
                                 topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
                             }
                         }, topViewBlur.getHandler());
-                    }
-
-                    mThreadPool.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            //bitmap.eraseColor(Color.TRANSPARENT);
-                            //mRecyclerView.draw(canvas);
-                        }
-                    });
-
-                    /*mRecyclerView.setDrawingCacheEnabled(true);
-                    mRecyclerView.buildDrawingCache();
-                    mRecyclerView.getDrawingCache();
-                    mRecyclerView.setDrawingCacheEnabled(false);*/
-
-                    /*bitmap.eraseColor(Color.TRANSPARENT);
-                    mRecyclerView.draw(canvas);*/
-
-                    //topViewBlur.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, 20)));
-                    //topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
+                    }*/
                 }
             });
 
@@ -231,7 +217,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                     int y = location[1];
                     Rect rectBlur = new Rect();
                     rectBlur.left = x;
-                    rectBlur.top = topViewBlur.getHeight()+y;
+                    rectBlur.top = topViewBlur.getHeight() + y;
                     rectBlur.right = rectBlur.left + topViewBlur.getWidth();
                     rectBlur.bottom = rectBlur.top + topViewBlur.getHeight();
                     Log.d("Wbj", "onClick, rectBlur: " + rectBlur.toString());
@@ -265,7 +251,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         Bitmap bitmap = Bitmap.createBitmap(topViewBlur.getWidth(), topViewBlur.getHeight(), Bitmap.Config.ARGB_4444);
-                        PixelCopy.request(activity.getWindow(),rectBlur, bitmap, new PixelCopy.OnPixelCopyFinishedListener() {
+                        PixelCopy.request(activity.getWindow(), rectBlur, bitmap, new PixelCopy.OnPixelCopyFinishedListener() {
                             @Override
                             public void onPixelCopyFinished(int copyResult) {
                                 Log.d("Wbj", "onPixelCopyFinished, copyResult: " + copyResult);
@@ -286,6 +272,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                     mRecyclerView.draw(canvas);*/
 
                     topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
+
                     /*Bitmap blurredBitmap = Toolkit.INSTANCE.blur(blurBitmap, 25);
                     if (!blurBitmap.isRecycled()) {
                         blurBitmap.recycle();
@@ -314,6 +301,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
 
     Canvas canvas = null;
     Bitmap bitmap;
+    RectF clipRect = new RectF();
     private final ExecutorService mThreadPool = Executors.newFixedThreadPool(3);
 
     @Override
