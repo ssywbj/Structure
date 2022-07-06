@@ -155,7 +155,7 @@ public class BlurActivity extends AppCompatActivity {
         Paint paint = shapeDrawable.getPaint();
         viewCover.post(new Runnable() {
             @Override
-            public void run() { //为适配底部导航栏，开启高斯模糊后的背景为透明度0.9到1的颜色渐变
+            public void run() {
                 paint.setShader(new LinearGradient(0, 0, 0, viewCover.getMeasuredHeight(), newColor, color, Shader.TileMode.CLAMP));
                 viewCover.setBackground(shapeDrawable);
             }
