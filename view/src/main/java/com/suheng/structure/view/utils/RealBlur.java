@@ -167,6 +167,7 @@ public class RealBlur implements Runnable {
             mViewBitmap = this.loadViewBitmap();
             mThreadPool.execute(this);
         } else {
+            mViewBitmap = this.loadViewBitmap();
             this.run();
         }
     }
