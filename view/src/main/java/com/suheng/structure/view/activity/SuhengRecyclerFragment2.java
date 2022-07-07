@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -17,7 +16,6 @@ import android.provider.MediaStore;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.PixelCopy;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -37,12 +35,14 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.renderscript.Toolkit;
 import com.suheng.structure.view.GridItemDecoration;
 import com.suheng.structure.view.R;
 import com.suheng.structure.view.adapter.RecyclerAdapter;
 import com.suheng.structure.view.utils.DateUtil;
 import com.suheng.structure.view.utils.RealBlur;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -119,25 +119,27 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
             View viewBlur = activity.getViewBlur();
             realBlur.setViewBlurredAndBlur(mRecyclerView, viewBlur);
 
-            /*mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
                 }
 
                 @Override
-                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
+                public void onScrolled(@NonNull RecyclerView recyclerView, int rdx, int rdy) {
+                    super.onScrolled(recyclerView, rdx, rdy);
                     Log.d("Wbj", "onScrollChanged: " + mRecyclerView);
-                    realBlur.updateBlurViewBackground(true);
+                    realBlur.updateBlurViewBackground();
+
+                    //updateBlurViewBackground(viewBlur,mRecyclerView);
                 }
-            });*/
+            });
 
             ViewTreeObserver viewTreeObserver = mRecyclerView.getViewTreeObserver();
             viewTreeObserver.addOnDrawListener(new ViewTreeObserver.OnDrawListener() {
                 @Override
                 public void onDraw() {
-                    Log.d("Wbj", "viewTreeObserver, onDraw: " + mRecyclerView);
+                    //Log.d("Wbj", "viewTreeObserver, onDraw: " + mRecyclerView);
                     //realBlur.updateBlurViewBackground(true);
                 }
             });
@@ -153,58 +155,8 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
             viewTreeObserver.addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
                 @Override
                 public void onScrollChanged() {
-                    Log.d("Wbj", "viewTreeObserver, onScrollChanged: " + mRecyclerView);
-                    //realBlur.updateBlurViewBackground(false);
-
-                    int width = mRecyclerView.getWidth();
-                    int height = mRecyclerView.getHeight();
-                    if (width == 0 || height == 0) {
-                        return;
-                    }
-
-                    if (canvas == null) {
-                        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
-                        canvas = new Canvas(bitmap);
-                        clipRect.set(0, 0, topViewBlur.getWidth(), topViewBlur.getHeight());
-                        //canvas.clipRect(clipRect);
-                        //float sy = 1.0f * mRecyclerView.getHeight() / topViewBlur.getHeight();
-                        //Log.d("Wbj", "onClick, clipRect: " + clipRect.toShortString() + ", " + mRecyclerView.getHeight() + "---" + topViewBlur.getHeight() + ", sy: " + sy);
-                    }
-
-                    //bitmap.eraseColor(Color.TRANSPARENT);
-                    //mRecyclerView.draw(canvas);
-                    //topViewBlur.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, 20)));
-                    //topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
-
-                    /*int[] location = new int[2];
-                    topViewBlur.getLocationOnScreen(location);
-                    int x = location[0];
-                    int y = location[1];
-                    Rect rectBlur = new Rect();
-                    rectBlur.left = x;
-                    rectBlur.top = y;
-                    rectBlur.right = rectBlur.left + topViewBlur.getWidth();
-                    rectBlur.bottom = rectBlur.top + topViewBlur.getHeight();*/
-
-                    /*int[] location = new int[2];
-                    topViewBlur.getLocationInWindow(location);
-                    int x = location[0];
-                    int y = location[1];
-                    Rect rectBlur = new Rect();
-                    rectBlur.left = x;
-                    rectBlur.top = y + topViewBlur.getHeight();
-                    rectBlur.right = rectBlur.left + topViewBlur.getWidth();
-                    rectBlur.bottom = rectBlur.top + topViewBlur.getHeight();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        Bitmap bitmap = Bitmap.createBitmap(topViewBlur.getWidth(), topViewBlur.getHeight(), Bitmap.Config.ARGB_4444);
-                        PixelCopy.request(activity.getWindow(), rectBlur, bitmap, new PixelCopy.OnPixelCopyFinishedListener() {
-                            @Override
-                            public void onPixelCopyFinished(int copyResult) {
-                                Log.d("Wbj", "onPixelCopyFinished, copyResult: " + copyResult);
-                                topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
-                            }
-                        }, topViewBlur.getHandler());
-                    }*/
+                    /*Log.d("Wbj", "viewTreeObserver, onScrollChanged: " + mRecyclerView);
+                    //realBlur.updateBlurViewBackground(false);*/
                 }
             });
 
@@ -212,96 +164,122 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                 @Override
                 public void onClick(View v) {
                     int[] location = new int[2];
-                    topViewBlur.getLocationInWindow(location);
+                    viewBlur.getLocationOnScreen(location);
                     int x = location[0];
                     int y = location[1];
-                    Rect rectBlur = new Rect();
-                    rectBlur.left = x;
-                    rectBlur.top = topViewBlur.getHeight() + y;
-                    rectBlur.right = rectBlur.left + topViewBlur.getWidth();
-                    rectBlur.bottom = rectBlur.top + topViewBlur.getHeight();
-                    Log.d("Wbj", "onClick, rectBlur: " + rectBlur.toString());
                     mRecyclerView.getLocationOnScreen(location);
                     int x1 = location[0];
                     int y1 = location[1];
 
-                    /*Bitmap bitmap = Bitmap.createBitmap(mRecyclerView.getWidth(), mRecyclerView.getHeight(), Bitmap.Config.ARGB_4444);
+                    int width = viewBlur.getWidth();
+                    int height = viewBlur.getHeight();
+                    int bitmapWidth = (int) Math.ceil(1f * width / mScaleFactor);
+                    int bitmapHeight = (int) Math.ceil(1f * height / mScaleFactor);
+                    Bitmap bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
                     Canvas canvas = new Canvas(bitmap);
-                    RectF clipRect = new RectF();
-                    clipRect.set(0, 0, topViewBlur.getWidth(), topViewBlur.getHeight());
-                    float sy = 1.0f * mRecyclerView.getHeight() / topViewBlur.getHeight();
-                    Log.d("Wbj", "onClick, clipRect: " + clipRect.toShortString() + ", " + mRecyclerView.getHeight()
-                            + "---" + topViewBlur.getHeight() + ", sy: " + sy);
-                    canvas.scale(1, sy);
-                    canvas.clipRect(clipRect);
-                    mRecyclerView.draw(canvas);*/
-
-                    /*Bitmap bitmap = Bitmap.createBitmap(mRecyclerView.getWidth(), mRecyclerView.getHeight(), Bitmap.Config.ARGB_4444);
-                    Canvas canvas = new Canvas(bitmap);
-                    RectF clipRect = new RectF();
-                    int top = 20;
-                    clipRect.set(0, top, viewBlur.getWidth(), top + viewBlur.getHeight());
-                    float sy = 1.0f * mRecyclerView.getHeight() / viewBlur.getHeight();
-                    Log.d("Wbj", "onClick, clipRect: " + clipRect.toShortString() + ", " + mRecyclerView.getHeight()
-                            + "---" + viewBlur.getHeight() + ", sy: " + sy);
-                    canvas.scale(1, sy);
-                    //canvas.translate(0, top);
-                    canvas.clipRect(clipRect);
-                    mRecyclerView.draw(canvas);*/
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        Bitmap bitmap = Bitmap.createBitmap(topViewBlur.getWidth(), topViewBlur.getHeight(), Bitmap.Config.ARGB_4444);
-                        PixelCopy.request(activity.getWindow(), rectBlur, bitmap, new PixelCopy.OnPixelCopyFinishedListener() {
-                            @Override
-                            public void onPixelCopyFinished(int copyResult) {
-                                Log.d("Wbj", "onPixelCopyFinished, copyResult: " + copyResult);
-                                topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
-                            }
-                        }, topViewBlur.getHandler());
-                    }
-
-                    /*Bitmap bitmap = Bitmap.createBitmap(mRecyclerView.getWidth(), mRecyclerView.getHeight(), Bitmap.Config.ARGB_4444);
-                    Canvas canvas = new Canvas(bitmap);
-                    RectF clipRect = new RectF();
-                    clipRect.set(0, 0, topViewBlur.getWidth(), topViewBlur.getHeight());
-                    float sy = 1.0f * mRecyclerView.getHeight() / topViewBlur.getHeight();
-                    Log.d("Wbj", "onClick, clipRect: " + clipRect.toShortString() + ", " + mRecyclerView.getHeight()
-                            + "---" + topViewBlur.getHeight() + ", sy: " + sy);
-                    canvas.scale(1, sy);
-                    canvas.clipRect(clipRect);
-                    mRecyclerView.draw(canvas);*/
-
-                    topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
-
-                    /*Bitmap blurredBitmap = Toolkit.INSTANCE.blur(blurBitmap, 25);
-                    if (!blurBitmap.isRecycled()) {
-                        blurBitmap.recycle();
-                    }*/
-
-                    /*Bitmap bitmap = Bitmap.createBitmap(mRecyclerView.getWidth(), mRecyclerView.getHeight(), Bitmap.Config.ARGB_4444);
-                    Canvas canvas = new Canvas(bitmap);
+                    float scale = 1f / mScaleFactor;
+                    float dx = x1 - x;
+                    float dy = y1 - y;
+                    canvas.scale(scale, scale);
+                    canvas.translate(dx, dy);
+                    Log.d("Wbj", "onClick, x: " + x + ", y: " + y + ", x1: " + x1 + ", y1: " + y1 + ", scale: " + scale + ", dx: " + dx + ", dy: " + dy);
+                    Log.d("Wbj", "onClick, width: " + width + ", height: " + height + ", bitmapWidth: " + bitmapWidth + ", bitmapHeight: " + bitmapHeight);
                     mRecyclerView.draw(canvas);
-                    Bitmap blurBitmap = Bitmap.createBitmap(bitmap, Math.abs(x - x1)
-                            , Math.abs(y - y1), viewBlur.getWidth(), viewBlur.getHeight());
-
-                    if (!bitmap.isRecycled()) {
-                        bitmap.recycle();
+                    Bitmap bg = null;
+                    if (topViewBlur.getBackground() instanceof BitmapDrawable) {
+                        bg = ((BitmapDrawable) topViewBlur.getBackground()).getBitmap();
                     }
-                    Bitmap blurredBitmap = Toolkit.INSTANCE.blur(blurBitmap, 25);
-                    if (!blurBitmap.isRecycled()) {
-                        blurBitmap.recycle();
+                    topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
+                    if (bg != null && !bg.isRecycled()) {
+                        bg.recycle();
                     }
 
-                    topViewBlur.setBackground(new BitmapDrawable(getResources(), blurredBitmap));*/
                 }
             });
         }
 
     }
 
-    Canvas canvas = null;
-    Bitmap bitmap;
+    private void updateBlurViewBackground(View viewBlur,View viewBlurred) {
+        int[] location = new int[2];
+        viewBlur.getLocationOnScreen(location);
+        int x = location[0];
+        int y = location[1];
+        viewBlurred.getLocationOnScreen(location);
+        int x1 = location[0];
+        int y1 = location[1];
+
+        int width = viewBlur.getWidth();
+        int height = viewBlur.getHeight();
+        int bitmapWidth = (int) Math.ceil(1f * width / mScaleFactor);
+        int bitmapHeight = (int) Math.ceil(1f * height / mScaleFactor);
+        if (bitmapWidth == 0 || bitmapHeight == 0) {
+            return;
+        }
+        Log.d("Wbj", "width: " + width + ", height: " + height + ", bitmapWidth: " + bitmapWidth + ", bitmapHeight: " + bitmapHeight);
+        if (mViewBlurBitmap == null) {
+            mViewBlurBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
+            mViewBlurCanvas = new Canvas(mViewBlurBitmap);
+            float scale = 1f / mScaleFactor;
+            float dx = x1 - x;
+            float dy = y1 - y;
+            mViewBlurCanvas.scale(scale, scale);
+            mViewBlurCanvas.translate(dx, dy);
+            Log.d("Wbj", "x: " + x + ", y: " + y + ", x1: " + x1 + ", y1: " + y1 + ", scale: " + scale + ", dx: " + dx + ", dy: " + dy);
+        }
+        viewBlurred.draw(mViewBlurCanvas);
+
+        Bitmap blurredBitmap = Toolkit.INSTANCE.blur(mViewBlurBitmap, mRadius);
+
+        if (mViewBlurBg == null) {
+            mViewBlurBg = new BitmapDrawable(getResources(), blurredBitmap);
+            viewBlur.setBackground(mViewBlurBg);
+        } else {
+            Bitmap bgBitmap = mViewBlurBg.getBitmap();
+            if (bgBitmap == null) {
+                return;
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                mViewBlurBg.setBitmap(blurredBitmap);
+                if (!bgBitmap.isRecycled()) {
+                    Log.d("Wbj", "recycle, bgBitmap: " + bgBitmap);
+                    bgBitmap.recycle();
+                }
+            } else {
+                try {
+                    ByteBuffer byteBuffer = ByteBuffer.allocate(blurredBitmap.getByteCount());
+                    blurredBitmap.copyPixelsToBuffer(byteBuffer);
+                    Log.d("Wbj", "run, 333333333: " + bgBitmap + ", thread: " + Thread.currentThread().getName());
+                    bgBitmap.eraseColor(Color.TRANSPARENT);
+                    bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
+                } catch (Exception e) {
+                    Log.e("Wbj", "copy blurredBitmap bitmap fail!", e);
+                } finally {
+                    if (!blurredBitmap.isRecycled()) {
+                        blurredBitmap.recycle();
+                    }
+                }
+            }
+        }
+    }
+
+    private Canvas mViewBlurCanvas;
+    private Bitmap mViewBlurBitmap;
+    private BitmapDrawable mViewBlurBg;
+    private int mScaleFactor = 6;
+    private int mRadius = 20;
+
+    public void setScaleFactor(int scaleFactor) {
+        mScaleFactor = scaleFactor;
+    }
+
+    public void setRadius(int radius) {
+        mRadius = radius;
+    }
+
     RectF clipRect = new RectF();
+
     private final ExecutorService mThreadPool = Executors.newFixedThreadPool(3);
 
     @Override

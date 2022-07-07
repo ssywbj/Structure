@@ -114,7 +114,7 @@ public class PictureManagerActivity extends AppCompatActivity {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if (mRealBlur != null) {
-                    mRealBlur.updateBlurViewBackground(true);
+                    mRealBlur.updateBlurViewBackground();
                 }
             }
         });
@@ -146,7 +146,7 @@ public class PictureManagerActivity extends AppCompatActivity {
             }
         });*/
 
-        mRealBlur = new RealBlur(this);
+        mRealBlur = new RealBlur();
         mRealBlur.setViewBlurredAndBlur(recyclerView, findViewById(R.id.fob_image_sub));
     }
 

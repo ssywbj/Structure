@@ -53,7 +53,7 @@ public class BlurActivity extends AppCompatActivity {
         if (actionBar != null) {
             Log.d("Wbj", "getActionBarHeight: " + actionBar.getHeight());
         }*/
-        mRealBlur = new RealBlur(this);
+        mRealBlur = new RealBlur();
 
         mViewBlur = findViewById(R.id.foot_bar_root);
         //mViewBlur = findViewById(R.id.foot_bar_cover);
@@ -145,7 +145,7 @@ public class BlurActivity extends AppCompatActivity {
 
     private void setViewContainerBg() {
         View viewCover = findViewById(R.id.foot_bar_cover);
-        float alpha = 0.9f;
+        float alpha = 0.8f;
         int color = Color.WHITE;
         int newColor = Color.argb((int) (255 * alpha), Color.red(color), Color.green(color), Color.blue(color));
 
