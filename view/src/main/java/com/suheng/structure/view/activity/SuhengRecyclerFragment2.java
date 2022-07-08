@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -18,7 +19,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -111,7 +111,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                 });
         activityResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        View topViewBlur = view.findViewById(R.id.frg_fob_image_blur);
+        ImageView topViewBlur = view.findViewById(R.id.frg_fob_image_blur);
 
         if (mContext instanceof BlurActivity) {
             BlurActivity activity = (BlurActivity) mContext;
@@ -128,35 +128,9 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int rdx, int rdy) {
                     super.onScrolled(recyclerView, rdx, rdy);
-                    Log.d("Wbj", "onScrollChanged: " + mRecyclerView);
-                    realBlur.updateBlurViewBackground();
-
-                    //updateBlurViewBackground(viewBlur,mRecyclerView);
-                }
-            });
-
-            ViewTreeObserver viewTreeObserver = mRecyclerView.getViewTreeObserver();
-            viewTreeObserver.addOnDrawListener(new ViewTreeObserver.OnDrawListener() {
-                @Override
-                public void onDraw() {
-                    //Log.d("Wbj", "viewTreeObserver, onDraw: " + mRecyclerView);
-                    //realBlur.updateBlurViewBackground(true);
-                }
-            });
-            /*viewTreeObserver.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    Log.d("Wbj", "onPreDraw: " + mRecyclerView);
-                    //realBlur.updateBlurViewBackground(true);
-                    return true;
-                }
-            });*/
-
-            viewTreeObserver.addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-                @Override
-                public void onScrollChanged() {
-                    /*Log.d("Wbj", "viewTreeObserver, onScrollChanged: " + mRecyclerView);
-                    //realBlur.updateBlurViewBackground(false);*/
+                    //Log.d("Wbj", "onScrollChanged: " + mRecyclerView);
+                    //realBlur.updateBlurViewBackground();
+                    updateBlurViewBackground(viewBlur, mRecyclerView);
                 }
             });
 
@@ -171,7 +145,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                     int x1 = location[0];
                     int y1 = location[1];
 
-                    int width = viewBlur.getWidth();
+                    /*int width = viewBlur.getWidth();
                     int height = viewBlur.getHeight();
                     int bitmapWidth = (int) Math.ceil(1f * width / mScaleFactor);
                     int bitmapHeight = (int) Math.ceil(1f * height / mScaleFactor);
@@ -192,7 +166,23 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                     topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
                     if (bg != null && !bg.isRecycled()) {
                         bg.recycle();
+                    }*/
+
+                    topViewBlur.getLocationOnScreen(location);
+                    x = location[0];
+                    y = location[1];
+                    Rect rect = new Rect();
+                    rect.set(x, y, x + topViewBlur.getWidth(), y + topViewBlur.getHeight());
+                    Bitmap bitmap = intersectsViewBitmap(mRecyclerView, rect);
+                    topViewBlur.setImageBitmap(bitmap);
+                    /*Bitmap bg = null;
+                    if (topViewBlur.getBackground() instanceof BitmapDrawable) {
+                        bg = ((BitmapDrawable) topViewBlur.getBackground()).getBitmap();
                     }
+                    topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
+                    if (bg != null && !bg.isRecycled()) {
+                        bg.recycle();
+                    }*/
 
                 }
             });
@@ -200,7 +190,35 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
 
     }
 
-    private void updateBlurViewBackground(View viewBlur,View viewBlurred) {
+    /**
+     * @param view 要截取的View
+     * @param rect 要截取的区域
+     * @return bitmap: View的区域位图
+     */
+    public static Bitmap intersectsViewBitmap(View view, Rect rect) {
+        //获取View的位置及边界信息
+        int[] location = new int[2];
+        view.getLocationOnScreen(location);
+        int x = location[0];
+        int y = location[1];
+        Rect viewRect = new Rect();
+        viewRect.set(x, y, x + view.getWidth(), y + view.getHeight());
+
+        if (viewRect.contains(rect)) { //要截取的区域要在View的区域之中
+            Bitmap bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            float dx = x - rect.left;
+            float dy = y - rect.top;
+            canvas.translate(dx, dy); //平移到要截取的位置
+            view.draw(canvas);
+
+            return bitmap;
+        }
+
+        return null;
+    }
+
+    private void updateBlurViewBackground(View viewBlur, View viewBlurred) {
         int[] location = new int[2];
         viewBlur.getLocationOnScreen(location);
         int x = location[0];
@@ -297,7 +315,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
         //Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, null, null, sortOrder);
 
         String absolutePath = "/storage/emulated/0/DCIM/Camera/20161209_120251.jpg";//查询某一张图片
-        absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();//查询某个目录下的所有图片
+        absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath();//查询某个目录下的所有图片
         String selection = MediaStore.Images.Media.DATA + " like ?";//查询条件
         String[] selectionArgs = {absolutePath + "%"};//查询目录
         Cursor cursor = mContext.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, selection, selectionArgs, sortOrder); //columns传空表示查询所有字段

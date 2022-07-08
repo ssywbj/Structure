@@ -114,7 +114,7 @@ public class SuhengRecyclerFragment3 extends SuhengBaseFragment {
         //Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, null, null, sortOrder);
 
         String absolutePath = "/storage/emulated/0/DCIM/Camera/20161209_120251.jpg";//查询某一张图片
-        absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();//查询某个目录下的所有图片
+        absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath();//查询某个目录下的所有图片
         String selection = MediaStore.Images.Media.DATA + " like ?";//查询条件
         String[] selectionArgs = {absolutePath + "%"};//查询目录
         Cursor cursor = mContext.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, selection, selectionArgs, sortOrder); //columns传空表示查询所有字段
@@ -197,7 +197,7 @@ public class SuhengRecyclerFragment3 extends SuhengBaseFragment {
     @Nullable
     @Override
     public View getBlurredView() {
-        return null;
+        return mRecyclerView;
     }
 
     private class ContentAdapter extends RecyclerAdapter<ImageInfo, RecyclerAdapter.Holder> {

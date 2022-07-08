@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Path;
-import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -27,6 +26,31 @@ public class ClipView extends View {
 
     @Override
     public void draw(Canvas canvas) {
+        float radius = getWidth() / 2f;
+        Matrix matrix = new Matrix();
+        Path path = new Path();
+        path.moveTo(getWidth() / 2f, -radius + getHeight() / 2f);
+
+        float ratio = 0.91f;
+        float[] src = {radius * ratio, -radius, radius, -radius * ratio, radius, 0};
+        float[] dst = {0, 0, 0, 0, 0, 0};
+        matrix.postTranslate(getWidth() / 2f, getHeight() / 2f);
+        matrix.mapPoints(dst, src);
+        path.cubicTo(dst[0], dst[1], dst[2], dst[3], dst[4], dst[5]);
+
+        for (int i = 0; i < 3; i++) {
+            matrix.preRotate(90);
+            matrix.mapPoints(dst, src);
+            path.cubicTo(dst[0], dst[1], dst[2], dst[3], dst[4], dst[5]);
+        }
+
+        canvas.clipPath(path);
+
+        super.draw(canvas);
+    }
+
+    /*@Override
+    public void draw(Canvas canvas) {
         Path path = new Path();
         RectF rectF = new RectF(0, 0, getWidth(), getHeight());
         //path.addRoundRect(rectF, 20, 20, Path.Direction.CCW);
@@ -40,7 +64,7 @@ public class ClipView extends View {
         canvas.clipPath(path);
 
         super.draw(canvas);
-    }
+    }*/
 
     //正六边形
     private Path hexagonPath(float radius) {
@@ -75,7 +99,7 @@ public class ClipView extends View {
         Path path = new Path();
         path.moveTo(getWidth() / 2f, -radius + getHeight() / 2f);
 
-        float ratio = 0.91f;
+        float ratio = 0.91f; //控制四个角的弧度比例
         float[] src = {radius * ratio, -radius, radius, -radius * ratio, radius, 0};
         float[] dst = {0, 0, 0, 0, 0, 0};
         matrix.postTranslate(getWidth() / 2f, getHeight() / 2f);

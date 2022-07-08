@@ -37,6 +37,14 @@
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_marginTop="2dp" />
+
+        <com.suheng.structure.view.ClipView
+            android:layout_marginTop="10dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/excel"/>
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

@@ -55,16 +55,21 @@ public class BlurActivity extends AppCompatActivity {
         }*/
         mRealBlur = new RealBlur();
 
-        mViewBlur = findViewById(R.id.foot_bar_root);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            mViewBlur = findViewById(R.id.foot_bar_blur12);
+        } else {
+            mViewBlur = findViewById(R.id.foot_bar_root);
+        }
         //mViewBlur = findViewById(R.id.foot_bar_cover);
         ViewGroup barTabLayout = findViewById(R.id.foot_bar_tab_layout);
         ViewPager2 viewPager = findViewById(R.id.fragment_container);
 
         List<SuhengBaseFragment> frgs = new ArrayList<>();
-        //frgs.add(new FobRecyclerFrg());
         frgs.add(mFobRecyclerFrg2);
-        frgs.add(mFobRecyclerFrg3);
-        frgs.add(mSuhengScrollFragment);
+        //frgs.add(mFobRecyclerFrg3);
+        //frgs.add(mSuhengScrollFragment);
+        mFrgCurrent = mFobRecyclerFrg2;
+
         viewPager.setAdapter(new FragmentStateAdapter(this) {
             @NonNull
             @Override
@@ -91,12 +96,11 @@ public class BlurActivity extends AppCompatActivity {
                 //mFootBar.setItemSelectState(position);
                 int item = position % frgs.size();
                 viewPager.setCurrentItem(item);
-                SuhengBaseFragment suhengBaseFragment = frgs.get(item);
-                //mFootBar.toggleDynamicBlur(fobBaseFrg.getBlurredView());
+                SuhengBaseFragment fragment = frgs.get(item);
+                setViewBlurred(fragment.getBlurredView());
             }
         });
         viewPager.setCurrentItem(0);
-        mFrgCurrent = mFobRecyclerFrg2;
 
         int[][] states = new int[2][];
         states[0] = new int[]{android.R.attr.state_selected};
@@ -145,7 +149,7 @@ public class BlurActivity extends AppCompatActivity {
 
     private void setViewContainerBg() {
         View viewCover = findViewById(R.id.foot_bar_cover);
-        float alpha = 0.8f;
+        float alpha = 0.9f;
         int color = Color.WHITE;
         int newColor = Color.argb((int) (255 * alpha), Color.red(color), Color.green(color), Color.blue(color));
 
@@ -159,13 +163,13 @@ public class BlurActivity extends AppCompatActivity {
                 paint.setShader(new LinearGradient(0, 0, 0, viewCover.getMeasuredHeight(), newColor, color, Shader.TileMode.CLAMP));
                 viewCover.setBackground(shapeDrawable);
             }
-        });
+        });*/
 
         boolean supportNavigationBar = isSupportNavigationBar(this);
         Log.d("Wbj", "supportNavigationBar: " + supportNavigationBar);
         if (supportNavigationBar) {
             getWindow().setNavigationBarColor(color);
-        }*/
+        }
     }
 
     public void setViewBlurred(View viewBlurred) {
