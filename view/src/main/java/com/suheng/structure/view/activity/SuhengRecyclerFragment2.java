@@ -6,8 +6,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -40,13 +38,10 @@ import com.suheng.structure.view.GridItemDecoration;
 import com.suheng.structure.view.R;
 import com.suheng.structure.view.adapter.RecyclerAdapter;
 import com.suheng.structure.view.utils.DateUtil;
-import com.suheng.structure.view.utils.RealBlur;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
     public static final int SPAN_COUNT = 3;
@@ -111,14 +106,8 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                 });
         activityResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        ImageView topViewBlur = view.findViewById(R.id.frg_fob_image_blur);
-
         if (mContext instanceof BlurActivity) {
             BlurActivity activity = (BlurActivity) mContext;
-            RealBlur realBlur = activity.getDynamicBlur();
-            View viewBlur = activity.getViewBlur();
-            realBlur.setViewBlurredAndBlur(mRecyclerView, viewBlur);
-
             mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -128,94 +117,12 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int rdx, int rdy) {
                     super.onScrolled(recyclerView, rdx, rdy);
-                    //Log.d("Wbj", "onScrollChanged: " + mRecyclerView);
-                    //realBlur.updateBlurViewBackground();
-                    updateBlurViewBackground(viewBlur, mRecyclerView);
-                }
-            });
-
-            topViewBlur.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int[] location = new int[2];
-                    viewBlur.getLocationOnScreen(location);
-                    int x = location[0];
-                    int y = location[1];
-                    mRecyclerView.getLocationOnScreen(location);
-                    int x1 = location[0];
-                    int y1 = location[1];
-
-                    /*int width = viewBlur.getWidth();
-                    int height = viewBlur.getHeight();
-                    int bitmapWidth = (int) Math.ceil(1f * width / mScaleFactor);
-                    int bitmapHeight = (int) Math.ceil(1f * height / mScaleFactor);
-                    Bitmap bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
-                    Canvas canvas = new Canvas(bitmap);
-                    float scale = 1f / mScaleFactor;
-                    float dx = x1 - x;
-                    float dy = y1 - y;
-                    canvas.scale(scale, scale);
-                    canvas.translate(dx, dy);
-                    Log.d("Wbj", "onClick, x: " + x + ", y: " + y + ", x1: " + x1 + ", y1: " + y1 + ", scale: " + scale + ", dx: " + dx + ", dy: " + dy);
-                    Log.d("Wbj", "onClick, width: " + width + ", height: " + height + ", bitmapWidth: " + bitmapWidth + ", bitmapHeight: " + bitmapHeight);
-                    mRecyclerView.draw(canvas);
-                    Bitmap bg = null;
-                    if (topViewBlur.getBackground() instanceof BitmapDrawable) {
-                        bg = ((BitmapDrawable) topViewBlur.getBackground()).getBitmap();
-                    }
-                    topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
-                    if (bg != null && !bg.isRecycled()) {
-                        bg.recycle();
-                    }*/
-
-                    topViewBlur.getLocationOnScreen(location);
-                    x = location[0];
-                    y = location[1];
-                    Rect rect = new Rect();
-                    rect.set(x, y, x + topViewBlur.getWidth(), y + topViewBlur.getHeight());
-                    Bitmap bitmap = intersectsViewBitmap(mRecyclerView, rect);
-                    topViewBlur.setImageBitmap(bitmap);
-                    /*Bitmap bg = null;
-                    if (topViewBlur.getBackground() instanceof BitmapDrawable) {
-                        bg = ((BitmapDrawable) topViewBlur.getBackground()).getBitmap();
-                    }
-                    topViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
-                    if (bg != null && !bg.isRecycled()) {
-                        bg.recycle();
-                    }*/
-
+                    Log.d("Wbj", "RecyclerView onScrollChanged");
+                    updateBlurViewBackground(activity.getTopViewBlur(), mRecyclerView);
                 }
             });
         }
 
-    }
-
-    /**
-     * @param view 要截取的View
-     * @param rect 要截取的区域
-     * @return bitmap: View的区域位图
-     */
-    public static Bitmap intersectsViewBitmap(View view, Rect rect) {
-        //获取View的位置及边界信息
-        int[] location = new int[2];
-        view.getLocationOnScreen(location);
-        int x = location[0];
-        int y = location[1];
-        Rect viewRect = new Rect();
-        viewRect.set(x, y, x + view.getWidth(), y + view.getHeight());
-
-        if (viewRect.contains(rect)) { //要截取的区域要在View的区域之中
-            Bitmap bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-            float dx = x - rect.left;
-            float dy = y - rect.top;
-            canvas.translate(dx, dy); //平移到要截取的位置
-            view.draw(canvas);
-
-            return bitmap;
-        }
-
-        return null;
     }
 
     private void updateBlurViewBackground(View viewBlur, View viewBlurred) {
@@ -295,10 +202,6 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
     public void setRadius(int radius) {
         mRadius = radius;
     }
-
-    RectF clipRect = new RectF();
-
-    private final ExecutorService mThreadPool = Executors.newFixedThreadPool(3);
 
     @Override
     public void onDestroy() {

@@ -4,8 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,12 +35,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlurActivity extends AppCompatActivity {
-    private RealBlur mRealBlur;
     private final SuhengRecyclerFragment2 mFobRecyclerFrg2 = new SuhengRecyclerFragment2();
     private final SuhengRecyclerFragment3 mFobRecyclerFrg3 = new SuhengRecyclerFragment3();
     private final SuhengScrollFragment mSuhengScrollFragment = new SuhengScrollFragment();
     private SuhengBaseFragment mFrgCurrent;
-    private View mViewBlur;
+    private View mTopViewBlur;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,14 +56,14 @@ public class BlurActivity extends AppCompatActivity {
         if (actionBar != null) {
             Log.d("Wbj", "getActionBarHeight: " + actionBar.getHeight());
         }*/
-        mRealBlur = new RealBlur();
 
+        RealBlur realBlur = new RealBlur();
+        View mViewBlur;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             mViewBlur = findViewById(R.id.foot_bar_blur12);
         } else {
             mViewBlur = findViewById(R.id.foot_bar_root);
         }
-        //mViewBlur = findViewById(R.id.foot_bar_cover);
         ViewGroup barTabLayout = findViewById(R.id.foot_bar_tab_layout);
         ViewPager2 viewPager = findViewById(R.id.fragment_container);
 
@@ -68,7 +71,7 @@ public class BlurActivity extends AppCompatActivity {
         frgs.add(mFobRecyclerFrg2);
         //frgs.add(mFobRecyclerFrg3);
         //frgs.add(mSuhengScrollFragment);
-        mFrgCurrent = mFobRecyclerFrg2;
+        mFrgCurrent = frgs.get(0);
 
         viewPager.setAdapter(new FragmentStateAdapter(this) {
             @NonNull
@@ -93,11 +96,10 @@ public class BlurActivity extends AppCompatActivity {
                     child.setSelected(i == position);
                 }
 
-                //mFootBar.setItemSelectState(position);
                 int item = position % frgs.size();
                 viewPager.setCurrentItem(item);
                 SuhengBaseFragment fragment = frgs.get(item);
-                setViewBlurred(fragment.getBlurredView());
+                realBlur.updateViewBlurred(fragment.getBlurredView());
             }
         });
         viewPager.setCurrentItem(0);
@@ -132,19 +134,69 @@ public class BlurActivity extends AppCompatActivity {
             });
         }
 
-        this.setViewBlurred(mFrgCurrent.getBlurredView());
+        realBlur.setViewBlurredAndBlur(mFrgCurrent.getBlurredView(), mViewBlur);
         //this.setViewContainerBg();
 
-        /*View viewCover = findViewById(R.id.foot_bar_cover);
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.girl_gaitubao);
-        int radius = 13;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            RenderEffect blurEffect = RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.CLAMP);
-            viewCover.setRenderEffect(blurEffect);
-            viewCover.setBackground(new BitmapDrawable(getResources(), bitmap));
-        } else {
-            viewCover.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, radius)));
-        }*/
+        mTopViewBlur = findViewById(R.id.frg_fob_image_blur);
+        mTopViewBlur.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int[] location = new int[2];
+                mViewBlur.getLocationOnScreen(location);
+                int x = location[0];
+                int y = location[1];
+
+                View blurredView = mFrgCurrent.getBlurredView();
+                if (blurredView == null) {
+                    return;
+                }
+                /*blurredView.getLocationOnScreen(location);
+                int x1 = location[0];
+                int y1 = location[1];
+
+                int scaleFactor = 6;
+                int width = mViewBlur.getWidth();
+                int height = mViewBlur.getHeight();
+                int bitmapWidth = (int) Math.ceil(1f * width / scaleFactor);
+                int bitmapHeight = (int) Math.ceil(1f * height / scaleFactor);
+                Bitmap bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
+                Canvas canvas = new Canvas(bitmap);
+                float scale = 1f / scaleFactor;
+                float dx = x1 - x;
+                float dy = y1 - y;
+                canvas.scale(scale, scale);
+                canvas.translate(dx, dy);
+                Log.d("Wbj", "onClick, x: " + x + ", y: " + y + ", x1: " + x1 + ", y1: " + y1 + ", scale: " + scale + ", dx: " + dx + ", dy: " + dy);
+                Log.d("Wbj", "onClick, width: " + width + ", height: " + height + ", bitmapWidth: " + bitmapWidth + ", bitmapHeight: " + bitmapHeight);
+                blurredView.draw(canvas);
+                Bitmap bg = null;
+                if (mTopViewBlur.getBackground() instanceof BitmapDrawable) {
+                    bg = ((BitmapDrawable) mTopViewBlur.getBackground()).getBitmap();
+                }
+                mTopViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
+                if (bg != null && !bg.isRecycled()) {
+                    bg.recycle();
+                }*/
+
+                mTopViewBlur.getLocationOnScreen(location);
+                x = location[0];
+                y = location[1];
+                Rect rect = new Rect();
+                rect.set(x, y, x + mTopViewBlur.getWidth(), y + mTopViewBlur.getHeight());
+                Bitmap bitmap = intersectsViewBitmap(blurredView, rect);
+                //topViewBlur.setImageBitmap(bitmap);
+
+                Bitmap bg = null;
+                if (mTopViewBlur.getBackground() instanceof BitmapDrawable) {
+                    bg = ((BitmapDrawable) mTopViewBlur.getBackground()).getBitmap();
+                }
+                mTopViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
+                if (bg != null && !bg.isRecycled()) {
+                    bg.recycle();
+                }
+
+            }
+        });
     }
 
     private void setViewContainerBg() {
@@ -172,16 +224,8 @@ public class BlurActivity extends AppCompatActivity {
         }
     }
 
-    public void setViewBlurred(View viewBlurred) {
-        mRealBlur.setViewBlurredAndBlur(viewBlurred, mViewBlur);
-    }
-
-    public View getViewBlur() {
-        return mViewBlur;
-    }
-
-    public RealBlur getDynamicBlur() {
-        return mRealBlur;
+    public View getTopViewBlur() {
+        return mTopViewBlur;
     }
 
     public static int getStatusBarHeight(Context context) {
@@ -253,6 +297,34 @@ public class BlurActivity extends AppCompatActivity {
             y = location2[1];
             Log.d("Wbj", "getLocationInSurface, x: " + x + ", y:" + y);
         }
+    }
+
+    /**
+     * @param view 要截取的View
+     * @param rect 要截取的区域
+     * @return bitmap: View的区域位图
+     */
+    public static Bitmap intersectsViewBitmap(View view, Rect rect) {
+        //获取View的位置及边界信息
+        int[] location = new int[2];
+        view.getLocationOnScreen(location);
+        int x = location[0];
+        int y = location[1];
+        Rect viewRect = new Rect();
+        viewRect.set(x, y, x + view.getWidth(), y + view.getHeight());
+
+        if (viewRect.contains(rect)) { //要截取的区域要在View的区域之中
+            Bitmap bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            float dx = x - rect.left;
+            float dy = y - rect.top;
+            canvas.translate(dx, dy); //平移到要截取的位置
+            view.draw(canvas);
+
+            return bitmap;
+        }
+
+        return null;
     }
 
 }
