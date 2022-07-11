@@ -1,5 +1,6 @@
 package com.suheng.structure.view.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -9,9 +10,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyCharacterMap;
@@ -20,10 +21,13 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
@@ -39,23 +43,19 @@ public class BlurActivity extends AppCompatActivity {
     private final SuhengRecyclerFragment3 mFobRecyclerFrg3 = new SuhengRecyclerFragment3();
     private final SuhengScrollFragment mSuhengScrollFragment = new SuhengScrollFragment();
     private SuhengBaseFragment mFrgCurrent;
-    private View mTopViewBlur;
+    private ImageView mTopViewBlur;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blur);
 
-        /*DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         Log.d("Wbj", "getDisplayMetrics: " + displayMetrics.widthPixels + ", " + displayMetrics.heightPixels);
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
         Log.d("Wbj", "getRealMetrics: " + metrics.widthPixels + ", " + metrics.heightPixels);
         Log.d("Wbj", "getStatusBarHeight: " + getStatusBarHeight(this));
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            Log.d("Wbj", "getActionBarHeight: " + actionBar.getHeight());
-        }*/
 
         RealBlur realBlur = new RealBlur();
         View mViewBlur;
@@ -68,9 +68,9 @@ public class BlurActivity extends AppCompatActivity {
         ViewPager2 viewPager = findViewById(R.id.fragment_container);
 
         List<SuhengBaseFragment> frgs = new ArrayList<>();
-        frgs.add(mFobRecyclerFrg2);
+        //frgs.add(mFobRecyclerFrg2);
         //frgs.add(mFobRecyclerFrg3);
-        //frgs.add(mSuhengScrollFragment);
+        frgs.add(mSuhengScrollFragment);
         mFrgCurrent = frgs.get(0);
 
         viewPager.setAdapter(new FragmentStateAdapter(this) {
@@ -98,8 +98,8 @@ public class BlurActivity extends AppCompatActivity {
 
                 int item = position % frgs.size();
                 viewPager.setCurrentItem(item);
-                SuhengBaseFragment fragment = frgs.get(item);
-                realBlur.updateViewBlurred(fragment.getBlurredView());
+                mFrgCurrent = frgs.get(item);
+                realBlur.updateViewBlurred(mFrgCurrent.getBlurredView());
             }
         });
         viewPager.setCurrentItem(0);
@@ -142,7 +142,8 @@ public class BlurActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int[] location = new int[2];
-                mViewBlur.getLocationOnScreen(location);
+                //mViewBlur.getLocationOnScreen(location);
+                mTopViewBlur.getLocationOnScreen(location);
                 int x = location[0];
                 int y = location[1];
 
@@ -154,7 +155,7 @@ public class BlurActivity extends AppCompatActivity {
                 int x1 = location[0];
                 int y1 = location[1];
 
-                int scaleFactor = 6;
+                int scaleFactor = 1;
                 int width = mViewBlur.getWidth();
                 int height = mViewBlur.getHeight();
                 int bitmapWidth = (int) Math.ceil(1f * width / scaleFactor);
@@ -165,9 +166,10 @@ public class BlurActivity extends AppCompatActivity {
                 float dx = x1 - x;
                 float dy = y1 - y;
                 canvas.scale(scale, scale);
-                canvas.translate(dx, dy);
+                canvas.translate(dx, dy*//*+blurredView.getScrollY()*//*);
                 Log.d("Wbj", "onClick, x: " + x + ", y: " + y + ", x1: " + x1 + ", y1: " + y1 + ", scale: " + scale + ", dx: " + dx + ", dy: " + dy);
-                Log.d("Wbj", "onClick, width: " + width + ", height: " + height + ", bitmapWidth: " + bitmapWidth + ", bitmapHeight: " + bitmapHeight);
+                Log.d("Wbj", "onClick, width: " + width + ", height: " + height + ", bitmapWidth: " + bitmapWidth + ", bitmapHeight: " + bitmapHeight
+                        + ", blurredWidth: " + blurredView.getWidth() + "---" + blurredView.getMeasuredWidth() + ", blurredHeight: " + blurredView.getHeight() + "---" + blurredView.getMeasuredHeight());
                 blurredView.draw(canvas);
                 Bitmap bg = null;
                 if (mTopViewBlur.getBackground() instanceof BitmapDrawable) {
@@ -178,23 +180,13 @@ public class BlurActivity extends AppCompatActivity {
                     bg.recycle();
                 }*/
 
-                mTopViewBlur.getLocationOnScreen(location);
+                //mTopViewBlur.getLocationOnScreen(location);
                 x = location[0];
                 y = location[1];
                 Rect rect = new Rect();
                 rect.set(x, y, x + mTopViewBlur.getWidth(), y + mTopViewBlur.getHeight());
                 Bitmap bitmap = intersectsViewBitmap(blurredView, rect);
-                //topViewBlur.setImageBitmap(bitmap);
-
-                Bitmap bg = null;
-                if (mTopViewBlur.getBackground() instanceof BitmapDrawable) {
-                    bg = ((BitmapDrawable) mTopViewBlur.getBackground()).getBitmap();
-                }
-                mTopViewBlur.setBackground(new BitmapDrawable(getResources(), bitmap));
-                if (bg != null && !bg.isRecycled()) {
-                    bg.recycle();
-                }
-
+                mTopViewBlur.setImageBitmap(bitmap);
             }
         });
     }
@@ -301,10 +293,11 @@ public class BlurActivity extends AppCompatActivity {
 
     /**
      * @param view 要截取的View
-     * @param rect 要截取的区域
+     * @param r    要截取的区域
      * @return bitmap: View的区域位图
      */
-    public static Bitmap intersectsViewBitmap(View view, Rect rect) {
+    @SuppressLint("RestrictedApi")
+    public static Bitmap intersectsViewBitmap(View view, Rect r) {
         //获取View的位置及边界信息
         int[] location = new int[2];
         view.getLocationOnScreen(location);
@@ -313,18 +306,50 @@ public class BlurActivity extends AppCompatActivity {
         Rect viewRect = new Rect();
         viewRect.set(x, y, x + view.getWidth(), y + view.getHeight());
 
-        if (viewRect.contains(rect)) { //要截取的区域要在View的区域之中
-            Bitmap bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-            float dx = x - rect.left;
-            float dy = y - rect.top;
-            canvas.translate(dx, dy); //平移到要截取的位置
-            view.draw(canvas);
+        Rect rect = new Rect(r);
+        Log.d("Wbj", "before intersect rect: " + rect);
+        boolean intersect = rect.intersect(viewRect);
+        if (intersect) { //要截取的区域要在View的区域之中
+            Log.i("Wbj", "after intersect rect: " + rect);
+            Bitmap bitmap;
+            int dy = y - rect.top;
+            int dx = x - rect.left;
+            if ((view instanceof NestedScrollView) || (view instanceof ScrollView)) {
+                int scrollRange, scrollY;
+                if (view instanceof NestedScrollView) {
+                    NestedScrollView scrollView = (NestedScrollView) view;
+                    scrollRange = scrollView.computeVerticalScrollRange();
+                } else {
+                    //ScrollView scrollView = (ScrollView) view;
+                    scrollRange = 0;
+                }
+
+                if (scrollRange == 0) {
+                    return null;
+                }
+
+                scrollY = view.getScrollY();
+                Bitmap viewBitmap = Bitmap.createBitmap(viewRect.width(), scrollRange, Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(viewBitmap);
+                view.draw(canvas);
+
+                bitmap = Bitmap.createBitmap(viewBitmap, -dx, scrollY - dy, rect.width(), rect.height()); //截取片断
+
+                if (!viewBitmap.isRecycled()) {
+                    viewBitmap.recycle();
+                }
+            } else {
+                bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+                canvas.translate(dx, dy); //平移到要截取的位置
+                view.draw(canvas);
+            }
 
             return bitmap;
+        } else { //两个View没有相交部分
+            Log.w("Wbj", "Hasn't intersect region between two views!");
+            return null;
         }
-
-        return null;
     }
 
 }

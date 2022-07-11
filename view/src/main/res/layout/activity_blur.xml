@@ -13,8 +13,7 @@
         android:id="@+id/frg_fob_image_blur"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_gravity="top"
-        android:background="@android:color/holo_purple" />
+        android:layout_gravity="top" />
 
     <FrameLayout
         android:id="@+id/foot_bar_root"

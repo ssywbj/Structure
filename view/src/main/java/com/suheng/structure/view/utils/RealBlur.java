@@ -1,8 +1,10 @@
 package com.suheng.structure.view.utils;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RenderEffect;
 import android.graphics.Shader;
@@ -11,8 +13,10 @@ import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ScrollView;
 
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 
 import com.google.android.renderscript.Toolkit;
 
@@ -65,6 +69,9 @@ public class RealBlur implements Runnable {
         mViewBlur = viewBlur;
     }
 
+    private boolean mIsScrollView;
+    private Bitmap mScrollViewBitmap;
+
     public void updateViewBlurred(View viewBlurred) {
         if (viewBlurred == null) {
             this.stopBlurred();
@@ -92,13 +99,16 @@ public class RealBlur implements Runnable {
         this.stopBlurred();
 
         mViewBlurred = viewBlurred;
+        mIsScrollView = ((mViewBlurred instanceof NestedScrollView) || (mViewBlurred instanceof ScrollView));
+
         ViewTreeObserver viewTreeObserver = mViewBlurred.getViewTreeObserver();
         if (mGlobalLayoutListener == null) {
             mGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
                     boolean alive = viewTreeObserver.isAlive();
-                    Log.i("Wbj", "viewTreeObserver, onGlobalLayout, alive: " + alive + ", getMeasuredWidth: " + mViewBlurred.getMeasuredWidth());
+                    Log.i("Wbj", "viewTreeObserver, onGlobalLayout, alive: " + alive + ", getWidth: " + mViewBlurred.getWidth() + ", getHeight: " + mViewBlurred.getHeight());
+
                     updateBlurViewBackground();
                     /*if (alive) {
                         viewTreeObserver.removeOnGlobalLayoutListener(mGlobalLayoutListener);
@@ -197,6 +207,7 @@ public class RealBlur implements Runnable {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Nullable
     public Bitmap loadViewBlurBitmap() {
         boolean intersects = Rect.intersects(mRectBlur, mRectBlurred);
@@ -215,7 +226,7 @@ public class RealBlur implements Runnable {
         int x1 = location[0];
         int y1 = location[1];
 
-        int width = mViewBlur.getWidth();
+        int width = mIsScrollView ? mViewBlurred.getWidth() : mViewBlur.getWidth();
         int height = mViewBlur.getHeight();
         int bitmapWidth = (int) Math.ceil(1f * width / mScaleFactor);
         int bitmapHeight = (int) Math.ceil(1f * height / mScaleFactor);
@@ -223,18 +234,53 @@ public class RealBlur implements Runnable {
             return null;
         }
         Log.d("Wbj", "width: " + width + ", height: " + height + ", bitmapWidth: " + bitmapWidth + ", bitmapHeight: " + bitmapHeight);
-        if (mViewBlurBitmap == null) {
-            mViewBlurBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
-            mViewBlurCanvas = new Canvas(mViewBlurBitmap);
-            float scale = 1f / mScaleFactor;
-            mViewBlurCanvas.scale(scale, scale);
-            float dx = x1 - x;
-            float dy = y1 - y;
-            mViewBlurCanvas.translate(dx, dy);
-            Log.d("Wbj", "x: " + x + ", y: " + y + ", x1: " + x1 + ", y1: " + y1 + ", scale: " + scale + ", dx: " + dx + ", dy: " + dy);
+
+        int dx = x1 - x;
+        int dy = y1 - y;
+        float scale = 1f / mScaleFactor;
+        Log.d("Wbj", "x: " + x + ", y: " + y + ", x1: " + x1 + ", y1: " + y1 + ", scale: " + scale + ", dx: " + dx + ", dy: " + dy);
+
+        if (mIsScrollView) {
+            if (mScrollViewBitmap == null) {
+                int scrollRange = 0;
+                if (mViewBlurred instanceof NestedScrollView) {
+                    NestedScrollView scrollView = (NestedScrollView) mViewBlurred;
+                    scrollRange = scrollView.computeVerticalScrollRange();
+                }
+                bitmapHeight = (int) Math.ceil(1f * scrollRange / mScaleFactor);
+                if (bitmapHeight == 0) {
+                    return null;
+                }
+
+                mScrollViewBitmap = Bitmap.createBitmap(width, scrollRange, Bitmap.Config.ARGB_4444);
+                //mScrollViewBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
+                Canvas canvas = new Canvas(mScrollViewBitmap);
+                //canvas.scale(scale, scale);
+                mViewBlurred.draw(canvas);
+            }
+
+            if (mScrollViewBitmap != null) {
+                Bitmap bitmap = mViewBlurBitmap;
+                int scrollY = mViewBlurred.getScrollY();
+                Matrix matrix = new Matrix();
+                matrix.setScale(scale, scale);
+                //mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, -dx, scrollY - dy, width, height, matrix, false); //截取片断
+                mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, -dx, scrollY - dy, width, height); //截取片断
+                if (bitmap != null && !bitmap.isRecycled()) {
+                    bitmap.recycle();
+                }
+            }
+        } else {
+            if (mViewBlurBitmap == null) {
+                mViewBlurBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
+                mViewBlurCanvas = new Canvas(mViewBlurBitmap);
+                mViewBlurCanvas.scale(scale, scale);
+                mViewBlurCanvas.translate(dx, dy);
+            }
+
+            mViewBlurBitmap.eraseColor(mEraseColor);
+            mViewBlurred.draw(mViewBlurCanvas);
         }
-        mViewBlurBitmap.eraseColor(mEraseColor);
-        mViewBlurred.draw(mViewBlurCanvas);
 
         return mViewBlurBitmap;
     }

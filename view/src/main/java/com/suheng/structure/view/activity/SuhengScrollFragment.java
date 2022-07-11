@@ -101,7 +101,22 @@ public class SuhengScrollFragment extends SuhengBaseFragment {
             imageView2.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, radius)));
         }
 
-        //((NestedScrollView) mBlurredView).setFillViewport(true);
+        /*if (mBlurredView instanceof NestedScrollView) {
+            NestedScrollView scrollView = (NestedScrollView) mBlurredView;
+            @SuppressLint("RestrictedApi") int scrollRange = scrollView.computeVerticalScrollRange();
+            @SuppressLint("RestrictedApi") int scrollOffset = scrollView.computeVerticalScrollOffset();
+            int scrollY = scrollView.getScrollY();
+            Log.d("Wbj", "view blurred, scrollRange: " + scrollRange + ", scrollOffset:" + scrollOffset + ", scrollY: " + scrollY);
+            scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+                @Override
+                public void onScrollChanged() {
+                    @SuppressLint("RestrictedApi") int scrollRange = scrollView.computeVerticalScrollRange();
+                    @SuppressLint("RestrictedApi") int scrollOffset = scrollView.computeVerticalScrollOffset();
+                    int scrollY = scrollView.getScrollY();
+                    Log.v("Wbj", "view blurred, scrollRange: " + scrollRange + ", scrollOffset:" + scrollOffset + ", scrollY: " + scrollY);
+                }
+            });
+        }*/
     }
 
     @Override

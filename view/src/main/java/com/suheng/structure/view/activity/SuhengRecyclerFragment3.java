@@ -197,7 +197,7 @@ public class SuhengRecyclerFragment3 extends SuhengBaseFragment {
     @Nullable
     @Override
     public View getBlurredView() {
-        return mRecyclerView;
+        return null;
     }
 
     private class ContentAdapter extends RecyclerAdapter<ImageInfo, RecyclerAdapter.Holder> {

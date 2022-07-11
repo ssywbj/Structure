@@ -118,7 +118,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                 public void onScrolled(@NonNull RecyclerView recyclerView, int rdx, int rdy) {
                     super.onScrolled(recyclerView, rdx, rdy);
                     Log.d("Wbj", "RecyclerView onScrollChanged");
-                    updateBlurViewBackground(activity.getTopViewBlur(), mRecyclerView);
+                    //updateBlurViewBackground(activity.getTopViewBlur(), mRecyclerView);
                 }
             });
         }
