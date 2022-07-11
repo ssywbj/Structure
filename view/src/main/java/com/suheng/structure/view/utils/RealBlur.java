@@ -252,10 +252,10 @@ public class RealBlur implements Runnable {
                     return null;
                 }
 
-                mScrollViewBitmap = Bitmap.createBitmap(width, scrollRange, Bitmap.Config.ARGB_4444);
-                //mScrollViewBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
+                //mScrollViewBitmap = Bitmap.createBitmap(width, scrollRange, Bitmap.Config.ARGB_4444);
+                mScrollViewBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
                 Canvas canvas = new Canvas(mScrollViewBitmap);
-                //canvas.scale(scale, scale);
+                canvas.scale(scale, scale);
                 mViewBlurred.draw(canvas);
             }
 
@@ -264,8 +264,9 @@ public class RealBlur implements Runnable {
                 int scrollY = mViewBlurred.getScrollY();
                 Matrix matrix = new Matrix();
                 matrix.setScale(scale, scale);
-                //mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, -dx, scrollY - dy, width, height, matrix, false); //截取片断
-                mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, -dx, scrollY - dy, width, height); //截取片断
+                mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, -dx / mScaleFactor, (scrollY - dy) / mScaleFactor
+                        , width / mScaleFactor, height / mScaleFactor); //截取片断
+                //mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, -dx, scrollY - dy, width, height); //截取片断
                 if (bitmap != null && !bitmap.isRecycled()) {
                     bitmap.recycle();
                 }

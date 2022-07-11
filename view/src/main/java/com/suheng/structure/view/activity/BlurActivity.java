@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -32,6 +33,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.renderscript.Toolkit;
 import com.suheng.structure.view.R;
 import com.suheng.structure.view.utils.RealBlur;
 
@@ -142,8 +144,8 @@ public class BlurActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int[] location = new int[2];
-                //mViewBlur.getLocationOnScreen(location);
-                mTopViewBlur.getLocationOnScreen(location);
+                mViewBlur.getLocationOnScreen(location);
+                //mTopViewBlur.getLocationOnScreen(location);
                 int x = location[0];
                 int y = location[1];
 
@@ -186,7 +188,8 @@ public class BlurActivity extends AppCompatActivity {
                 Rect rect = new Rect();
                 rect.set(x, y, x + mTopViewBlur.getWidth(), y + mTopViewBlur.getHeight());
                 Bitmap bitmap = intersectsViewBitmap(blurredView, rect);
-                mTopViewBlur.setImageBitmap(bitmap);
+                //mTopViewBlur.setImageBitmap(bitmap);
+                mTopViewBlur.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, 15)));
             }
         });
     }
@@ -329,11 +332,17 @@ public class BlurActivity extends AppCompatActivity {
                 }
 
                 scrollY = view.getScrollY();
-                Bitmap viewBitmap = Bitmap.createBitmap(viewRect.width(), scrollRange, Bitmap.Config.ARGB_8888);
+                int factor = 3;
+                Bitmap viewBitmap = Bitmap.createBitmap(viewRect.width() / factor, scrollRange / factor, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(viewBitmap);
+                canvas.scale(1f / factor, 1f / factor);
                 view.draw(canvas);
 
-                bitmap = Bitmap.createBitmap(viewBitmap, -dx, scrollY - dy, rect.width(), rect.height()); //截取片断
+                Log.i("Wbj", "canvas w h: " + canvas.getWidth() + ", " + canvas.getHeight());
+
+                //bitmap = Bitmap.createBitmap(viewBitmap, -dx, scrollY - dy, rect.width(), rect.height()); //截取片断
+                bitmap = Bitmap.createBitmap(viewBitmap, -dx / factor, (scrollY - dy) / factor, rect.width() / factor, rect.height() / factor); //截取片断
+                //bitmap = viewBitmap; //截取片断
 
                 if (!viewBitmap.isRecycled()) {
                     viewBitmap.recycle();
