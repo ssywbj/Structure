@@ -70,7 +70,7 @@ public class BlurActivity extends AppCompatActivity {
         ViewPager2 viewPager = findViewById(R.id.fragment_container);
 
         List<SuhengBaseFragment> frgs = new ArrayList<>();
-        //frgs.add(mFobRecyclerFrg2);
+        frgs.add(mFobRecyclerFrg2);
         //frgs.add(mFobRecyclerFrg3);
         frgs.add(mSuhengScrollFragment);
         mFrgCurrent = frgs.get(0);

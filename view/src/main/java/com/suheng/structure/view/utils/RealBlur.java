@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RenderEffect;
 import android.graphics.Shader;
@@ -22,6 +21,7 @@ import com.google.android.renderscript.Toolkit;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -185,12 +185,13 @@ public class RealBlur implements Runnable {
             mUIRunnable.updateBlurViewBackground(mViewBlur, mViewBlurBg);
         } else {
             if (mThreadPool == null) {
-                int processors = Runtime.getRuntime().availableProcessors();
-                int executorThreads = (processors <= 3 ? 1 : processors / 2);
-                mThreadPool = Executors.newFixedThreadPool(executorThreads);
+                mThreadPool = Executors.newSingleThreadExecutor();
             }
-
             mThreadPool.execute(this);
+
+            /*Bitmap blurredBitmap = Toolkit.INSTANCE.blur(viewBlurBitmap, mRadius);
+            mUIRunnable.setBitmap(blurredBitmap);
+            mUIRunnable.updateBlurViewBackground(mViewBlur, mViewBlurBg);*/
         }
     }
 
@@ -252,18 +253,24 @@ public class RealBlur implements Runnable {
                     return null;
                 }
 
+                int[] colors = new int[bitmapWidth * bitmapHeight];
+                Arrays.fill(colors, mEraseColor);
+                Bitmap bitmap = Bitmap.createBitmap(colors, bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
                 //mScrollViewBitmap = Bitmap.createBitmap(width, scrollRange, Bitmap.Config.ARGB_4444);
-                mScrollViewBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
+                //mScrollViewBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
+                mScrollViewBitmap = bitmap.copy(bitmap.getConfig(), true);
                 Canvas canvas = new Canvas(mScrollViewBitmap);
                 canvas.scale(scale, scale);
                 mViewBlurred.draw(canvas);
+
+                if (!bitmap.isRecycled()) {
+                    bitmap.recycle();
+                }
             }
 
             if (mScrollViewBitmap != null) {
                 Bitmap bitmap = mViewBlurBitmap;
                 int scrollY = mViewBlurred.getScrollY();
-                Matrix matrix = new Matrix();
-                matrix.setScale(scale, scale);
                 mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, -dx / mScaleFactor, (scrollY - dy) / mScaleFactor
                         , width / mScaleFactor, height / mScaleFactor); //截取片断
                 //mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, -dx, scrollY - dy, width, height); //截取片断

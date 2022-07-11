@@ -59,7 +59,9 @@
         <activity android:name=".activity.ScrollGestureActivity" />
         <activity android:name=".activity.DampingActivity" />
         <activity android:name=".activity.SVGDemoActivity" />
-        <activity android:name=".activity.BlurActivity" />
+        <activity 
+            android:name=".activity.BlurActivity"
+            android:exported="true" />
 
     </application>
 
