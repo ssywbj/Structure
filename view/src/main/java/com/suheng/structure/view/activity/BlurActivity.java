@@ -13,7 +13,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyCharacterMap;
@@ -52,12 +51,12 @@ public class BlurActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blur);
 
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        /*DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         Log.d("Wbj", "getDisplayMetrics: " + displayMetrics.widthPixels + ", " + displayMetrics.heightPixels);
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
         Log.d("Wbj", "getRealMetrics: " + metrics.widthPixels + ", " + metrics.heightPixels);
-        Log.d("Wbj", "getStatusBarHeight: " + getStatusBarHeight(this));
+        Log.d("Wbj", "getStatusBarHeight: " + getStatusBarHeight(this));*/
 
         RealBlur realBlur = new RealBlur();
         View mViewBlur;
@@ -90,7 +89,6 @@ public class BlurActivity extends AppCompatActivity {
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-                Log.d("Wbj", "onPageSelected, position: " + position);
                 super.onPageSelected(position);
                 int childCount = barTabLayout.getChildCount();
                 for (int i = 0; i < childCount; i++) {
@@ -101,7 +99,20 @@ public class BlurActivity extends AppCompatActivity {
                 int item = position % frgs.size();
                 viewPager.setCurrentItem(item);
                 mFrgCurrent = frgs.get(item);
-                realBlur.updateViewBlurred(mFrgCurrent.getBlurredView());
+
+                Log.d("Wbj", "onPageSelected, position: " + position + ", isAdded: " + mFrgCurrent.isAdded() + ", blurredView: " + mFrgCurrent.getBlurredView());
+                if (mFrgCurrent.isAdded()) {
+                    realBlur.updateViewBlurred(mFrgCurrent.getBlurredView());
+                } else {
+                    mViewBlur.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.v("Wbj", "postDelayed, onPageSelected, position: " + position + ", isAdded: " + mFrgCurrent.isAdded() + ", blurredView: " + mFrgCurrent.getBlurredView());
+                            realBlur.updateViewBlurred(mFrgCurrent.getBlurredView());
+                        }
+                    }, 60);
+                }
+
             }
         });
         viewPager.setCurrentItem(0);

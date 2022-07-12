@@ -9,6 +9,7 @@ import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.TouchDelegate;
 import android.view.View;
@@ -28,6 +29,7 @@ public class SuhengScrollFragment extends SuhengBaseFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d("Wbj", "onCreateView, onCreateView");
         return inflater.inflate(R.layout.fragment_fob_scroll, container, false);
     }
 
@@ -35,6 +37,7 @@ public class SuhengScrollFragment extends SuhengBaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mBlurredView = view.findViewById(R.id.fob_scroll);
+        Log.d("Wbj", "onViewCreated, onViewCreated");
 
         View layoutTextDelegate = view.findViewById(R.id.layout_delegate);
         View textDelegate = view.findViewById(R.id.text_delegate);
@@ -121,6 +124,7 @@ public class SuhengScrollFragment extends SuhengBaseFragment {
 
     @Override
     public View getBlurredView() {
+        Log.d("Wbj", "getBlurredView, blurred view: " + mBlurredView);
         return mBlurredView;
     }
 
