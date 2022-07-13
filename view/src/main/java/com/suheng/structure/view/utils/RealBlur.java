@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.RenderEffect;
-import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.util.Log;
@@ -23,7 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class RealBlur {
-
+    private static final String TAG = RealBlur.class.getSimpleName();
     private final Rect mRectBlur = new Rect();
     private final Rect mRectBlurred = new Rect();
     private View mViewBlurred;
@@ -35,7 +33,7 @@ public class RealBlur {
     private Bitmap mViewBlurBitmap;
     private BitmapDrawable mViewBlurBg;
 
-    private int mRadius = 15;
+    private int mRadius = 13;
     private int mScaleFactor = 6;
     private int mEraseColor = Color.WHITE;
 
@@ -48,22 +46,17 @@ public class RealBlur {
         }
 
         mViewBlur = viewBlur;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            mViewBlur.setRenderEffect(RenderEffect.createBlurEffect(mRadius, mRadius, Shader.TileMode.CLAMP));
-        }
     }
 
     public void updateViewBlurred(View viewBlurred) {
         this.stopBlurred();
         if (viewBlurred == null) {
-            Log.w("Wbj", "view blurred is null, return!");
+            Log.w(TAG, "view blurred is null, return!");
             return;
         }
 
-        Log.i("Wbj", "updateViewBlurred, before stop: " + mViewBlurred);
         mViewBlurred = viewBlurred;
         mIsScrollView = ((mViewBlurred instanceof NestedScrollView) || (mViewBlurred instanceof ScrollView));
-        Log.i("Wbj", "updateViewBlurred, after stop: " + mIsScrollView + ", viewBlurred: " + viewBlurred);
 
         ViewTreeObserver viewTreeObserver = mViewBlurred.getViewTreeObserver();
         if (mGlobalLayoutListener == null) {
@@ -71,12 +64,9 @@ public class RealBlur {
                 @Override
                 public void onGlobalLayout() {
                     boolean alive = viewTreeObserver.isAlive();
-                    Log.i("Wbj", "viewTreeObserver, onGlobalLayout, alive: " + alive + ", getWidth: " + mViewBlurred.getWidth() + ", getHeight: " + mViewBlurred.getHeight());
+                    Log.i(TAG, "viewTreeObserver, onGlobalLayout, alive: " + alive);
 
                     updateBlurViewBackground();
-                    /*if (alive) {
-                        viewTreeObserver.removeOnGlobalLayoutListener(mGlobalLayoutListener);
-                    }*/
                 }
             };
             viewTreeObserver.addOnGlobalLayoutListener(mGlobalLayoutListener);
@@ -86,7 +76,7 @@ public class RealBlur {
             mScrollChangedListener = new ViewTreeObserver.OnScrollChangedListener() {
                 @Override
                 public void onScrollChanged() {
-                    Log.d("Wbj", "viewTreeObserver, onScrollChanged: " + mViewBlurred);
+                    Log.d(TAG, "viewTreeObserver, onScrollChanged: " + mViewBlurred);
                     updateBlurViewBackground();
                 }
             };
@@ -96,7 +86,6 @@ public class RealBlur {
 
     public void stopBlurred() {
         if (mViewBlurred != null && mGlobalLayoutListener != null) {
-            Log.v("Wbj", "stopBlurred, removeTreeObserver: " + mViewBlurred);
             mViewBlurred.getViewTreeObserver().removeOnScrollChangedListener(mScrollChangedListener);
             mViewBlurred.getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
             mViewBlurred = null;
@@ -115,6 +104,7 @@ public class RealBlur {
             Bitmap bitmap = mViewBlurBg.getBitmap();
             if (bitmap != null && !bitmap.isRecycled()) {
                 bitmap.recycle();
+                Log.d(TAG, "recycleViewBlurBg, ViewBlurBg.getBitmap()");
             }
             mViewBlurBg = null;
         }
@@ -122,6 +112,7 @@ public class RealBlur {
         if (mViewBlurBitmap != null) {
             if (!mViewBlurBitmap.isRecycled()) {
                 mViewBlurBitmap.recycle();
+                Log.d(TAG, "recycleViewBlurBg, ViewBlurBitmap");
             }
             mViewBlurBitmap = null;
         }
@@ -129,6 +120,7 @@ public class RealBlur {
         if (mScrollViewBitmap != null) {
             if (!mScrollViewBitmap.isRecycled()) {
                 mScrollViewBitmap.recycle();
+                Log.d(TAG, "recycleViewBlurBg, ScrollViewBitmap");
             }
             mScrollViewBitmap = null;
         }
@@ -140,43 +132,48 @@ public class RealBlur {
     }
 
     public void updateBlurViewBackground() {
+        if (mViewBlur == null || mViewBlurred == null) {
+            return;
+        }
+
         Bitmap viewBlurBitmap = this.loadViewBlurBitmap();
         if (viewBlurBitmap == null) {
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            updateBlurViewBackground(viewBlurBitmap);
-        } else {
-            updateBlurViewBackground(Toolkit.INSTANCE.blur(viewBlurBitmap, mRadius));
-        }
+        this.updateBlurViewBackground(Toolkit.INSTANCE.blur(viewBlurBitmap, mRadius));
     }
 
     private void updateBlurViewBackground(Bitmap bitmap) {
         if (mViewBlurBg == null) {
             mViewBlurBg = new BitmapDrawable(mViewBlur.getResources(), bitmap);
             mViewBlur.setBackground(mViewBlurBg);
-            Log.d("Wbj", "run, 1111111111: " + mViewBlurBg + ", realBlur.mViewBlur: " + mViewBlurred);
+            Log.d(TAG, "updateBlurViewBackground, 11111: " + mViewBlurBg);
         } else {
+            Bitmap bgBitmap = mViewBlurBg.getBitmap();
+            if (bgBitmap == null || bitmap == null) {
+                Log.d(TAG, "updateBlurViewBackground, 22222, bgBitmap or bitmap is null");
+                return;
+            }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                Log.d("Wbj", "run, 222222222: " + bitmap + ", thread: " + Thread.currentThread().getName());
+                Log.d(TAG, "updateBlurViewBackground, 22222");
                 mViewBlurBg.setBitmap(bitmap);
-                mViewBlur.invalidate();
-            } else {
-                Bitmap bgBitmap = mViewBlurBg.getBitmap();
-                if (bgBitmap == null || bitmap == null) {
-                    Log.d("Wbj", "run, 333333333 null null null");
-                    return;
+                mViewBlur.invalidateDrawable(mViewBlurBg);
+                if (!bgBitmap.isRecycled()) {
+                    Log.d(TAG, "updateBlurViewBackground, 22222 recycle bgBitmap");
+                    bgBitmap.recycle();
                 }
+            } else {
                 ByteBuffer byteBuffer = null;
                 try {
-                    Log.d("Wbj", "run, 333333333: " + bitmap + ", thread: " + Thread.currentThread().getName());
+                    Log.d(TAG, "updateBlurViewBackground, 33333");
                     byteBuffer = ByteBuffer.allocate(bitmap.getByteCount());
                     bitmap.copyPixelsToBuffer(byteBuffer);
                     bgBitmap.eraseColor(Color.TRANSPARENT);
                     bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
                 } catch (Exception e) {
-                    Log.e("Wbj", "copy bitmap to buffer fail!", e);
+                    Log.e(TAG, "copy bitmap to buffer fail!", e);
                 } finally {
                     if (!bitmap.isRecycled()) {
                         bitmap.recycle();
@@ -201,7 +198,7 @@ public class RealBlur {
         int y = location[1];
         int width = view.getWidth();
         int height = view.getHeight();
-        //Log.d("Wbj", "view location, x: " + x + ", y:" + y + ", width: " + width + ", height: " + height + ", view: " + view);
+        //Log.d(TAG, "view location, x: " + x + ", y:" + y + ", width: " + width + ", height: " + height + ", view: " + view);
         rect.left = x;
         rect.top = y;
         rect.right = rect.left + width;
@@ -217,7 +214,7 @@ public class RealBlur {
         boolean isViewBlurredLocChange = this.getViewLocation(mViewBlurred, mRectBlurred);
         boolean intersect = mRectBlur.intersect(mRectBlurred);
         if (!intersect) { //两个View没有相交部分
-            Log.w("Wbj", "Hasn't intersect region between two views!");
+            Log.w(TAG, "Hasn't intersect region between two views!");
             return null;
         }
 
@@ -233,7 +230,7 @@ public class RealBlur {
         int dx = mRectBlurred.left - mRectBlur.left;
         int dy = mRectBlurred.top - mRectBlur.top;
         float scale = 1f / mScaleFactor;
-        Log.d("Wbj", "scale: " + scale + ", dx: " + dx + ", dy: " + dy + ", isViewBlurredLocChange: " + isViewBlurredLocChange
+        Log.d(TAG, "scale: " + scale + ", dx: " + dx + ", dy: " + dy + ", isViewBlurredLocChange: " + isViewBlurredLocChange
                 + ", isViewBlurLocChange: " + isViewBlurLocChange);
 
         if ((isViewBlurLocChange || isViewBlurredLocChange)) {
@@ -256,8 +253,6 @@ public class RealBlur {
                 Arrays.fill(colors, mEraseColor);
                 Bitmap bitmap = Bitmap.createBitmap(colors, bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
                 mScrollViewBitmap = bitmap.copy(bitmap.getConfig(), true);
-                //mScrollViewBitmap = Bitmap.createBitmap(width, scrollRange, Bitmap.Config.ARGB_4444);
-                //mScrollViewBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
                 Canvas canvas = new Canvas(mScrollViewBitmap);
                 canvas.scale(scale, scale);
                 mViewBlurred.draw(canvas);
@@ -271,7 +266,6 @@ public class RealBlur {
             int scrollY = mViewBlurred.getScrollY();
             mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, -dx / mScaleFactor, (scrollY - dy) / mScaleFactor
                     , width / mScaleFactor, height / mScaleFactor); //截取片断
-            //mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, -dx, scrollY - dy, width, height); //截取片断
             if (bitmap != null && !bitmap.isRecycled()) {
                 bitmap.recycle();
             }

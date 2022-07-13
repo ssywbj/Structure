@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
+    private static final String TAG = SuhengRecyclerFragment2.class.getSimpleName();
     public static final int SPAN_COUNT = 3;
     public static final int SPAN_SPACE = 1;
     private ContentAdapter mContentAdapter;
@@ -107,7 +108,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
         activityResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
 
         if (mContext instanceof BlurActivity) {
-            BlurActivity activity = (BlurActivity) mContext;
+            mActivity = (BlurActivity) mContext;
             mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -117,13 +118,15 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int rdx, int rdy) {
                     super.onScrolled(recyclerView, rdx, rdy);
-                    Log.d("Wbj", "RecyclerView onScrollChanged");
-                    //updateBlurViewBackground(activity.getTopViewBlur(), mRecyclerView);
+                    //updateBlurViewBackground(mActivity.getTopViewBlur(), mRecyclerView);
+                    //updateBlurViewBackground(mActivity.getViewBlur(), mRecyclerView);
                 }
             });
         }
 
     }
+
+    private BlurActivity mActivity;
 
     private void updateBlurViewBackground(View viewBlur, View viewBlurred) {
         int[] location = new int[2];
@@ -141,7 +144,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
         if (bitmapWidth == 0 || bitmapHeight == 0) {
             return;
         }
-        Log.d("Wbj", "width: " + width + ", height: " + height + ", bitmapWidth: " + bitmapWidth + ", bitmapHeight: " + bitmapHeight);
+        Log.d(TAG, "width: " + width + ", height: " + height + ", bitmapWidth: " + bitmapWidth + ", bitmapHeight: " + bitmapHeight);
         if (mViewBlurBitmap == null) {
             mViewBlurBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
             mViewBlurCanvas = new Canvas(mViewBlurBitmap);
@@ -150,7 +153,7 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
             float dy = y1 - y;
             mViewBlurCanvas.scale(scale, scale);
             mViewBlurCanvas.translate(dx, dy);
-            Log.d("Wbj", "x: " + x + ", y: " + y + ", x1: " + x1 + ", y1: " + y1 + ", scale: " + scale + ", dx: " + dx + ", dy: " + dy);
+            Log.d(TAG, "x: " + x + ", y: " + y + ", x1: " + x1 + ", y1: " + y1 + ", scale: " + scale + ", dx: " + dx + ", dy: " + dy);
         }
         viewBlurred.draw(mViewBlurCanvas);
 
@@ -167,19 +170,20 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 mViewBlurBg.setBitmap(blurredBitmap);
+                viewBlur.invalidateDrawable(mViewBlurBg);
                 if (!bgBitmap.isRecycled()) {
-                    Log.d("Wbj", "recycle, bgBitmap: " + bgBitmap);
+                    Log.d(TAG, "recycle, bgBitmap: " + bgBitmap);
                     bgBitmap.recycle();
                 }
             } else {
                 try {
                     ByteBuffer byteBuffer = ByteBuffer.allocate(blurredBitmap.getByteCount());
                     blurredBitmap.copyPixelsToBuffer(byteBuffer);
-                    Log.d("Wbj", "run, 333333333: " + bgBitmap + ", thread: " + Thread.currentThread().getName());
+                    Log.d(TAG, "run, 333333333: " + bgBitmap + ", thread: " + Thread.currentThread().getName());
                     bgBitmap.eraseColor(Color.TRANSPARENT);
                     bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
                 } catch (Exception e) {
-                    Log.e("Wbj", "copy blurredBitmap bitmap fail!", e);
+                    Log.e(TAG, "copy blurredBitmap bitmap fail!", e);
                 } finally {
                     if (!blurredBitmap.isRecycled()) {
                         blurredBitmap.recycle();

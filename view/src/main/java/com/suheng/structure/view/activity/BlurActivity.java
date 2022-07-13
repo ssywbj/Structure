@@ -45,6 +45,7 @@ public class BlurActivity extends AppCompatActivity {
     private final SuhengScrollFragment mSuhengScrollFragment = new SuhengScrollFragment();
     private SuhengBaseFragment mFrgCurrent;
     private ImageView mTopViewBlur;
+    private View mViewBlur;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +59,7 @@ public class BlurActivity extends AppCompatActivity {
         Log.d("Wbj", "getRealMetrics: " + metrics.widthPixels + ", " + metrics.heightPixels);
         Log.d("Wbj", "getStatusBarHeight: " + getStatusBarHeight(this));*/
 
-        RealBlur realBlur = new RealBlur();
-        View mViewBlur;
+        mTopViewBlur = findViewById(R.id.frg_fob_image_blur);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             mViewBlur = findViewById(R.id.foot_bar_blur12);
         } else {
@@ -73,6 +73,9 @@ public class BlurActivity extends AppCompatActivity {
         //frgs.add(mFobRecyclerFrg3);
         frgs.add(mSuhengScrollFragment);
         mFrgCurrent = frgs.get(0);
+
+        RealBlur realBlur = new RealBlur();
+        realBlur.setViewBlurredAndBlur(mFrgCurrent.getBlurredView(), mViewBlur);
 
         viewPager.setAdapter(new FragmentStateAdapter(this) {
             @NonNull
@@ -147,10 +150,8 @@ public class BlurActivity extends AppCompatActivity {
             });
         }
 
-        realBlur.setViewBlurredAndBlur(mFrgCurrent.getBlurredView(), mViewBlur);
         //this.setViewContainerBg();
 
-        mTopViewBlur = findViewById(R.id.frg_fob_image_blur);
         mTopViewBlur.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -232,6 +233,10 @@ public class BlurActivity extends AppCompatActivity {
 
     public View getTopViewBlur() {
         return mTopViewBlur;
+    }
+
+    public View getViewBlur() {
+        return mViewBlur;
     }
 
     public static int getStatusBarHeight(Context context) {

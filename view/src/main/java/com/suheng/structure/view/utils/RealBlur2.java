@@ -19,15 +19,11 @@ import androidx.core.widget.NestedScrollView;
 
 import com.google.android.renderscript.Toolkit;
 
-import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-public class RealBlur2 implements Runnable {
-
-    private ExecutorService mThreadPool;
+public class RealBlur2 {
+    private static final String TAG = RealBlur2.class.getSimpleName();
     private final Rect mRectBlur = new Rect();
     private final Rect mRectBlurred = new Rect();
     private View mViewBlurred;
@@ -38,12 +34,13 @@ public class RealBlur2 implements Runnable {
     private Canvas mViewBlurCanvas;
     private Bitmap mViewBlurBitmap;
     private BitmapDrawable mViewBlurBg;
-    private final UIRunnable mUIRunnable = new UIRunnable(this);
 
     private int mRadius = 15;
     private int mScaleFactor = 6;
     private int mEraseColor = Color.WHITE;
-    private RenderEffect mRenderEffect;
+
+    private boolean mIsScrollView;
+    private Bitmap mScrollViewBitmap;
 
     public void updateViewBlur(View viewBlur) {
         if (viewBlur == null) {
@@ -51,28 +48,17 @@ public class RealBlur2 implements Runnable {
         }
 
         mViewBlur = viewBlur;
-        if (mRenderEffect == null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                mRenderEffect = RenderEffect.createBlurEffect(mRadius, mRadius, Shader.TileMode.CLAMP);
-                mViewBlur.setRenderEffect(mRenderEffect);
-            }
-        }
     }
-
-    private boolean mIsScrollView;
-    private Bitmap mScrollViewBitmap;
 
     public void updateViewBlurred(View viewBlurred) {
         this.stopBlurred();
         if (viewBlurred == null) {
-            Log.w("Wbj", "view blurred is null, return!");
+            Log.w(TAG, "view blurred is null, return!");
             return;
         }
 
-        Log.i("Wbj", "updateViewBlurred, before stop: " + mViewBlurred);
         mViewBlurred = viewBlurred;
         mIsScrollView = ((mViewBlurred instanceof NestedScrollView) || (mViewBlurred instanceof ScrollView));
-        Log.i("Wbj", "updateViewBlurred, after stop: " + mIsScrollView + ", viewBlurred: " + viewBlurred);
 
         ViewTreeObserver viewTreeObserver = mViewBlurred.getViewTreeObserver();
         if (mGlobalLayoutListener == null) {
@@ -80,12 +66,9 @@ public class RealBlur2 implements Runnable {
                 @Override
                 public void onGlobalLayout() {
                     boolean alive = viewTreeObserver.isAlive();
-                    Log.i("Wbj", "viewTreeObserver, onGlobalLayout, alive: " + alive + ", getWidth: " + mViewBlurred.getWidth() + ", getHeight: " + mViewBlurred.getHeight());
+                    Log.i(TAG, "viewTreeObserver, onGlobalLayout, alive: " + alive);
 
                     updateBlurViewBackground();
-                    /*if (alive) {
-                        viewTreeObserver.removeOnGlobalLayoutListener(mGlobalLayoutListener);
-                    }*/
                 }
             };
             viewTreeObserver.addOnGlobalLayoutListener(mGlobalLayoutListener);
@@ -95,7 +78,7 @@ public class RealBlur2 implements Runnable {
             mScrollChangedListener = new ViewTreeObserver.OnScrollChangedListener() {
                 @Override
                 public void onScrollChanged() {
-                    Log.d("Wbj", "viewTreeObserver, onScrollChanged: " + mViewBlurred);
+                    Log.d(TAG, "viewTreeObserver, onScrollChanged: " + mViewBlurred);
                     updateBlurViewBackground();
                 }
             };
@@ -105,14 +88,8 @@ public class RealBlur2 implements Runnable {
 
     public void stopBlurred() {
         if (mViewBlurred != null && mGlobalLayoutListener != null) {
-            Log.v("Wbj", "stopBlurred, removeTreeObserver: " + mViewBlurred);
             mViewBlurred.getViewTreeObserver().removeOnScrollChangedListener(mScrollChangedListener);
             mViewBlurred.getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
-
-            /*if (mThreadPool != null && !mThreadPool.isShutdown()) {
-                mThreadPool.shutdownNow();
-            }*/
-
             mViewBlurred = null;
             mGlobalLayoutListener = null;
             mScrollChangedListener = null;
@@ -154,38 +131,69 @@ public class RealBlur2 implements Runnable {
     }
 
     public void updateBlurViewBackground() {
+        if (mViewBlur == null || mViewBlurred == null) {
+            return;
+        }
+
         Bitmap viewBlurBitmap = this.loadViewBlurBitmap();
         if (viewBlurBitmap == null) {
             return;
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            //mViewBlur.setRenderEffect(RenderEffect.createBlurEffect(mRadius, mRadius, Shader.TileMode.MIRROR));
-            mUIRunnable.setBitmap(viewBlurBitmap);
-            mUIRunnable.updateBlurViewBackground();
+            mViewBlur.setRenderEffect(RenderEffect.createBlurEffect(mRadius, mRadius, Shader.TileMode.CLAMP));
+            updateBlurViewBackground(viewBlurBitmap, true);
         } else {
-            if (mThreadPool == null) {
-                mThreadPool = Executors.newSingleThreadExecutor();
-            }
-            mThreadPool.execute(this);
+            updateBlurViewBackground(Toolkit.INSTANCE.blur(viewBlurBitmap, mRadius));
+        }
 
-            /*Bitmap blurredBitmap = Toolkit.INSTANCE.blur(viewBlurBitmap, mRadius);
-            mUIRunnable.setBitmap(blurredBitmap);
-            mUIRunnable.updateBlurViewBackground();*/
+        //updateBlurViewBackground(Toolkit.INSTANCE.blur(viewBlurBitmap, mRadius));
+    }
+
+    private void updateBlurViewBackground(Bitmap bitmap, boolean isRenderEffect) {
+        if (mViewBlurBg == null) {
+            mViewBlurBg = new BitmapDrawable(mViewBlur.getResources(), bitmap);
+            mViewBlur.setBackground(mViewBlurBg);
+            Log.d(TAG, "updateBlurViewBackground, 11111: " + mViewBlurBg);
+        } else {
+            Bitmap bgBitmap = mViewBlurBg.getBitmap();
+            if (bgBitmap == null || bitmap == null) {
+                Log.d(TAG, "updateBlurViewBackground, 22222, bgBitmap or bitmap is null");
+                return;
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                Log.d(TAG, "updateBlurViewBackground, 22222");
+                mViewBlurBg.setBitmap(bitmap);
+                mViewBlur.invalidateDrawable(mViewBlurBg);
+                if (!isRenderEffect && !bgBitmap.isRecycled()) {
+                    Log.d(TAG, "updateBlurViewBackground, 22222 recycle bgBitmap");
+                    bgBitmap.recycle();
+                }
+            } else {
+                ByteBuffer byteBuffer = null;
+                try {
+                    Log.d(TAG, "updateBlurViewBackground, 33333");
+                    byteBuffer = ByteBuffer.allocate(bitmap.getByteCount());
+                    bitmap.copyPixelsToBuffer(byteBuffer);
+                    bgBitmap.eraseColor(Color.TRANSPARENT);
+                    bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
+                } catch (Exception e) {
+                    Log.e(TAG, "copy bitmap to buffer fail!", e);
+                } finally {
+                    if (!bitmap.isRecycled()) {
+                        bitmap.recycle();
+                    }
+                    if (byteBuffer != null) {
+                        byteBuffer.clear();
+                    }
+                }
+            }
         }
     }
 
-    @Override
-    public void run() {
-        if (mViewBlurBitmap == null) {
-            return;
-        }
-
-        Bitmap blurredBitmap = Toolkit.INSTANCE.blur(mViewBlurBitmap, mRadius);
-        if (mViewBlur != null && mViewBlur.getHandler() != null) {
-            mUIRunnable.setBitmap(blurredBitmap);
-            mViewBlur.getHandler().post(mUIRunnable);
-        }
+    private void updateBlurViewBackground(Bitmap bitmap) {
+        this.updateBlurViewBackground(bitmap, false);
     }
 
     private boolean getViewLocation(View view, Rect rect) {
@@ -200,7 +208,7 @@ public class RealBlur2 implements Runnable {
         int y = location[1];
         int width = view.getWidth();
         int height = view.getHeight();
-        //Log.d("Wbj", "view location, x: " + x + ", y:" + y + ", width: " + width + ", height: " + height + ", view: " + view);
+        //Log.d(TAG, "view location, x: " + x + ", y:" + y + ", width: " + width + ", height: " + height + ", view: " + view);
         rect.left = x;
         rect.top = y;
         rect.right = rect.left + width;
@@ -211,12 +219,12 @@ public class RealBlur2 implements Runnable {
 
     @SuppressLint("RestrictedApi")
     @Nullable
-    public Bitmap loadViewBlurBitmap() {
+    private Bitmap loadViewBlurBitmap() {
         boolean isViewBlurLocChange = this.getViewLocation(mViewBlur, mRectBlur);
         boolean isViewBlurredLocChange = this.getViewLocation(mViewBlurred, mRectBlurred);
         boolean intersect = mRectBlur.intersect(mRectBlurred);
         if (!intersect) { //两个View没有相交部分
-            Log.w("Wbj", "Hasn't intersect region between two views!");
+            Log.w(TAG, "Hasn't intersect region between two views!");
             return null;
         }
 
@@ -232,7 +240,7 @@ public class RealBlur2 implements Runnable {
         int dx = mRectBlurred.left - mRectBlur.left;
         int dy = mRectBlurred.top - mRectBlur.top;
         float scale = 1f / mScaleFactor;
-        Log.d("Wbj", "scale: " + scale + ", dx: " + dx + ", dy: " + dy + ", isViewBlurredLocChange: " + isViewBlurredLocChange
+        Log.d(TAG, "scale: " + scale + ", dx: " + dx + ", dy: " + dy + ", isViewBlurredLocChange: " + isViewBlurredLocChange
                 + ", isViewBlurLocChange: " + isViewBlurLocChange);
 
         if ((isViewBlurLocChange || isViewBlurredLocChange)) {
@@ -300,67 +308,4 @@ public class RealBlur2 implements Runnable {
     public void setEraseColor(int eraseColor) {
         mEraseColor = eraseColor;
     }
-
-    private static final class UIRunnable implements Runnable {
-
-        private final WeakReference<RealBlur2> mWeakReference;
-        private Bitmap mBitmap;
-
-        public UIRunnable(RealBlur2 realBlur) {
-            mWeakReference = new WeakReference<>(realBlur);
-        }
-
-        public void setBitmap(Bitmap bitmap) {
-            mBitmap = bitmap;
-        }
-
-        @Override
-        public void run() {
-            if (mBitmap == null) {
-                Log.d("Wbj", "run, 1111111111 mBitmap mBitmap mBitmap");
-                return;
-            }
-            this.updateBlurViewBackground();
-        }
-
-        private void updateBlurViewBackground() {
-            RealBlur2 realBlur = mWeakReference.get();
-            if (realBlur == null || realBlur.mViewBlur == null) {
-                return;
-            }
-
-            if (realBlur.mViewBlurBg == null) {
-                realBlur.mViewBlurBg = new BitmapDrawable(realBlur.mViewBlur.getResources(), mBitmap);
-                realBlur.mViewBlur.setBackground(realBlur.mViewBlurBg);
-                Log.d("Wbj", "run, 1111111111: " + realBlur.mViewBlurBg + ", realBlur.mViewBlur: " + realBlur.mViewBlurred);
-            } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    Log.d("Wbj", "run, 222222222: " + mBitmap + ", thread: " + Thread.currentThread().getName());
-                    realBlur.mViewBlurBg.setBitmap(mBitmap);
-                    realBlur.mViewBlur.invalidate();
-                } else {
-                    Bitmap bgBitmap = realBlur.mViewBlurBg.getBitmap();
-                    if (bgBitmap == null) {
-                        Log.d("Wbj", "run, 333333333 null null null");
-                        return;
-                    }
-                    ByteBuffer byteBuffer = null;
-                    try {
-                        Log.d("Wbj", "run, 333333333: " + mBitmap + ", thread: " + Thread.currentThread().getName());
-                        byteBuffer = ByteBuffer.allocate(mBitmap.getByteCount());
-                        mBitmap.copyPixelsToBuffer(byteBuffer);
-                        bgBitmap.eraseColor(Color.TRANSPARENT);
-                        bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
-                    } catch (Exception e) {
-                        Log.e("Wbj", "copy bitmap to buffer fail!", e);
-                    } finally {
-                        if (byteBuffer != null) {
-                            byteBuffer.clear();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 }
