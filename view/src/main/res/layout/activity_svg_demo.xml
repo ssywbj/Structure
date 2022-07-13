@@ -16,8 +16,8 @@
 
     <ImageView
         android:id="@+id/image_svg"
-        android:layout_width="match_parent"
-        android:layout_height="160dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginTop="2dp" />
 
     <ImageView

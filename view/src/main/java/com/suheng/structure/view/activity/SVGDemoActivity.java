@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableWrapper;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.XmlRes;
@@ -40,26 +41,31 @@ public class SVGDemoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_svg_demo);
 
         ImageView imageView = findViewById(R.id.image_svg);
-        AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.water_drop_anim);
-        vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.tt_search_anim);
-        if (vectorDrawableCompat != null) {
-            imageView.setImageDrawable(vectorDrawableCompat);
-            vectorDrawableCompat.registerAnimationCallback(new Animatable2Compat.AnimationCallback() {
-                @Override
-                public void onAnimationStart(Drawable drawable) {
-                    super.onAnimationStart(drawable);
-                    Log.d("Wbj", "-----svg anim start-----");
-                }
+        //AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.water_drop_anim);
+        //final AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.tt_search_anim);
+        final AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.tt_search_anim);
+        imageView.setImageDrawable(vectorDrawableCompat);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (vectorDrawableCompat != null) {
+                    vectorDrawableCompat.registerAnimationCallback(new Animatable2Compat.AnimationCallback() {
+                        @Override
+                        public void onAnimationStart(Drawable drawable) {
+                            super.onAnimationStart(drawable);
+                            Log.d("Wbj", "-----svg anim start-----");
+                        }
 
-                @Override
-                public void onAnimationEnd(Drawable drawable) {
-                    super.onAnimationEnd(drawable);
-                    Log.d("Wbj", "-----svg anim end-----");
+                        @Override
+                        public void onAnimationEnd(Drawable drawable) {
+                            super.onAnimationEnd(drawable);
+                            Log.d("Wbj", "-----svg anim end-----");
+                        }
+                    });
+                    vectorDrawableCompat.start();
                 }
-            });
-
-            vectorDrawableCompat.start();
-        }
+            }
+        });
 
         ImageView imageView2 = findViewById(R.id.image_svg2);
         //imageView2.setImageBitmap(BitmapHelper.get(this, R.drawable.tt_search_colors, Color.BLACK));
