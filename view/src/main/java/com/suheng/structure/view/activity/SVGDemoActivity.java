@@ -11,7 +11,7 @@ import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableWrapper;
+import android.graphics.drawable.DrawableContainer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -73,7 +73,8 @@ public class SVGDemoActivity extends AppCompatActivity {
         this.getPathList();
 
         try {
-            Drawable fromXml = DrawableWrapper.createFromXml(getResources(), getResources().getXml(R.xml.tt_search_colors));
+            //Drawable fromXml = DrawableWrapper.createFromXml(getResources(), getResources().getXml(R.xml.tt_search_colors));
+            Drawable fromXml = DrawableContainer.createFromXml(getResources(), getResources().getXml(R.xml.tt_search_colors));
             Log.i(TAG, "fromXml: " + fromXml.getIntrinsicWidth() + ", " + fromXml.getIntrinsicHeight());
             //imageView2.setImageDrawable(fromXml);
         } catch (IOException | XmlPullParserException e) {
@@ -158,7 +159,8 @@ public class SVGDemoActivity extends AppCompatActivity {
         Drawable drawable = null;
         Resources resources = context.getResources();
         try {
-            drawable = DrawableWrapper.createFromXml(resources, resources.getXml(xmlId));
+            //drawable = DrawableWrapper.createFromXml(resources, resources.getXml(xmlId));
+            drawable = DrawableContainer.createFromXml(getResources(), getResources().getXml(xmlId));
         } catch (IOException | XmlPullParserException e) {
             Log.e(TAG, "drawable from xml error", e);
         }

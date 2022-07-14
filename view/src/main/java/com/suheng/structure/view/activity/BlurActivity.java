@@ -72,7 +72,7 @@ public class BlurActivity extends AppCompatActivity {
 
         List<SuhengBaseFragment> frgs = new ArrayList<>();
         frgs.add(mFobRecyclerFrg2);
-        //frgs.add(mFobRecyclerFrg3);
+        frgs.add(mFobRecyclerFrg3);
         frgs.add(mSuhengScrollFragment);
         mFrgCurrent = frgs.get(0);
 
