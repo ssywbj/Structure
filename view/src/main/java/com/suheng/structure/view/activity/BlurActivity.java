@@ -1,6 +1,5 @@
 package com.suheng.structure.view.activity;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -36,10 +35,13 @@ import com.google.android.renderscript.Toolkit;
 import com.suheng.structure.view.R;
 import com.suheng.structure.view.utils.RealBlur;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BlurActivity extends AppCompatActivity {
+    private static final String TAG = BlurActivity.class.getSimpleName();
     private final SuhengRecyclerFragment2 mFobRecyclerFrg2 = new SuhengRecyclerFragment2();
     private final SuhengRecyclerFragment3 mFobRecyclerFrg3 = new SuhengRecyclerFragment3();
     private final SuhengScrollFragment mSuhengScrollFragment = new SuhengScrollFragment();
@@ -103,14 +105,14 @@ public class BlurActivity extends AppCompatActivity {
                 viewPager.setCurrentItem(item);
                 mFrgCurrent = frgs.get(item);
 
-                Log.d("Wbj", "onPageSelected, position: " + position + ", isAdded: " + mFrgCurrent.isAdded() + ", blurredView: " + mFrgCurrent.getBlurredView());
+                Log.d(TAG, "onPageSelected, position: " + position + ", isAdded: " + mFrgCurrent.isAdded() + ", blurredView: " + mFrgCurrent.getBlurredView());
                 if (mFrgCurrent.isAdded()) {
                     realBlur.updateViewBlurred(mFrgCurrent.getBlurredView());
                 } else {
                     mViewBlur.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            Log.v("Wbj", "postDelayed, onPageSelected, position: " + position + ", isAdded: " + mFrgCurrent.isAdded() + ", blurredView: " + mFrgCurrent.getBlurredView());
+                            Log.v(TAG, "postDelayed, onPageSelected, position: " + position + ", isAdded: " + mFrgCurrent.isAdded() + ", blurredView: " + mFrgCurrent.getBlurredView());
                             realBlur.updateViewBlurred(mFrgCurrent.getBlurredView());
                         }
                     }, 60);
@@ -156,8 +158,8 @@ public class BlurActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int[] location = new int[2];
-                mViewBlur.getLocationOnScreen(location);
-                //mTopViewBlur.getLocationOnScreen(location);
+                //mViewBlur.getLocationOnScreen(location);
+                mTopViewBlur.getLocationOnScreen(location);
                 int x = location[0];
                 int y = location[1];
 
@@ -201,7 +203,9 @@ public class BlurActivity extends AppCompatActivity {
                 rect.set(x, y, x + mTopViewBlur.getWidth(), y + mTopViewBlur.getHeight());
                 Bitmap bitmap = intersectsViewBitmap(blurredView, rect);
                 //mTopViewBlur.setImageBitmap(bitmap);
-                mTopViewBlur.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, 15)));
+                if (bitmap != null) {
+                    mTopViewBlur.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, 15)));
+                }
             }
         });
     }
@@ -225,7 +229,7 @@ public class BlurActivity extends AppCompatActivity {
         });*/
 
         boolean supportNavigationBar = isSupportNavigationBar(this);
-        Log.d("Wbj", "supportNavigationBar: " + supportNavigationBar);
+        Log.d(TAG, "supportNavigationBar: " + supportNavigationBar);
         if (supportNavigationBar) {
             getWindow().setNavigationBarColor(color);
         }
@@ -315,7 +319,6 @@ public class BlurActivity extends AppCompatActivity {
      * @param r    要截取的区域
      * @return bitmap: View的区域位图
      */
-    @SuppressLint("RestrictedApi")
     public static Bitmap intersectsViewBitmap(View view, Rect r) {
         //获取View的位置及边界信息
         int[] location = new int[2];
@@ -326,40 +329,37 @@ public class BlurActivity extends AppCompatActivity {
         viewRect.set(x, y, x + view.getWidth(), y + view.getHeight());
 
         Rect rect = new Rect(r);
-        Log.d("Wbj", "before intersect rect: " + rect);
+        Log.d(TAG, "before intersect rect: " + rect);
         boolean intersect = rect.intersect(viewRect);
         if (intersect) { //要截取的区域要在View的区域之中
-            Log.i("Wbj", "after intersect rect: " + rect);
+            Log.i(TAG, "after intersect rect: " + rect);
             Bitmap bitmap;
             int dy = y - rect.top;
             int dx = x - rect.left;
             if ((view instanceof NestedScrollView) || (view instanceof ScrollView)) {
-                int scrollRange, scrollY;
-                if (view instanceof NestedScrollView) {
-                    NestedScrollView scrollView = (NestedScrollView) view;
-                    scrollRange = scrollView.computeVerticalScrollRange();
-                } else {
-                    //ScrollView scrollView = (ScrollView) view;
-                    scrollRange = 0;
+                int scrollRange = 0;
+                try {
+                    Method method = View.class.getDeclaredMethod("computeVerticalScrollRange");
+                    method.setAccessible(true);
+                    Object invoke = method.invoke(view);
+                    if (invoke instanceof Integer) {
+                        scrollRange = (int) invoke;
+                        Log.i(TAG, "reflect invoke scrollRange: " + scrollRange);
+                    }
+                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                    Log.e(TAG, "reflect invoke computeVerticalScrollRange() fail!", e);
                 }
 
                 if (scrollRange == 0) {
                     return null;
                 }
 
-                scrollY = view.getScrollY();
-                int factor = 3;
-                Bitmap viewBitmap = Bitmap.createBitmap(viewRect.width() / factor, scrollRange / factor, Bitmap.Config.ARGB_8888);
+                int scrollY = view.getScrollY();
+                Bitmap viewBitmap = Bitmap.createBitmap(viewRect.width() , scrollRange, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(viewBitmap);
-                canvas.scale(1f / factor, 1f / factor);
                 view.draw(canvas);
-
-                Log.i("Wbj", "canvas w h: " + canvas.getWidth() + ", " + canvas.getHeight());
-
-                //bitmap = Bitmap.createBitmap(viewBitmap, -dx, scrollY - dy, rect.width(), rect.height()); //截取片断
-                bitmap = Bitmap.createBitmap(viewBitmap, -dx / factor, (scrollY - dy) / factor, rect.width() / factor, rect.height() / factor); //截取片断
-                //bitmap = viewBitmap; //截取片断
-
+                Log.i(TAG, "canvas w h: " + canvas.getWidth() + ", " + canvas.getHeight());
+                bitmap = Bitmap.createBitmap(viewBitmap, -dx, scrollY - dy , rect.width() , rect.height() ); //截取片断
                 if (!viewBitmap.isRecycled()) {
                     viewBitmap.recycle();
                 }
@@ -372,7 +372,7 @@ public class BlurActivity extends AppCompatActivity {
 
             return bitmap;
         } else { //两个View没有相交部分
-            Log.w("Wbj", "Hasn't intersect region between two views!");
+            Log.w(TAG, "Hasn't intersect region between two views!");
             return null;
         }
     }

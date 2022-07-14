@@ -1,6 +1,5 @@
 package com.suheng.structure.view.utils;
 
-import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -17,6 +16,8 @@ import androidx.core.widget.NestedScrollView;
 
 import com.google.android.renderscript.Toolkit;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -49,11 +50,11 @@ public class RealBlur {
     }
 
     public void updateViewBlurred(View viewBlurred) {
-        this.stopBlurred();
         if (viewBlurred == null) {
             Log.w(TAG, "view blurred is null, return!");
             return;
         }
+        this.stopBlurred();
 
         mViewBlurred = viewBlurred;
         mIsScrollView = ((mViewBlurred instanceof NestedScrollView) || (mViewBlurred instanceof ScrollView));
@@ -136,7 +137,13 @@ public class RealBlur {
             return;
         }
 
-        Bitmap viewBlurBitmap = this.loadViewBlurBitmap();
+        Bitmap viewBlurBitmap;
+        try {
+            viewBlurBitmap = this.loadViewBlurBitmap();
+        } catch (Exception e) {
+            viewBlurBitmap = null;
+            Log.e(TAG, "load ViewBlur Bitmap fail!", e);
+        }
         if (viewBlurBitmap == null) {
             return;
         }
@@ -207,7 +214,6 @@ public class RealBlur {
         return !((left == rect.left) && (top == rect.top) && (right == rect.right) && (bottom == rect.bottom));
     }
 
-    @SuppressLint("RestrictedApi")
     @Nullable
     private Bitmap loadViewBlurBitmap() {
         boolean isViewBlurLocChange = this.getViewLocation(mViewBlur, mRectBlur);
@@ -225,7 +231,7 @@ public class RealBlur {
         if (bitmapWidth == 0 || bitmapHeight == 0) {
             return null;
         }
-        //Log.d("Wbj", "width: " + width + ", height: " + height + ", bitmapWidth: " + bitmapWidth + ", bitmapHeight: " + bitmapHeight);
+        Log.d("Wbj", "width: " + width + ", height: " + height + ", bitmapWidth: " + bitmapWidth + ", bitmapHeight: " + bitmapHeight);
 
         int dx = mRectBlurred.left - mRectBlur.left;
         int dy = mRectBlurred.top - mRectBlur.top;
@@ -239,12 +245,27 @@ public class RealBlur {
 
         if (mIsScrollView) {
             if (mScrollViewBitmap == null) {
+                Rect hitRect = new Rect();
+                mViewBlurred.getHitRect(hitRect);
+                Rect visRect = new Rect();
+                mViewBlurred.getGlobalVisibleRect(visRect);
+                Log.d(TAG, "hitRect: " + hitRect + ", visRect: " + visRect);
+
                 int scrollRange = 0;
-                if (mViewBlurred instanceof NestedScrollView) {
-                    NestedScrollView scrollView = (NestedScrollView) mViewBlurred;
-                    scrollRange = scrollView.computeVerticalScrollRange();
+                try {
+                    Method method = View.class.getDeclaredMethod("computeVerticalScrollRange");
+                    method.setAccessible(true);
+                    Object invoke = method.invoke(mViewBlurred);
+                    if (invoke instanceof Integer) {
+                        scrollRange = (int) invoke;
+                        Log.i(TAG, "reflect invoke scrollRange: " + scrollRange);
+                    }
+                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                    Log.e(TAG, "reflect invoke computeVerticalScrollRange() fail!", e);
                 }
+
                 bitmapHeight = (int) Math.ceil(1f * scrollRange / mScaleFactor);
+                Log.d(TAG, "scrollRange: " + scrollRange + ", getTop: " + mViewBlurred.getTop() + ", getBottom: " + mViewBlurred.getBottom());
                 if (bitmapHeight == 0) {
                     return null;
                 }
@@ -262,10 +283,22 @@ public class RealBlur {
                 }
             }
 
-            Bitmap bitmap = mViewBlurBitmap;
             int scrollY = mViewBlurred.getScrollY();
-            mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, -dx / mScaleFactor, (scrollY - dy) / mScaleFactor
-                    , width / mScaleFactor, height / mScaleFactor); //截取片断
+
+            int x = -dx / mScaleFactor;
+            int y = (scrollY - dy) / mScaleFactor;
+            int dstWidth = width / mScaleFactor;
+            int dstHeight = height / mScaleFactor;
+            if (x < 0 || y < 0 || dstWidth <= 0 || dstHeight <= 0) {
+                Log.w(TAG, "pivot out source bitmap");
+                return null;
+            }
+            if (x + dstWidth > mScrollViewBitmap.getWidth() || y + dstHeight > mScrollViewBitmap.getHeight()) {
+                Log.w(TAG, "need dst bitmap dimen over source bitmap");
+                return null;
+            }
+            Bitmap bitmap = mViewBlurBitmap;
+            mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, x, y, dstWidth, dstHeight); //截取片断
             if (bitmap != null && !bitmap.isRecycled()) {
                 bitmap.recycle();
             }
