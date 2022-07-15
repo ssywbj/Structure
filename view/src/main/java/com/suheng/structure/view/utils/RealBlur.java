@@ -101,14 +101,7 @@ public class RealBlur {
     }
 
     private void recycleViewBlurBg() {
-        if (mViewBlurBg != null) {
-            Bitmap bitmap = mViewBlurBg.getBitmap();
-            if (bitmap != null && !bitmap.isRecycled()) {
-                bitmap.recycle();
-                Log.d(TAG, "recycleViewBlurBg, ViewBlurBg.getBitmap()");
-            }
-            mViewBlurBg = null;
-        }
+        mViewBlurBg = null;
 
         if (mViewBlurBitmap != null) {
             if (!mViewBlurBitmap.isRecycled()) {
