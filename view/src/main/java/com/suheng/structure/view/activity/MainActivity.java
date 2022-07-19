@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         mStringList.add("Blur");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "BlurActivity");
 
-        startActivity(new Intent(this, BlurActivity.class));
+        //startActivity(new Intent(this, BlurActivity.class));
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();
@@ -96,20 +96,12 @@ public class MainActivity extends AppCompatActivity {
         drawable.start();
         Log.d("SVGView", "drawable, NumberOfFrames: " + drawable.getNumberOfFrames() + ", Duration: " + drawable.getDuration(0));*/
 
-        //动态开启或关闭：adb shell setprop log.tag.<YOUR_LOG_TAG> <LEVEL>，如：adb shell setprop log.tag.wbj_main D
-        if (Log.isLoggable("wbj_main", Log.INFO)) {
-            Log.i("wbj_main", "INFO, INFO, INFO");
-        }
-
-        if (Log.isLoggable("wbj_main", Log.WARN)) {
-            Log.w("wbj_main", "WARN, WARN, WARN");
-        }
-
-        Log.v("wbj_main", "VERBOSE, VERBOSE, VERBOSE");
-        Log.d("wbj_main", "DEBUG, DEBUG, DEBUG");
-        Log.i("wbj_main", "INFO, INFO, INFO");
-        Log.w("wbj_main", "WARN, WARN, WARN");
-        Log.e("wbj_main", "ERROR, ERROR, ERROR");
+        //log的等级(LEVEL)由低到高：V(VERBOSE,2), D(DEBUG,3), I(INFO,4), W(WARN,5), E(ERROR,6), A(ASSERT,7)
+        Log.v("wbj_main", "VERBOSE, VERBOSE"); //V
+        Log.d("wbj_main", "DEBUG, DEBUG"); //D
+        Log.i("wbj_main", "INFO, INFO"); //I
+        Log.w("wbj_main", "WARN, WARN"); //W
+        Log.e("wbj_main", "ERROR, ERROR"); //E
 
         int resId = R.anim.layout_animation_fall_down;
         LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(this, resId);
@@ -119,9 +111,36 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (Log.isLoggable("wbj_maine", Log.INFO)) {
-            Log.i("wbj_maine", "INFO-, INFO-, INFO-");
+        //动态开启或关闭：adb shell setprop log.tag.LOG_TAG LEVEL
+
+        String tagLoggable = "WbjLoggable";
+        //adb shell setprop log.tag.WbjLoggable V，输出v、d、i、w、e
+        Log.v(tagLoggable, "VERBOSE+++");
+        if (Log.isLoggable(tagLoggable, Log.VERBOSE)) {
+            Log.v(tagLoggable, "VERBOSE---");
         }
+        //adb shell setprop log.tag.WbjLoggable D，输出d、i、w、e；以上的"VERBOSE+++"和"VERBOSE---"均不输出，与是否用"Log.isLoggable"判断无关
+        Log.d(tagLoggable, "DEBUG+++");
+        if (Log.isLoggable(tagLoggable, Log.DEBUG)) {
+            Log.d(tagLoggable, "DEBUG---");
+        }
+        //adb shell setprop log.tag.WbjLoggable I，输出i、w、e；以上的"VERBOSE+++"、"VERBOSE---"、"DEBUG+++"、"DEBUG---"均不输出，与是否用"Log.isLoggable"判断无关
+        Log.i(tagLoggable, "INFO+++");
+        if (Log.isLoggable(tagLoggable, Log.INFO)) {
+            Log.i(tagLoggable, "INFO---");
+        }
+        //adb shell setprop log.tag.WbjLoggable W，输出w、e；同理，以上的log均不输出，与是否用"Log.isLoggable"判断无关
+        Log.w(tagLoggable, "WARN+++");
+        if (Log.isLoggable(tagLoggable, Log.WARN)) {
+            Log.w(tagLoggable, "WARN---");
+        }
+        //adb shell setprop log.tag.WbjLoggable E，只输出e；同理，以上的log均不输出，，与是否用"Log.isLoggable"判断无关
+        Log.e(tagLoggable, "ERROR+++");
+        if (Log.isLoggable(tagLoggable, Log.ERROR)) {
+            Log.e(tagLoggable, "ERROR---");
+        }
+
+        //adb shell setprop log.tag.WbjLoggable A，关闭全部；同理，以上的log均不输出，，与是否用"Log.isLoggable"判断无关
     }
 
     @Override

@@ -89,7 +89,6 @@ public class RealBlur {
         if (mViewBlurred != null && mGlobalLayoutListener != null) {
             mViewBlurred.getViewTreeObserver().removeOnScrollChangedListener(mScrollChangedListener);
             mViewBlurred.getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
-            mViewBlurred = null;
             mGlobalLayoutListener = null;
             mScrollChangedListener = null;
         }
