@@ -11,6 +11,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 
 import androidx.annotation.Nullable;
@@ -24,6 +25,14 @@ public class ScrollerTrackerView2 extends View {
     private int mDownX, mOffsetX, mScrollOffsetX;
 
     private VelocityTracker mVelocityTracker;
+    /**
+     * 滑动的最大速度
+     */
+    private int mMaximumVelocity;
+    /**
+     * 滑动的最小速度
+     */
+    private int mMinimumVelocity;
 
     public ScrollerTrackerView2(Context context) {
         this(context, null);
@@ -47,9 +56,13 @@ public class ScrollerTrackerView2 extends View {
         mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, metrics));
 
         mScroller = new OverScroller(getContext());
+
         //https://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2012/1114/558.html
         //https://juejin.cn/post/6844903791066628110
         mVelocityTracker = VelocityTracker.obtain();
+        mMaximumVelocity = ViewConfiguration.get(getContext()).getScaledMaximumFlingVelocity();
+        mMinimumVelocity = ViewConfiguration.get(getContext()).getScaledMinimumFlingVelocity();
+        Log.v(TAG, "init, maximumVelocity：" + mMaximumVelocity + ", minimumVelocity: " + mMinimumVelocity);
     }
 
     @Override
@@ -60,9 +73,6 @@ public class ScrollerTrackerView2 extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mVelocityTracker == null) {
-            mVelocityTracker = VelocityTracker.obtain();
-        }
         mVelocityTracker.addMovement(event);
 
         switch (event.getAction()) {
@@ -76,12 +86,14 @@ public class ScrollerTrackerView2 extends View {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 //计算速度
-                mVelocityTracker.computeCurrentVelocity(1000);
-                float velocityX = mVelocityTracker.getXVelocity();
-                Log.v(TAG, "fling, velocityX：" + velocityX);
+                //mVelocityTracker.computeCurrentVelocity(1000);
+                //float velocityXTmp = mVelocityTracker.getXVelocity();
+                mVelocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
+                int velocityX = (int) mVelocityTracker.getXVelocity();
+                Log.v(TAG, "fling, velocityX：" + velocityX + ", getScrollX(): " + getScrollX() + ", ScrollOffsetX: " + mScrollOffsetX);
 
-                if (Math.abs(velocityX) > 5000) {
-                    mScroller.fling(mScrollOffsetX, 0, (int) -velocityX, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0);
+                if (Math.abs(velocityX) > 2000) {
+                    mScroller.fling(mScrollOffsetX, 0, -velocityX, 0, 0, Integer.MAX_VALUE, 0, 0);
                 } else {
                     int ddx = (int) (event.getX() - mDownX);
                     boolean isScrollToOtherIndex = Math.abs(ddx) >= mWidth / 4;
@@ -93,12 +105,14 @@ public class ScrollerTrackerView2 extends View {
                         }
                     }
                     mOffsetX = mIndex * mWidth;
-                    Log.v(TAG, "ACTION_UP, index: " + mIndex + ", mOffsetX: " + mOffsetX + ", ddx:" + ddx);
+                    Log.v(TAG, "action_up, index: " + mIndex + ", mOffsetX: " + mOffsetX + ", ddx:" + ddx);
+                    this.smoothScrollTo(mOffsetX);
                 }
 
                 mVelocityTracker.clear(); //清除监视器事件
                 break;
         }
+
         return true;
     }
 
@@ -127,12 +141,6 @@ public class ScrollerTrackerView2 extends View {
             //Log.d(TAG, "computeScroll is over, isFinished: " + mScroller.isFinished());
         }
     }
-
-    /*@Override
-    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        super.onScrollChanged(l, t, oldl, oldt);
-        Log.d(TAG, "onScrollChanged, l: " + l + ", t: " + t + ", oldl: " + oldl + ", oldt: " + oldt);
-    }*/
 
     @Override
     protected void onDraw(Canvas canvas) {

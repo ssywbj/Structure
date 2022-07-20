@@ -49,7 +49,9 @@
         <activity android:name=".activity.GuaguaLeActivity" />
         <activity android:name=".activity.BezierActivity" />
         <activity android:name=".activity.FontViewActivity" />
-        <activity android:name=".activity.ScrollTrackerActivity" />
+        <activity
+            android:name=".activity.ScrollTrackerActivity"
+            android:exported="true" />
         <activity android:name=".activity.InfiniteLineActivity" />
         <activity android:name=".activity.HexagonProgressBarActivity" />
         <activity android:name=".activity.SVGActivity" />
@@ -59,7 +61,7 @@
         <activity android:name=".activity.ScrollGestureActivity" />
         <activity android:name=".activity.DampingActivity" />
         <activity android:name=".activity.SVGDemoActivity" />
-        <activity 
+        <activity
             android:name=".activity.BlurActivity"
             android:exported="true" />
 

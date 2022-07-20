@@ -6,7 +6,7 @@ module="view"
 
 devices=()
 pkg="com.suheng.structure.view"
-aty_path="${pkg}/.activity.BlurActivity"
+aty_path="${pkg}/.activity.ScrollTrackerActivity"
 mapfile -t devices < <(adb devices | grep -w "device") #结果用数组保存
 for device in "${devices[@]}"; do
   echo "device info: ${device}"

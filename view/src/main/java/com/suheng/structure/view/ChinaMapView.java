@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableContainer;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -140,8 +139,7 @@ public class ChinaMapView extends View {
 
     private void getPathList() {
         try {
-            //Drawable fromXml = DrawableWrapper.createFromXml(getResources(), getResources().getXml(R.xml.chinahigh));
-            Drawable fromXml = DrawableContainer.createFromXml(getResources(), getResources().getXml(R.xml.chinahigh));
+            Drawable fromXml = Drawable.createFromXml(getResources(), getResources().getXml(R.xml.chinahigh));
             Log.i(TAG, "fromXml: " + fromXml.getIntrinsicWidth() + ", " + fromXml.getIntrinsicHeight());
         } catch (IOException | XmlPullParserException e) {
             Log.e(TAG, "fromXml error", e);

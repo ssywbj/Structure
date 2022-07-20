@@ -60,8 +60,6 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ColorFilterActivity");
         mStringList.add("GuaguaLe");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "GuaguaLeActivity");
-        mStringList.add("ChinaMap");
-        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ChinaMapActivity");
         mStringList.add("Bezier");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "BezierActivity");
         mStringList.add("FontView");
@@ -87,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         mStringList.add("Blur");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "BlurActivity");
 
-        //startActivity(new Intent(this, BlurActivity.class));
+        startActivity(new Intent(this, ScrollTrackerActivity.class));
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();

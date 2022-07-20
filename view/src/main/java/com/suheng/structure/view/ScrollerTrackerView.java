@@ -53,7 +53,6 @@ public class ScrollerTrackerView extends View {
         mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, metrics));
 
         mScroller = new OverScroller(getContext());
-
     }
 
     @Override
@@ -84,17 +83,18 @@ public class ScrollerTrackerView extends View {
                     }
                 }
                 mOffsetX = mIndex * mWidth;
-                Log.v(TAG, "ACTION_UP, index: " + mIndex + ", mOffsetX: " + mOffsetX + ", ddx:" + ddx);
+                Log.v(TAG, "action_up, index: " + mIndex + ", mOffsetX: " + mOffsetX + ", ddx:" + ddx);
                 this.smoothScrollTo(mOffsetX);
                 break;
         }
+
         return true;
     }
 
     private void smoothScrollTo(int offsetX) {
         int startX = mScroller.getFinalX(); //getFinal: 获取Scroller最终停止位置的位置
         int dx = offsetX - startX;
-        Log.d(TAG, "offsetX: " + offsetX + ", startX: " + startX + ", dx: " + dx);
+        Log.d(TAG, "smoothScrollTo, offsetX: " + offsetX + ", startX: " + startX + ", dx: " + dx);
 
         //startScroll：Scroller开始滚动，start：开始滚动的位置，d：滚动的距离，duration：滚动时长
         mScroller.startScroll(startX, 0, dx, 0, 500);
@@ -116,12 +116,6 @@ public class ScrollerTrackerView extends View {
             Log.d(TAG, "computeScroll is over, isFinished: " + mScroller.isFinished());
         }
     }
-
-    /*@Override
-    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        super.onScrollChanged(l, t, oldl, oldt);
-        Log.d(TAG, "onScrollChanged, l: " + l + ", t: " + t + ", oldl: " + oldl + ", oldt: " + oldt);
-    }*/
 
     @Override
     protected void onDraw(Canvas canvas) {

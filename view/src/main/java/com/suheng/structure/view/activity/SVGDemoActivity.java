@@ -1,7 +1,5 @@
 package com.suheng.structure.view.activity;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,7 +9,6 @@ import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableContainer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -73,15 +70,14 @@ public class SVGDemoActivity extends AppCompatActivity {
         this.getPathList();
 
         try {
-            //Drawable fromXml = DrawableWrapper.createFromXml(getResources(), getResources().getXml(R.xml.tt_search_colors));
-            Drawable fromXml = DrawableContainer.createFromXml(getResources(), getResources().getXml(R.xml.tt_search_colors));
+            Drawable fromXml = Drawable.createFromXml(getResources(), getResources().getXml(R.xml.tt_search_colors));
             Log.i(TAG, "fromXml: " + fromXml.getIntrinsicWidth() + ", " + fromXml.getIntrinsicHeight());
             //imageView2.setImageDrawable(fromXml);
         } catch (IOException | XmlPullParserException e) {
             Log.e(TAG, "fromXml error", e);
         }
 
-        imageView2.setImageBitmap(get(this, R.xml.tt_search_colors, 1));
+        imageView2.setImageBitmap(get(R.xml.tt_search_colors, 1));
     }
 
     private static final String NAME_SPACE = "http://schemas.android.com/apk/res/android";
@@ -155,12 +151,10 @@ public class SVGDemoActivity extends AppCompatActivity {
     }
 
 
-    public Bitmap get(Context context, @XmlRes int xmlId, float scale) {
+    public Bitmap get(@XmlRes int xmlId, float scale) {
         Drawable drawable = null;
-        Resources resources = context.getResources();
         try {
-            //drawable = DrawableWrapper.createFromXml(resources, resources.getXml(xmlId));
-            drawable = DrawableContainer.createFromXml(getResources(), getResources().getXml(xmlId));
+            drawable = Drawable.createFromXml(getResources(), getResources().getXml(xmlId));
         } catch (IOException | XmlPullParserException e) {
             Log.e(TAG, "drawable from xml error", e);
         }
@@ -174,7 +168,7 @@ public class SVGDemoActivity extends AppCompatActivity {
         Log.i(TAG, "drawable from xml: " + intrinsicWidth + ", " + intrinsicHeight);
         Bitmap bitmap = Bitmap.createBitmap((int) (intrinsicWidth * scale), (int) (intrinsicHeight * scale), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG));
+        canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG | Paint.ANTI_ALIAS_FLAG));
         for (ChinaMapView.PathBean pathBean : mPathBeans) {
             mPaint.setColor(Color.parseColor(pathBean.getStrokeColor()));
             canvas.drawPath(pathBean.getPath(), mPaint);
@@ -185,8 +179,8 @@ public class SVGDemoActivity extends AppCompatActivity {
         return bitmap;
     }
 
-    public Bitmap get(Context context, @XmlRes int xmlId) {
-        return this.get(context, xmlId, 1);
+    public Bitmap get(@XmlRes int xmlId) {
+        return this.get(xmlId, 1);
     }
 
 }
