@@ -87,7 +87,7 @@
             android:layout_height="36dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:src="@drawable/icon_folder" />
+            android:src="@drawable/icon_app_file_manager" />
 
         <com.suheng.structure.view.AnimImageView5
             android:id="@+id/aiv5_three"
@@ -95,7 +95,7 @@
             android:layout_height="36dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:src="@drawable/icon_calendar" />
+            android:src="@drawable/icon_app_file_manager" />
 
         <com.suheng.structure.view.AnimImageView5
             android:id="@+id/aiv5_four"

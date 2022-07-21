@@ -13,12 +13,13 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.DrawableRes;
-import androidx.core.content.ContextCompat;
+import androidx.appcompat.content.res.AppCompatResources;
 
 public class BitmapHelper {
 
     public static Bitmap get(Context context, @DrawableRes int resId, int color, float scale, float degrees) {
-        Drawable drawable = ContextCompat.getDrawable(context, resId);
+        //Drawable drawable = ContextCompat.getDrawable(context, resId);
+        Drawable drawable = AppCompatResources.getDrawable(context, resId);
         if (drawable == null) {
             throw new NullPointerException("drawable is null, please check res id!");
         } else {

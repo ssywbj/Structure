@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
 
 import com.suheng.structure.view.R;
@@ -19,8 +20,8 @@ public class DrawableActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawable);
         ImageView imageView = findViewById(R.id.image_drawable);
-        Drawable one = ContextCompat.getDrawable(this, R.drawable.icon_calendar);
-        Drawable two = ContextCompat.getDrawable(this, R.drawable.icon_folder);
+        Drawable one = AppCompatResources.getDrawable(this, R.drawable.icon_calendar);
+        Drawable two = AppCompatResources.getDrawable(this, R.drawable.icon_folder);
 
         TransitionDrawable transitionDrawable = new TransitionDrawable(new Drawable[]{
                 ContextCompat.getDrawable(this, R.drawable.beauty), ContextCompat.getDrawable(this, R.drawable.beauty2)});
