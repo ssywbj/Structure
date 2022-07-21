@@ -6,10 +6,15 @@
 
     <com.suheng.structure.view.ScrollerTrackerView
         android:layout_width="match_parent"
-        android:layout_height="180dp" />
+        android:layout_height="150dp" />
 
     <com.suheng.structure.view.ScrollerTrackerView2
         android:layout_width="match_parent"
-        android:layout_height="180dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="4dp" />
+
+    <com.suheng.structure.view.ScrollerTrackerView3
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
         android:layout_marginTop="4dp" />
 </LinearLayout>

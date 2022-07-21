@@ -10,28 +10,31 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.OverScroller;
 
 import androidx.annotation.Nullable;
 
-public class ScrollerTrackerView2 extends View {
-    private static final String TAG = ScrollerTrackerView2.class.getSimpleName();
+public class ScrollerTrackerView3 extends View {
+    private static final String TAG = ScrollerTrackerView3.class.getSimpleName();
     private int mIndex;
     private Paint mPaint;
     private int mWidth;
     private int mTouchCurrentX, mTouchDownX;
     private int mMaxScrollLength, mDataSize = 3;
 
-    public ScrollerTrackerView2(Context context) {
+    private OverScroller mScroller;
+
+    public ScrollerTrackerView3(Context context) {
         super(context);
         this.init();
     }
 
-    public ScrollerTrackerView2(Context context, @Nullable AttributeSet attrs) {
+    public ScrollerTrackerView3(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.init();
     }
 
-    public ScrollerTrackerView2(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ScrollerTrackerView3(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.init();
     }
@@ -42,6 +45,8 @@ public class ScrollerTrackerView2 extends View {
         mPaint.setColor(Color.BLACK);
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, metrics));
+
+        this.initScroller();
     }
 
     @Override
@@ -59,7 +64,7 @@ public class ScrollerTrackerView2 extends View {
             return;
         }
 
-        Log.d(TAG, "onDraw, mDataSize: " + mDataSize);
+        //Log.v(TAG, "onDraw, mDataSize: " + mDataSize);
         canvas.save();
         for (int i = 0; i < mDataSize; i++) {
             String text = "页面：" + i;
@@ -95,15 +100,8 @@ public class ScrollerTrackerView2 extends View {
                     }
                 }
 
-                /*scrollBy(dmx, 0);
-                if (getScrollX() <= 0) { //最左边
-                    scrollTo(0, 0);
-                }
-                if (getScrollX() >= mMaxScrollLength) { //最右边
-                    scrollTo(mMaxScrollLength, 0);
-                }*/
                 mTouchCurrentX = moveX;
-                Log.v(TAG, "action_move, getScrollX(): " + getScrollX() + ", dmx: " + dmx);
+                //Log.v(TAG, "action_move, getScrollX(): " + getScrollX() + ", dmx: " + dmx);
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
@@ -121,12 +119,55 @@ public class ScrollerTrackerView2 extends View {
                         }
                     }
                 }
-                scrollTo(mIndex * mWidth, 0);
+                this.smoothScrollTo(mIndex * mWidth);
                 Log.v(TAG, "action_up, getScrollX(): " + getScrollX() + ", dux: " + dux + ", isChangePage: " + isChangePage);
                 break;
         }
 
         return true;
+    }
+
+    private void initScroller() {
+        mScroller = new OverScroller(getContext());
+    }
+
+    private void smoothScrollTo(int offsetX) {
+        //scrollTo(offsetX, 0);
+        int currX = mScroller.getCurrX();
+        int finalX = mScroller.getFinalX();
+        int startX = getScrollX();
+        int dx = offsetX - startX;
+        Log.d(TAG, "smoothScrollTo, startX: " + startX + ", dx: " + dx + ", finalX: " + finalX + ", currX: " + currX);
+
+        //startX：开始点的x坐标；startY：开始点的y坐标；dx：水平方向的偏移量，正数会将内容向左滚动；dy：垂直方向的偏移量，正数会将内容向上滚动。
+        mScroller.startScroll(startX, 0, dx, 0, 500);
+
+        invalidate();
+    }
+
+    @Override
+    public void computeScroll() {
+        super.computeScroll();
+        boolean finished = mScroller.isFinished();
+        //计算滚动中的新坐标，会配合着getCurrX()和getCurrY()。如果返回true，说明动画未完成；若返回false，说明动画已经完成或是被终止。
+        boolean computeScrollOffset = mScroller.computeScrollOffset();
+        if (computeScrollOffset) {
+            int currX = mScroller.getCurrX(); //滚动中的水平方向相对于原点的偏移量，即当前的X坐标。
+            int finalX = mScroller.getFinalX(); //最终滚动到的X坐标，最终是Scroller.getCurrX()=Scroller.getFinalX()
+            scrollTo(currX, 0);
+            invalidate();
+            Log.d(TAG, "computeScroll, finished: " + finished + ", currX: " + currX + ", finalX: " + finalX);
+        } else {
+            Log.d(TAG, "computeScroll, finished: " + finished);
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (!mScroller.isFinished()) {
+            mScroller.abortAnimation();
+        }
     }
 
 }
