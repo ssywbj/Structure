@@ -16,11 +16,10 @@ import androidx.annotation.Nullable;
 
 public class ScrollerTrackerView4 extends View {
     private static final String TAG = ScrollerTrackerView4.class.getSimpleName();
-    private int mIndex;
+    private int mIndex, mOffsetX;
     private Paint mPaint;
     private int mWidth;
     private int mTouchCurrentX, mTouchDownX;
-    private int mMaxScrollLength, mDataSize = 3;
 
     private OverScroller mScroller;
 
@@ -53,8 +52,6 @@ public class ScrollerTrackerView4 extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         mWidth = getMeasuredWidth();
-        mMaxScrollLength = (mDataSize - 1) * mWidth;
-        Log.v(TAG, "onMeasure, MaxFlingLength：" + mMaxScrollLength);
     }
 
     @Override
@@ -64,9 +61,9 @@ public class ScrollerTrackerView4 extends View {
             return;
         }
 
-        drawText(canvas, (mIndex - 1) * mWidth, mIndex - 1);
-        drawText(canvas, mIndex * mWidth, mIndex);
-        drawText(canvas, (mIndex + 1) * mWidth, mIndex + 1);
+        this.drawText(canvas, (mIndex - 1) * mWidth, mIndex - 1);
+        this.drawText(canvas, mIndex * mWidth, mIndex);
+        this.drawText(canvas, (mIndex + 1) * mWidth, mIndex + 1);
     }
 
     private void drawText(Canvas canvas, int startX, int index) {
@@ -86,12 +83,13 @@ public class ScrollerTrackerView4 extends View {
                 break;
             case MotionEvent.ACTION_MOVE:
                 final int moveX = (int) event.getX();
-                final int dmx = mTouchCurrentX - moveX;
-                //scrollBy(dmx, 0);
-                //mTouchCurrentX = moveX;
-                //Log.v(TAG, "action_move, getScrollX(): " + getScrollX() + ", dmx: " + dmx);
 
-                this.smoothScrollTo(mTouchCurrentX - moveX + mIndex * mWidth);
+                /*final int dmx = mTouchCurrentX - moveX;
+                scrollBy(dmx, 0);
+                mTouchCurrentX = moveX;
+                Log.v(TAG, "action_move, getScrollX(): " + getScrollX() + ", dmx: " + dmx);*/
+
+                this.smoothScrollTo(mTouchDownX - moveX + mOffsetX);
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
@@ -105,8 +103,11 @@ public class ScrollerTrackerView4 extends View {
                         mIndex--;
                     }
                 }
+
+                mOffsetX = mIndex * mWidth;
+                //this.smoothScrollTo2(mIndex * mWidth);
                 this.smoothScrollTo(mIndex * mWidth);
-                Log.v(TAG, "action_up, getScrollX(): " + getScrollX() + ", dux: " + dux + ", isChangePage: " + isChangePage);
+                Log.v(TAG, "action_up, mIndex: " + mIndex + ", dux: " + dux + ", isChangePage: " + isChangePage);
                 break;
         }
 
@@ -119,11 +120,25 @@ public class ScrollerTrackerView4 extends View {
 
     private void smoothScrollTo(int offsetX) {
         //scrollTo(offsetX, 0);
+
         int currX = mScroller.getCurrX();
-        int finalX = mScroller.getFinalX();
+        int startX = mScroller.getFinalX();
+        int dx = offsetX - startX;
+        Log.v(TAG, "smoothScrollTo, offsetX: " + offsetX + ", startX: " + startX + ", dx: " + dx + ", currX: " + currX);
+
+        //startX：开始点的x坐标；startY：开始点的y坐标；dx：水平方向的偏移量，正数会将内容向左滚动；dy：垂直方向的偏移量，正数会将内容向上滚动。
+        mScroller.startScroll(startX, 0, dx, 0, 500);
+
+        invalidate();
+    }
+
+    private void smoothScrollTo2(int offsetX) {
+        //scrollTo(offsetX, 0);
+
+        int currX = mScroller.getCurrX();
         int startX = getScrollX();
         int dx = offsetX - startX;
-        Log.d(TAG, "smoothScrollTo, startX: " + startX + ", dx: " + dx + ", finalX: " + finalX + ", currX: " + currX);
+        Log.v(TAG, "smoothScrollTo, offsetX: " + offsetX + ", startX: " + startX + ", dx: " + dx + ", currX: " + currX);
 
         //startX：开始点的x坐标；startY：开始点的y坐标；dx：水平方向的偏移量，正数会将内容向左滚动；dy：垂直方向的偏移量，正数会将内容向上滚动。
         mScroller.startScroll(startX, 0, dx, 0, 500);
