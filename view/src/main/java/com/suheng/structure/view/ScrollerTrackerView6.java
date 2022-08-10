@@ -9,43 +9,34 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
-import android.view.VelocityTracker;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 
 import androidx.annotation.Nullable;
 
-public class ScrollerTrackerView5 extends View {
-    private static final String TAG = ScrollerTrackerView5.class.getSimpleName();
+public class ScrollerTrackerView6 extends View {
+    private static final String TAG = ScrollerTrackerView6.class.getSimpleName();
     private int mIndex, mOffsetX;
     private Paint mPaint;
     private int mWidth;
-    private int mTouchDownX;
+    private int mTouchCurrentX, mTouchDownX;
 
     private OverScroller mScroller;
 
-    private VelocityTracker mVelocityTracker;
-    /**
-     * 滑动的最大速度
-     */
-    private int mMaximumVelocity;
-    /**
-     * 滑动的最小速度
-     */
-    private int mMinimumVelocity;
+    private boolean mIsCycle = true;
+    private int mCycleNum = 3;
 
-    public ScrollerTrackerView5(Context context) {
+    public ScrollerTrackerView6(Context context) {
         super(context);
         this.init();
     }
 
-    public ScrollerTrackerView5(Context context, @Nullable AttributeSet attrs) {
+    public ScrollerTrackerView6(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.init();
     }
 
-    public ScrollerTrackerView5(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ScrollerTrackerView6(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.init();
     }
@@ -73,40 +64,43 @@ public class ScrollerTrackerView5 extends View {
             return;
         }
 
-        this.drawText(canvas, (mIndex - 1) * mWidth, mIndex - 1);
-        this.drawText(canvas, mIndex * mWidth, mIndex);
-        this.drawText(canvas, (mIndex + 1) * mWidth, mIndex + 1);
+        int index = mIsCycle ? Math.abs(mIndex) % mCycleNum : mIndex;
+        int pageIndexPrevious = index - 1;
+        if (pageIndexPrevious < 0) {
+            pageIndexPrevious = mCycleNum - 1;
+        }
+        drawText(canvas, (mIndex - 1) * mWidth, pageIndexPrevious);
+        drawText(canvas, mIndex * mWidth, index);
+        int pageIndexNext = index + 1;
+        if (pageIndexNext > mCycleNum - 1) {
+            pageIndexNext = 0;
+        }
+        drawText(canvas, (mIndex + 1) * mWidth, pageIndexNext);
     }
 
-    private void drawText(Canvas canvas, int startX, int index) {
+    private void drawText(Canvas canvas, int dx, int pageIndex) {
         canvas.save();
-        canvas.translate(startX, 0);
-        String text = "页面：" + index;
-        canvas.drawText(text, 10, 100, mPaint);
+        canvas.translate(dx, 0);
+        String text = "页面：" + pageIndex;
+        canvas.drawText(text, 800, 100, mPaint);
+        //canvas.drawText(text, 10, 100, mPaint);
         canvas.restore();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        mVelocityTracker.addMovement(event);
-
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mTouchDownX = (int) event.getX();
+                mTouchCurrentX = mTouchDownX;
                 break;
             case MotionEvent.ACTION_MOVE:
                 final int moveX = (int) event.getX();
+
                 this.smoothScrollTo(mTouchDownX - moveX + mOffsetX);
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                //计算速度
-                //mVelocityTracker.computeCurrentVelocity(1000);
-                //float velocityXTmp = mVelocityTracker.getXVelocity();
-                mVelocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
-                float velocityX = mVelocityTracker.getXVelocity();
-                Log.v(TAG, "fling, velocityX：" + velocityX);
-
                 final int dux = (int) (mTouchDownX - event.getX());
                 boolean isChangePage = (Math.abs(dux) >= mWidth / 4); //判断抬手时可以换页的条件：滑动的距离达到视图1/4的宽度
                 if (isChangePage) { //切换页面
@@ -121,8 +115,6 @@ public class ScrollerTrackerView5 extends View {
                 mOffsetX = mIndex * mWidth;
                 this.smoothScrollTo(mIndex * mWidth);
                 Log.v(TAG, "action_up, mIndex: " + mIndex + ", dux: " + dux + ", isChangePage: " + isChangePage);
-
-                mVelocityTracker.clear(); //清除监视器事件
                 break;
         }
 
@@ -131,20 +123,11 @@ public class ScrollerTrackerView5 extends View {
 
     private void initScroller() {
         mScroller = new OverScroller(getContext());
-
-        //https://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2012/1114/558.html
-        //https://juejin.cn/post/6844903791066628110
-        //https://blog.csdn.net/shensky711/article/details/115624628
-        //https://www.paonet.com/a/7777777777777702145
-        mVelocityTracker = VelocityTracker.obtain();
-        ViewConfiguration viewConfiguration = ViewConfiguration.get(getContext());
-        mMaximumVelocity = viewConfiguration.getScaledMaximumFlingVelocity();
-        mMinimumVelocity = viewConfiguration.getScaledMinimumFlingVelocity();
-        Log.v(TAG, "init, maximumVelocity：" + mMaximumVelocity + ", minimumVelocity: " + mMinimumVelocity
-                + ", scaledTouchSlop: " + viewConfiguration.getScaledTouchSlop());
     }
 
     private void smoothScrollTo(int offsetX) {
+        //scrollTo(offsetX, 0);
+
         int currX = mScroller.getCurrX();
         int startX = mScroller.getFinalX();
         int dx = offsetX - startX;
@@ -179,7 +162,13 @@ public class ScrollerTrackerView5 extends View {
         if (!mScroller.isFinished()) {
             mScroller.abortAnimation();
         }
-        mVelocityTracker.recycle(); //回收速度监控器
     }
 
+    public void setCycle(boolean cycle) {
+        mIsCycle = cycle;
+    }
+
+    public void setCycleNum(int cycleNum) {
+        mCycleNum = cycleNum;
+    }
 }
