@@ -9,6 +9,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,6 +49,7 @@ public class BlurActivity extends AppCompatActivity {
     private final SuhengScrollFragment mSuhengScrollFragment = new SuhengScrollFragment();
     private SuhengBaseFragment mFrgCurrent;
     private ImageView mTopViewBlur;
+    private ImageView mTopViewBlur2;
     private View mViewBlur;
 
     @Override
@@ -62,6 +65,7 @@ public class BlurActivity extends AppCompatActivity {
         Log.d("Wbj", "getStatusBarHeight: " + getStatusBarHeight(this));*/
 
         mTopViewBlur = findViewById(R.id.frg_fob_image_blur);
+        mTopViewBlur2 = findViewById(R.id.frg_fob_image_blur2);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             mViewBlur = findViewById(R.id.foot_bar_blur12);
         } else {
@@ -158,8 +162,9 @@ public class BlurActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int[] location = new int[2];
-                //mViewBlur.getLocationOnScreen(location);
-                mTopViewBlur.getLocationOnScreen(location);
+                //View viewBlur = mTopViewBlur;
+                View viewBlur = mViewBlur;
+                viewBlur.getLocationOnScreen(location);
                 int x = location[0];
                 int y = location[1];
 
@@ -196,15 +201,22 @@ public class BlurActivity extends AppCompatActivity {
                     bg.recycle();
                 }*/
 
-                //mTopViewBlur.getLocationOnScreen(location);
                 x = location[0];
                 y = location[1];
                 Rect rect = new Rect();
-                rect.set(x, y, x + mTopViewBlur.getWidth(), y + mTopViewBlur.getHeight());
+                rect.set(x, y, x + viewBlur.getWidth(), y + viewBlur.getHeight());
                 Bitmap bitmap = intersectsViewBitmap(blurredView, rect);
                 //mTopViewBlur.setImageBitmap(bitmap);
                 if (bitmap != null) {
-                    mTopViewBlur.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, 15)));
+                    int radius = 18;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        mTopViewBlur.setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.REPEAT));
+                        mTopViewBlur.setImageBitmap(bitmap);
+                    } else {
+                        mTopViewBlur.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, radius)));
+                    }
+
+                    mTopViewBlur2.setImageBitmap(Toolkit.INSTANCE.blur(bitmap, radius));
                 }
             }
         });
@@ -355,11 +367,74 @@ public class BlurActivity extends AppCompatActivity {
                 }
 
                 int scrollY = view.getScrollY();
-                Bitmap viewBitmap = Bitmap.createBitmap(viewRect.width() , scrollRange, Bitmap.Config.ARGB_8888);
+                Bitmap viewBitmap = Bitmap.createBitmap(viewRect.width(), scrollRange, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(viewBitmap);
                 view.draw(canvas);
                 Log.i(TAG, "canvas w h: " + canvas.getWidth() + ", " + canvas.getHeight());
-                bitmap = Bitmap.createBitmap(viewBitmap, -dx, scrollY - dy , rect.width() , rect.height() ); //截取片断
+                bitmap = Bitmap.createBitmap(viewBitmap, -dx, scrollY - dy, rect.width(), rect.height()); //截取片断
+                if (!viewBitmap.isRecycled()) {
+                    viewBitmap.recycle();
+                }
+            } else {
+                bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+                canvas.translate(dx, dy); //平移到要截取的位置
+                view.draw(canvas);
+            }
+
+            return bitmap;
+        } else { //两个View没有相交部分
+            Log.w(TAG, "Hasn't intersect region between two views!");
+            return null;
+        }
+    }
+
+    /**
+     * @param view 要截取的View
+     * @param r    要截取的区域
+     * @return bitmap: View的区域位图
+     */
+    public static Bitmap intersectsViewBitmap(View view, Rect r, int scaleFactor) {
+        //获取View的位置及边界信息
+        int[] location = new int[2];
+        view.getLocationOnScreen(location);
+        int x = location[0];
+        int y = location[1];
+        Rect viewRect = new Rect();
+        viewRect.set(x, y, x + view.getWidth(), y + view.getHeight());
+
+        Rect rect = new Rect(r);
+        Log.d(TAG, "before intersect rect: " + rect);
+        boolean intersect = rect.intersect(viewRect);
+        if (intersect) { //要截取的区域要在View的区域之中
+            Log.i(TAG, "after intersect rect: " + rect);
+            Bitmap bitmap;
+            int dy = y - rect.top;
+            int dx = x - rect.left;
+            if ((view instanceof NestedScrollView) || (view instanceof ScrollView)) {
+                int scrollRange = 0;
+                try {
+                    Method method = View.class.getDeclaredMethod("computeVerticalScrollRange");
+                    method.setAccessible(true);
+                    Object invoke = method.invoke(view);
+                    if (invoke instanceof Integer) {
+                        scrollRange = (int) invoke;
+                        Log.i(TAG, "reflect invoke scrollRange: " + scrollRange);
+                    }
+                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                    Log.e(TAG, "reflect invoke computeVerticalScrollRange() fail!", e);
+                }
+
+                if (scrollRange == 0) {
+                    return null;
+                }
+
+                int scrollY = view.getScrollY();
+                Bitmap viewBitmap = Bitmap.createBitmap(viewRect.width(), scrollRange, Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(viewBitmap);
+                view.draw(canvas);
+                Log.i(TAG, "canvas w h: " + canvas.getWidth() + ", " + canvas.getHeight());
+                bitmap = Bitmap.createBitmap(viewBitmap, -dx, scrollY - dy, rect.width(), rect.height()); //截取片断
                 if (!viewBitmap.isRecycled()) {
                     viewBitmap.recycle();
                 }

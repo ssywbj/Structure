@@ -4,17 +4,18 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
-
-import com.google.android.renderscript.Toolkit;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,16 +48,27 @@ public class RealBlur {
         }
 
         mViewBlur = viewBlur;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            mRadius = 18;
+            mScaleFactor = 2;
+        } else {
+            mRadius = 13;
+            mScaleFactor = 6;
+        }
     }
 
     public void updateViewBlurred(View viewBlurred) {
-        if (viewBlurred == null) {
-            Log.w(TAG, "view blurred is null, return!");
+        Log.v(TAG, "setBlurredView, blurredView: " + viewBlurred);
+        if (mViewBlurred == viewBlurred) {
             return;
         }
         this.stopBlurred();
-
         mViewBlurred = viewBlurred;
+        if (mViewBlurred == null) {
+            return;
+        }
+
         mIsScrollView = ((mViewBlurred instanceof NestedScrollView) || (mViewBlurred instanceof ScrollView));
 
         ViewTreeObserver viewTreeObserver = mViewBlurred.getViewTreeObserver();
@@ -140,10 +152,21 @@ public class RealBlur {
             return;
         }
 
-        this.updateBlurViewBackground(Toolkit.INSTANCE.blur(viewBlurBitmap, mRadius));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { //12
+            //RenderEffect bitmapEffect = RenderEffect.createBitmapEffect(viewBlurBitmap);
+            //mViewBlur.setRenderEffect(bitmapEffect);
+            mViewBlur.setRenderEffect(RenderEffect.createBlurEffect(mRadius, mRadius, Shader.TileMode.REPEAT));
+            if (mViewBlur instanceof ImageView) {
+                ((ImageView) mViewBlur).setImageBitmap(viewBlurBitmap);
+            } else {
+                updateBlurViewBackground(viewBlurBitmap, true);
+            }
+        } else {
+            //this.updateBlurViewBackground(Toolkit.INSTANCE.blur(viewBlurBitmap, mRadius));
+        }
     }
 
-    private void updateBlurViewBackground(Bitmap bitmap) {
+    private void updateBlurViewBackground(Bitmap bitmap, boolean isRenderEffect) {
         if (mViewBlurBg == null) {
             mViewBlurBg = new BitmapDrawable(mViewBlur.getResources(), bitmap);
             mViewBlur.setBackground(mViewBlurBg);
@@ -159,7 +182,7 @@ public class RealBlur {
                 Log.d(TAG, "updateBlurViewBackground, 22222");
                 mViewBlurBg.setBitmap(bitmap);
                 mViewBlur.invalidateDrawable(mViewBlurBg);
-                if (!bgBitmap.isRecycled()) {
+                if (!isRenderEffect && !bgBitmap.isRecycled()) {
                     Log.d(TAG, "updateBlurViewBackground, 22222 recycle bgBitmap");
                     bgBitmap.recycle();
                 }
@@ -183,6 +206,10 @@ public class RealBlur {
                 }
             }
         }
+    }
+
+    private void updateBlurViewBackground(Bitmap bitmap) {
+        this.updateBlurViewBackground(bitmap, false);
     }
 
     private boolean getViewLocation(View view, Rect rect) {
