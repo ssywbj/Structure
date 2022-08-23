@@ -1,5 +1,6 @@
 package com.suheng.structure.view.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -8,6 +9,10 @@ import android.graphics.RenderEffect;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -41,6 +46,26 @@ public class RealBlur {
 
     private boolean mIsScrollView;
     private Bitmap mScrollViewBitmap;
+
+    private RenderScript mRenderScript;
+    private ScriptIntrinsicBlur mScriptIntrinsicBlur;
+    private Allocation mInput, mOutput;
+    private Bitmap mOutBitmap;
+
+    public RealBlur() {
+    }
+
+    public RealBlur(Context context) {
+        mRenderScript = RenderScript.create(context);
+        mScriptIntrinsicBlur = ScriptIntrinsicBlur.create(mRenderScript, Element.U8_4(mRenderScript));
+    }
+
+    private void initAllocation(Bitmap bitmap) {
+        this.recycleAllocation();
+        mInput = Allocation.createFromBitmap(mRenderScript, bitmap);
+        mOutput = Allocation.createTyped(mRenderScript, mInput.getType());
+        mOutBitmap = bitmap.copy(bitmap.getConfig(), true);
+    }
 
     public void updateViewBlur(View viewBlur) {
         if (viewBlur == null) {
@@ -129,6 +154,8 @@ public class RealBlur {
             }
             mScrollViewBitmap = null;
         }
+
+        this.recycleAllocation();
     }
 
     public void setViewBlurredAndBlur(View viewBlurred, View viewBlur) {
@@ -155,15 +182,30 @@ public class RealBlur {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { //12
             //RenderEffect bitmapEffect = RenderEffect.createBitmapEffect(viewBlurBitmap);
             //mViewBlur.setRenderEffect(bitmapEffect);
-            mViewBlur.setRenderEffect(RenderEffect.createBlurEffect(mRadius, mRadius, Shader.TileMode.REPEAT));
+
+            //mViewBlur.setRenderEffect(RenderEffect.createBlurEffect(mRadius, mRadius, Shader.TileMode.REPEAT));
+
+            RenderEffect bitmapEffect = RenderEffect.createBitmapEffect(viewBlurBitmap, new Rect(0, 0, viewBlurBitmap.getWidth(), viewBlurBitmap.getHeight())
+                    , new Rect(0, 0, mRectBlur.width(), mRectBlur.height()));
+            mViewBlur.setRenderEffect(RenderEffect.createBlurEffect(mRadius, mRadius, bitmapEffect, Shader.TileMode.REPEAT));
             if (mViewBlur instanceof ImageView) {
                 ((ImageView) mViewBlur).setImageBitmap(viewBlurBitmap);
+                //updateBlurViewBackground(viewBlurBitmap, true);
             } else {
                 updateBlurViewBackground(viewBlurBitmap, true);
             }
         } else {
             //this.updateBlurViewBackground(Toolkit.INSTANCE.blur(viewBlurBitmap, mRadius));
+            this.blur();
+            this.updateBlurViewBackground(mOutBitmap);
         }
+    }
+
+    private void blur() { //生成模糊的bitmap
+        mScriptIntrinsicBlur.setRadius(mRadius);
+        mScriptIntrinsicBlur.setInput(mInput);
+        mScriptIntrinsicBlur.forEach(mOutput);
+        mOutput.copyTo(mOutBitmap);
     }
 
     private void updateBlurViewBackground(Bitmap bitmap, boolean isRenderEffect) {
@@ -181,29 +223,22 @@ public class RealBlur {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 Log.d(TAG, "updateBlurViewBackground, 22222");
                 mViewBlurBg.setBitmap(bitmap);
-                mViewBlur.invalidateDrawable(mViewBlurBg);
+                //mViewBlur.invalidateDrawable(mViewBlurBg);
                 if (!isRenderEffect && !bgBitmap.isRecycled()) {
                     Log.d(TAG, "updateBlurViewBackground, 22222 recycle bgBitmap");
                     bgBitmap.recycle();
                 }
             } else {
-                ByteBuffer byteBuffer = null;
+                Log.d(TAG, "updateBlurViewBackground, 33333");
+                ByteBuffer byteBuffer = ByteBuffer.allocate(bitmap.getByteCount());
                 try {
-                    Log.d(TAG, "updateBlurViewBackground, 33333");
-                    byteBuffer = ByteBuffer.allocate(bitmap.getByteCount());
                     bitmap.copyPixelsToBuffer(byteBuffer);
                     bgBitmap.eraseColor(Color.TRANSPARENT);
                     bgBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
                 } catch (Exception e) {
                     Log.e(TAG, "copy bitmap to buffer fail!", e);
-                } finally {
-                    if (!bitmap.isRecycled()) {
-                        bitmap.recycle();
-                    }
-                    if (byteBuffer != null) {
-                        byteBuffer.clear();
-                    }
                 }
+                byteBuffer.clear();
             }
         }
     }
@@ -263,6 +298,7 @@ public class RealBlur {
         }
 
         if (mIsScrollView) {
+            boolean initAllocation = false;
             if (mScrollViewBitmap == null) {
                 Rect hitRect = new Rect();
                 mViewBlurred.getHitRect(hitRect);
@@ -300,6 +336,8 @@ public class RealBlur {
                 if (!bitmap.isRecycled()) {
                     bitmap.recycle();
                 }
+
+                initAllocation = true;
             }
 
             int scrollY = mViewBlurred.getScrollY();
@@ -321,12 +359,19 @@ public class RealBlur {
             if (bitmap != null && !bitmap.isRecycled()) {
                 bitmap.recycle();
             }
+            if (initAllocation) {
+                this.initAllocation(mViewBlurBitmap);
+            } /*else {
+                mInput.copyTo(mViewBlurBitmap);
+            }*/
         } else {
             if (mViewBlurBitmap == null) {
                 mViewBlurBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
                 mViewBlurCanvas = new Canvas(mViewBlurBitmap);
                 mViewBlurCanvas.scale(scale, scale);
                 mViewBlurCanvas.translate(dx, dy);
+
+                this.initAllocation(mViewBlurBitmap);
             }
 
             mViewBlurBitmap.eraseColor(mEraseColor);
@@ -346,5 +391,24 @@ public class RealBlur {
 
     public void setEraseColor(int eraseColor) {
         mEraseColor = eraseColor;
+    }
+
+    private void recycleAllocation() {
+        if (mInput != null) {
+            mInput.destroy();
+            mInput = null;
+        }
+
+        if (mOutput != null) {
+            mOutput.destroy();
+            mOutput = null;
+        }
+
+        if (mOutBitmap != null) {
+            if (!mOutBitmap.isRecycled()) {
+                mOutBitmap.recycle();
+            }
+            mOutBitmap = null;
+        }
     }
 }

@@ -14,6 +14,10 @@ import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyCharacterMap;
@@ -80,7 +84,8 @@ public class BlurActivity extends AppCompatActivity {
         frgs.add(mSuhengScrollFragment);
         mFrgCurrent = frgs.get(0);
 
-        RealBlur realBlur = new RealBlur();
+        //RealBlur realBlur = new RealBlur();
+        RealBlur realBlur = new RealBlur(this);
         realBlur.setViewBlurredAndBlur(mFrgCurrent.getBlurredView(), mViewBlur);
 
         viewPager.setAdapter(new FragmentStateAdapter(this) {
@@ -216,7 +221,8 @@ public class BlurActivity extends AppCompatActivity {
                         mTopViewBlur.setBackground(new BitmapDrawable(getResources(), Toolkit.INSTANCE.blur(bitmap, radius)));
                     }
 
-                    mTopViewBlur2.setImageBitmap(Toolkit.INSTANCE.blur(bitmap, radius));
+                    //mTopViewBlur2.setImageBitmap(Toolkit.INSTANCE.blur(bitmap, radius));
+                    mTopViewBlur2.setImageBitmap(getBlurBitmap(BlurActivity.this, bitmap, 18));
                 }
             }
         });
@@ -450,6 +456,47 @@ public class BlurActivity extends AppCompatActivity {
             Log.w(TAG, "Hasn't intersect region between two views!");
             return null;
         }
+    }
+
+    private RenderScript mRS;
+    private Allocation mInAllocation;
+    private Allocation[] mOutAllocations;
+    private ScriptIntrinsicBlur mScriptBlur;
+
+    /*private void createScript() {
+        mRS = RenderScript.create(this);
+
+        mInAllocation = Allocation.createFromBitmap(mRS, mBitmapIn);
+
+        mOutAllocations = new Allocation[NUM_BITMAPS];
+        for (int i = 0; i < NUM_BITMAPS; ++i) {
+            mOutAllocations[i] = Allocation.createFromBitmap(mRS, mBitmapsOut[i]);
+        }
+
+        // Create intrinsics.
+        // RenderScript has built-in features such as blur, convolve filter etc.
+        // These intrinsics are handy for specific operations without writing RenderScript kernel.
+        // In the sample, it's creating blur, convolve and matrix intrinsics.
+
+        mScriptBlur = ScriptIntrinsicBlur.create(mRS, Element.U8_4(mRS));
+        mScriptConvolve = ScriptIntrinsicConvolve5x5.create(mRS,
+                Element.U8_4(mRS));
+        mScriptMatrix = ScriptIntrinsicColorMatrix.create(mRS,
+                Element.U8_4(mRS));
+    }*/
+
+    public static Bitmap getBlurBitmap(Context context, Bitmap bitmap, int radius) {
+        RenderScript renderScript = RenderScript.create(context);
+        ScriptIntrinsicBlur scriptIntrinsicBlur = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+
+        Allocation input = Allocation.createFromBitmap(renderScript, bitmap);
+        Allocation output = Allocation.createTyped(renderScript, input.getType());
+        scriptIntrinsicBlur.setRadius(radius);
+        scriptIntrinsicBlur.setInput(input);
+        scriptIntrinsicBlur.forEach(output);
+        output.copyTo(bitmap);
+
+        return bitmap;
     }
 
 }
