@@ -458,33 +458,6 @@ public class BlurActivity extends AppCompatActivity {
         }
     }
 
-    private RenderScript mRS;
-    private Allocation mInAllocation;
-    private Allocation[] mOutAllocations;
-    private ScriptIntrinsicBlur mScriptBlur;
-
-    /*private void createScript() {
-        mRS = RenderScript.create(this);
-
-        mInAllocation = Allocation.createFromBitmap(mRS, mBitmapIn);
-
-        mOutAllocations = new Allocation[NUM_BITMAPS];
-        for (int i = 0; i < NUM_BITMAPS; ++i) {
-            mOutAllocations[i] = Allocation.createFromBitmap(mRS, mBitmapsOut[i]);
-        }
-
-        // Create intrinsics.
-        // RenderScript has built-in features such as blur, convolve filter etc.
-        // These intrinsics are handy for specific operations without writing RenderScript kernel.
-        // In the sample, it's creating blur, convolve and matrix intrinsics.
-
-        mScriptBlur = ScriptIntrinsicBlur.create(mRS, Element.U8_4(mRS));
-        mScriptConvolve = ScriptIntrinsicConvolve5x5.create(mRS,
-                Element.U8_4(mRS));
-        mScriptMatrix = ScriptIntrinsicColorMatrix.create(mRS,
-                Element.U8_4(mRS));
-    }*/
-
     public static Bitmap getBlurBitmap(Context context, Bitmap bitmap, int radius) {
         RenderScript renderScript = RenderScript.create(context);
         ScriptIntrinsicBlur scriptIntrinsicBlur = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
