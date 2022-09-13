@@ -22,6 +22,8 @@ import android.widget.ScrollView;
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 
+import com.google.android.renderscript.Toolkit;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -179,7 +181,7 @@ public class RealBlur {
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { //12
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { //S:Android 12
             //RenderEffect bitmapEffect = RenderEffect.createBitmapEffect(viewBlurBitmap);
             //mViewBlur.setRenderEffect(bitmapEffect);
 
@@ -190,14 +192,14 @@ public class RealBlur {
             mViewBlur.setRenderEffect(RenderEffect.createBlurEffect(mRadius, mRadius, bitmapEffect, Shader.TileMode.REPEAT));
             if (mViewBlur instanceof ImageView) {
                 ((ImageView) mViewBlur).setImageBitmap(viewBlurBitmap);
-                //updateBlurViewBackground(viewBlurBitmap, true);
             } else {
                 updateBlurViewBackground(viewBlurBitmap, true);
             }
         } else {
-            //this.updateBlurViewBackground(Toolkit.INSTANCE.blur(viewBlurBitmap, mRadius));
-            this.blur();
-            this.updateBlurViewBackground(mOutBitmap);
+            this.updateBlurViewBackground(Toolkit.INSTANCE.blur(viewBlurBitmap, mRadius));
+
+            //this.blur();
+            //this.updateBlurViewBackground(mOutBitmap);
         }
     }
 
@@ -354,16 +356,16 @@ public class RealBlur {
                 Log.w(TAG, "need dst bitmap dimen over source bitmap");
                 return null;
             }
-            Bitmap bitmap = mViewBlurBitmap;
-            mViewBlurBitmap = Bitmap.createBitmap(mScrollViewBitmap, x, y, dstWidth, dstHeight); //截取片断
-            if (bitmap != null && !bitmap.isRecycled()) {
-                bitmap.recycle();
+            Bitmap bitmap = Bitmap.createBitmap(mScrollViewBitmap, x, y, dstWidth, dstHeight); //截取片断;
+            if (mViewBlurBitmap == null) {
+                mViewBlurBitmap = bitmap;
+            } else {
+                copyBitmapFromBuffer(mViewBlurBitmap, bitmap, true);
             }
+            Log.v(TAG, "mViewBlurBitmap: " + mViewBlurBitmap);
             if (initAllocation) {
                 this.initAllocation(mViewBlurBitmap);
-            } /*else {
-                mInput.copyTo(mViewBlurBitmap);
-            }*/
+            }
         } else {
             if (mViewBlurBitmap == null) {
                 mViewBlurBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_4444);
@@ -411,4 +413,24 @@ public class RealBlur {
             mOutBitmap = null;
         }
     }
+
+    public static void copyBitmapFromBuffer(Bitmap dst, Bitmap src, boolean recycleSrc) {
+        ByteBuffer byteBuffer = null;
+        try {
+            byteBuffer = ByteBuffer.allocate(src.getByteCount());
+            src.copyPixelsToBuffer(byteBuffer);
+            dst.eraseColor(Color.TRANSPARENT);
+            dst.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer.array()));
+        } catch (Exception e) {
+            Log.e(TAG, "copy src form buffer fail!", e);
+        } finally {
+            if (recycleSrc && !src.isRecycled()) {
+                src.recycle();
+            }
+            if (byteBuffer != null) {
+                byteBuffer.clear();
+            }
+        }
+    }
+
 }
