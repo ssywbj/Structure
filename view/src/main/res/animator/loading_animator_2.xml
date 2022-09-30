@@ -2,8 +2,9 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:ordering="sequentially">
 
+    <!--从右上平移到下方且左侧坐标向左沿伸-->
     <objectAnimator
-        android:duration="@integer/svg_anim_duration"
+        android:duration="@integer/water_drop_anim_duration"
         android:interpolator="@android:interpolator/decelerate_cubic"
         android:propertyName="pathData"
         android:valueFrom="
@@ -22,8 +23,9 @@
             L180,180"
         android:valueType="pathType" />
 
+    <!--在下方的位置上，右侧坐标向左缩短-->
     <objectAnimator
-        android:duration="@integer/svg_anim_duration"
+        android:duration="@integer/water_drop_anim_duration"
         android:interpolator="@android:interpolator/decelerate_cubic"
         android:propertyName="pathData"
         android:valueFrom="
@@ -42,8 +44,9 @@
             L80,180"
         android:valueType="pathType" />
 
+    <!--从下方平移到上方且右侧坐标向右沿伸-->
     <objectAnimator
-        android:duration="@integer/svg_anim_duration"
+        android:duration="@integer/water_drop_anim_duration"
         android:interpolator="@android:interpolator/decelerate_cubic"
         android:propertyName="pathData"
         android:valueFrom="
@@ -54,7 +57,7 @@
             M20,180
             L80,180"
         android:valueTo="
-             M20,30
+            M20,30
             L180,30
             M20,60
             L180,60
@@ -62,8 +65,9 @@
             L180,90"
         android:valueType="pathType" />
 
+    <!--在上方的位置上，左侧坐标向右缩短恢复到在右上的形状-->
     <objectAnimator
-        android:duration="@integer/svg_anim_duration"
+        android:duration="@integer/water_drop_anim_duration"
         android:interpolator="@android:interpolator/decelerate_cubic"
         android:propertyName="pathData"
         android:valueFrom="

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/loading">
+
+    <target
+        android:name="@string/loading_path_1"
+        android:animation="@animator/loading_animator_1" />
+
+    <target
+        android:name="@string/loading_path_2"
+        android:animation="@animator/loading_animator_2" />
+
+    <target
+        android:name="@string/loading_path_3"
+        android:animation="@animator/loading_animator_3" />
+
+</animated-vector>
+

@@ -2,9 +2,11 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:ordering="sequentially"><!--按顺序执行-->
 
-    <!--依次执行 pathData 位置变换-->
+    <!--依次执行pathData，实现位置的变换-->
+
+    <!--左上平移到右上-->
     <objectAnimator
-        android:duration="@integer/svg_anim_duration"
+        android:duration="@integer/water_drop_anim_duration"
         android:interpolator="@android:interpolator/decelerate_cubic"
         android:propertyName="pathData"
         android:valueFrom="
@@ -27,8 +29,9 @@
             L100,30"
         android:valueType="pathType" />
 
+    <!--右上平移到右下-->
     <objectAnimator
-        android:duration="@integer/svg_anim_duration"
+        android:duration="@integer/water_drop_anim_duration"
         android:interpolator="@android:interpolator/decelerate_cubic"
         android:propertyName="pathData"
         android:valueFrom="
@@ -51,8 +54,9 @@
             L100,120"
         android:valueType="pathType" />
 
+    <!--右下平移到左下-->
     <objectAnimator
-        android:duration="@integer/svg_anim_duration"
+        android:duration="@integer/water_drop_anim_duration"
         android:interpolator="@android:interpolator/decelerate_cubic"
         android:propertyName="pathData"
         android:valueFrom="
@@ -75,8 +79,9 @@
             L20,120"
         android:valueType="pathType" />
 
+    <!--左下平移到左上（归位）-->
     <objectAnimator
-        android:duration="@integer/svg_anim_duration"
+        android:duration="@integer/water_drop_anim_duration"
         android:interpolator="@android:interpolator/decelerate_cubic"
         android:propertyName="pathData"
         android:valueFrom="

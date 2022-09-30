@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,15 +33,22 @@ import java.util.List;
 
 public class SVGDemoActivity extends AppCompatActivity {
 
+    //https://xianxiaotao.github.io/2019/07/05/05%20CUSTOM%20VIEW/05.2%20%E7%B2%BE%E9%80%9A%E8%87%AA%E5%AE%9A%E4%B9%89%20View%20%E4%B9%8B%E5%8A%A8%E7%94%BB%E8%BF%9B%E9%98%B6%E2%80%94%E2%80%94SVG%20%E5%8A%A8%E7%94%BB/
+    //https://blog.csdn.net/EthanCo/article/details/104092794
+    //https://developer.android.com/guide/topics/graphics/vector-drawable-resources?hl=zh-cn
+    //https://blog.csdn.net/zyjzyj2/article/details/53530568
+    //https://juejin.cn/post/6844903524103356430
+    //https://www.jianshu.com/p/456df1434739
+    //https://maronyea.me/dev/304/
+    //https://svga.io/svga-preview.html
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_svg_demo);
 
         ImageView imageView = findViewById(R.id.image_svg);
-        //AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.water_drop_anim);
-        //final AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.tt_search_anim);
-        final AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.tt_search_anim);
+        //final AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.checkbox_checked_animated);
+        final AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.checkbox_checked_animated2);
         imageView.setImageDrawable(vectorDrawableCompat);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,24 +68,70 @@ public class SVGDemoActivity extends AppCompatActivity {
                         }
                     });
                     vectorDrawableCompat.start();
+                    vectorDrawableCompat.jumpToCurrentState();
+                }
+            }
+        });
+        ImageView imageViewRev = findViewById(R.id.image_svg_rev);
+        AnimatedVectorDrawableCompat drawableRev = AnimatedVectorDrawableCompat.create(this, R.drawable.checkbox_unchecked_animated);
+        imageViewRev.setImageDrawable(drawableRev);
+        imageViewRev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawableRev != null) {
+                    drawableRev.start();
                 }
             }
         });
 
-        ImageView imageView2 = findViewById(R.id.image_svg2);
-        //imageView2.setImageBitmap(BitmapHelper.get(this, R.drawable.tt_search_colors, Color.BLACK));
-
-        this.getPathList();
-
-        try {
-            Drawable fromXml = Drawable.createFromXml(getResources(), getResources().getXml(R.xml.tt_search_colors));
-            Log.i(TAG, "fromXml: " + fromXml.getIntrinsicWidth() + ", " + fromXml.getIntrinsicHeight());
-            //imageView2.setImageDrawable(fromXml);
-        } catch (IOException | XmlPullParserException e) {
-            Log.e(TAG, "fromXml error", e);
+        ImageView imageWaterDrop = findViewById(R.id.image_water_drop);
+        Drawable drawableWaterDrop = imageWaterDrop.getDrawable();
+        if (drawableWaterDrop instanceof Animatable) {
+            ((Animatable) drawableWaterDrop).start();
         }
+        imageWaterDrop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Drawable drawable = imageWaterDrop.getDrawable();
+                if (drawable instanceof Animatable) {
+                    ((Animatable) drawable).start();
+                }
+            }
+        });
 
-        imageView2.setImageBitmap(get(R.xml.tt_search_colors, 1));
+        ImageView imageLoading = findViewById(R.id.image_loading);
+        //imageLoading.setImageBitmap(BitmapHelper.get(this, R.drawable.loading2, Color.BLACK));
+        this.getPathList();
+        try {
+            /*Drawable drawableSearch = Drawable.createFromXml(getResources(), getResources().getXml(R.xml.loading2));
+            Log.i(TAG, "from xml, drawableSearch: " + drawableSearch.getIntrinsicWidth() + ", " + drawableSearch.getIntrinsicHeight());
+            imageLoading.setImageDrawable(drawableSearch);*/
+
+            imageLoading.setImageDrawable(AnimatedVectorDrawableCompat.create(this, R.drawable.loading_animated));
+            imageLoading.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Drawable drawable = imageLoading.getDrawable();
+                    if (drawable instanceof Animatable) {
+                        ((Animatable) drawable).start();
+                    }
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "from xml error", e);
+        }
+        //imageLoading.setImageBitmap(get(R.xml.tt_search_colors, 1));
+
+        /*ImageView imageSearch = findViewById(R.id.image_search);
+        imageSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Drawable drawable = imageSearch.getDrawable();
+                if (drawable instanceof Animatable) {
+                    ((Animatable) drawable).start();
+                }
+            }
+        });*/
     }
 
     private static final String NAME_SPACE = "http://schemas.android.com/apk/res/android";
@@ -87,7 +141,7 @@ public class SVGDemoActivity extends AppCompatActivity {
     private static final String TAG = "Wbj";
 
     private void getPathList() {
-        XmlResourceParser parser = getResources().getXml(R.xml.tt_search_colors);
+        XmlResourceParser parser = getResources().getXml(R.xml.loading2);
         try {
             ChinaMapView.PathBean pathBean;
             RectF rectF = new RectF();

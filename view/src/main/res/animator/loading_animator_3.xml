@@ -3,7 +3,7 @@
     android:ordering="sequentially">
 
     <objectAnimator
-        android:duration="@integer/svg_anim_duration"
+        android:duration="@integer/water_drop_anim_duration"
         android:interpolator="@android:interpolator/decelerate_cubic"
         android:propertyName="pathData"
         android:valueFrom="
@@ -23,7 +23,7 @@
         android:valueType="pathType" />
 
     <objectAnimator
-        android:duration="@integer/svg_anim_duration"
+        android:duration="@integer/water_drop_anim_duration"
         android:interpolator="@android:interpolator/decelerate_cubic"
         android:propertyName="pathData"
         android:valueFrom="
@@ -43,7 +43,7 @@
         android:valueType="pathType" />
 
     <objectAnimator
-        android:duration="@integer/svg_anim_duration"
+        android:duration="@integer/water_drop_anim_duration"
         android:interpolator="@android:interpolator/decelerate_cubic"
         android:propertyName="pathData"
         android:valueFrom="
@@ -63,7 +63,7 @@
         android:valueType="pathType" />
 
     <objectAnimator
-        android:duration="@integer/svg_anim_duration"
+        android:duration="@integer/water_drop_anim_duration"
         android:interpolator="@android:interpolator/decelerate_cubic"
         android:propertyName="pathData"
         android:valueFrom="

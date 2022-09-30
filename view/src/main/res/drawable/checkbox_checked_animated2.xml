@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/checkbox_checked">
+
+    <target
+        android:name="@string/checked_fill_color"
+        android:animation="@animator/checkbox_checked_animator" />
+
+    <!--<target
+        android:name="@string/checked_hook_path"
+        android:animation="@animator/water_drop_anim" />-->
+</animated-vector>

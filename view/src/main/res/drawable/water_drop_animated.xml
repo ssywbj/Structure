@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/water_drop">
+
+    <target
+        android:name="@string/water_drop_path_1"
+        android:animation="@animator/water_drop_animator" />
+
+    <target
+        android:name="@string/water_drop_path_2"
+        android:animation="@animator/water_drop_animator" />
+
+    <target
+        android:name="@string/water_drop_path_3"
+        android:animation="@animator/water_drop_animator" />
+</animated-vector>
+

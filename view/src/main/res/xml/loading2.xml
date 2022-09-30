@@ -6,7 +6,7 @@
     android:viewportHeight="200">
 
     <path
-        android:name="@string/tt_search_path_1"
+        android:name="@string/loading_path_1"
         android:fillColor="#C2BFBF"
         android:pathData="
             M20,30
@@ -22,7 +22,7 @@
         android:strokeLineCap="round" />
 
     <path
-        android:name="@string/tt_search_path_2"
+        android:name="@string/loading_path_2"
         android:pathData="
             M120,30
             L180,30
@@ -35,7 +35,7 @@
         android:strokeLineCap="round" />
 
     <path
-        android:name="@string/tt_search_path_3"
+        android:name="@string/loading_path_3"
         android:pathData="
             M20,120
             L180,120

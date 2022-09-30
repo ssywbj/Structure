@@ -17,16 +17,15 @@
     <string name="nov">Nov</string>
     <string name="dec">Dec</string>
 
-    <integer name="svg_anim_duration">1000</integer>
-    <string name="w_drop_path_1" translatable="false">w_drop_path</string>
-    <string name="w_drop_path_2" translatable="false">w_drop_path_2</string>
-    <string name="w_drop_path_3" translatable="false">w_drop_path_3</string>
-    <string name="search_path_1" translatable="false">search_path</string>
-    <string name="search_path_2" translatable="false">search_path_2</string>
-    <string name="search_path_3" translatable="false">search_path_3</string>
-    <string name="tt_search_path_1" translatable="false">tt_search_path</string>
-    <string name="tt_search_path_2" translatable="false">tt_search_path_2</string>
-    <string name="tt_search_path_3" translatable="false">tt_search_path_3</string>
+    <integer name="water_drop_anim_duration">1000</integer>
+    <string name="water_drop_path_1" translatable="false">w_drop_path</string>
+    <string name="water_drop_path_2" translatable="false">w_drop_path_2</string>
+    <string name="water_drop_path_3" translatable="false">w_drop_path_3</string>
+    <string name="loading_path_1" translatable="false">loading_path</string>
+    <string name="loading_path_2" translatable="false">loading_path_2</string>
+    <string name="loading_path_3" translatable="false">loading_path_3</string>
+    <string name="checked_fill_color" translatable="false">checked_fill_color</string>
+    <string name="checked_hook_path" translatable="false">checked_hook_path</string>
 
     <integer name="anim_duration_medium">300</integer>
     <string name="picture_bottom_number">共 %d 张图片</string>

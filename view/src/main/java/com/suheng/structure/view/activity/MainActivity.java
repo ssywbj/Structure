@@ -85,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
         mStringList.add("Blur");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "BlurActivity");
 
-        startActivity(new Intent(this, ScrollTrackerActivity.class));
+        //startActivity(new Intent(this, ScrollTrackerActivity.class));
+        startActivity(new Intent(this, SVGDemoActivity.class));
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();
