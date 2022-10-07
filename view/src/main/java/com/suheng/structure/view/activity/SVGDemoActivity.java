@@ -41,6 +41,10 @@ public class SVGDemoActivity extends AppCompatActivity {
     //https://www.jianshu.com/p/456df1434739
     //https://maronyea.me/dev/304/
     //https://svga.io/svga-preview.html
+
+    //https://juejin.cn/post/6844903523696525325
+    //https://www.cnblogs.com/yuhanghzsd/p/5466846.html
+    //https://blog.csdn.net/weixin_41620505/article/details/107255168
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
