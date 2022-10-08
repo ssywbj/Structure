@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/wbj_svg1">
+
+    <target
+        android:name="wbj_svg1"
+        android:animation="@animator/wbj_svg1_animator" />
+
+    <target
+        android:name="wbj_svg2"
+        android:animation="@animator/wbj_svg1_animator" />
+
+    <target
+        android:name="wbj_svg3"
+        android:animation="@animator/wbj_svg1_animator" />
+</animated-vector>

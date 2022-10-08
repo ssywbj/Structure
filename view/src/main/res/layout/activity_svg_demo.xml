@@ -25,8 +25,9 @@
 
         <ImageView
             android:id="@+id/image_svg"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/black" />
 
         <ImageView
             android:id="@+id/image_svg_rev"
@@ -62,6 +63,30 @@
             android:layout_marginStart="4dp"
             android:background="@drawable/checkbox_style_selector__animated2"
             android:button="@null" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <com.suheng.structure.view.AnimCheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:padding="4dp"
+            android:text="ACB1" />
+
+        <!--<com.suheng.structure.view.AnimCheckBox
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/checkbox_style_selector"
+            android:button="@null"
+            android:checked="true"
+            android:text="ACB2" />-->
     </LinearLayout>
 
     <LinearLayout

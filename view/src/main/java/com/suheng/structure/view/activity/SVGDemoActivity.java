@@ -45,6 +45,7 @@ public class SVGDemoActivity extends AppCompatActivity {
     //https://juejin.cn/post/6844903523696525325
     //https://www.cnblogs.com/yuhanghzsd/p/5466846.html
     //https://blog.csdn.net/weixin_41620505/article/details/107255168
+    //https://www.jianshu.com/p/4707a4738a51
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +53,8 @@ public class SVGDemoActivity extends AppCompatActivity {
 
         ImageView imageView = findViewById(R.id.image_svg);
         //final AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.checkbox_checked_animated);
-        final AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.checkbox_checked_animated2);
+        //final AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.checkbox_checked_animated2);
+        final AnimatedVectorDrawableCompat vectorDrawableCompat = AnimatedVectorDrawableCompat.create(this, R.drawable.wbj_svg1_animated);
         imageView.setImageDrawable(vectorDrawableCompat);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,8 +73,12 @@ public class SVGDemoActivity extends AppCompatActivity {
                             Log.d("Wbj", "-----svg anim end-----");
                         }
                     });
-                    vectorDrawableCompat.start();
-                    vectorDrawableCompat.jumpToCurrentState();
+
+                    if (vectorDrawableCompat.isRunning()) {
+                        vectorDrawableCompat.jumpToCurrentState();
+                    } else {
+                        vectorDrawableCompat.start();
+                    }
                 }
             }
         });

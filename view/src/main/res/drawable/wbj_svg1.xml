@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+
+    <!--画一个矩形-->
+    <!--<path
+        android:name="wbj_svg1"
+        android:fillColor="@android:color/holo_blue_light"
+        android:pathData="M3,18L21,18L21,16L3,16z" />-->
+
+    <!--以下路径等价于上方路径-->
+    <path
+        android:name="wbj_svg1"
+        android:fillColor="@android:color/holo_blue_light"
+        android:pathData="M3,18h18v-3h-18z" />
+
+    <!--画一条线-->
+    <path
+        android:name="wbj_svg2"
+        android:pathData="M3,12h18"
+        android:strokeWidth="2"
+        android:strokeColor="@android:color/holo_purple"
+        android:strokeLineCap="round" />
+
+    <path
+        android:name="wbj_svg3"
+        android:pathData="M10,24L20,36L38,12"
+        android:strokeWidth="3"
+        android:strokeColor="@android:color/holo_red_light"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
