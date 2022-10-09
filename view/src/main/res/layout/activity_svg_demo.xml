@@ -72,7 +72,13 @@
         android:orientation="horizontal"
         android:padding="4dp">
 
+        <ImageView
+            android:id="@+id/image_checked_drawable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
         <com.suheng.structure.view.AnimCheckBox
+            android:id="@+id/anim_check_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"

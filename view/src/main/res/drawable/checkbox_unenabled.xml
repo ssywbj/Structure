@@ -12,7 +12,7 @@
 
     <path
         android:fillAlpha="0.3"
-        android:fillColor="#D8D8D8"
+        android:fillColor="#FF0000"
         android:fillType="evenOdd"
         android:pathData="M16.7,6.3h38.7c5.7,0 10.3,4.6 10.3,10.3v38.7c0,5.7 -4.6,10.3 -10.3,10.3H16.7C11,65.6 6.3,61 6.3,55.3V16.7C6.3,11 11,6.3 16.7,6.3z" />
 </vector>

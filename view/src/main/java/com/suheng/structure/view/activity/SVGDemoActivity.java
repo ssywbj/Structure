@@ -21,6 +21,7 @@ import androidx.core.graphics.PathParser;
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
+import com.suheng.structure.view.AnimCheckBox;
 import com.suheng.structure.view.ChinaMapView;
 import com.suheng.structure.view.R;
 
@@ -142,6 +143,12 @@ public class SVGDemoActivity extends AppCompatActivity {
                 }
             }
         });*/
+
+        AnimCheckBox AnimCB = findViewById(R.id.anim_check_box);
+        //AnimCB.setChecked(false);
+        ImageView imageCheckedDrawable = findViewById(R.id.image_checked_drawable);
+        //imageCheckedDrawable.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.checkbox_checked));
+        //imageCheckedDrawable.setImageDrawable(new CheckedDrawable(Color.RED));
     }
 
     private static final String NAME_SPACE = "http://schemas.android.com/apk/res/android";
