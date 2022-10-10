@@ -22,7 +22,7 @@ import androidx.core.content.ContextCompat;
 
 //https://www.kancloud.cn/alex_wsc/android_art/1828599
 //https://blog.csdn.net/lmj623565791/article/details/43752383
-public class CheckedDrawable extends Drawable {
+public class RadioDrawable extends Drawable {
     private static final String PVH_LEFT = "pvh_left";
     private static final String PVH_TOP = "pvh_top";
     private static final String PVH_RADIUS = "pvh_radius";
@@ -39,7 +39,7 @@ public class CheckedDrawable extends Drawable {
     private int mAlpha = 255, mCurrentAlpha;
     private float mRadius = 10.67f * 3, mCurrentRadius;
 
-    public CheckedDrawable(Context context, boolean isChecked) {
+    public RadioDrawable(Context context, boolean isChecked) {
         mContext = context;
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
         mPath = new Path();
@@ -49,7 +49,7 @@ public class CheckedDrawable extends Drawable {
         this.setChecked(isChecked);
     }
 
-    public CheckedDrawable(Context context) {
+    public RadioDrawable(Context context) {
         this(context, false);
     }
 
@@ -63,8 +63,8 @@ public class CheckedDrawable extends Drawable {
     }
 
     private void setBitmap() {
-        mNormalBitmap = CheckedDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.checkbox_unchecked));
-        mCheckedBitmap = CheckedDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.checkbox_checked_bg));
+        mNormalBitmap = RadioDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.checkbox_unchecked));
+        mCheckedBitmap = RadioDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.checkbox_checked_bg));
         /*mCheckedBitmap = Bitmap.createBitmap(normalBitmap.getWidth(), normalBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mCheckedBitmap);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);

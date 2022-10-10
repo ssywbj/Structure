@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/checked_box_wh"
+    android:height="@dimen/checked_box_wh"
+    android:viewportWidth="72"
+    android:viewportHeight="72">
+
+    <path
+        android:fillColor="#A1A1A1"
+        android:pathData="M35.9749,1.1499c19.0708,0 34.825,15.7542 34.825,34.825s-15.7542,34.825 -34.825,34.825s-34.825,-15.7542 -34.825,-34.825S16.9041,1.1499 35.9749,1.1499zM35.9749,6.1249c-16.5833,0 -29.85,13.2667 -29.85,29.85s13.2667,29.85 29.85,29.85s29.85,-13.2667 29.85,-29.85S52.5583,6.1249 35.9749,6.1249z" />
+</vector>

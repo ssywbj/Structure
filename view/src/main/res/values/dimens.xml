@@ -24,4 +24,6 @@
     <dimen name="picker_wheel_width_day">56dp</dimen>
     <dimen name="picker_wheel_width_month_day">134dp</dimen>
 
+    <dimen name="checked_box_wh">48dp</dimen>
+
 </resources>
