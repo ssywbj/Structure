@@ -87,20 +87,23 @@
             android:text="ACB1" />
 
         <RadioGroup
+            android:id="@+id/svg_radio_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:orientation="horizontal">
 
-            <com.suheng.structure.view.AnimRadioButton
+            <!--在RadioGroup中要为每个RadioButton添加一个id，不然单选功能会生效-->
+
+            <!--<com.suheng.structure.view.AnimRadioButton
+                android:id="@+id/radio_btn_1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false" />
+                android:layout_height="wrap_content" />-->
 
             <com.suheng.structure.view.AnimRadioButton
+                android:id="@+id/radio_btn_2"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true" />
+                android:layout_height="wrap_content" />
         </RadioGroup>
 
         <!--<com.suheng.structure.view.AnimCheckBox

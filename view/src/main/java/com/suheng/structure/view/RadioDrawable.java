@@ -2,11 +2,11 @@ package com.suheng.structure.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -15,6 +15,7 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.view.animation.BounceInterpolator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,11 +29,11 @@ public class RadioDrawable extends Drawable {
     private static final String PVH_RADIUS = "pvh_radius";
     private static final String PVH_ALPHA = "pvh_alpha";
     private final Paint mPaint;
-    private final ValueAnimator mValueAnimator;
+    private final ValueAnimator mValueAnimator, mValueAnimatorRadius, mValueAnimator2;
     private final Context mContext;
 
-    private Bitmap mNormalBitmap, mCheckedBitmap;
-    private final Path mPath;
+    private Bitmap mNormalBitmap, mCheckedBitmap, mCheckedBitmap2;
+    private final Path mPath, mPath2;
     private boolean mChecked;
 
     private int mCurrentLeft, mCurrentTop;
@@ -42,8 +43,13 @@ public class RadioDrawable extends Drawable {
     public RadioDrawable(Context context, boolean isChecked) {
         mContext = context;
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+
         mPath = new Path();
-        mValueAnimator = ValueAnimator.ofFloat();
+        mPath2 = new Path();
+
+        mValueAnimator = ValueAnimator.ofArgb(0);
+        mValueAnimatorRadius = ValueAnimator.ofFloat(0);
+        mValueAnimator2 = ValueAnimator.ofFloat(0);
 
         this.setBitmap();
         this.setChecked(isChecked);
@@ -60,16 +66,23 @@ public class RadioDrawable extends Drawable {
         mCurrentTop = checked ? this.getIntrinsicHeight() / 2 : 0;
         mCurrentAlpha = checked ? mAlpha : 0;
         mCurrentRadius = checked ? 0 : mRadius;
+
+        mRadius = Math.min(this.getIntrinsicWidth() / 2, this.getIntrinsicHeight() / 2);
     }
 
     private void setBitmap() {
-        mNormalBitmap = RadioDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.checkbox_unchecked));
-        mCheckedBitmap = RadioDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.checkbox_checked_bg));
-        /*mCheckedBitmap = Bitmap.createBitmap(normalBitmap.getWidth(), normalBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        mNormalBitmap = RadioDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.radio_btn_unchecked));
+        //mCheckedBitmap = RadioDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.radio_btn_checked));
+        mCheckedBitmap = Bitmap.createBitmap(mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mCheckedBitmap);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
         paint.setColor(Color.BLUE);
-        canvas.drawRoundRect(0, 0, normalBitmap.getWidth(), normalBitmap.getHeight(), mRadius, mRadius, paint);*/
+        canvas.drawCircle(mNormalBitmap.getWidth() / 2f, mNormalBitmap.getHeight() / 2f, mRadius * 2, paint);
+
+        mCheckedBitmap2 = Bitmap.createBitmap(mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        canvas = new Canvas(mCheckedBitmap2);
+        paint.setColor(Color.WHITE);
+        canvas.drawCircle(mNormalBitmap.getWidth() / 2f, mNormalBitmap.getHeight() / 2f, mRadius, paint);
     }
 
     public static Bitmap drawable2Bitmap(Drawable drawable) {
@@ -88,14 +101,10 @@ public class RadioDrawable extends Drawable {
 
     @Override
     public void setAlpha(int alpha) {
-        mPaint.setAlpha(alpha);
-        invalidateSelf();
     }
 
     @Override
     public void setColorFilter(@Nullable ColorFilter colorFilter) {
-        mPaint.setColorFilter(colorFilter);
-        invalidateSelf();
     }
 
     @Override
@@ -125,14 +134,22 @@ public class RadioDrawable extends Drawable {
             return;
         }
 
-        canvas.drawBitmap(mNormalBitmap, 0, 0, null);
+        canvas.drawBitmap(mNormalBitmap.extractAlpha(), 0, 0, mPaint);
 
-        int cc = canvas.saveLayerAlpha(0, 0, mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), mCurrentAlpha, Canvas.ALL_SAVE_FLAG);
-        //int cc = canvas.saveLayerAlpha(0, 0, mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), 255, Canvas.ALL_SAVE_FLAG);
-        canvas.clipPath(mPath, Region.Op.DIFFERENCE);
-        canvas.drawBitmap(mCheckedBitmap, 0, 0, null);
+        if (!mPath.isEmpty()) {
+            int cc = canvas.saveLayer(0, 0, mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), null, Canvas.ALL_SAVE_FLAG);
+            canvas.clipPath(mPath, Region.Op.DIFFERENCE);
+            canvas.drawBitmap(mCheckedBitmap, 0, 0, null);
+            canvas.restoreToCount(cc);
+        }
+
+        int cc = canvas.saveLayer(0, 0, mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), null, Canvas.ALL_SAVE_FLAG);
+        canvas.clipPath(mPath2);
+        canvas.drawBitmap(mCheckedBitmap2, 0, 0, null);
         canvas.restoreToCount(cc);
     }
+
+    private int mStrokeColor;
 
     public void setAnimParams(int currentLeft, int currentTop, int currentAlpha, float currentRadius) {
         final Rect bounds = getBounds();
@@ -158,21 +175,23 @@ public class RadioDrawable extends Drawable {
             endAlpha = 0;
             endRadius = mRadius;
         }
+
         /*Log.v(AnimCheckBox.TAG, "startAnim, currentLeft-endLeft: " + currentLeft + "-" + endLeft
                 + ", currentTop-endTop: " + currentTop + "-" + endTop
                 + ", currentAlpha-endAlpha: " + currentAlpha + "-" + endAlpha
                 + ", currentRadius-endRadius: " + currentRadius + "-" + endRadius);*/
-        mValueAnimator.setValues(PropertyValuesHolder.ofInt(PVH_LEFT, currentLeft, endLeft)
+        /*mValueAnimator.setValues(PropertyValuesHolder.ofInt(PVH_LEFT, currentLeft, endLeft)
                 , PropertyValuesHolder.ofInt(PVH_TOP, currentTop, endTop)
                 , PropertyValuesHolder.ofInt(PVH_ALPHA, currentAlpha, endAlpha)
                 , PropertyValuesHolder.ofFloat(PVH_RADIUS, currentRadius, endRadius));
-        //mValueAnimator.setDuration(1500);
-        mValueAnimator.setDuration(500);
+        mValueAnimator.setDuration(1500);*/
+        mValueAnimator.setDuration(1000);
+        mValueAnimator.setIntValues(0xFF000000, 0xFFFF0000);
 
         final ValueAnimator.AnimatorUpdateListener animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                Object valueLeft = animation.getAnimatedValue(PVH_LEFT);
+                /*Object valueLeft = animation.getAnimatedValue(PVH_LEFT);
                 Object valueTop = animation.getAnimatedValue(PVH_TOP);
                 Object valueRadius = animation.getAnimatedValue(PVH_RADIUS);
                 Object valueAlpha = animation.getAnimatedValue(PVH_ALPHA);
@@ -189,18 +208,64 @@ public class RadioDrawable extends Drawable {
 
                 mPath.reset();
                 mPath.addRoundRect(mCurrentLeft, mCurrentTop, bounds.right - mCurrentLeft, bounds.bottom - mCurrentTop
-                        , mCurrentRadius, mCurrentRadius, Path.Direction.CCW);
+                        , mCurrentRadius, mCurrentRadius, Path.Direction.CCW);*/
+
+                mStrokeColor = (int) animation.getAnimatedValue();
+                mPaint.setColor(mStrokeColor);
 
                 invalidateSelf();
             }
         };
         mValueAnimator.addUpdateListener(animatorUpdateListener);
+        mPath.reset();
+        mPath2.reset();
         mValueAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 mValueAnimator.removeUpdateListener(animatorUpdateListener);
                 mValueAnimator.removeListener(this);
+
+                mValueAnimatorRadius.setFloatValues(mRadius, 0);
+                mValueAnimatorRadius.setDuration(1000);
+                mValueAnimatorRadius.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        mPath.reset();
+                        float radius = (float) animation.getAnimatedValue();
+                        mPath.addCircle(exactCenterX, exactCenterY, radius, Path.Direction.CCW);
+
+                        invalidateSelf();
+                    }
+                });
+                mValueAnimatorRadius.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        mValueAnimatorRadius.removeListener(this);
+
+                        mPath.addCircle(exactCenterX, exactCenterY, .1f, Path.Direction.CCW);
+                        invalidateSelf();
+
+                        mValueAnimator2.setFloatValues(0, mRadius / 2);
+                        mValueAnimator2.setDuration(1500);
+                        mValueAnimator2.setInterpolator(new BounceInterpolator());
+                        mValueAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator animation) {
+                                mPath2.reset();
+                                float radius = (float) animation.getAnimatedValue();
+                                mPath2.addCircle(exactCenterX, exactCenterY, radius, Path.Direction.CCW);
+
+                                invalidateSelf();
+                            }
+                        });
+                        mValueAnimator2.start();
+
+                    }
+                });
+                mValueAnimatorRadius.start();
+
             }
         });
     }

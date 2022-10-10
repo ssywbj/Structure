@@ -42,6 +42,7 @@ public class CheckedDrawable extends Drawable {
     public CheckedDrawable(Context context, boolean isChecked) {
         mContext = context;
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+
         mPath = new Path();
         mValueAnimator = ValueAnimator.ofFloat();
 
@@ -65,11 +66,11 @@ public class CheckedDrawable extends Drawable {
     private void setBitmap() {
         mNormalBitmap = CheckedDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.checkbox_unchecked));
         mCheckedBitmap = CheckedDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.checkbox_checked_bg));
-        /*mCheckedBitmap = Bitmap.createBitmap(normalBitmap.getWidth(), normalBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        /*mCheckedBitmap = Bitmap.createBitmap(mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mCheckedBitmap);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
         paint.setColor(Color.BLUE);
-        canvas.drawRoundRect(0, 0, normalBitmap.getWidth(), normalBitmap.getHeight(), mRadius, mRadius, paint);*/
+        canvas.drawRoundRect(0, 0, mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), mRadius, mRadius, paint);*/
     }
 
     public static Bitmap drawable2Bitmap(Drawable drawable) {
@@ -88,14 +89,10 @@ public class CheckedDrawable extends Drawable {
 
     @Override
     public void setAlpha(int alpha) {
-        mPaint.setAlpha(alpha);
-        invalidateSelf();
     }
 
     @Override
     public void setColorFilter(@Nullable ColorFilter colorFilter) {
-        mPaint.setColorFilter(colorFilter);
-        invalidateSelf();
     }
 
     @Override
@@ -136,9 +133,9 @@ public class CheckedDrawable extends Drawable {
 
     public void setAnimParams(int currentLeft, int currentTop, int currentAlpha, float currentRadius) {
         final Rect bounds = getBounds();
-        final int exactCenterX = bounds.centerX();
-        final int exactCenterY = bounds.centerY();
-        /*Log.v(AnimCheckBox.TAG, "startAnim, centerX: " + exactCenterX + ", centerY: " + exactCenterY
+        final int centerX = bounds.centerX();
+        final int centerY = bounds.centerY();
+        /*Log.v(AnimCheckBox.TAG, "startAnim, centerX: " + centerX + ", centerY: " + centerY
                 + ", bounds: " + bounds.toShortString() + ", mChecked: " + mChecked);*/
 
         int endLeft, endTop, endAlpha;
@@ -146,13 +143,13 @@ public class CheckedDrawable extends Drawable {
         if (mChecked) {
             /*currentLeft = bounds.left;
             currentTop = bounds.top;*/
-            endLeft = exactCenterX;
-            endTop = exactCenterY;
+            endLeft = centerX;
+            endTop = centerY;
             endAlpha = mAlpha;
             endRadius = 0f;
         } else {
-            /*currentLeft = exactCenterX;
-            currentTop = exactCenterY;*/
+            /*currentLeft = centerX;
+            currentTop = centerY;*/
             endLeft = bounds.left;
             endTop = bounds.top;
             endAlpha = 0;
