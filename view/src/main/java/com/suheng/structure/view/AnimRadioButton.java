@@ -65,8 +65,7 @@ public class AnimRadioButton extends RadioButton {
         tempDrawable.cancelAnim();
 
         mCurrentDrawable = checked ? mCheckedDrawable : mNormalDrawable;
-        mCurrentDrawable.setAnimParams(tempDrawable.getCurrentLeft(), tempDrawable.getCurrentTop()
-                , tempDrawable.getCurrentAlpha(), tempDrawable.getCurrentRadius());
+        mCurrentDrawable.setAnimParams();
         mCurrentDrawable.startAnim();
     }
 
