@@ -15,26 +15,24 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.drawable.Drawable;
+import android.util.TypedValue;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import java.util.ArrayList;
+
 public class RadioDrawable extends Drawable {
-    private static final String PVH_LEFT = "pvh_left";
-    private static final String PVH_TOP = "pvh_top";
-    private static final String PVH_RADIUS = "pvh_radius";
-    private static final String PVH_ALPHA = "pvh_alpha";
     private final Paint mPaint;
-    private final ValueAnimator mAnimatorStrokeColor, mAnimatorCheckedOuter, mAnimatorCheckedInner;
-    private AnimatorSet mAnimatorSet;
+    private final AnimatorSet mAnimatorSet;
     private final Context mContext;
 
     private Bitmap mNormalBitmap, mCheckedBitmap;
     private final Path mPathCheckedOuter, mPathCheckedInner;
     private boolean mChecked;
     private int mStrokeColor = 0xFF000000;
-    private float mRadius, mCurrentRadius;
+    private float mRadius;
 
     public RadioDrawable(Context context, boolean isChecked) {
         mContext = context;
@@ -44,9 +42,6 @@ public class RadioDrawable extends Drawable {
         mPathCheckedInner = new Path();
 
         mAnimatorSet = new AnimatorSet();
-        mAnimatorStrokeColor = ValueAnimator.ofArgb(0);
-        mAnimatorCheckedOuter = ValueAnimator.ofFloat(0);
-        mAnimatorCheckedInner = ValueAnimator.ofFloat(0);
 
         this.setBitmap();
         this.setChecked(isChecked);
@@ -58,8 +53,6 @@ public class RadioDrawable extends Drawable {
 
     private void setChecked(boolean checked) {
         mChecked = checked;
-
-        mCurrentRadius = checked ? 0 : mRadius;
     }
 
     private void setBitmap() {
@@ -68,7 +61,7 @@ public class RadioDrawable extends Drawable {
         int width = mNormalBitmap.getWidth();
         int height = mNormalBitmap.getHeight();
         float cx = width / 2f, cy = height / 2f;
-        mRadius = Math.min(cx, cy);
+        mRadius = Math.min(cx, cy) - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, mContext.getResources().getDisplayMetrics());
         mCheckedBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mCheckedBitmap);
         canvas.drawCircle(cx, cy, mRadius, mPaint);
@@ -113,7 +106,7 @@ public class RadioDrawable extends Drawable {
             canvas.restoreToCount(cc);
         }
 
-        mPaint.setColor(Color.WHITE);
+        mPaint.setColor(Color.BLUE);
         int cc = canvas.saveLayer(0, 0, mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), mPaint, Canvas.ALL_SAVE_FLAG);
         canvas.clipPath(mPathCheckedInner);
         canvas.drawBitmap(mCheckedBitmap.extractAlpha(), 0, 0, mPaint);
@@ -131,28 +124,20 @@ public class RadioDrawable extends Drawable {
         } else {
         }
 
-        mAnimatorStrokeColor.setDuration(1000);
-        mAnimatorStrokeColor.setIntValues(0xFF000000, 0xFFFF0000);
-        final ValueAnimator.AnimatorUpdateListener animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+        ValueAnimator animatorStrokeColor = ValueAnimator.ofArgb(0xFF000000, 0xFFFF0000);
+        animatorStrokeColor.setDuration(1000);
+        animatorStrokeColor.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 mStrokeColor = (int) animation.getAnimatedValue();
                 invalidateSelf();
             }
-        };
-        mAnimatorStrokeColor.addUpdateListener(animatorUpdateListener);
-        mAnimatorStrokeColor.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                mAnimatorStrokeColor.removeUpdateListener(animatorUpdateListener);
-                mAnimatorStrokeColor.removeListener(this);
-            }
         });
 
-        mAnimatorCheckedOuter.setFloatValues(mRadius, 0);
-        mAnimatorCheckedOuter.setDuration(1000);
-        ValueAnimator.AnimatorUpdateListener animatorUpdateListener1 = new ValueAnimator.AnimatorUpdateListener() {
+        ValueAnimator animatorCheckedOuter = ValueAnimator.ofFloat(mRadius, 0);
+        animatorCheckedOuter.setDuration(1000);
+        animatorCheckedOuter.setStartDelay(animatorStrokeColor.getDuration());
+        animatorCheckedOuter.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float radius = (float) animation.getAnimatedValue();
@@ -160,32 +145,32 @@ public class RadioDrawable extends Drawable {
                 mPathCheckedOuter.addCircle(exactCenterX, exactCenterY, radius, Path.Direction.CCW);
                 invalidateSelf();
             }
-        };
-        mAnimatorCheckedOuter.addUpdateListener(animatorUpdateListener1);
-        mAnimatorCheckedOuter.addListener(new AnimatorListenerAdapter() {
+        });
+        animatorCheckedOuter.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                mAnimatorCheckedOuter.removeUpdateListener(animatorUpdateListener1);
-                mAnimatorCheckedOuter.removeListener(this);
                 mPathCheckedOuter.addCircle(exactCenterX, exactCenterY, .1f, Path.Direction.CCW);
             }
         });
 
-        float v = mRadius / 2;
-        mAnimatorCheckedInner.setFloatValues(0, v * 1.4f, v * 0.9f);
-        mAnimatorCheckedInner.setDuration(1300);
-        mAnimatorCheckedInner.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        ValueAnimator animatorCheckedInner = ValueAnimator.ofFloat(0, mRadius / 3 * 2, mRadius / 2);
+        animatorCheckedInner.setDuration(1300);
+        animatorCheckedInner.setStartDelay(animatorStrokeColor.getDuration() + animatorCheckedOuter.getDuration() / 2);
+        animatorCheckedInner.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                mPathCheckedInner.reset();
                 float radius = (float) animation.getAnimatedValue();
+                mPathCheckedInner.reset();
                 mPathCheckedInner.addCircle(exactCenterX, exactCenterY, radius, Path.Direction.CCW);
-                invalidateSelf();
+
+                if (!animatorCheckedOuter.isRunning()) {
+                    invalidateSelf();
+                }
             }
         });
 
-        mAnimatorSet.playSequentially(mAnimatorStrokeColor, mAnimatorCheckedOuter, mAnimatorCheckedInner);
+        mAnimatorSet.playTogether(animatorStrokeColor, animatorCheckedOuter, animatorCheckedInner);
         mAnimatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -197,27 +182,28 @@ public class RadioDrawable extends Drawable {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
+                ArrayList<Animator> animations = mAnimatorSet.getChildAnimations();
+                for (Animator animator : animations) {
+                    animator.removeAllListeners();
+                    ((ValueAnimator) animator).removeAllUpdateListeners();
+                }
                 mAnimatorSet.removeListener(this);
             }
         });
-        mAnimatorSet.start();
     }
 
     public void startAnim() {
-        mAnimatorStrokeColor.start();
+        mAnimatorSet.start();
     }
 
     public void cancelAnim() {
         if (this.isAnimRunning()) {
-            mAnimatorStrokeColor.cancel();
+            mAnimatorSet.cancel();
         }
     }
 
     public boolean isAnimRunning() {
-        return mAnimatorStrokeColor.isRunning();
+        return mAnimatorSet.isRunning();
     }
 
-    public float getCurrentRadius() {
-        return mCurrentRadius;
-    }
 }
