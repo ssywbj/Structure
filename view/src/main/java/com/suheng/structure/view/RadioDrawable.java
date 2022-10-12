@@ -141,88 +141,64 @@ public class RadioDrawable extends Drawable {
         if (mChecked) {
             animatorStrokeColor = ValueAnimator.ofArgb(strokeColor, mEndColor);
             animatorStrokeColor.setDuration(1000);
-            animatorStrokeColor.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    mStrokeColor = (int) animation.getAnimatedValue();
-
-                    invalidateSelf();
-                }
-            });
 
             mPathCheckedOuter.reset();
             mPathCheckedOuter.addCircle(centerX, centerY, mOuterStartRadius, Path.Direction.CCW);
             animatorCheckedOuter = ValueAnimator.ofFloat(outerRadius, 0);
             animatorCheckedOuter.setDuration(1000);
             animatorCheckedOuter.setStartDelay(animatorStrokeColor.getDuration());
-            animatorCheckedOuter.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    mOuterRadius = Math.max((float) animation.getAnimatedValue(), OUTER_MIN_RADIUS);
-                    mPathCheckedOuter.reset();
-                    mPathCheckedOuter.addCircle(centerX, centerY, mOuterRadius, Path.Direction.CCW);
-
-                    invalidateSelf();
-                }
-            });
 
             mPathCheckedInner.reset();
             animatorCheckedInner = ValueAnimator.ofFloat(innerRadius, mOuterStartRadius / 3 * 2, mOuterStartRadius / 2);
             animatorCheckedInner.setDuration(1000);
             animatorCheckedInner.setStartDelay(animatorStrokeColor.getDuration() + animatorCheckedOuter.getDuration() / 2);
-            animatorCheckedInner.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    mInnerRadius = (float) animation.getAnimatedValue();
-                    mPathCheckedInner.reset();
-                    mPathCheckedInner.addCircle(centerX, centerY, mInnerRadius, Path.Direction.CCW);
-
-                    invalidateSelf();
-                }
-            });
         } else {
             animatorCheckedInner = ValueAnimator.ofFloat(innerRadius, 0);
             animatorCheckedInner.setDuration(1000);
-            animatorCheckedInner.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    mInnerRadius = (float) animation.getAnimatedValue();
-                    mPathCheckedInner.reset();
-                    mPathCheckedInner.addCircle(centerX, centerY, mInnerRadius, Path.Direction.CCW);
-
-                    invalidateSelf();
-                }
-            });
 
             mPathCheckedOuter.reset();
             mPathCheckedOuter.addCircle(centerX, centerY, OUTER_MIN_RADIUS, Path.Direction.CCW);
             animatorCheckedOuter = ValueAnimator.ofFloat(outerRadius, mOuterStartRadius);
             animatorCheckedOuter.setDuration(1000);
             animatorCheckedOuter.setStartDelay(animatorCheckedInner.getDuration() / 2);
-            animatorCheckedOuter.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    mOuterRadius = Math.max((float) animation.getAnimatedValue(), OUTER_MIN_RADIUS);
-                    mPathCheckedOuter.reset();
-                    mPathCheckedOuter.addCircle(centerX, centerY, mOuterRadius, Path.Direction.CCW);
-
-                    invalidateSelf();
-                }
-            });
 
             mStrokeColor = strokeColor;
             animatorStrokeColor = ValueAnimator.ofArgb(strokeColor, mStartColor);
             animatorStrokeColor.setDuration(1000);
             animatorStrokeColor.setStartDelay(animatorCheckedInner.getDuration() + animatorCheckedOuter.getDuration());
-            animatorStrokeColor.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    mStrokeColor = (int) animation.getAnimatedValue();
-
-                    invalidateSelf();
-                }
-            });
         }
+
+        animatorStrokeColor.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mStrokeColor = (int) animation.getAnimatedValue();
+
+                invalidateSelf();
+            }
+        });
+
+        animatorCheckedOuter.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mOuterRadius = Math.max((float) animation.getAnimatedValue(), OUTER_MIN_RADIUS);
+                mPathCheckedOuter.reset();
+                mPathCheckedOuter.addCircle(centerX, centerY, mOuterRadius, Path.Direction.CCW);
+
+                invalidateSelf();
+            }
+        });
+
+        animatorCheckedInner.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mInnerRadius = (float) animation.getAnimatedValue();
+                mPathCheckedInner.reset();
+                mPathCheckedInner.addCircle(centerX, centerY, mInnerRadius, Path.Direction.CCW);
+
+                invalidateSelf();
+            }
+        });
+
         mAnimatorSet.playTogether(animatorCheckedInner, animatorCheckedOuter, animatorStrokeColor);
 
         mAnimatorSet.addListener(new AnimatorListenerAdapter() {
