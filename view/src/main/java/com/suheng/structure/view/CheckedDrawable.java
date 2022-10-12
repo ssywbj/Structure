@@ -57,8 +57,8 @@ public class CheckedDrawable extends Drawable {
     private void setChecked(boolean checked) {
         mChecked = checked;
 
-        mCurrentLeft = checked ? this.getIntrinsicWidth() / 2 : 0;
-        mCurrentTop = checked ? this.getIntrinsicHeight() / 2 : 0;
+        mCurrentLeft = checked ? getIntrinsicWidth() / 2 : 0;
+        mCurrentTop = checked ? getIntrinsicHeight() / 2 : 0;
         mCurrentAlpha = checked ? mAlpha : 0;
         mCurrentRadius = checked ? 0 : mRadius;
     }
@@ -124,8 +124,8 @@ public class CheckedDrawable extends Drawable {
 
         canvas.drawBitmap(mNormalBitmap, 0, 0, null);
 
-        int cc = canvas.saveLayerAlpha(0, 0, mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), mCurrentAlpha, Canvas.ALL_SAVE_FLAG);
-        //int cc = canvas.saveLayerAlpha(0, 0, mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), 255, Canvas.ALL_SAVE_FLAG);
+        int cc = canvas.saveLayerAlpha(0, 0, getIntrinsicWidth(), getIntrinsicHeight(), mCurrentAlpha, Canvas.ALL_SAVE_FLAG);
+        //int cc = canvas.saveLayerAlpha(0, 0, getIntrinsicWidth(), getIntrinsicHeight(), 255, Canvas.ALL_SAVE_FLAG);
         canvas.clipPath(mPath, Region.Op.DIFFERENCE);
         canvas.drawBitmap(mCheckedBitmap, 0, 0, null);
         canvas.restoreToCount(cc);

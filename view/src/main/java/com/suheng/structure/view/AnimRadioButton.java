@@ -1,6 +1,8 @@
 package com.suheng.structure.view;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -29,7 +31,7 @@ public class AnimRadioButton extends RadioButton {
     }
 
     private void init() {
-        setBackground(null);
+        setBackground(new ColorDrawable(Color.BLACK));
 
         StateListDrawable stateListDrawable = new StateListDrawable();
         /*stateListDrawable.addState(new int[]{android.R.attr.state_checked}, ContextCompat.getDrawable(getContext(), R.drawable.radio_btn_checked));
@@ -45,8 +47,9 @@ public class AnimRadioButton extends RadioButton {
 
         setButtonDrawable(stateListDrawable);
 
+        //setChecked(true);
         boolean checked = isChecked();
-        Log.d(TAG, "init, checked: " + checked);
+        Log.v(TAG, "init, checked: " + checked);
         if (checked) {
             mCurrentDrawable = mCheckedDrawable;
         } else {
@@ -57,15 +60,25 @@ public class AnimRadioButton extends RadioButton {
     @Override
     public void setChecked(boolean checked) {
         super.setChecked(checked);
-        Log.d(TAG, "setChecked, checked: " + checked);
+        Log.d(TAG, "setChecked, checked: " + checked + ", mCurrentDrawable: " + mCurrentDrawable);
         if (mCurrentDrawable == null) {
             return;
         }
+        if (checked && mCurrentDrawable == mCheckedDrawable) {
+            Log.v(TAG, "setChecked, checked && mCurrentDrawable == mCheckedDrawable");
+            return;
+        }
+        if (!checked && mCurrentDrawable == mNormalDrawable) {
+            Log.v(TAG, "setChecked, !checked && mCurrentDrawable == mNormalDrawable");
+            return;
+        }
+
         RadioDrawable tempDrawable = mCurrentDrawable;
         tempDrawable.cancelAnim();
 
         mCurrentDrawable = checked ? mCheckedDrawable : mNormalDrawable;
-        mCurrentDrawable.setAnimParams();
+        mCurrentDrawable.setAnimParams(tempDrawable.getStrokeColor(), tempDrawable.getOuterRadius()
+                , tempDrawable.getInnerRadius());
         mCurrentDrawable.startAnim();
     }
 
