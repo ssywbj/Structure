@@ -21,10 +21,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RadioDrawable2 extends Drawable {
     private static final float OUTER_MIN_RADIUS = .1f;
     private final Paint mPaint;
-    //private final AnimatorSet mAnimatorSet;
     private final Context mContext;
 
     private Bitmap mNormalBitmap, mCheckedBitmap;
@@ -43,7 +45,6 @@ public class RadioDrawable2 extends Drawable {
         mPathCheckedOuter = new Path();
         mPathCheckedInner = new Path();
 
-        //mAnimatorSet = new AnimatorSet();
         mValueAnimator = ValueAnimator.ofFloat();
 
         this.setBitmap();
@@ -137,135 +138,46 @@ public class RadioDrawable2 extends Drawable {
                 + "), outerRadius-mOuterRadius: " + outerRadius + "-" + mOuterRadius
                 + ", innerRadius-mInnerRadius: " + innerRadius + "-" + mInnerRadius);
 
-        /*int startColor = 0, endColor = 99;
-        PropertyValuesHolder pvhStrokeColor = PropertyValuesHolder.ofKeyframe("phv_stroke_color", Keyframe.ofInt(0, startColor)
-                , Keyframe.ofInt(0.2f, endColor), Keyframe.ofInt(1, endColor));
-        float startOuterRadius = 21, endOuterRadius = 0;
-        PropertyValuesHolder pvhOuterRadius = PropertyValuesHolder.ofKeyframe("phv_outer_radius", Keyframe.ofFloat(0, startOuterRadius)
-                , Keyframe.ofFloat(0.2f, startOuterRadius), Keyframe.ofFloat(0.6f, endOuterRadius), Keyframe.ofFloat(1, endOuterRadius));
-        float startInnerRadius = 0, middleInnerRadius = 18.5f, endInnerRadius = 13.4f;
-        PropertyValuesHolder pvhInnerRadius = PropertyValuesHolder.ofKeyframe("phv_inner_radius"
-                , Keyframe.ofFloat(0, startInnerRadius), Keyframe.ofFloat(0.6f, startInnerRadius), Keyframe.ofFloat(0.9f, middleInnerRadius), Keyframe.ofFloat(1f, endInnerRadius));
-        mValueAnimator.setValues(pvhStrokeColor, pvhOuterRadius, pvhInnerRadius);
-        mValueAnimator.setDuration(2000);
-        mValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                long currentPlayTime = animation.getCurrentPlayTime();
-                float fraction = animation.getAnimatedFraction();
-                Object objSColor = animation.getAnimatedValue("phv_stroke_color");
-                Object objORadius = animation.getAnimatedValue("phv_outer_radius");
-                Object objIRadius = animation.getAnimatedValue("phv_inner_radius");
-                Log.v(AnimRadioButton.TAG, "keyframe, objSColor: " + objSColor + ", objORadius: " + objORadius + ", objIRadius: " + objIRadius + ", currentPlayTime: " + currentPlayTime + ", fraction: " + fraction);
-
-                invalidateSelf();
-            }
-        });
-        mValueAnimator.start();*/
-
-        ValueAnimator animatorStrokeColor, animatorCheckedOuter, animatorCheckedInner;
+        final int scRedStart = Color.red(strokeColor), scGreenStart = Color.green(strokeColor), scBlueStart = Color.blue(strokeColor);
+        int scRedDelta, scGreenDelta, scBlueDelta;
+        List<PropertyValuesHolder> pValuesHolderList = new ArrayList<>();
         if (mChecked) {
-            /*animatorStrokeColor = ValueAnimator.ofArgb(strokeColor, mEndColor);
-            animatorStrokeColor.setDuration(1000);
+            scRedDelta = Color.red(mEndColor) - scRedStart;
+            scGreenDelta = Color.green(mEndColor) - scGreenStart;
+            scBlueDelta = Color.blue(mEndColor) - scBlueStart;
+            pValuesHolderList.add(PropertyValuesHolder.ofKeyframe("phv_stroke_color", Keyframe.ofFloat(0, 0)
+                    , Keyframe.ofFloat(0.2f, 1), Keyframe.ofFloat(1, 1)));
 
             mPathCheckedOuter.reset();
             mPathCheckedOuter.addCircle(centerX, centerY, mOuterStartRadius, Path.Direction.CCW);
-            animatorCheckedOuter = ValueAnimator.ofFloat(outerRadius, 0);
-            animatorCheckedOuter.setDuration(1000);
-            animatorCheckedOuter.setStartDelay(animatorStrokeColor.getDuration());
+            pValuesHolderList.add(PropertyValuesHolder.ofKeyframe("phv_outer_radius", Keyframe.ofFloat(0, outerRadius)
+                    , Keyframe.ofFloat(0.2f, outerRadius), Keyframe.ofFloat(0.6f, 0), Keyframe.ofFloat(1, 0)));
 
             mPathCheckedInner.reset();
-            animatorCheckedInner = ValueAnimator.ofFloat(innerRadius, mOuterStartRadius / 3 * 2, mOuterStartRadius / 2);
-            animatorCheckedInner.setDuration(1000);
-            animatorCheckedInner.setStartDelay(animatorStrokeColor.getDuration() + animatorCheckedOuter.getDuration() / 2);*/
-
-            PropertyValuesHolder pvhStrokeColor = PropertyValuesHolder.ofKeyframe("phv_stroke_color", Keyframe.ofInt(0, strokeColor)
-                    , Keyframe.ofInt(0.2f, mEndColor), Keyframe.ofInt(1, mEndColor));
-
-            mPathCheckedOuter.reset();
-            mPathCheckedOuter.addCircle(centerX, centerY, mOuterStartRadius, Path.Direction.CCW);
-            PropertyValuesHolder pvhOuterRadius = PropertyValuesHolder.ofKeyframe("phv_outer_radius", Keyframe.ofFloat(0, outerRadius)
-                    , Keyframe.ofFloat(0.2f, outerRadius), Keyframe.ofFloat(0.6f, 0), Keyframe.ofFloat(1, 0));
-
-            mPathCheckedInner.reset();
-            PropertyValuesHolder pvhInnerRadius = PropertyValuesHolder.ofKeyframe("phv_inner_radius"
+            pValuesHolderList.add(PropertyValuesHolder.ofKeyframe("phv_inner_radius"
                     , Keyframe.ofFloat(0, innerRadius), Keyframe.ofFloat(0.6f, innerRadius), Keyframe.ofFloat(0.9f, mOuterStartRadius / 3 * 2)
-                    , Keyframe.ofFloat(1f, mOuterStartRadius / 2));
-
-            mValueAnimator.setValues(pvhStrokeColor, pvhOuterRadius, pvhInnerRadius);
+                    , Keyframe.ofFloat(1f, mOuterStartRadius / 2)));
         } else {
-            /*animatorCheckedInner = ValueAnimator.ofFloat(innerRadius, 0);
-            animatorCheckedInner.setDuration(1000);
+            pValuesHolderList.add(PropertyValuesHolder.ofKeyframe("phv_inner_radius"
+                    , Keyframe.ofFloat(0, innerRadius), Keyframe.ofFloat(0.4f, 0), Keyframe.ofFloat(1f, 0)));
 
             mPathCheckedOuter.reset();
             mPathCheckedOuter.addCircle(centerX, centerY, OUTER_MIN_RADIUS, Path.Direction.CCW);
-            animatorCheckedOuter = ValueAnimator.ofFloat(outerRadius, mOuterStartRadius);
-            animatorCheckedOuter.setDuration(1000);
-            animatorCheckedOuter.setStartDelay(animatorCheckedInner.getDuration() / 2);
+            pValuesHolderList.add(PropertyValuesHolder.ofKeyframe("phv_outer_radius", Keyframe.ofFloat(0, outerRadius)
+                    , Keyframe.ofFloat(0, outerRadius), Keyframe.ofFloat(0.4f, outerRadius), Keyframe.ofFloat(0.8f, mOuterStartRadius)
+                    , Keyframe.ofFloat(1, mOuterStartRadius)));
 
             mStrokeColor = strokeColor;
-            animatorStrokeColor = ValueAnimator.ofArgb(strokeColor, mStartColor);
-            animatorStrokeColor.setDuration(1000);
-            animatorStrokeColor.setStartDelay(animatorCheckedInner.getDuration() + animatorCheckedOuter.getDuration());*/
-
-            PropertyValuesHolder pvhInnerRadius = PropertyValuesHolder.ofKeyframe("phv_inner_radius"
-                    , Keyframe.ofFloat(0, innerRadius), Keyframe.ofFloat(0.4f, 0), Keyframe.ofFloat(1f, 0));
-
-            mPathCheckedOuter.reset();
-            mPathCheckedOuter.addCircle(centerX, centerY, OUTER_MIN_RADIUS, Path.Direction.CCW);
-            PropertyValuesHolder pvhOuterRadius = PropertyValuesHolder.ofKeyframe("phv_outer_radius", Keyframe.ofFloat(0, outerRadius)
-                    , Keyframe.ofFloat(0, outerRadius), Keyframe.ofFloat(0.4f, outerRadius), Keyframe.ofFloat(0.8f, mOuterStartRadius), Keyframe.ofFloat(1, mOuterStartRadius));
-
-            mStrokeColor = strokeColor;
-            PropertyValuesHolder pvhStrokeColor = PropertyValuesHolder.ofKeyframe("phv_stroke_color", Keyframe.ofInt(0, strokeColor)
-                    , Keyframe.ofInt(0.8f, strokeColor), Keyframe.ofInt(1, mStartColor));
-
-            mValueAnimator.setValues(pvhStrokeColor, pvhOuterRadius, pvhInnerRadius);
+            scRedDelta = Color.red(mStartColor) - scRedStart;
+            scGreenDelta = Color.green(mStartColor) - scGreenStart;
+            scBlueDelta = Color.blue(mStartColor) - scBlueStart;
+            pValuesHolderList.add(PropertyValuesHolder.ofKeyframe("phv_stroke_color", Keyframe.ofFloat(0, 0)
+                    , Keyframe.ofFloat(0.8f, 0), Keyframe.ofFloat(1, 1)));
         }
 
-        /*animatorStrokeColor.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                mStrokeColor = (int) animation.getAnimatedValue();
-
-                invalidateSelf();
-            }
-        });
-        animatorCheckedOuter.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                mOuterRadius = Math.max((float) animation.getAnimatedValue(), OUTER_MIN_RADIUS);
-                mPathCheckedOuter.reset();
-                mPathCheckedOuter.addCircle(centerX, centerY, mOuterRadius, Path.Direction.CCW);
-
-                invalidateSelf();
-            }
-        });
-        animatorCheckedInner.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                mInnerRadius = (float) animation.getAnimatedValue();
-                mPathCheckedInner.reset();
-                mPathCheckedInner.addCircle(centerX, centerY, mInnerRadius, Path.Direction.CCW);
-
-                invalidateSelf();
-            }
-        });*/
-
-        /*mAnimatorSet.playTogether(animatorCheckedInner, animatorCheckedOuter, animatorStrokeColor);
-
-        mAnimatorSet.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                ArrayList<Animator> animations = mAnimatorSet.getChildAnimations();
-                for (Animator animator : animations) {
-                    animator.removeAllListeners();
-                    ((ValueAnimator) animator).removeAllUpdateListeners();
-                }
-                mAnimatorSet.removeListener(this);
-            }
-        });*/
+        PropertyValuesHolder[] pValuesHolders = new PropertyValuesHolder[pValuesHolderList.size()];
+        pValuesHolderList.toArray(pValuesHolders);
+        mValueAnimator.setValues(pValuesHolders);
 
         mValueAnimator.setDuration(2000);
         mValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -273,7 +185,11 @@ public class RadioDrawable2 extends Drawable {
             public void onAnimationUpdate(ValueAnimator animation) {
                 long currentPlayTime = animation.getCurrentPlayTime();
                 float fraction = animation.getAnimatedFraction();
-                mStrokeColor = (int) animation.getAnimatedValue("phv_stroke_color");
+                float strokeColorRadio = (float) animation.getAnimatedValue("phv_stroke_color");
+                int red = (int) (scRedStart + scRedDelta * strokeColorRadio);
+                int green = (int) (scGreenStart + scGreenDelta * strokeColorRadio);
+                int blue = (int) (scBlueStart + scBlueDelta * strokeColorRadio);
+                mStrokeColor = Color.argb(0xFF, red, green, blue);
                 mOuterRadius = (float) animation.getAnimatedValue("phv_outer_radius");
                 mInnerRadius = (float) animation.getAnimatedValue("phv_inner_radius");
                 Log.v(AnimRadioButton.TAG, "keyframe, mStrokeColor: " + mStrokeColor + ", mOuterRadius: " + mOuterRadius + ", mInnerRadius: "
@@ -291,19 +207,16 @@ public class RadioDrawable2 extends Drawable {
     }
 
     public void startAnim() {
-        //mAnimatorSet.start();
         mValueAnimator.start();
     }
 
     public void cancelAnim() {
         if (this.isAnimRunning()) {
-            //mAnimatorSet.cancel();
             mValueAnimator.cancel();
         }
     }
 
     public boolean isAnimRunning() {
-        //return mAnimatorSet.isRunning();
         return mValueAnimator.isRunning();
     }
 

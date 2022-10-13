@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RadioDrawable extends Drawable {
     private static final float OUTER_MIN_RADIUS = .1f;
@@ -127,6 +128,8 @@ public class RadioDrawable extends Drawable {
         canvas.restoreToCount(cc2);
     }
 
+    private final List<Animator> mAnimators = new ArrayList<>();
+
     public void setAnimParams(int strokeColor, float outerRadius, float innerRadius) {
         final Rect bounds = getBounds();
         final int centerX = bounds.centerX();
@@ -176,6 +179,19 @@ public class RadioDrawable extends Drawable {
                 invalidateSelf();
             }
         });
+        animatorStrokeColor.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                Log.i(AnimRadioButton.TAG, "onAnimationStart, animatorStrokeColor: " + RadioDrawable.this);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                Log.i(AnimRadioButton.TAG, "onAnimationEnd, animatorStrokeColor: " + RadioDrawable.this);
+            }
+        });
 
         animatorCheckedOuter.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -187,6 +203,19 @@ public class RadioDrawable extends Drawable {
                 invalidateSelf();
             }
         });
+        animatorCheckedOuter.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                Log.d(AnimRadioButton.TAG, "onAnimationStart, animatorCheckedOuter: " + RadioDrawable.this);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                Log.d(AnimRadioButton.TAG, "onAnimationEnd, animatorCheckedOuter: " + RadioDrawable.this);
+            }
+        });
 
         animatorCheckedInner.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -196,6 +225,19 @@ public class RadioDrawable extends Drawable {
                 mPathCheckedInner.addCircle(centerX, centerY, mInnerRadius, Path.Direction.CCW);
 
                 invalidateSelf();
+            }
+        });
+        animatorCheckedInner.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                Log.v(AnimRadioButton.TAG, "onAnimationStart, animatorCheckedInner: " + RadioDrawable.this);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                Log.v(AnimRadioButton.TAG, "onAnimationEnd, animatorCheckedInner: " + RadioDrawable.this);
             }
         });
 

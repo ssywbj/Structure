@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat;
 
 public class AnimRadioButton extends RadioButton {
     public static final String TAG = AnimRadioButton.class.getSimpleName();
-    private RadioDrawable mCheckedDrawable, mNormalDrawable, mCurrentDrawable;
+    private RadioDrawable2 mCheckedDrawable, mNormalDrawable, mCurrentDrawable;
 
     public AnimRadioButton(Context context) {
         super(context);
@@ -39,8 +39,8 @@ public class AnimRadioButton extends RadioButton {
         stateListDrawable.addState(new int[]{}, ContextCompat.getDrawable(getContext(), R.drawable.radio_btn_unchecked));
         setButtonDrawable(stateListDrawable);*/
 
-        mCheckedDrawable = new RadioDrawable(getContext(), true);
-        mNormalDrawable = new RadioDrawable(getContext());
+        mCheckedDrawable = new RadioDrawable2(getContext(), true);
+        mNormalDrawable = new RadioDrawable2(getContext());
         stateListDrawable.addState(new int[]{android.R.attr.state_checked}, mCheckedDrawable);
         stateListDrawable.addState(new int[]{-android.R.attr.state_enabled}, ContextCompat.getDrawable(getContext(), R.drawable.radio_btn_uneabled));
         stateListDrawable.addState(new int[]{}, mNormalDrawable);
@@ -60,20 +60,20 @@ public class AnimRadioButton extends RadioButton {
     @Override
     public void setChecked(boolean checked) {
         super.setChecked(checked);
-        Log.d(TAG, "setChecked, checked: " + checked + ", mCurrentDrawable: " + mCurrentDrawable);
+        //Log.d(TAG, "setChecked, checked: " + checked + ", mCurrentDrawable: " + mCurrentDrawable);
         if (mCurrentDrawable == null) {
             return;
         }
         if (checked && mCurrentDrawable == mCheckedDrawable) {
-            Log.v(TAG, "setChecked, checked && mCurrentDrawable == mCheckedDrawable");
+            //Log.v(TAG, "setChecked, checked && mCurrentDrawable == mCheckedDrawable");
             return;
         }
         if (!checked && mCurrentDrawable == mNormalDrawable) {
-            Log.v(TAG, "setChecked, !checked && mCurrentDrawable == mNormalDrawable");
+            //Log.v(TAG, "setChecked, !checked && mCurrentDrawable == mNormalDrawable");
             return;
         }
 
-        RadioDrawable tempDrawable = mCurrentDrawable;
+        RadioDrawable2 tempDrawable = mCurrentDrawable;
         tempDrawable.cancelAnim();
 
         mCurrentDrawable = checked ? mCheckedDrawable : mNormalDrawable;
@@ -82,4 +82,9 @@ public class AnimRadioButton extends RadioButton {
         mCurrentDrawable.startAnim();
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mCurrentDrawable.cancelAnim();
+    }
 }
