@@ -40,7 +40,7 @@ public class AnimCheckBox extends CheckBox {
         stateListDrawable.addState(new int[]{-android.R.attr.state_enabled}, ContextCompat.getDrawable(getContext(), R.drawable.checkbox_unenabled));
         stateListDrawable.addState(new int[]{}, mNormalDrawable);
         setButtonDrawable(stateListDrawable);
-        setBackground(null);
+        //setBackground(null);
 
         //setChecked(true);
         //setEnabled(false);
@@ -70,8 +70,7 @@ public class AnimCheckBox extends CheckBox {
         tempDrawable.cancelAnim();
 
         mCurrentDrawable = checked ? mCheckedDrawable : mNormalDrawable;
-        mCurrentDrawable.setAnimParams(tempDrawable.getCurrentLeft(), tempDrawable.getCurrentTop()
-                , tempDrawable.getCurrentAlpha(), tempDrawable.getCurrentRadius());
+        mCurrentDrawable.setAnimParams(tempDrawable);
         mCurrentDrawable.startAnim();
         //Log.d(TAG, "setChecked, after: " + mDrawableCurrent);
     }

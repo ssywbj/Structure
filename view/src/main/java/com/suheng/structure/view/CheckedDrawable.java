@@ -2,19 +2,24 @@ package com.suheng.structure.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.Keyframe;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PathMeasure;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
+import android.util.TypedValue;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,7 +32,8 @@ public class CheckedDrawable extends Drawable {
     private static final String PVH_TOP = "pvh_top";
     private static final String PVH_RADIUS = "pvh_radius";
     private static final String PVH_ALPHA = "pvh_alpha";
-    private final Paint mPaint;
+    private static final String PVH_TICK = "pvh_tick";
+
     private final ValueAnimator mValueAnimator;
     private final Context mContext;
 
@@ -38,13 +44,27 @@ public class CheckedDrawable extends Drawable {
     private int mCurrentLeft, mCurrentTop;
     private int mAlpha = 255, mCurrentAlpha;
     private float mRadius = 10.67f * 3, mCurrentRadius;
+    private float mTickLength;
+
+    private final Paint mPaintTick;
+    private final Path mPathTick;
+    private final PathMeasure mPathMeasure;
 
     public CheckedDrawable(Context context, boolean isChecked) {
         mContext = context;
-        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+
+        mPaintTick = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+        mPaintTick.setColor(Color.WHITE);
+        mPaintTick.setStyle(Paint.Style.STROKE);
+        mPaintTick.setStrokeCap(Paint.Cap.ROUND);
+        mPaintTick.setStrokeJoin(Paint.Join.ROUND);
+        mPaintTick.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, context.getResources().getDisplayMetrics()));
 
         mPath = new Path();
         mValueAnimator = ValueAnimator.ofFloat();
+
+        mPathTick = new Path();
+        mPathMeasure = new PathMeasure();
 
         this.setBitmap();
         this.setChecked(isChecked);
@@ -61,6 +81,17 @@ public class CheckedDrawable extends Drawable {
         mCurrentTop = checked ? getIntrinsicHeight() / 2 : 0;
         mCurrentAlpha = checked ? mAlpha : 0;
         mCurrentRadius = checked ? 0 : mRadius;
+
+        Path pathTick = new Path();
+        pathTick.reset();
+        float dx = getIntrinsicWidth() / 2f;
+        pathTick.moveTo(-dx / 2, 0);
+        pathTick.lineTo(0, dx / 2);
+        pathTick.lineTo(dx / 2, 0);
+        mPathMeasure.setPath(pathTick, false);
+
+        mTickLength = checked ? mPathMeasure.getLength() : 0;
+        mPathMeasure.getSegment(0, mTickLength, mPathTick, true);
     }
 
     private void setBitmap() {
@@ -129,9 +160,19 @@ public class CheckedDrawable extends Drawable {
         canvas.clipPath(mPath, Region.Op.DIFFERENCE);
         canvas.drawBitmap(mCheckedBitmap, 0, 0, null);
         canvas.restoreToCount(cc);
+
+        canvas.save();
+        canvas.translate(getIntrinsicWidth() / 2f, getIntrinsicHeight() / 2f);
+        canvas.drawPath(mPathTick, mPaintTick);
+        canvas.restore();
     }
 
-    public void setAnimParams(int currentLeft, int currentTop, int currentAlpha, float currentRadius) {
+    public void setAnimParams(CheckedDrawable reverseDrawable) {
+        this.setAnimParams(reverseDrawable.getCurrentLeft(), reverseDrawable.getCurrentTop()
+                , reverseDrawable.getCurrentAlpha(), reverseDrawable.getCurrentRadius());
+    }
+
+    private void setAnimParams(int currentLeft, int currentTop, int currentAlpha, float currentRadius) {
         final Rect bounds = getBounds();
         final int centerX = bounds.centerX();
         final int centerY = bounds.centerY();
@@ -139,14 +180,27 @@ public class CheckedDrawable extends Drawable {
                 + ", bounds: " + bounds.toShortString() + ", mChecked: " + mChecked);*/
 
         int endLeft, endTop, endAlpha;
-        float endRadius;
+        float endRadius, startDTick, stopDTick, tickFraction;
         if (mChecked) {
             /*currentLeft = bounds.left;
             currentTop = bounds.top;*/
             endLeft = centerX;
             endTop = centerY;
             endAlpha = mAlpha;
-            endRadius = 0f;
+            endRadius = 0;
+
+            startDTick = 0;
+            stopDTick = mPathMeasure.getLength();
+            tickFraction = 0.4f;
+
+            mValueAnimator.setValues(PropertyValuesHolder.ofKeyframe(PVH_LEFT, Keyframe.ofInt(0, currentLeft), Keyframe.ofInt(1, endLeft))
+                    , PropertyValuesHolder.ofKeyframe(PVH_TOP, Keyframe.ofInt(0, currentTop), Keyframe.ofInt(1, endTop))
+                    , PropertyValuesHolder.ofKeyframe(PVH_ALPHA, Keyframe.ofInt(0, currentAlpha), Keyframe.ofInt(1, endAlpha))
+                    , PropertyValuesHolder.ofKeyframe(PVH_RADIUS, Keyframe.ofFloat(0, currentRadius), Keyframe.ofFloat(1, endRadius))
+                    , PropertyValuesHolder.ofKeyframe(PVH_TICK
+                            , Keyframe.ofFloat(0, startDTick)
+                            , Keyframe.ofFloat(tickFraction, startDTick)
+                            , Keyframe.ofFloat(1, stopDTick)));
         } else {
             /*currentLeft = centerX;
             currentTop = centerY;*/
@@ -154,35 +208,64 @@ public class CheckedDrawable extends Drawable {
             endTop = bounds.top;
             endAlpha = 0;
             endRadius = mRadius;
+
+            startDTick = mPathMeasure.getLength();
+            stopDTick = 0;
+            tickFraction = 0.6f;
+
+            mValueAnimator.setValues(PropertyValuesHolder.ofKeyframe(PVH_LEFT, Keyframe.ofInt(0, currentLeft)
+                    , Keyframe.ofInt(tickFraction, currentLeft), Keyframe.ofInt(1, endLeft))
+                    , PropertyValuesHolder.ofKeyframe(PVH_TOP, Keyframe.ofInt(0, currentTop)
+                            , Keyframe.ofInt(tickFraction, currentTop), Keyframe.ofInt(1, endTop))
+                    , PropertyValuesHolder.ofKeyframe(PVH_ALPHA, Keyframe.ofInt(0, currentAlpha)
+                            , Keyframe.ofInt(tickFraction, currentAlpha), Keyframe.ofInt(1, endAlpha))
+                    , PropertyValuesHolder.ofKeyframe(PVH_RADIUS, Keyframe.ofFloat(0, currentRadius)
+                            , Keyframe.ofFloat(tickFraction, currentRadius), Keyframe.ofFloat(1, endRadius))
+                    , PropertyValuesHolder.ofKeyframe(PVH_TICK, Keyframe.ofFloat(0, startDTick)
+                            , Keyframe.ofFloat(tickFraction, stopDTick)
+                            , Keyframe.ofFloat(1, stopDTick)));
         }
         /*Log.v(AnimCheckBox.TAG, "startAnim, currentLeft-endLeft: " + currentLeft + "-" + endLeft
                 + ", currentTop-endTop: " + currentTop + "-" + endTop
                 + ", currentAlpha-endAlpha: " + currentAlpha + "-" + endAlpha
                 + ", currentRadius-endRadius: " + currentRadius + "-" + endRadius);*/
-        mValueAnimator.setValues(PropertyValuesHolder.ofInt(PVH_LEFT, currentLeft, endLeft)
+
+        /*mValueAnimator.setValues(PropertyValuesHolder.ofInt(PVH_LEFT, currentLeft, endLeft)
                 , PropertyValuesHolder.ofInt(PVH_TOP, currentTop, endTop)
                 , PropertyValuesHolder.ofInt(PVH_ALPHA, currentAlpha, endAlpha)
-                , PropertyValuesHolder.ofFloat(PVH_RADIUS, currentRadius, endRadius));
+                , PropertyValuesHolder.ofFloat(PVH_RADIUS, currentRadius, endRadius));*/
+
         //mValueAnimator.setDuration(1500);
         mValueAnimator.setDuration(500);
 
         final ValueAnimator.AnimatorUpdateListener animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                Object valueLeft = animation.getAnimatedValue(PVH_LEFT);
-                Object valueTop = animation.getAnimatedValue(PVH_TOP);
-                Object valueRadius = animation.getAnimatedValue(PVH_RADIUS);
-                Object valueAlpha = animation.getAnimatedValue(PVH_ALPHA);
-                if (!((valueLeft instanceof Integer) && (valueTop instanceof Integer) && (valueRadius instanceof Float)
-                        && (valueAlpha instanceof Integer))) {
-                    return;
+                Object objLeft = animation.getAnimatedValue(PVH_LEFT);
+                Object objTop = animation.getAnimatedValue(PVH_TOP);
+                Object objRadius = animation.getAnimatedValue(PVH_RADIUS);
+                Object objAlpha = animation.getAnimatedValue(PVH_ALPHA);
+                Object objTick = animation.getAnimatedValue(PVH_TICK);
+                if (objLeft instanceof Integer) {
+                    mCurrentLeft = (int) objLeft;
+                }
+                if (objTop instanceof Integer) {
+                    mCurrentTop = (int) objTop;
+                }
+                if (objLeft instanceof Integer) {
+                    mCurrentAlpha = (int) objAlpha;
+                }
+                if (objRadius instanceof Float) {
+                    mCurrentRadius = (float) objRadius;
+                }
+                if (objTick instanceof Float) {
+                    mTickLength = (float) objTick;
                 }
 
-                mCurrentLeft = (int) valueLeft;
-                mCurrentTop = (int) valueTop;
-                mCurrentAlpha = (int) valueAlpha;
-                mCurrentRadius = (float) valueRadius;
                 //Log.d(AnimCheckBox.TAG, "mCurrentRadius: " + mCurrentRadius + ", mCurrentAlpha: " + mCurrentAlpha + ", mCurrentLeft: " + mCurrentLeft + ", mCurrentTop: " + mCurrentTop + ", this: " + this);
+                Log.d(AnimCheckBox.TAG, "objTick: " + mTickLength);
+                mPathTick.reset();
+                mPathMeasure.getSegment(0, mTickLength, mPathTick, true);
 
                 mPath.reset();
                 mPath.addRoundRect(mCurrentLeft, mCurrentTop, bounds.right - mCurrentLeft, bounds.bottom - mCurrentTop
@@ -216,19 +299,19 @@ public class CheckedDrawable extends Drawable {
         return mValueAnimator.isRunning();
     }
 
-    public int getCurrentLeft() {
+    private int getCurrentLeft() {
         return mCurrentLeft;
     }
 
-    public int getCurrentTop() {
+    private int getCurrentTop() {
         return mCurrentTop;
     }
 
-    public float getCurrentRadius() {
+    private float getCurrentRadius() {
         return mCurrentRadius;
     }
 
-    public int getCurrentAlpha() {
+    private int getCurrentAlpha() {
         return mCurrentAlpha;
     }
 

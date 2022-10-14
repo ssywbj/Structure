@@ -82,9 +82,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:checked="false"
+            android:background="@android:color/holo_red_light"
+            android:checked="true"
             android:padding="4dp"
             android:text="ACB1" />
+
+        <com.suheng.structure.view.AnimCheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:background="@android:color/holo_red_light"
+            android:padding="4dp"
+            android:text="ACB2" />
 
         <RadioGroup
             android:id="@+id/svg_radio_group"
