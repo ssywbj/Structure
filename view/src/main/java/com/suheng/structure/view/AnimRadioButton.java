@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat;
 
 public class AnimRadioButton extends RadioButton {
     public static final String TAG = AnimRadioButton.class.getSimpleName();
-    private RadioDrawable2 mCheckedDrawable, mNormalDrawable, mCurrentDrawable;
+    private RadioDrawable mCheckedDrawable, mNormalDrawable, mCurrentDrawable;
 
     public AnimRadioButton(Context context) {
         super(context);
@@ -39,8 +39,8 @@ public class AnimRadioButton extends RadioButton {
         stateListDrawable.addState(new int[]{}, ContextCompat.getDrawable(getContext(), R.drawable.radio_btn_unchecked));
         setButtonDrawable(stateListDrawable);*/
 
-        mCheckedDrawable = new RadioDrawable2(getContext(), true);
-        mNormalDrawable = new RadioDrawable2(getContext());
+        mCheckedDrawable = new RadioDrawable(getContext(), true);
+        mNormalDrawable = new RadioDrawable(getContext());
         stateListDrawable.addState(new int[]{android.R.attr.state_checked}, mCheckedDrawable);
         stateListDrawable.addState(new int[]{-android.R.attr.state_enabled}, ContextCompat.getDrawable(getContext(), R.drawable.radio_btn_uneabled));
         stateListDrawable.addState(new int[]{}, mNormalDrawable);
@@ -73,12 +73,11 @@ public class AnimRadioButton extends RadioButton {
             return;
         }
 
-        RadioDrawable2 tempDrawable = mCurrentDrawable;
+        RadioDrawable tempDrawable = mCurrentDrawable;
         tempDrawable.cancelAnim();
 
         mCurrentDrawable = checked ? mCheckedDrawable : mNormalDrawable;
-        mCurrentDrawable.setAnimParams(tempDrawable.getStrokeColor(), tempDrawable.getOuterRadius()
-                , tempDrawable.getInnerRadius(), tempDrawable.getExecFraction());
+        mCurrentDrawable.setAnimParams(tempDrawable);
         mCurrentDrawable.startAnim();
     }
 
