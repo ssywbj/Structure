@@ -178,34 +178,33 @@ public class RadioDrawable extends Drawable {
         List<PropertyValuesHolder> pValuesHolderList = new ArrayList<>();
         PropertyValuesHolder pvhStrokeColor, pvhOuterRadius, pvhInnerRadius;
         Keyframe kfScStart = Keyframe.ofFloat(0, 0), kfScEnd = Keyframe.ofFloat(1, 1);
-        int pvhCount = 1;
-
+        int keyframeCount = 1;
         if (mChecked) {
             scRedDelta = Color.red(mEndColor) - scRedStart;
             scGreenDelta = Color.green(mEndColor) - scGreenStart;
             scBlueDelta = Color.blue(mEndColor) - scBlueStart;
 
             if (execFraction > 0.4f) {
-                pvhCount++;
+                keyframeCount++;
                 if (execFraction > 0.8f) {
-                    pvhCount++;
+                    keyframeCount++;
                 }
             }
 
 
-            final float fOuterRadius = FRAMES_OUTER_RADIUS_RATIO + FRAMES_STROKE_COLOR_RATIO;
+            final float fOuterRadius = FRAMES_STROKE_COLOR_RATIO + FRAMES_OUTER_RADIUS_RATIO;
             final float fInnerMaxRadius = FRAMES_INNER_MAX_RADIUS_RATIO + fOuterRadius;
             final float fInnerMinRadius = FRAMES_INNER_MIN_RADIUS_RATIO + fInnerMaxRadius;
 
             mPathCheckedOuter.reset();
             mPathCheckedOuter.addCircle(centerX, centerY, mOuterStartRadius, Path.Direction.CCW);
             mPathCheckedInner.reset();
-            if (pvhCount == 1) {
+            if (keyframeCount == 1) {
                 pvhInnerRadius = PropertyValuesHolder.ofKeyframe(PVH_INNER_RADIUS
                         , Keyframe.ofFloat(0, innerRadius)
                         , Keyframe.ofFloat(0.9f, mInnerMaxRadius)
                         , Keyframe.ofFloat(1f, mInnerEndRadius));
-            } else if (pvhCount == 2) {
+            } else if (keyframeCount == 2) {
                 pvhOuterRadius = PropertyValuesHolder.ofKeyframe(PVH_OUTER_RADIUS
                         , Keyframe.ofFloat(0, outerRadius)
                         , Keyframe.ofFloat(0.6f, 0)
@@ -240,40 +239,47 @@ public class RadioDrawable extends Drawable {
             }
             pValuesHolderList.add(pvhInnerRadius);
 
-            /*Log.d(AnimRadioButton.TAG, "checked anim, pvhCount: " + pvhCount + ", startStrokeColor-endStrokeColor: (" + strokeColor
+            Log.d(AnimRadioButton.TAG, "checked anim, keyframeCount: " + keyframeCount + ", startStrokeColor-endStrokeColor: (" + strokeColor
                     + ")-(" + mEndColor + "), startOuterRadius-endOuterRadius: (" + outerRadius + "-" + OUTER_MIN_RADIUS
-                    + "), startInnerRadius-endInnerRadius: (" + innerRadius + "-" + osrHalf + ")");*/
+                    + "), startInnerRadius-endInnerRadius: (" + innerRadius + "-" + mInnerEndRadius + ")");
         } else {
             mStrokeColor = strokeColor;
             scRedDelta = Color.red(mStartColor) - scRedStart;
             scGreenDelta = Color.green(mStartColor) - scGreenStart;
             scBlueDelta = Color.blue(mStartColor) - scBlueStart;
 
-            if (execFraction > 0.2f) {
-                pvhCount++;
+            if (execFraction > FRAMES_STROKE_COLOR_RATIO) {
+                keyframeCount++;
                 mPathCheckedOuter.reset();
                 mPathCheckedOuter.addCircle(centerX, centerY, OUTER_MIN_RADIUS, Path.Direction.CCW);
-                if (execFraction > 0.6f) {
-                    pvhCount++;
-                }
+            }
+            if (execFraction > FRAMES_STROKE_COLOR_RATIO + FRAMES_OUTER_RADIUS_RATIO) {
+                keyframeCount++;
+            }
+            if (execFraction > FRAMES_STROKE_COLOR_RATIO + FRAMES_OUTER_RADIUS_RATIO + FRAMES_INNER_MAX_RADIUS_RATIO) {
+                keyframeCount++;
+            }
+            if (execFraction > FRAMES_STROKE_COLOR_RATIO + FRAMES_OUTER_RADIUS_RATIO + FRAMES_INNER_MAX_RADIUS_RATIO + FRAMES_INNER_MIN_RADIUS_RATIO) {
+                keyframeCount++;
             }
 
-            final float fInnerMaxRadius = FRAMES_INNER_MIN_RADIUS_RATIO + FRAMES_INNER_RADIUS_RATIO;
-            final float fInnerEndRadius = FRAMES_INNER_MAX_RADIUS_RATIO + fInnerMaxRadius;
-            final float fOuterRadius = FRAMES_OUTER_RADIUS_RATIO + fInnerEndRadius;
+            if (keyframeCount == 5) {
+                final float fInnerRadius = (execFraction - FRAMES_STROKE_COLOR_RATIO - FRAMES_OUTER_RADIUS_RATIO - FRAMES_INNER_MAX_RADIUS_RATIO - FRAMES_INNER_MIN_RADIUS_RATIO) / execFraction;
+                final float fInnerMinRadius = FRAMES_INNER_MIN_RADIUS_RATIO / execFraction;
+                final float fInnerMaxRadius = FRAMES_INNER_MAX_RADIUS_RATIO / execFraction + fInnerMinRadius;
+                final float fOuterRadius = FRAMES_OUTER_RADIUS_RATIO / execFraction + fInnerMaxRadius;
 
-            if (pvhCount == 3) {
                 pvhInnerRadius = PropertyValuesHolder.ofKeyframe(PVH_INNER_RADIUS
                         , Keyframe.ofFloat(0, innerRadius)
-                        , Keyframe.ofFloat(FRAMES_INNER_RADIUS_RATIO, mInnerMinRadius)
-                        , Keyframe.ofFloat(fInnerMaxRadius, mInnerMaxRadius)
-                        , Keyframe.ofFloat(fInnerEndRadius, 0)
+                        , Keyframe.ofFloat(fInnerRadius, mInnerMinRadius)
+                        , Keyframe.ofFloat(fInnerMinRadius, mInnerMaxRadius)
+                        , Keyframe.ofFloat(fInnerMaxRadius, 0)
                         , Keyframe.ofFloat(1f, 0));
                 pValuesHolderList.add(pvhInnerRadius);
 
                 pvhOuterRadius = PropertyValuesHolder.ofKeyframe(PVH_OUTER_RADIUS
                         , Keyframe.ofFloat(0, outerRadius)
-                        , Keyframe.ofFloat(fInnerEndRadius, outerRadius)
+                        , Keyframe.ofFloat(fInnerMaxRadius, outerRadius)
                         , Keyframe.ofFloat(fOuterRadius, mOuterStartRadius)
                         , Keyframe.ofFloat(1, mOuterStartRadius));
                 pValuesHolderList.add(pvhOuterRadius);
@@ -282,24 +288,71 @@ public class RadioDrawable extends Drawable {
                         , kfScStart
                         , Keyframe.ofFloat(fOuterRadius, 0)
                         , kfScEnd);
-            } else if (pvhCount == 2) {
+            } else if (keyframeCount == 4) {
+                final float fInnerMinRadius = (execFraction - FRAMES_STROKE_COLOR_RATIO - FRAMES_OUTER_RADIUS_RATIO - FRAMES_INNER_MAX_RADIUS_RATIO) / execFraction;
+                final float fInnerMaxRadius = FRAMES_INNER_MAX_RADIUS_RATIO / execFraction + fInnerMinRadius;
+                final float fOuterRadius = FRAMES_OUTER_RADIUS_RATIO / execFraction + fInnerMaxRadius;
+
+                pvhInnerRadius = PropertyValuesHolder.ofKeyframe(PVH_INNER_RADIUS
+                        , Keyframe.ofFloat(0, innerRadius)
+                        , Keyframe.ofFloat(fInnerMinRadius, mInnerMaxRadius)
+                        , Keyframe.ofFloat(fInnerMaxRadius, 0)
+                        , Keyframe.ofFloat(1f, 0));
+                pValuesHolderList.add(pvhInnerRadius);
+
                 pvhOuterRadius = PropertyValuesHolder.ofKeyframe(PVH_OUTER_RADIUS
                         , Keyframe.ofFloat(0, outerRadius)
-                        , Keyframe.ofFloat(0.4f, mOuterStartRadius)
+                        , Keyframe.ofFloat(fInnerMaxRadius, outerRadius)
+                        , Keyframe.ofFloat(fOuterRadius, mOuterStartRadius)
                         , Keyframe.ofFloat(1, mOuterStartRadius));
                 pValuesHolderList.add(pvhOuterRadius);
 
                 pvhStrokeColor = PropertyValuesHolder.ofKeyframe(PVH_STROKE_COLOR
                         , kfScStart
-                        , Keyframe.ofFloat(0.4f, 0), kfScEnd);
+                        , Keyframe.ofFloat(fOuterRadius, 0)
+                        , kfScEnd);
+            } else if (keyframeCount == 3) {
+                final float fInnerMaxRadius = (execFraction - FRAMES_STROKE_COLOR_RATIO - FRAMES_OUTER_RADIUS_RATIO) / execFraction;
+                final float fOuterRadius = FRAMES_OUTER_RADIUS_RATIO / execFraction + fInnerMaxRadius;
+
+                pvhInnerRadius = PropertyValuesHolder.ofKeyframe(PVH_INNER_RADIUS
+                        , Keyframe.ofFloat(0, innerRadius)
+                        , Keyframe.ofFloat(fInnerMaxRadius, 0)
+                        , Keyframe.ofFloat(1f, 0));
+                pValuesHolderList.add(pvhInnerRadius);
+
+                pvhOuterRadius = PropertyValuesHolder.ofKeyframe(PVH_OUTER_RADIUS
+                        , Keyframe.ofFloat(0, outerRadius)
+                        , Keyframe.ofFloat(fInnerMaxRadius, outerRadius)
+                        , Keyframe.ofFloat(fOuterRadius, mOuterStartRadius)
+                        , Keyframe.ofFloat(1, mOuterStartRadius));
+                pValuesHolderList.add(pvhOuterRadius);
+
+                pvhStrokeColor = PropertyValuesHolder.ofKeyframe(PVH_STROKE_COLOR
+                        , kfScStart
+                        , Keyframe.ofFloat(fOuterRadius, 0)
+                        , kfScEnd);
+            } else if (keyframeCount == 2) {
+                final float fOuterRadius = (execFraction - FRAMES_STROKE_COLOR_RATIO) / execFraction;
+
+                pvhOuterRadius = PropertyValuesHolder.ofKeyframe(PVH_OUTER_RADIUS
+                        , Keyframe.ofFloat(0, outerRadius)
+                        , Keyframe.ofFloat(fOuterRadius, mOuterStartRadius)
+                        , Keyframe.ofFloat(1, mOuterStartRadius));
+                pValuesHolderList.add(pvhOuterRadius);
+
+                pvhStrokeColor = PropertyValuesHolder.ofKeyframe(PVH_STROKE_COLOR
+                        , kfScStart
+                        , Keyframe.ofFloat(fOuterRadius, 0)
+                        , kfScEnd);
             } else {
                 pvhStrokeColor = PropertyValuesHolder.ofKeyframe(PVH_STROKE_COLOR, kfScStart, kfScEnd);
             }
             pValuesHolderList.add(pvhStrokeColor);
 
-            /*Log.d(AnimRadioButton.TAG, "unchecked anim, pvhCount: " + pvhCount + ", startStrokeColor-endStrokeColor: (" + strokeColor
+            Log.d(AnimRadioButton.TAG, "unchecked anim, keyframeCount: " + keyframeCount + ", startStrokeColor-endStrokeColor: (" + strokeColor
                     + ")-(" + mStartColor + "), startOuterRadius-endOuterRadius: (" + outerRadius + "-" + mOuterStartRadius
-                    + "), startInnerRadius-endInnerRadius: (" + innerRadius + "-" + 0 + ")");*/
+                    + "), startInnerRadius-endInnerRadius: (" + innerRadius + "-" + 0 + ")");
         }
 
         mValueAnimator.setValues(pValuesHolderList.toArray(new PropertyValuesHolder[0]));
@@ -347,8 +400,8 @@ public class RadioDrawable extends Drawable {
                 super.onAnimationEnd(animation);
                 mValueAnimator.removeUpdateListener(updateListener);
                 mValueAnimator.removeListener(this);
-                /*Log.d(AnimRadioButton.TAG, "onAnimationEnd, mStrokeColor: " + mStrokeColor + ", mOuterRadius: " + mOuterRadius
-                        + ", mInnerRadius: " + mInnerRadius + ", mExecFraction: " + mExecFraction + ", object: " + RadioDrawable.this);*/
+                Log.d(AnimRadioButton.TAG, "onAnimationEnd, mStrokeColor: " + mStrokeColor + ", mOuterRadius: " + mOuterRadius
+                        + ", mInnerRadius: " + mInnerRadius + ", mExecFraction: " + mExecFraction + ", object: " + RadioDrawable.this);
             }
         });
     }
