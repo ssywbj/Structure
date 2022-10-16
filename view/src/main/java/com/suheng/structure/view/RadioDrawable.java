@@ -186,11 +186,10 @@ public class RadioDrawable extends Drawable {
 
             if (execFraction > 0.4f) {
                 keyframeCount++;
-                if (execFraction > 0.8f) {
-                    keyframeCount++;
-                }
             }
-
+            if (execFraction > 0.8f) {
+                keyframeCount++;
+            }
 
             final float fOuterRadius = FRAMES_STROKE_COLOR_RATIO + FRAMES_OUTER_RADIUS_RATIO;
             final float fInnerMaxRadius = FRAMES_INNER_MAX_RADIUS_RATIO + fOuterRadius;
@@ -265,7 +264,7 @@ public class RadioDrawable extends Drawable {
 
             if (keyframeCount == 5) {
                 final float fInnerRadius = (execFraction - FRAMES_STROKE_COLOR_RATIO - FRAMES_OUTER_RADIUS_RATIO - FRAMES_INNER_MAX_RADIUS_RATIO - FRAMES_INNER_MIN_RADIUS_RATIO) / execFraction;
-                final float fInnerMinRadius = FRAMES_INNER_MIN_RADIUS_RATIO / execFraction;
+                final float fInnerMinRadius = FRAMES_INNER_MIN_RADIUS_RATIO / execFraction + fInnerRadius;
                 final float fInnerMaxRadius = FRAMES_INNER_MAX_RADIUS_RATIO / execFraction + fInnerMinRadius;
                 final float fOuterRadius = FRAMES_OUTER_RADIUS_RATIO / execFraction + fInnerMaxRadius;
 
