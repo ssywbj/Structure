@@ -59,9 +59,10 @@ public class CheckedDrawable extends Drawable {
     private final Path pathTick = new Path(), mPathStart = new Path();
     private final PathMeasure mPathMeasure, mPathStartMeasure;
 
-    private final float[] mPosEnd = new float[2];
-    private final float[] mPosStart = new float[2];
-    private final float[] mTan = new float[2];
+    private final float[] mPosEnd = new float[2], mPosStart = new float[2];
+    private final float[] mTan = new float[2], mTanStart = new float[2];
+
+    private float mExecFraction = 1;
 
     public CheckedDrawable(Context context, boolean isChecked) {
         mContext = context;
@@ -92,6 +93,8 @@ public class CheckedDrawable extends Drawable {
         this(context, false);
     }
 
+    private float y, y1;
+
     private void setChecked(boolean checked) {
         mChecked = checked;
 
@@ -105,9 +108,9 @@ public class CheckedDrawable extends Drawable {
         mDeltaTickLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 7, mContext.getResources().getDisplayMetrics());
         //mDeltaTickLength = 0;
         float x = -dx / 2 - mDeltaTickLength;
-        float y = 0 - mDeltaTickLength / 2;
+        y = 0 - mDeltaTickLength / 2;
         pathTick.moveTo(x, y);
-        float y1 = dx / 2 - mDeltaTickLength / 2;
+        y1 = dx / 2 - mDeltaTickLength / 2;
         pathTick.lineTo(y, y1);
         float x1 = dx / 2 + mDeltaTickLength;
         float y2 = 0 - 2 * mDeltaTickLength;
@@ -202,38 +205,38 @@ public class CheckedDrawable extends Drawable {
 
         canvas.save();
         canvas.translate(getIntrinsicWidth() / 2f, getIntrinsicHeight() / 2f);
+
         mPaintTick.setColor(Color.WHITE);
         canvas.drawPath(pathTick, mPaintTick);
-        //mPaintTick.setColor(Color.RED);
-        //canvas.drawPath(mPathTick, mPaintTick);
         mPaintPosEnd.setColor(Color.BLACK);
         canvas.drawPoints(mPosEnd, mPaintPosEnd);
         mPaintPosEnd.setColor(Color.YELLOW);
         canvas.drawPoint(mPosStart[0], mPosStart[1], mPaintPosEnd);
         mPaintTick.setColor(Color.GRAY);
         canvas.drawPath(mPathStart, mPaintTick);
+
+        mPaintTick.setColor(Color.GREEN);
+        canvas.drawPath(mPathTick, mPaintTick);
         canvas.restore();
     }
 
-    public void setAnimParams(CheckedDrawable reverseDrawable) {
-        this.setAnimParams(reverseDrawable.getCurrentLeft(), reverseDrawable.getCurrentTop()
-                , reverseDrawable.getCurrentAlpha(), reverseDrawable.getCurrentRadius());
+    private void setAnimParams(CheckedDrawable reverseDrawable) {
+        this.setAnimParams(reverseDrawable.mCurrentLeft, reverseDrawable.mCurrentTop
+                , reverseDrawable.mCurrentAlpha, reverseDrawable.mCurrentRadius, reverseDrawable.mExecFraction);
     }
 
-    private void setAnimParams(int currentLeft, int currentTop, int currentAlpha, float currentRadius) {
+    private void setAnimParams(int currentLeft, int currentTop, int currentAlpha, float currentRadius, float execFraction) {
         final Rect bounds = getBounds();
         final int centerX = bounds.centerX();
         final int centerY = bounds.centerY();
         Log.v(AnimCheckBox.TAG, "startAnim, centerX: " + centerX + ", centerY: " + centerY
-                + ", bounds: " + bounds.toShortString() + ", mChecked: " + mChecked);
+                + ", bounds: " + bounds.toShortString() + ", mChecked: " + mChecked + ", execFraction: " + execFraction);
 
         int endLeft, endTop, endAlpha;
         float endRadius, startDTickMax, stopDTickMax, statTickFractionMax;
         float stopDTick, statTickFraction;
         float startDStartPathMax, stopDStartPath, stopDStartPathMax;
         if (mChecked) {
-            /*currentLeft = bounds.left;
-            currentTop = bounds.top;*/
             endLeft = centerX;
             endTop = centerY;
             endAlpha = mAlpha;
@@ -265,8 +268,6 @@ public class CheckedDrawable extends Drawable {
                             , Keyframe.ofFloat(1, stopDStartPath)));
 
         } else {
-            /*currentLeft = centerX;
-            currentTop = centerY;*/
             endLeft = bounds.left;
             endTop = bounds.top;
             endAlpha = 0;
@@ -306,17 +307,13 @@ public class CheckedDrawable extends Drawable {
                 + ", currentAlpha-endAlpha: " + currentAlpha + "-" + endAlpha
                 + ", currentRadius-endRadius: " + currentRadius + "-" + endRadius);*/
 
-        /*mValueAnimator.setValues(PropertyValuesHolder.ofInt(PVH_LEFT, currentLeft, endLeft)
-                , PropertyValuesHolder.ofInt(PVH_TOP, currentTop, endTop)
-                , PropertyValuesHolder.ofInt(PVH_ALPHA, currentAlpha, endAlpha)
-                , PropertyValuesHolder.ofFloat(PVH_RADIUS, currentRadius, endRadius));*/
-
-        //mValueAnimator.setDuration(1500);
         mValueAnimator.setDuration(ANIM_DURATION);
 
         final ValueAnimator.AnimatorUpdateListener animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
+                mExecFraction = animation.getAnimatedFraction();
+
                 Object objLeft = animation.getAnimatedValue(PVH_LEFT);
                 Object objTop = animation.getAnimatedValue(PVH_TOP);
                 Object objRadius = animation.getAnimatedValue(PVH_RADIUS);
@@ -343,15 +340,16 @@ public class CheckedDrawable extends Drawable {
                 }
 
                 //Log.d(AnimCheckBox.TAG, "mCurrentRadius: " + mCurrentRadius + ", mCurrentAlpha: " + mCurrentAlpha + ", mCurrentLeft: " + mCurrentLeft + ", mCurrentTop: " + mCurrentTop + ", this: " + this);
-                mPathTick.reset();
-                //mPathMeasure.getSegment(mDeltaTickLength, mTickLength, mPathTick, true);
-                mPathMeasure.getSegment(0, mTickLength, mPathTick, true);
-
                 mPathMeasure.getPosTan(mTickLength, mPosEnd, mTan);
-                Log.d(AnimCheckBox.TAG, "mTickLength: " + mTickLength + ", mPos x: " + mPosEnd[0] + ", y: " + mPosEnd[1] + ", mTan x: " + mTan[0] + ", y: " + mTan[1]);
-
-                mPathStartMeasure.getPosTan(mStartLength, mPosStart, mTan);
-                Log.d(AnimCheckBox.TAG, "mTickLength: " + mTickLength + ", mPos x: " + mPosEnd[0] + ", y: " + mPosEnd[1] + ", mTan x: " + mTan[0] + ", y: " + mTan[1]);
+                Log.v(AnimCheckBox.TAG, "mTickLength: " + mTickLength + ", mPosEnd x: " + mPosEnd[0] + ", y: " + mPosEnd[1] + ", mTan x: " + mTan[0] + ", y: " + mTan[1] + ", mExecFraction: " + mExecFraction);
+                mPathStartMeasure.getPosTan(mStartLength, mPosStart, mTanStart);
+                Log.d(AnimCheckBox.TAG, "mStartLength: " + mStartLength + ", mPosStart x: " + mPosStart[0] + ", y: " + mPosStart[1] + ", mTan x: " + mTanStart[0] + ", y: " + mTanStart[1]);
+                mPathTick.reset();
+                mPathTick.moveTo(mPosStart[0], mPosStart[1]);
+                if (!(Math.abs(mTanStart[0] - mTan[0]) < 0.0000001f && Math.abs(mTanStart[1] - mTan[1]) < 0.0000001f)) {
+                    mPathTick.lineTo(y, y1);
+                }
+                mPathTick.lineTo(mPosEnd[0], mPosEnd[1]);
 
                 mPath.reset();
                 mPath.addRoundRect(mCurrentLeft, mCurrentTop, bounds.right - mCurrentLeft, bounds.bottom - mCurrentTop
@@ -367,11 +365,15 @@ public class CheckedDrawable extends Drawable {
                 super.onAnimationEnd(animation);
                 mValueAnimator.removeUpdateListener(animatorUpdateListener);
                 mValueAnimator.removeListener(this);
+                Log.v(AnimCheckBox.TAG, "mTickLength: " + mTickLength + ", mPosEnd x: " + mPosEnd[0] + ", y: " + mPosEnd[1] + ", mTan x: " + mTan[0] + ", y: " + mTan[1] + ", mExecFraction: " + mExecFraction);
+                Log.d(AnimCheckBox.TAG, "mStartLength: " + mStartLength + ", mPosStart x: " + mPosStart[0] + ", y: " + mPosStart[1] + ", mTan x: " + mTanStart[0] + ", y: " + mTanStart[1]);
             }
         });
     }
 
-    public void startAnim() {
+    public void startAnim(CheckedDrawable reverseDrawable) {
+        reverseDrawable.cancelAnim();
+        this.setAnimParams(reverseDrawable);
         mValueAnimator.start();
     }
 
@@ -383,22 +385,6 @@ public class CheckedDrawable extends Drawable {
 
     public boolean isAnimRunning() {
         return mValueAnimator.isRunning();
-    }
-
-    private int getCurrentLeft() {
-        return mCurrentLeft;
-    }
-
-    private int getCurrentTop() {
-        return mCurrentTop;
-    }
-
-    private float getCurrentRadius() {
-        return mCurrentRadius;
-    }
-
-    private int getCurrentAlpha() {
-        return mCurrentAlpha;
     }
 
 }

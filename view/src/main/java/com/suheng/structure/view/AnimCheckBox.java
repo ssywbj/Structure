@@ -67,55 +67,14 @@ public class AnimCheckBox extends CheckBox {
 
         //Log.d(TAG, "setChecked, before: " + mDrawableCurrent);
         CheckedDrawable tempDrawable = mCurrentDrawable;
-        tempDrawable.cancelAnim();
-
         mCurrentDrawable = checked ? mCheckedDrawable : mNormalDrawable;
-        mCurrentDrawable.setAnimParams(tempDrawable);
-        mCurrentDrawable.startAnim();
+        mCurrentDrawable.startAnim(tempDrawable);
         //Log.d(TAG, "setChecked, after: " + mDrawableCurrent);
     }
 
     @Override
-    public void invalidateDrawable(@NonNull Drawable drawable) {
-        super.invalidateDrawable(drawable);
-        if (drawable instanceof StateListDrawable) {
-            //Log.d(TAG, "invalidateDrawable, drawable: " + drawable);
-            StateListDrawable stateListDrawable = (StateListDrawable) drawable;
-            /*int[] state = stateListDrawable.getState();
-            StringBuilder sb = new StringBuilder("state: ");
-            for (int i : state) {
-                sb.append(i).append(", ");
-            }
-            final int length = sb.length();
-            sb.delete(length - 2, length);*/
-            Drawable drawableCurrent = stateListDrawable.getCurrent();
-            boolean checked = isChecked();
-            //Log.d(TAG, "invalidateDrawable, isChecked: " + checked + ", current drawable: " + mDrawableCurrent + ", getCurrent: : " + drawableCurrent);
-            /*if (mCheckedCurrent == checked) {
-                return;
-            }*/
-            //Log.i(TAG, "invalidateDrawable, change status: " + checked + ", checked current :" + mCheckedCurrent);
-
-            //mCheckedCurrent = checked;
-
-            /*if (mDrawableCurrent == drawableCurrent) {
-                return;
-            }
-            Log.i(TAG, "invalidateDrawable, change status: " + checked);
-            if (drawableCurrent == normalDrawable) {
-                Log.d(TAG, "invalidateDrawable, normalDrawable exec anim");
-            }
-
-            if (drawableCurrent == checkedDrawable) {
-                Log.d(TAG, "invalidateDrawable, checkedDrawable exec anim");
-            }
-
-            mDrawableCurrent = drawableCurrent;
-
-            if (checked) {
-
-            }*/
-        }
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mCurrentDrawable.cancelAnim();
     }
-
 }
