@@ -55,6 +55,13 @@ public class AnimCheckBox extends CheckBox {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+
+
+    @Override
     public void setChecked(boolean checked) {
         super.setChecked(checked);
         Log.d(TAG, "setChecked, checked: " + checked);

@@ -83,7 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:background="@android:color/holo_red_light"
-            android:checked="true"
+            android:checked="false"
             android:padding="4dp"
             android:text="ACB1" />
 
