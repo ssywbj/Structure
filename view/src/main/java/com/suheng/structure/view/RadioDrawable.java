@@ -161,9 +161,8 @@ public class RadioDrawable extends Drawable {
         canvas.restoreToCount(cc);
     }
 
-    public void setAnimParams(RadioDrawable reverseDrawable) {
-        this.setAnimParams(reverseDrawable.getStrokeColor(), reverseDrawable.getOuterRadius()
-                , reverseDrawable.getInnerRadius(), reverseDrawable.getExecFraction());
+    private void setAnimParams(RadioDrawable reverse) {
+        this.setAnimParams(reverse.mStrokeColor, reverse.mOuterRadius, reverse.mInnerRadius, reverse.mExecFraction);
     }
 
     private void setAnimParams(int strokeColor, float outerRadius, float innerRadius, float execFraction) {
@@ -405,7 +404,9 @@ public class RadioDrawable extends Drawable {
         });
     }
 
-    public void startAnim() {
+    public void startAnim(RadioDrawable reverse) {
+        reverse.cancelAnim();
+        this.setAnimParams(reverse);
         mValueAnimator.start();
     }
 
@@ -415,23 +416,7 @@ public class RadioDrawable extends Drawable {
         }
     }
 
-    public float getExecFraction() {
-        return mExecFraction;
-    }
-
     public boolean isAnimRunning() {
         return mValueAnimator.isRunning();
-    }
-
-    private int getStrokeColor() {
-        return mStrokeColor;
-    }
-
-    private float getOuterRadius() {
-        return mOuterRadius;
-    }
-
-    private float getInnerRadius() {
-        return mInnerRadius;
     }
 }

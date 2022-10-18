@@ -74,16 +74,16 @@ public class AnimRadioButton extends RadioButton {
         }
 
         RadioDrawable tempDrawable = mCurrentDrawable;
-        tempDrawable.cancelAnim();
-
         mCurrentDrawable = checked ? mCheckedDrawable : mNormalDrawable;
-        mCurrentDrawable.setAnimParams(tempDrawable);
-        mCurrentDrawable.startAnim();
+        mCurrentDrawable.startAnim(tempDrawable);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mCurrentDrawable.cancelAnim();
+        if (mCurrentDrawable != null) {
+            mCurrentDrawable.cancelAnim();
+        }
     }
+
 }

@@ -61,20 +61,18 @@ public class AnimCheckBox extends CheckBox {
         if (mCurrentDrawable == null) {
             return;
         }
-        /*if (mCheckedCurrent == checked) {
-            return;
-        }*/
 
-        //Log.d(TAG, "setChecked, before: " + mDrawableCurrent);
         CheckedDrawable tempDrawable = mCurrentDrawable;
         mCurrentDrawable = checked ? mCheckedDrawable : mNormalDrawable;
         mCurrentDrawable.startAnim(tempDrawable);
-        //Log.d(TAG, "setChecked, after: " + mDrawableCurrent);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mCurrentDrawable.cancelAnim();
+        if (mCurrentDrawable != null) {
+            mCurrentDrawable.cancelAnim();
+        }
     }
+
 }
