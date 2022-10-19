@@ -29,10 +29,10 @@ import androidx.core.content.ContextCompat;
 //https://blog.csdn.net/lmj623565791/article/details/43752383
 public class CheckedDrawable extends Drawable {
     //private static final int ANIM_DURATION = 500;
-    private static final int ANIM_DURATION = 4000;
+    private static final int ANIM_DURATION = 2000;
     private static final float FRAMES_BORDER_RATIO = 0.4f;
-    private static final float FRAMES_TICK_RATIO_MAX = 0.4f;
-    private static final float FRAMES_TICK_RATIO = 0.2f;
+    private static final float FRAMES_TICK_RATIO_MAX = 0.5f;
+    private static final float FRAMES_TICK_RATIO = 0.1f;
 
     private static final String PVH_LEFT = "pvh_left";
     private static final String PVH_TOP = "pvh_top";
@@ -71,8 +71,8 @@ public class CheckedDrawable extends Drawable {
         mPaintTick.setStyle(Paint.Style.STROKE);
         mPaintTick.setStrokeCap(Paint.Cap.ROUND);
         mPaintTick.setStrokeJoin(Paint.Join.ROUND);
-        //mPaintTick.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, context.getResources().getDisplayMetrics()));
-        mPaintTick.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, context.getResources().getDisplayMetrics()));
+        mPaintTick.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4.5f, context.getResources().getDisplayMetrics()));
+        //mPaintTick.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, context.getResources().getDisplayMetrics()));
 
         mPaintPosEnd = new Paint();
         mPaintPosEnd.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, context.getResources().getDisplayMetrics()));
@@ -105,7 +105,7 @@ public class CheckedDrawable extends Drawable {
 
         mPathFullTick.reset();
         float dx = getIntrinsicWidth() / 2f;
-        mDeltaTickLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, mContext.getResources().getDisplayMetrics());
+        mDeltaTickLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, mContext.getResources().getDisplayMetrics());
         //mDeltaTickLength = 0;
         float x = -dx / 2 - mDeltaTickLength;
         y = 0 - mDeltaTickLength / 2;
@@ -121,7 +121,6 @@ public class CheckedDrawable extends Drawable {
         mMeasurePathFullTick.getSegment(0, 40, mPathStart, true);
         mDeltaStartLength = 16;
         mPathStartMeasure.setPath(mPathStart, false);
-        mStartLength = mPathStartMeasure.getLength();
 
         mPosEnd[0] = x;
         mPosEnd[1] = y;
@@ -131,8 +130,10 @@ public class CheckedDrawable extends Drawable {
         Log.d(AnimCheckBox.TAG, "setChecked, check: " + checked + ", (" + x + ", " + y + "), (" + y + ", " + y1 + "), (" + x1 + ", " + y2 + ")"
                 + ", mPos(x, y): mPos(" + x + ", " + y + ")" + ", this: " + this);
 
-        mTickLength = checked ? mMeasurePathFullTick.getLength() - mDeltaTickLength : mDeltaTickLength;
+        mTickLength = checked ? mMeasurePathFullTick.getLength() - mDeltaTickLength : 0;
         mMeasurePathFullTick.getSegment(mDeltaTickLength, mTickLength, mPathTick, true);
+
+        mStartLength = checked ? mPathStartMeasure.getLength() - mDeltaStartLength : 0;
     }
 
     private void setBitmap() {
@@ -205,8 +206,9 @@ public class CheckedDrawable extends Drawable {
         canvas.save();
         canvas.translate(getIntrinsicWidth() / 2f, getIntrinsicHeight() / 2f);
 
-        mPaintTick.setColor(Color.GREEN);
-        canvas.drawPath(mPathFullTick, mPaintTick);
+        /*mPaintTick.setColor(Color.GREEN);
+        canvas.drawPath(mPathFullTick, mPaintTick);*/
+
         /*mPaintPosEnd.setColor(Color.BLACK);
         canvas.drawPoints(mPosEnd, mPaintPosEnd);
         mPaintPosEnd.setColor(Color.YELLOW);
@@ -233,15 +235,13 @@ public class CheckedDrawable extends Drawable {
         Log.v(AnimCheckBox.TAG, "startAnim, tickLength: " + tickLength + ", startLength: " + startLength);
 
         int endLeft, endTop, endAlpha;
-        float endRadius, startDTickMax, stopDTickMax, statTickFractionMax;
-        float stopDTick, statTickFraction;
-        float startDStartPathMax, stopDStartPath, stopDStartPathMax;
+        float endRadius;
         int keyframeCount = 1;
         if (mChecked) {
-            if (execFraction > FRAMES_BORDER_RATIO) {
+            if (execFraction > FRAMES_TICK_RATIO) {
                 keyframeCount++;
             }
-            if (execFraction > FRAMES_BORDER_RATIO + FRAMES_TICK_RATIO_MAX) {
+            if (execFraction > FRAMES_TICK_RATIO + FRAMES_TICK_RATIO_MAX) {
                 keyframeCount++;
             }
 
@@ -250,35 +250,23 @@ public class CheckedDrawable extends Drawable {
             endAlpha = mAlpha;
             endRadius = 0;
 
-            startDTickMax = 0;
-            statTickFractionMax = FRAMES_BORDER_RATIO;
-            stopDTickMax = mMeasurePathFullTick.getLength();
-            statTickFraction = statTickFractionMax + FRAMES_TICK_RATIO_MAX;
-            stopDTick = stopDTickMax - mDeltaTickLength;
-
-            startDStartPathMax = 0;
-            stopDStartPathMax = mPathStartMeasure.getLength();
-            stopDStartPath = stopDStartPathMax - mDeltaStartLength;
-
             if (keyframeCount == 3) {
-                float fractionBorder = FRAMES_BORDER_RATIO;
-
-                float fractionTickMax = fractionBorder + FRAMES_TICK_RATIO_MAX;
-                startDTickMax = 0;
-                stopDTickMax = mMeasurePathFullTick.getLength();
-                stopDTick = stopDTickMax - mDeltaTickLength;
+                float fractionBorder = (execFraction - FRAMES_TICK_RATIO - FRAMES_TICK_RATIO_MAX) / execFraction;
+                float fractionTickMax = FRAMES_TICK_RATIO_MAX / execFraction + fractionBorder;
+                float stopDTickMax = mMeasurePathFullTick.getLength();
+                float stopDTick = stopDTickMax - mDeltaTickLength;
 
                 float stopDStartMax = mPathStartMeasure.getLength();
                 float stopDStart = stopDStartMax - mDeltaStartLength;
 
                 mValueAnimator.setValues(
-                        PropertyValuesHolder.ofKeyframe(PVH_LEFT,
-                                Keyframe.ofInt(0, currentLeft)
+                        PropertyValuesHolder.ofKeyframe(PVH_LEFT
+                                , Keyframe.ofInt(0, currentLeft)
                                 , Keyframe.ofInt(fractionBorder, endLeft)
                                 , Keyframe.ofInt(1, endLeft)),
                         PropertyValuesHolder.ofKeyframe(PVH_TOP
-                                , Keyframe.ofInt(0, currentTop),
-                                Keyframe.ofInt(fractionBorder, endTop)
+                                , Keyframe.ofInt(0, currentTop)
+                                , Keyframe.ofInt(fractionBorder, endTop)
                                 , Keyframe.ofInt(1, endTop)),
                         PropertyValuesHolder.ofKeyframe(PVH_ALPHA
                                 , Keyframe.ofInt(0, currentAlpha)
@@ -289,43 +277,43 @@ public class CheckedDrawable extends Drawable {
                                 , Keyframe.ofFloat(fractionBorder, endRadius)
                                 , Keyframe.ofFloat(1, endRadius)),
                         PropertyValuesHolder.ofKeyframe(PVH_TICK
-                                , Keyframe.ofFloat(0, startDTickMax)
-                                , Keyframe.ofFloat(fractionBorder, startDTickMax)
+                                , Keyframe.ofFloat(0, tickLength)
+                                , Keyframe.ofFloat(fractionBorder, tickLength)
                                 , Keyframe.ofFloat(fractionTickMax, stopDTickMax)
                                 , Keyframe.ofFloat(1, stopDTick)),
                         PropertyValuesHolder.ofKeyframe(PVH_PATH_START
-                                , Keyframe.ofFloat(0, startDTickMax)
-                                , Keyframe.ofFloat(fractionBorder, startDTickMax)
+                                , Keyframe.ofFloat(0, startLength)
+                                , Keyframe.ofFloat(fractionBorder, startLength)
                                 , Keyframe.ofFloat(fractionTickMax, stopDStartMax)
                                 , Keyframe.ofFloat(1, stopDStart)));
-            } else {
+            } else if (keyframeCount == 2) {
+                float fractionTickMax = (execFraction - FRAMES_TICK_RATIO) / execFraction;
+                float stopDTickMax = mMeasurePathFullTick.getLength();
+                float stopDTick = stopDTickMax - mDeltaTickLength;
+
+                float stopDStartPathMax = mPathStartMeasure.getLength();
+                float stopDStartPath = stopDStartPathMax - mDeltaStartLength;
+
                 mValueAnimator.setValues(
-                        PropertyValuesHolder.ofKeyframe(PVH_LEFT,
-                                Keyframe.ofInt(0, currentLeft)
-                                , Keyframe.ofInt(FRAMES_BORDER_RATIO, endLeft)
-                                , Keyframe.ofInt(1, endLeft)),
-                        PropertyValuesHolder.ofKeyframe(PVH_TOP
-                                , Keyframe.ofInt(0, currentTop),
-                                Keyframe.ofInt(FRAMES_BORDER_RATIO, endTop)
-                                , Keyframe.ofInt(1, endTop)),
-                        PropertyValuesHolder.ofKeyframe(PVH_ALPHA
-                                , Keyframe.ofInt(0, currentAlpha)
-                                , Keyframe.ofInt(FRAMES_BORDER_RATIO, endAlpha)
-                                , Keyframe.ofInt(1, endAlpha)),
-                        PropertyValuesHolder.ofKeyframe(PVH_RADIUS
-                                , Keyframe.ofFloat(0, currentRadius)
-                                , Keyframe.ofFloat(FRAMES_BORDER_RATIO, endRadius)
-                                , Keyframe.ofFloat(1, endRadius)),
                         PropertyValuesHolder.ofKeyframe(PVH_TICK
-                                , Keyframe.ofFloat(0, startDTickMax)
-                                , Keyframe.ofFloat(statTickFractionMax, startDTickMax)
-                                , Keyframe.ofFloat(statTickFraction, stopDTickMax)
+                                , Keyframe.ofFloat(0, tickLength)
+                                , Keyframe.ofFloat(fractionTickMax, stopDTickMax)
                                 , Keyframe.ofFloat(1, stopDTick)),
                         PropertyValuesHolder.ofKeyframe(PVH_PATH_START
-                                , Keyframe.ofFloat(0, startDStartPathMax)
-                                , Keyframe.ofFloat(statTickFractionMax, startDStartPathMax)
-                                , Keyframe.ofFloat(statTickFraction, stopDStartPathMax)
+                                , Keyframe.ofFloat(0, startLength)
+                                , Keyframe.ofFloat(fractionTickMax, stopDStartPathMax)
                                 , Keyframe.ofFloat(1, stopDStartPath)));
+            } else {
+                float stopDTick = mMeasurePathFullTick.getLength() - mDeltaTickLength;
+                float stopDStart = mPathStartMeasure.getLength() - mDeltaStartLength;
+
+                mValueAnimator.setValues(
+                        PropertyValuesHolder.ofKeyframe(PVH_TICK
+                                , Keyframe.ofFloat(0, tickLength)
+                                , Keyframe.ofFloat(1, stopDTick)),
+                        PropertyValuesHolder.ofKeyframe(PVH_PATH_START
+                                , Keyframe.ofFloat(0, startLength)
+                                , Keyframe.ofFloat(1, stopDStart)));
             }
         } else {
             if (execFraction > FRAMES_BORDER_RATIO) {
@@ -341,85 +329,81 @@ public class CheckedDrawable extends Drawable {
             endRadius = mRadius;
 
             if (keyframeCount == 3) {
-                stopDTickMax = mMeasurePathFullTick.getLength();
-                startDTickMax = stopDTickMax - mDeltaTickLength;
-                float fractionTickMax = FRAMES_TICK_RATIO;
+                float fractionTick = (execFraction - FRAMES_BORDER_RATIO - FRAMES_TICK_RATIO_MAX) / execFraction;
 
-                float stopDTickMin = 0;
-                float fractionTickMin = fractionTickMax + FRAMES_TICK_RATIO_MAX;
-
+                float fractionTickMax = FRAMES_TICK_RATIO_MAX / execFraction + fractionTick;
+                float stopDTickMax = mMeasurePathFullTick.getLength();
                 float stopDStartMax = mPathStartMeasure.getLength();
-                float startDStartMax = stopDStartMax - mDeltaStartLength;
 
                 mValueAnimator.setValues(
                         PropertyValuesHolder.ofKeyframe(PVH_TICK
-                                , Keyframe.ofFloat(0, startDTickMax)
-                                , Keyframe.ofFloat(fractionTickMax, stopDTickMax)
-                                , Keyframe.ofFloat(fractionTickMin, stopDTickMin)
-                                , Keyframe.ofFloat(1, stopDTickMin)),
+                                , Keyframe.ofFloat(0, tickLength)
+                                , Keyframe.ofFloat(fractionTick, stopDTickMax)
+                                , Keyframe.ofFloat(fractionTickMax, 0)
+                                , Keyframe.ofFloat(1, 0)),
                         PropertyValuesHolder.ofKeyframe(PVH_PATH_START
-                                , Keyframe.ofFloat(0, startDStartMax)
-                                , Keyframe.ofFloat(fractionTickMax, stopDStartMax)
-                                , Keyframe.ofFloat(fractionTickMin, stopDTickMin)
-                                , Keyframe.ofFloat(1, stopDTickMin)),
-                        PropertyValuesHolder.ofKeyframe(PVH_LEFT,
-                                Keyframe.ofInt(0, currentLeft)
-                                , Keyframe.ofInt(fractionTickMin, currentLeft)
+                                , Keyframe.ofFloat(0, startLength)
+                                , Keyframe.ofFloat(fractionTick, stopDStartMax)
+                                , Keyframe.ofFloat(fractionTickMax, 0)
+                                , Keyframe.ofFloat(1, 0)),
+                        PropertyValuesHolder.ofKeyframe(PVH_LEFT
+                                , Keyframe.ofInt(0, currentLeft)
+                                , Keyframe.ofInt(fractionTickMax, currentLeft)
                                 , Keyframe.ofInt(1, endLeft)),
                         PropertyValuesHolder.ofKeyframe(PVH_TOP
                                 , Keyframe.ofInt(0, currentTop)
-                                , Keyframe.ofInt(fractionTickMin, currentTop)
+                                , Keyframe.ofInt(fractionTickMax, currentTop)
                                 , Keyframe.ofInt(1, endTop)),
                         PropertyValuesHolder.ofKeyframe(PVH_ALPHA
                                 , Keyframe.ofInt(0, currentAlpha)
-                                , Keyframe.ofInt(fractionTickMin, currentAlpha)
+                                , Keyframe.ofInt(fractionTickMax, currentAlpha)
                                 , Keyframe.ofInt(1, endAlpha)),
                         PropertyValuesHolder.ofKeyframe(PVH_RADIUS
                                 , Keyframe.ofFloat(0, currentRadius)
-                                , Keyframe.ofFloat(fractionTickMin, currentRadius)
+                                , Keyframe.ofFloat(fractionTickMax, currentRadius)
                                 , Keyframe.ofFloat(1, endRadius)));
             } else if (keyframeCount == 2) {
-                startDTickMax = 0;
-                statTickFractionMax = execFraction - FRAMES_BORDER_RATIO;
-                stopDTickMax = mTickLength;
-                statTickFraction = statTickFractionMax + FRAMES_TICK_RATIO_MAX;
-                stopDTick = stopDTickMax - mDeltaTickLength;
+                float fractionTickMax = (execFraction - FRAMES_BORDER_RATIO) / execFraction;
 
-                startDStartPathMax = 0;
-                stopDStartPathMax = mPathStartMeasure.getLength();
-                stopDStartPath = stopDStartPathMax - mDeltaStartLength;
-
-                mValueAnimator.setValues(PropertyValuesHolder.ofKeyframe(PVH_TICK
-                        , Keyframe.ofFloat(0, tickLength)
-                        , Keyframe.ofFloat(statTickFractionMax, startDTickMax)
-                        , Keyframe.ofFloat(statTickFraction, stopDTickMax)
-                        , Keyframe.ofFloat(1, stopDTickMax))
-                        , PropertyValuesHolder.ofKeyframe(PVH_PATH_START
-                                , Keyframe.ofFloat(0, stopDStartPath)
-                                , Keyframe.ofFloat(FRAMES_TICK_RATIO, startDStartPathMax)
-                                , Keyframe.ofFloat(statTickFractionMax, stopDStartPathMax)
-                                , Keyframe.ofFloat(1, stopDStartPathMax))
-                        , PropertyValuesHolder.ofKeyframe(PVH_LEFT
+                mValueAnimator.setValues(
+                        PropertyValuesHolder.ofKeyframe(PVH_TICK
+                                , Keyframe.ofFloat(0, tickLength)
+                                , Keyframe.ofFloat(fractionTickMax, 0)
+                                , Keyframe.ofFloat(1, 0)),
+                        PropertyValuesHolder.ofKeyframe(PVH_PATH_START
+                                , Keyframe.ofFloat(0, startLength)
+                                , Keyframe.ofFloat(fractionTickMax, 0)
+                                , Keyframe.ofFloat(1, 0)),
+                        PropertyValuesHolder.ofKeyframe(PVH_LEFT
                                 , Keyframe.ofInt(0, currentLeft)
-                                , Keyframe.ofInt(statTickFractionMax, currentLeft)
-                                , Keyframe.ofInt(1, endLeft))
-                        , PropertyValuesHolder.ofKeyframe(PVH_TOP
+                                , Keyframe.ofInt(fractionTickMax, currentLeft)
+                                , Keyframe.ofInt(1, endLeft)),
+                        PropertyValuesHolder.ofKeyframe(PVH_TOP
                                 , Keyframe.ofInt(0, currentTop)
-                                , Keyframe.ofInt(statTickFractionMax, currentTop)
-                                , Keyframe.ofInt(1, endTop))
-                        , PropertyValuesHolder.ofKeyframe(PVH_ALPHA
+                                , Keyframe.ofInt(fractionTickMax, currentTop)
+                                , Keyframe.ofInt(1, endTop)),
+                        PropertyValuesHolder.ofKeyframe(PVH_ALPHA
                                 , Keyframe.ofInt(0, currentAlpha)
-                                , Keyframe.ofInt(statTickFractionMax, currentAlpha)
-                                , Keyframe.ofInt(1, endAlpha))
-                        , PropertyValuesHolder.ofKeyframe(PVH_RADIUS
+                                , Keyframe.ofInt(fractionTickMax, currentAlpha)
+                                , Keyframe.ofInt(1, endAlpha)),
+                        PropertyValuesHolder.ofKeyframe(PVH_RADIUS
                                 , Keyframe.ofFloat(0, currentRadius)
-                                , Keyframe.ofFloat(statTickFractionMax, currentRadius)
+                                , Keyframe.ofFloat(fractionTickMax, currentRadius)
                                 , Keyframe.ofFloat(1, endRadius)));
             } else {
-                mValueAnimator.setValues(PropertyValuesHolder.ofKeyframe(PVH_LEFT, Keyframe.ofInt(0, currentLeft), Keyframe.ofInt(1, endLeft))
-                        , PropertyValuesHolder.ofKeyframe(PVH_TOP, Keyframe.ofInt(0, currentTop), Keyframe.ofInt(1, endTop))
-                        , PropertyValuesHolder.ofKeyframe(PVH_ALPHA, Keyframe.ofInt(0, currentAlpha), Keyframe.ofInt(1, endAlpha))
-                        , PropertyValuesHolder.ofKeyframe(PVH_RADIUS, Keyframe.ofFloat(0, currentRadius), Keyframe.ofFloat(1, endRadius)));
+                mValueAnimator.setValues(
+                        PropertyValuesHolder.ofKeyframe(PVH_LEFT
+                                , Keyframe.ofInt(0, currentLeft)
+                                , Keyframe.ofInt(1, endLeft)),
+                        PropertyValuesHolder.ofKeyframe(PVH_TOP
+                                , Keyframe.ofInt(0, currentTop)
+                                , Keyframe.ofInt(1, endTop)),
+                        PropertyValuesHolder.ofKeyframe(PVH_ALPHA
+                                , Keyframe.ofInt(0, currentAlpha)
+                                , Keyframe.ofInt(1, endAlpha)),
+                        PropertyValuesHolder.ofKeyframe(PVH_RADIUS
+                                , Keyframe.ofFloat(0, currentRadius)
+                                , Keyframe.ofFloat(1, endRadius)));
             }
         }
         /*Log.v(AnimCheckBox.TAG, "startAnim, currentLeft-endLeft: " + currentLeft + "-" + endLeft
@@ -461,9 +445,9 @@ public class CheckedDrawable extends Drawable {
 
                 //Log.d(AnimCheckBox.TAG, "mCurrentRadius: " + mCurrentRadius + ", mCurrentAlpha: " + mCurrentAlpha + ", mCurrentLeft: " + mCurrentLeft + ", mCurrentTop: " + mCurrentTop + ", this: " + this);
                 mMeasurePathFullTick.getPosTan(mTickLength, mPosEnd, mTan);
-                //Log.v(AnimCheckBox.TAG, "mTickLength: " + mTickLength + ", mPosEnd x: " + mPosEnd[0] + ", y: " + mPosEnd[1] + ", mTan x: " + mTan[0] + ", y: " + mTan[1] + ", mExecFraction: " + mExecFraction);
+                Log.v(AnimCheckBox.TAG, "mTickLength: " + mTickLength + ", mPosEnd x: " + mPosEnd[0] + ", y: " + mPosEnd[1] + ", mTan x: " + mTan[0] + ", y: " + mTan[1] + ", mExecFraction: " + mExecFraction);
                 mPathStartMeasure.getPosTan(mStartLength, mPosStart, mTanStart);
-                //Log.d(AnimCheckBox.TAG, "mStartLength: " + mStartLength + ", mPosStart x: " + mPosStart[0] + ", y: " + mPosStart[1] + ", mTan x: " + mTanStart[0] + ", y: " + mTanStart[1]);
+                Log.d(AnimCheckBox.TAG, "mStartLength: " + mStartLength + ", mPosStart x: " + mPosStart[0] + ", y: " + mPosStart[1] + ", mTan x: " + mTanStart[0] + ", y: " + mTanStart[1]);
                 mPathTick.reset();
                 if ((Math.abs(mPosStart[0] - mPosEnd[0]) > 0.0000001f && Math.abs(mPosStart[1] - mPosEnd[1]) > 0.0000001f)) {
                     mPathTick.moveTo(mPosStart[0], mPosStart[1]);
