@@ -39,7 +39,7 @@ public class RadioDrawable extends Drawable {
     private static final float FRAMES_INNER_RADIUS_RATIO = 5f / FRAMES_TOTAL;
 
     //private static final int ANIM_DURATION = 500;
-    private static final int ANIM_DURATION = 3000;
+    private static final int ANIM_DURATION = 1150;
     private static final float OUTER_MIN_RADIUS = .1f;
 
     private final Paint mPaint;
@@ -183,16 +183,18 @@ public class RadioDrawable extends Drawable {
             scGreenDelta = Color.green(mEndColor) - scGreenStart;
             scBlueDelta = Color.blue(mEndColor) - scBlueStart;
 
-            if (execFraction > 0.4f) {
+            if (execFraction > FRAMES_INNER_RADIUS_RATIO) {
                 keyframeCount++;
             }
-            if (execFraction > 0.8f) {
+            if (execFraction > FRAMES_INNER_RADIUS_RATIO + FRAMES_INNER_MIN_RADIUS_RATIO) {
                 keyframeCount++;
             }
-
-            final float fOuterRadius = FRAMES_STROKE_COLOR_RATIO + FRAMES_OUTER_RADIUS_RATIO;
-            final float fInnerMaxRadius = FRAMES_INNER_MAX_RADIUS_RATIO + fOuterRadius;
-            final float fInnerMinRadius = FRAMES_INNER_MIN_RADIUS_RATIO + fInnerMaxRadius;
+            if (execFraction > FRAMES_INNER_RADIUS_RATIO + FRAMES_INNER_MIN_RADIUS_RATIO + FRAMES_INNER_MAX_RADIUS_RATIO) {
+                keyframeCount++;
+            }
+            if (execFraction > FRAMES_INNER_RADIUS_RATIO + FRAMES_INNER_MIN_RADIUS_RATIO + FRAMES_INNER_MAX_RADIUS_RATIO + FRAMES_OUTER_RADIUS_RATIO) {
+                keyframeCount++;
+            }
 
             mPathCheckedOuter.reset();
             mPathCheckedOuter.addCircle(centerX, centerY, mOuterStartRadius, Path.Direction.CCW);
@@ -200,30 +202,56 @@ public class RadioDrawable extends Drawable {
             if (keyframeCount == 1) {
                 pvhInnerRadius = PropertyValuesHolder.ofKeyframe(PVH_INNER_RADIUS
                         , Keyframe.ofFloat(0, innerRadius)
-                        , Keyframe.ofFloat(0.9f, mInnerMaxRadius)
                         , Keyframe.ofFloat(1f, mInnerEndRadius));
             } else if (keyframeCount == 2) {
+                final float fInnerMinRadius = (execFraction - FRAMES_INNER_RADIUS_RATIO) / execFraction;
+
+                pvhInnerRadius = PropertyValuesHolder.ofKeyframe(PVH_INNER_RADIUS
+                        , Keyframe.ofFloat(0, innerRadius)
+                        , Keyframe.ofFloat(fInnerMinRadius, mInnerMinRadius)
+                        , Keyframe.ofFloat(1f, mInnerEndRadius));
+            } else if (keyframeCount == 3) {
+                final float fInnerMaxRadius = (execFraction - FRAMES_INNER_RADIUS_RATIO - FRAMES_INNER_MIN_RADIUS_RATIO) / execFraction;
+                final float fInnerMinRadius = FRAMES_INNER_MIN_RADIUS_RATIO / execFraction + fInnerMaxRadius;
+
+                pvhInnerRadius = PropertyValuesHolder.ofKeyframe(PVH_INNER_RADIUS
+                        , Keyframe.ofFloat(0, innerRadius)
+                        , Keyframe.ofFloat(fInnerMaxRadius, mInnerMaxRadius)
+                        , Keyframe.ofFloat(fInnerMinRadius, mInnerMinRadius)
+                        , Keyframe.ofFloat(1, mInnerEndRadius));
+                pValuesHolderList.add(pvhInnerRadius);
+            } else if (keyframeCount == 4) {
+                final float fOuterRadius = (execFraction - FRAMES_INNER_RADIUS_RATIO - FRAMES_INNER_MIN_RADIUS_RATIO - FRAMES_INNER_MAX_RADIUS_RATIO) / execFraction;
+                final float fInnerMaxRadius = FRAMES_INNER_MAX_RADIUS_RATIO / execFraction + fOuterRadius;
+                final float fInnerMinRadius = FRAMES_INNER_MIN_RADIUS_RATIO / execFraction + fInnerMaxRadius;
+
                 pvhOuterRadius = PropertyValuesHolder.ofKeyframe(PVH_OUTER_RADIUS
                         , Keyframe.ofFloat(0, outerRadius)
-                        , Keyframe.ofFloat(0.6f, 0)
-                        , Keyframe.ofFloat(1, 0));
+                        , Keyframe.ofFloat(fOuterRadius, OUTER_MIN_RADIUS)
+                        , Keyframe.ofFloat(1, OUTER_MIN_RADIUS));
                 pValuesHolderList.add(pvhOuterRadius);
 
                 pvhInnerRadius = PropertyValuesHolder.ofKeyframe(PVH_INNER_RADIUS
                         , Keyframe.ofFloat(0, innerRadius)
-                        , Keyframe.ofFloat(0.6f, innerRadius)
-                        , Keyframe.ofFloat(0.9f, mInnerMaxRadius)
+                        , Keyframe.ofFloat(fOuterRadius, innerRadius)
+                        , Keyframe.ofFloat(fInnerMaxRadius, mInnerMaxRadius)
+                        , Keyframe.ofFloat(fInnerMinRadius, mInnerMinRadius)
                         , Keyframe.ofFloat(1f, mInnerEndRadius));
             } else {
+                final float fStrokeColor = (execFraction - FRAMES_INNER_RADIUS_RATIO - FRAMES_INNER_MIN_RADIUS_RATIO - FRAMES_INNER_MAX_RADIUS_RATIO - FRAMES_OUTER_RADIUS_RATIO) / execFraction;
+                final float fOuterRadius = FRAMES_OUTER_RADIUS_RATIO / execFraction + fStrokeColor;
+                final float fInnerMaxRadius = FRAMES_INNER_MAX_RADIUS_RATIO / execFraction + fOuterRadius;
+                final float fInnerMinRadius = FRAMES_INNER_MIN_RADIUS_RATIO / execFraction + fInnerMaxRadius;
+
                 pvhStrokeColor = PropertyValuesHolder.ofKeyframe(PVH_STROKE_COLOR
                         , Keyframe.ofFloat(0, 0)
-                        , Keyframe.ofFloat(FRAMES_STROKE_COLOR_RATIO, 1)
+                        , Keyframe.ofFloat(fStrokeColor, 1)
                         , Keyframe.ofFloat(1, 1));
                 pValuesHolderList.add(pvhStrokeColor);
 
                 pvhOuterRadius = PropertyValuesHolder.ofKeyframe(PVH_OUTER_RADIUS
                         , Keyframe.ofFloat(0, outerRadius)
-                        , Keyframe.ofFloat(FRAMES_STROKE_COLOR_RATIO, outerRadius)
+                        , Keyframe.ofFloat(fStrokeColor, outerRadius)
                         , Keyframe.ofFloat(fOuterRadius, OUTER_MIN_RADIUS)
                         , Keyframe.ofFloat(1, OUTER_MIN_RADIUS));
                 pValuesHolderList.add(pvhOuterRadius);
