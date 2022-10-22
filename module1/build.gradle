@@ -7,7 +7,6 @@ apply plugin: 'com.alibaba.arouter'//ARouter配置5(共5步)
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
     //resourcePrefix "${project.name}_"//资源命名规范暂不约束
 
     defaultConfig {
