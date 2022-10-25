@@ -16,7 +16,6 @@ import android.graphics.PathMeasure;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.Region;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.util.TypedValue;
@@ -24,6 +23,8 @@ import android.util.TypedValue;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+
+import com.suheng.structure.view.utils.MathUtils;
 
 //https://www.kancloud.cn/alex_wsc/android_art/1828599
 //https://blog.csdn.net/lmj623565791/article/details/43752383
@@ -34,10 +35,7 @@ public class CheckedDrawable extends Drawable {
     private static final float FRAMES_TICK_RATIO_MAX = 0.5f;
     private static final float FRAMES_TICK_RATIO = 0.1f;
 
-    private static final String PVH_LEFT = "pvh_left";
-    private static final String PVH_TOP = "pvh_top";
-    private static final String PVH_RADIUS = "pvh_radius";
-    private static final String PVH_ALPHA = "pvh_alpha";
+    private static final String PVH_BORDER = "pvh_border";
     private static final String PVH_TICK = "pvh_tick";
     private static final String PVH_PATH_START = "pvh_path_start";
 
@@ -49,18 +47,24 @@ public class CheckedDrawable extends Drawable {
 
     private int mCurrentLeft, mCurrentTop;
     private int mAlpha = 255, mCurrentAlpha;
-    private float mRadius = 10.67f * 3, mCurrentRadius;
+    private float mRadius, mCurrentRadius;
     private float mTickLength, mDeltaTickLength;
-    private float mStartLength, mDeltaStartLength;
 
-    private final Paint mPaintTick, mPaintPosEnd;
+    private final Paint mPaintTick;
     private final Path mPathBorder;
-    private final Path mPathTick, mPathStart, mPathFullTick;
-    private final PathMeasure mMeasurePathFullTick, mPathStartMeasure;
+    private final Path mPathTick;
+    private final PathMeasure mMeasurePathFullTick;
 
-    private final float[] mPosEnd = new float[2], mPosStart = new float[2];
-    private final float[] mTan = new float[2], mTanStart = new float[2];
-    private float y, y1;
+    private final float[] mPointStart = new float[2];
+    private final float[] mTanPointStart = new float[2];
+    private final Path mPathPointStart;
+    private final PathMeasure mMeasurePathPointStart;
+    private float mPathPointStartLength, mDeltaPathPointStartLength;
+
+    private final float[] mPointEnd = new float[2];
+    private final float[] mTanPointEnd = new float[2];
+
+    private float mPointTickBottomX, mPointTickBottomY;
 
     private float mExecFraction = 1;
 
@@ -71,24 +75,24 @@ public class CheckedDrawable extends Drawable {
         mPaintTick.setStyle(Paint.Style.STROKE);
         mPaintTick.setStrokeCap(Paint.Cap.ROUND);
         mPaintTick.setStrokeJoin(Paint.Join.ROUND);
-        mPaintTick.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4.5f, context.getResources().getDisplayMetrics()));
-        //mPaintTick.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, context.getResources().getDisplayMetrics()));
+        mPaintTick.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4.2f, context.getResources().getDisplayMetrics()));
+        //mPaintTick.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, context.getResources().getDisplayMetrics()));
 
-        mPaintPosEnd = new Paint();
-        mPaintPosEnd.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, context.getResources().getDisplayMetrics()));
-
-        mPathBorder = new Path();
-        mPathFullTick = new Path();
-        mPathTick = new Path();
-        mPathStart = new Path();
         mValueAnimator = ValueAnimator.ofFloat();
 
+        mPathBorder = new Path();
+
+        mPathTick = new Path();
         mMeasurePathFullTick = new PathMeasure();
 
-        mPathStartMeasure = new PathMeasure();
+        mPathPointStart = new Path();
+        mMeasurePathPointStart = new PathMeasure();
 
         this.setBitmap();
         this.setChecked(isChecked);
+
+        mRadius = 10.67f * 3;
+        //mRadius = 10.67f * 1.5f;
     }
 
     public CheckedDrawable(Context context) {
@@ -103,61 +107,49 @@ public class CheckedDrawable extends Drawable {
         mCurrentAlpha = checked ? mAlpha : 0;
         mCurrentRadius = checked ? 0 : mRadius;
 
-        mPathFullTick.reset();
+        Path pathFullTick = new Path();
         float dx = getIntrinsicWidth() / 2f;
         mDeltaTickLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, mContext.getResources().getDisplayMetrics());
-        //mDeltaTickLength = 0;
+        //mDeltaTickLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3.5f, mContext.getResources().getDisplayMetrics());
         float x = -dx / 2 - mDeltaTickLength;
-        y = 0 - mDeltaTickLength / 2;
-        mPathFullTick.moveTo(x, y);
-        y1 = dx / 2 - mDeltaTickLength / 2;
-        mPathFullTick.lineTo(y, y1);
+        mPointTickBottomX = 0 - mDeltaTickLength / 2;
+        pathFullTick.moveTo(x, mPointTickBottomX);
+        mPointTickBottomY = dx / 2 - mDeltaTickLength / 2;
+        mPointTickBottomX += 2;
+        pathFullTick.lineTo(mPointTickBottomX, mPointTickBottomY);
         float x1 = dx / 2 + mDeltaTickLength;
         float y2 = 0 - 2 * mDeltaTickLength;
-        mPathFullTick.lineTo(x1, y2);
-        mMeasurePathFullTick.setPath(mPathFullTick, false);
+        pathFullTick.lineTo(x1, y2);
+        mMeasurePathFullTick.setPath(pathFullTick, false);
 
-        mPathStart.reset();
-        mMeasurePathFullTick.getSegment(0, 40, mPathStart, true);
-        mDeltaStartLength = 16;
-        mPathStartMeasure.setPath(mPathStart, false);
+        mPathPointStart.reset();
+        mMeasurePathFullTick.getSegment(0, 40, mPathPointStart, true);
+        mDeltaPathPointStartLength = 16;
+        /*mMeasurePathFullTick.getSegment(0, 22, mPathPointStart, true);
+        mDeltaPathPointStartLength = 9;*/
+        mMeasurePathPointStart.setPath(mPathPointStart, false);
 
-        mPosEnd[0] = x;
-        mPosEnd[1] = y;
+        mPointEnd[0] = x;
+        mPointEnd[1] = mPointTickBottomX;
 
-        mPosStart[0] = x;
-        mPosStart[1] = y;
-        Log.d(AnimCheckBox.TAG, "setChecked, check: " + checked + ", (" + x + ", " + y + "), (" + y + ", " + y1 + "), (" + x1 + ", " + y2 + ")"
-                + ", mPos(x, y): mPos(" + x + ", " + y + ")" + ", this: " + this);
+        mPointStart[0] = x;
+        mPointStart[1] = mPointTickBottomX;
+        Log.d(AnimCheckBox.TAG, "setChecked, check: " + checked + ", (" + x + ", " + mPointTickBottomX + "), (" + mPointTickBottomX + ", " + mPointTickBottomY + "), (" + x1 + ", " + y2 + ")" + ", mPos(x, y): mPos(" + x + ", " + mPointTickBottomX + ")" + ", this: " + this);
 
         mTickLength = checked ? mMeasurePathFullTick.getLength() - mDeltaTickLength : 0;
         mMeasurePathFullTick.getSegment(mDeltaTickLength, mTickLength, mPathTick, true);
 
-        mStartLength = checked ? mPathStartMeasure.getLength() - mDeltaStartLength : 0;
+        mPathPointStartLength = checked ? mMeasurePathPointStart.getLength() - mDeltaPathPointStartLength : 0;
     }
 
     private void setBitmap() {
-        mNormalBitmap = CheckedDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.checkbox_unchecked));
-        mCheckedBitmap = CheckedDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.checkbox_checked_bg));
+        mNormalBitmap = MathUtils.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.checkbox_unchecked));
+        mCheckedBitmap = MathUtils.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.checkbox_checked_bg));
         /*mCheckedBitmap = Bitmap.createBitmap(mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mCheckedBitmap);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
         paint.setColor(Color.BLUE);
         canvas.drawRoundRect(0, 0, mNormalBitmap.getWidth(), mNormalBitmap.getHeight(), mRadius, mRadius, paint);*/
-    }
-
-    public static Bitmap drawable2Bitmap(Drawable drawable) {
-        if (drawable instanceof BitmapDrawable) {
-            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
-            return bitmapDrawable.getBitmap();
-        }
-
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
-                drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
     }
 
     @Override
@@ -183,12 +175,6 @@ public class CheckedDrawable extends Drawable {
         return mNormalBitmap == null ? mContext.getResources().getDimensionPixelSize(R.dimen.checked_box_wh) : mNormalBitmap.getWidth();
     }
 
-    /*@Override
-    public void setBounds(@NonNull Rect bounds) {
-        super.setBounds(bounds);
-        Log.v(AnimCheckBox.TAG, "setBounds, bounds: " + bounds.toShortString() + ", mChecked: " + mChecked);
-    }*/
-
     @Override
     public void draw(@NonNull Canvas canvas) {
         if (mNormalBitmap == null || mCheckedBitmap == null) {
@@ -206,36 +192,25 @@ public class CheckedDrawable extends Drawable {
         canvas.save();
         canvas.translate(getIntrinsicWidth() / 2f, getIntrinsicHeight() / 2f);
 
-        /*mPaintTick.setColor(Color.GREEN);
-        canvas.drawPath(mPathFullTick, mPaintTick);*/
-
-        /*mPaintPosEnd.setColor(Color.BLACK);
-        canvas.drawPoints(mPosEnd, mPaintPosEnd);
-        mPaintPosEnd.setColor(Color.YELLOW);
-        canvas.drawPoint(mPosStart[0], mPosStart[1], mPaintPosEnd);
-        mPaintTick.setColor(Color.GRAY);
-        canvas.drawPath(mPathStart, mPaintTick);*/
-
         mPaintTick.setColor(Color.WHITE);
         canvas.drawPath(mPathTick, mPaintTick);
         canvas.restore();
     }
 
     private void setAnimParams(CheckedDrawable reverse) {
-        this.setAnimParams(reverse.mCurrentLeft, reverse.mCurrentTop, reverse.mCurrentAlpha, reverse.mCurrentRadius
-                , reverse.mTickLength, reverse.mStartLength, reverse.mExecFraction);
+        this.setAnimParams(reverse.mCurrentLeft, reverse.mCurrentTop, reverse.mCurrentAlpha, reverse.mCurrentRadius, reverse.mTickLength, reverse.mPathPointStartLength, reverse.mExecFraction);
     }
 
-    private void setAnimParams(int currentLeft, int currentTop, int currentAlpha, float currentRadius, float tickLength, float startLength, float execFraction) {
+    private void setAnimParams(final int currentLeft, final int currentTop, final int currentAlpha, final float currentRadius
+            , final float tickLength, final float startLength, final float execFraction) {
         final Rect bounds = getBounds();
         final int centerX = bounds.centerX();
         final int centerY = bounds.centerY();
-        Log.v(AnimCheckBox.TAG, "startAnim, centerX: " + centerX + ", centerY: " + centerY
-                + ", bounds: " + bounds.toShortString() + ", mChecked: " + mChecked + ", execFraction: " + execFraction + ", this:" + this);
+        Log.v(AnimCheckBox.TAG, "startAnim, centerX: " + centerX + ", centerY: " + centerY + ", bounds: " + bounds.toShortString() + ", mChecked: " + mChecked + ", execFraction: " + execFraction + ", this:" + this);
         Log.v(AnimCheckBox.TAG, "startAnim, tickLength: " + tickLength + ", startLength: " + startLength);
 
-        int endLeft, endTop, endAlpha;
-        float endRadius;
+        final int leftDelta, topDelta, alphaDelta;
+        float radiusDelta;
         int keyframeCount = 1;
         if (mChecked) {
             if (execFraction > FRAMES_TICK_RATIO) {
@@ -245,10 +220,10 @@ public class CheckedDrawable extends Drawable {
                 keyframeCount++;
             }
 
-            endLeft = centerX;
-            endTop = centerY;
-            endAlpha = mAlpha;
-            endRadius = 0;
+            leftDelta = centerX - currentLeft;
+            topDelta = centerY - currentTop;
+            alphaDelta = mAlpha - currentAlpha;
+            radiusDelta = -currentRadius;
 
             if (keyframeCount == 3) {
                 float fractionBorder = (execFraction - FRAMES_TICK_RATIO - FRAMES_TICK_RATIO_MAX) / execFraction;
@@ -256,26 +231,14 @@ public class CheckedDrawable extends Drawable {
                 float stopDTickMax = mMeasurePathFullTick.getLength();
                 float stopDTick = stopDTickMax - mDeltaTickLength;
 
-                float stopDStartMax = mPathStartMeasure.getLength();
-                float stopDStart = stopDStartMax - mDeltaStartLength;
+                float stopDStartMax = mMeasurePathPointStart.getLength();
+                float stopDStart = stopDStartMax - mDeltaPathPointStartLength;
 
                 mValueAnimator.setValues(
-                        PropertyValuesHolder.ofKeyframe(PVH_LEFT
-                                , Keyframe.ofInt(0, currentLeft)
-                                , Keyframe.ofInt(fractionBorder, endLeft)
-                                , Keyframe.ofInt(1, endLeft)),
-                        PropertyValuesHolder.ofKeyframe(PVH_TOP
-                                , Keyframe.ofInt(0, currentTop)
-                                , Keyframe.ofInt(fractionBorder, endTop)
-                                , Keyframe.ofInt(1, endTop)),
-                        PropertyValuesHolder.ofKeyframe(PVH_ALPHA
-                                , Keyframe.ofInt(0, currentAlpha)
-                                , Keyframe.ofInt(fractionBorder, endAlpha)
-                                , Keyframe.ofInt(1, endAlpha)),
-                        PropertyValuesHolder.ofKeyframe(PVH_RADIUS
-                                , Keyframe.ofFloat(0, currentRadius)
-                                , Keyframe.ofFloat(fractionBorder, endRadius)
-                                , Keyframe.ofFloat(1, endRadius)),
+                        PropertyValuesHolder.ofKeyframe(PVH_BORDER
+                                , Keyframe.ofFloat(0, 0)
+                                , Keyframe.ofFloat(fractionBorder, 1)
+                                , Keyframe.ofFloat(1, 1)),
                         PropertyValuesHolder.ofKeyframe(PVH_TICK
                                 , Keyframe.ofFloat(0, tickLength)
                                 , Keyframe.ofFloat(fractionBorder, tickLength)
@@ -291,8 +254,8 @@ public class CheckedDrawable extends Drawable {
                 float stopDTickMax = mMeasurePathFullTick.getLength();
                 float stopDTick = stopDTickMax - mDeltaTickLength;
 
-                float stopDStartPathMax = mPathStartMeasure.getLength();
-                float stopDStartPath = stopDStartPathMax - mDeltaStartLength;
+                float stopDStartPathMax = mMeasurePathPointStart.getLength();
+                float stopDStartPath = stopDStartPathMax - mDeltaPathPointStartLength;
 
                 mValueAnimator.setValues(
                         PropertyValuesHolder.ofKeyframe(PVH_TICK
@@ -305,7 +268,7 @@ public class CheckedDrawable extends Drawable {
                                 , Keyframe.ofFloat(1, stopDStartPath)));
             } else {
                 float stopDTick = mMeasurePathFullTick.getLength() - mDeltaTickLength;
-                float stopDStart = mPathStartMeasure.getLength() - mDeltaStartLength;
+                float stopDStart = mMeasurePathPointStart.getLength() - mDeltaPathPointStartLength;
 
                 mValueAnimator.setValues(
                         PropertyValuesHolder.ofKeyframe(PVH_TICK
@@ -323,17 +286,17 @@ public class CheckedDrawable extends Drawable {
                 keyframeCount++;
             }
 
-            endLeft = bounds.left;
-            endTop = bounds.top;
-            endAlpha = 0;
-            endRadius = mRadius;
+            leftDelta = bounds.left - currentLeft;
+            topDelta = bounds.top - currentTop;
+            alphaDelta = -currentAlpha;
+            radiusDelta = mRadius - currentRadius;
 
             if (keyframeCount == 3) {
                 float fractionTick = (execFraction - FRAMES_BORDER_RATIO - FRAMES_TICK_RATIO_MAX) / execFraction;
 
                 float fractionTickMax = FRAMES_TICK_RATIO_MAX / execFraction + fractionTick;
                 float stopDTickMax = mMeasurePathFullTick.getLength();
-                float stopDStartMax = mPathStartMeasure.getLength();
+                float stopDStartMax = mMeasurePathPointStart.getLength();
 
                 mValueAnimator.setValues(
                         PropertyValuesHolder.ofKeyframe(PVH_TICK
@@ -346,22 +309,10 @@ public class CheckedDrawable extends Drawable {
                                 , Keyframe.ofFloat(fractionTick, stopDStartMax)
                                 , Keyframe.ofFloat(fractionTickMax, 0)
                                 , Keyframe.ofFloat(1, 0)),
-                        PropertyValuesHolder.ofKeyframe(PVH_LEFT
-                                , Keyframe.ofInt(0, currentLeft)
-                                , Keyframe.ofInt(fractionTickMax, currentLeft)
-                                , Keyframe.ofInt(1, endLeft)),
-                        PropertyValuesHolder.ofKeyframe(PVH_TOP
-                                , Keyframe.ofInt(0, currentTop)
-                                , Keyframe.ofInt(fractionTickMax, currentTop)
-                                , Keyframe.ofInt(1, endTop)),
-                        PropertyValuesHolder.ofKeyframe(PVH_ALPHA
-                                , Keyframe.ofInt(0, currentAlpha)
-                                , Keyframe.ofInt(fractionTickMax, currentAlpha)
-                                , Keyframe.ofInt(1, endAlpha)),
-                        PropertyValuesHolder.ofKeyframe(PVH_RADIUS
-                                , Keyframe.ofFloat(0, currentRadius)
-                                , Keyframe.ofFloat(fractionTickMax, currentRadius)
-                                , Keyframe.ofFloat(1, endRadius)));
+                        PropertyValuesHolder.ofKeyframe(PVH_BORDER
+                                , Keyframe.ofFloat(0, 0)
+                                , Keyframe.ofFloat(fractionTickMax, 0)
+                                , Keyframe.ofFloat(1, 1)));
             } else if (keyframeCount == 2) {
                 float fractionTickMax = (execFraction - FRAMES_BORDER_RATIO) / execFraction;
 
@@ -374,36 +325,15 @@ public class CheckedDrawable extends Drawable {
                                 , Keyframe.ofFloat(0, startLength)
                                 , Keyframe.ofFloat(fractionTickMax, 0)
                                 , Keyframe.ofFloat(1, 0)),
-                        PropertyValuesHolder.ofKeyframe(PVH_LEFT
-                                , Keyframe.ofInt(0, currentLeft)
-                                , Keyframe.ofInt(fractionTickMax, currentLeft)
-                                , Keyframe.ofInt(1, endLeft)),
-                        PropertyValuesHolder.ofKeyframe(PVH_TOP
-                                , Keyframe.ofInt(0, currentTop)
-                                , Keyframe.ofInt(fractionTickMax, currentTop)
-                                , Keyframe.ofInt(1, endTop)),
-                        PropertyValuesHolder.ofKeyframe(PVH_ALPHA
-                                , Keyframe.ofInt(0, currentAlpha)
-                                , Keyframe.ofInt(fractionTickMax, currentAlpha)
-                                , Keyframe.ofInt(1, endAlpha)),
-                        PropertyValuesHolder.ofKeyframe(PVH_RADIUS
-                                , Keyframe.ofFloat(0, currentRadius)
-                                , Keyframe.ofFloat(fractionTickMax, currentRadius)
-                                , Keyframe.ofFloat(1, endRadius)));
+                        PropertyValuesHolder.ofKeyframe(PVH_BORDER
+                                , Keyframe.ofFloat(0, 0)
+                                , Keyframe.ofFloat(fractionTickMax, 0)
+                                , Keyframe.ofFloat(1, 1)));
             } else {
                 mValueAnimator.setValues(
-                        PropertyValuesHolder.ofKeyframe(PVH_LEFT
-                                , Keyframe.ofInt(0, currentLeft)
-                                , Keyframe.ofInt(1, endLeft)),
-                        PropertyValuesHolder.ofKeyframe(PVH_TOP
-                                , Keyframe.ofInt(0, currentTop)
-                                , Keyframe.ofInt(1, endTop)),
-                        PropertyValuesHolder.ofKeyframe(PVH_ALPHA
-                                , Keyframe.ofInt(0, currentAlpha)
-                                , Keyframe.ofInt(1, endAlpha)),
-                        PropertyValuesHolder.ofKeyframe(PVH_RADIUS
-                                , Keyframe.ofFloat(0, currentRadius)
-                                , Keyframe.ofFloat(1, endRadius)));
+                        PropertyValuesHolder.ofKeyframe(PVH_BORDER
+                                , Keyframe.ofFloat(0, 0)
+                                , Keyframe.ofFloat(1, 1)));
             }
         }
         /*Log.v(AnimCheckBox.TAG, "startAnim, currentLeft-endLeft: " + currentLeft + "-" + endLeft
@@ -418,48 +348,39 @@ public class CheckedDrawable extends Drawable {
             public void onAnimationUpdate(ValueAnimator animation) {
                 mExecFraction = animation.getAnimatedFraction();
 
-                Object objLeft = animation.getAnimatedValue(PVH_LEFT);
-                Object objTop = animation.getAnimatedValue(PVH_TOP);
-                Object objRadius = animation.getAnimatedValue(PVH_RADIUS);
-                Object objAlpha = animation.getAnimatedValue(PVH_ALPHA);
+                Object objBorderRatio = animation.getAnimatedValue(PVH_BORDER);
                 Object objTick = animation.getAnimatedValue(PVH_TICK);
                 Object objPathStart = animation.getAnimatedValue(PVH_PATH_START);
-                if (objLeft instanceof Integer) {
-                    mCurrentLeft = (int) objLeft;
-                }
-                if (objTop instanceof Integer) {
-                    mCurrentTop = (int) objTop;
-                }
-                if (objLeft instanceof Integer) {
-                    mCurrentAlpha = (int) objAlpha;
-                }
-                if (objRadius instanceof Float) {
-                    mCurrentRadius = (float) objRadius;
+                if (objBorderRatio instanceof Float) {
+                    float borderRatio = (float) objBorderRatio;
+                    mCurrentLeft = (int) (currentLeft + leftDelta * borderRatio);
+                    mCurrentTop = (int) (currentTop + topDelta * borderRatio);
+                    mCurrentAlpha = (int) (currentAlpha + alphaDelta * borderRatio);
+                    mCurrentRadius = (int) (currentRadius + radiusDelta * borderRatio);
                 }
                 if (objTick instanceof Float) {
                     mTickLength = (float) objTick;
                 }
                 if (objPathStart instanceof Float) {
-                    mStartLength = (float) objPathStart;
+                    mPathPointStartLength = (float) objPathStart;
                 }
 
                 //Log.d(AnimCheckBox.TAG, "mCurrentRadius: " + mCurrentRadius + ", mCurrentAlpha: " + mCurrentAlpha + ", mCurrentLeft: " + mCurrentLeft + ", mCurrentTop: " + mCurrentTop + ", this: " + this);
-                mMeasurePathFullTick.getPosTan(mTickLength, mPosEnd, mTan);
-                Log.v(AnimCheckBox.TAG, "mTickLength: " + mTickLength + ", mPosEnd x: " + mPosEnd[0] + ", y: " + mPosEnd[1] + ", mTan x: " + mTan[0] + ", y: " + mTan[1] + ", mExecFraction: " + mExecFraction);
-                mPathStartMeasure.getPosTan(mStartLength, mPosStart, mTanStart);
-                Log.d(AnimCheckBox.TAG, "mStartLength: " + mStartLength + ", mPosStart x: " + mPosStart[0] + ", y: " + mPosStart[1] + ", mTan x: " + mTanStart[0] + ", y: " + mTanStart[1]);
+                mMeasurePathFullTick.getPosTan(mTickLength, mPointEnd, mTanPointEnd);
+                //Log.v(AnimCheckBox.TAG, "mTickLength: " + mTickLength + ", mPosEnd x: " + mPointEnd[0] + ", y: " + mPointEnd[1] + ", mTan x: " + mTanPointEnd[0] + ", y: " + mTanPointEnd[1] + ", mExecFraction: " + mExecFraction);
+                mMeasurePathPointStart.getPosTan(mPathPointStartLength, mPointStart, mTanPointStart);
+                //Log.d(AnimCheckBox.TAG, "mStartLength: " + mPathPointStartLength + ", mPosStart x: " + mPointStart[0] + ", y: " + mPointStart[1] + ", mTan x: " + mTanPointStart[0] + ", y: " + mTanPointStart[1]);
                 mPathTick.reset();
-                if ((Math.abs(mPosStart[0] - mPosEnd[0]) > 0.0000001f && Math.abs(mPosStart[1] - mPosEnd[1]) > 0.0000001f)) {
-                    mPathTick.moveTo(mPosStart[0], mPosStart[1]);
-                    if (!(Math.abs(mTanStart[0] - mTan[0]) < 0.0000001f && Math.abs(mTanStart[1] - mTan[1]) < 0.0000001f)) {
-                        mPathTick.lineTo(y, y1);
+                if ((Math.abs(mPointStart[0] - mPointEnd[0]) > 0.0000001f && Math.abs(mPointStart[1] - mPointEnd[1]) > 0.0000001f)) {
+                    mPathTick.moveTo(mPointStart[0], mPointStart[1]);
+                    if (!(Math.abs(mTanPointStart[0] - mTanPointEnd[0]) < 0.0000001f && Math.abs(mTanPointStart[1] - mTanPointEnd[1]) < 0.0000001f)) {
+                        mPathTick.lineTo(mPointTickBottomX, mPointTickBottomY);
                     }
-                    mPathTick.lineTo(mPosEnd[0], mPosEnd[1]);
+                    mPathTick.lineTo(mPointEnd[0], mPointEnd[1]);
                 }
 
                 mPathBorder.reset();
-                mPathBorder.addRoundRect(mCurrentLeft, mCurrentTop, bounds.right - mCurrentLeft, bounds.bottom - mCurrentTop
-                        , mCurrentRadius, mCurrentRadius, Path.Direction.CCW);
+                mPathBorder.addRoundRect(mCurrentLeft, mCurrentTop, bounds.right - mCurrentLeft, bounds.bottom - mCurrentTop, mCurrentRadius, mCurrentRadius, Path.Direction.CCW);
 
                 invalidateSelf();
             }
@@ -471,10 +392,8 @@ public class CheckedDrawable extends Drawable {
                 super.onAnimationEnd(animation);
                 mValueAnimator.removeUpdateListener(animatorUpdateListener);
                 mValueAnimator.removeListener(this);
-                Log.v(AnimCheckBox.TAG, "onAnimationEnd, mTickLength: " + mTickLength + ", mPosEnd x: " + mPosEnd[0] + ", y: " + mPosEnd[1] + ", mTan x: " + mTan[0] + ", y: " + mTan[1]
-                        + ", mExecFraction: " + mExecFraction + ", object: " + CheckedDrawable.this);
-                Log.d(AnimCheckBox.TAG, "onAnimationEnd, mStartLength: " + mStartLength + ", mPosStart x: " + mPosStart[0] + ", y: " + mPosStart[1] + ", mTan x: " + mTanStart[0]
-                        + ", y: " + mTanStart[1] + ", mTickLength: " + mTickLength + ", mStartLength: " + mStartLength);
+                Log.v(AnimCheckBox.TAG, "onAnimationEnd, mTickLength: " + mTickLength + ", mPosEnd x: " + mPointEnd[0] + ", y: " + mPointEnd[1] + ", mTan x: " + mTanPointEnd[0] + ", y: " + mTanPointEnd[1] + ", mExecFraction: " + mExecFraction + ", object: " + CheckedDrawable.this);
+                Log.d(AnimCheckBox.TAG, "onAnimationEnd, mStartLength: " + mPathPointStartLength + ", mPosStart x: " + mPointStart[0] + ", y: " + mPointStart[1] + ", mTan x: " + mTanPointStart[0] + ", y: " + mTanPointStart[1] + ", mTickLength: " + mTickLength + ", mStartLength: " + mPathPointStartLength);
             }
         });
     }
@@ -496,3 +415,4 @@ public class CheckedDrawable extends Drawable {
     }
 
 }
+

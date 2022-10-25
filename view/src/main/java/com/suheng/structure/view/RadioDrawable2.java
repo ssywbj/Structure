@@ -22,6 +22,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.suheng.structure.view.utils.MathUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,8 +75,8 @@ public class RadioDrawable2 extends Drawable {
     }
 
     private void setBitmap() {
-        mNormalBitmap = CheckedDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.radio_btn_unchecked));
-        //mCheckedBitmap = RadioDrawable.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.radio_btn_checked));
+        mNormalBitmap = MathUtils.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.radio_btn_unchecked));
+        //mCheckedBitmap = MathUtils.drawable2Bitmap(ContextCompat.getDrawable(mContext, R.drawable.radio_btn_checked));
         int width = mNormalBitmap.getWidth();
         int height = mNormalBitmap.getHeight();
         float cx = width / 2f, cy = height / 2f;

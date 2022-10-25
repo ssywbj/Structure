@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RadioGroup;
 
 import androidx.annotation.XmlRes;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,7 +21,6 @@ import androidx.core.graphics.PathParser;
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
-import com.suheng.structure.view.AnimCheckBox;
 import com.suheng.structure.view.ChinaMapView;
 import com.suheng.structure.view.R;
 
@@ -144,26 +142,6 @@ public class SVGDemoActivity extends AppCompatActivity {
                 }
             }
         });*/
-
-        AnimCheckBox animCB = findViewById(R.id.anim_check_box);
-        //animCB.setChecked(false);
-        ImageView imageCheckedDrawable = findViewById(R.id.image_checked_drawable);
-        //imageCheckedDrawable.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.checkbox_checked));
-        //imageCheckedDrawable.setImageDrawable(new CheckedDrawable(Color.RED));
-
-        RadioGroup radioGroup = findViewById(R.id.svg_radio_group);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                //Log.i(AnimRadioButton.TAG, "RadioGroup, checkedId: " + checkedId);
-            }
-        });
-        animCB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                radioGroup.clearCheck();
-            }
-        });
     }
 
     private static final String NAME_SPACE = "http://schemas.android.com/apk/res/android";

@@ -63,7 +63,10 @@
         <activity android:name=".activity.SVGDemoActivity" />
         <activity
             android:name=".activity.BlurActivity"
-            android:exported="true" />
+            android:label="Dynamic Blur" />
+        <activity
+            android:name=".activity.CheckedActivity"
+            android:label="CheckBox" />
 
     </application>
 
