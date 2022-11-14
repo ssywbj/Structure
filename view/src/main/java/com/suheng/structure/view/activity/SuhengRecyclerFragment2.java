@@ -285,6 +285,8 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
         return mRecyclerView;
     }
 
+    private boolean mEditMode;
+
     private class ContentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private static final int VIEW_TYPE_FOOTER = 1;
         private static final int VIEW_TYPE_TITLE = 2;
@@ -318,6 +320,27 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
             if ((holder instanceof ContentHolder) && (object instanceof ImageInfo)) {
                 ContentHolder contentHolder = (ContentHolder) holder;
                 Glide.with(SuhengRecyclerFragment2.this).load(((ImageInfo) object).getPath()).into(contentHolder.mImageView);
+
+                holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        mEditMode = true;
+                        notifyItemChanged(position);
+                        return mEditMode;
+                    }
+                });
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mEditMode){
+                            //notifyItemChanged(position);
+                            notifyItemChanged(position, object);
+                            Log.d("FobRecyclerFrg", "ContentHolder, holder: " + holder);
+                        }
+                    }
+                });
+
             }
         }
 
