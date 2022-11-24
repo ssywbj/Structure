@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@android:color/white"
     android:padding="2dp">
 
     <LinearLayout
@@ -19,8 +20,8 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:button="@drawable/checkbox_style_selector"
-            android:layout_marginStart="4dp" />
+            android:layout_marginStart="4dp"
+            android:button="@drawable/checkbox_style_selector" />
 
         <!--<CheckedTextView
             android:layout_width="wrap_content"
@@ -116,4 +117,111 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/rect_bg_red"
+        android:gravity="center"
+        android:padding="6dp"
+        android:shadowColor="@android:color/black"
+        android:shadowRadius="10"
+        android:text="无阴影"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/rect_bg_red"
+        android:elevation="4dp"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="阴影4dp"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/rect_bg_blue"
+        android:elevation="8dp"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="阴影8dp"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rect_bg_white"
+        android:elevation="16dp"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="阴影16dp"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/rect_bg_white"
+        android:elevation="32dp"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="1        阴影32dp        1"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="34dp"
+        android:background="@drawable/rect_bg"
+        android:elevation="16dp"
+        android:translationZ="16dp"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="阴影16dp+tranZ16dp"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="34dp"
+        android:background="@drawable/rect_bg"
+        android:elevation="16dp"
+        android:translationZ="16dp"
+        android:outlineAmbientShadowColor="@android:color/holo_red_dark"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="阴影16dp+tranZ16dp"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="34dp"
+        android:background="@drawable/rect_bg_white"
+        android:elevation="24dp"
+        android:outlineSpotShadowColor="#4D000000"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="阴     影16dp"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
 </LinearLayout>
