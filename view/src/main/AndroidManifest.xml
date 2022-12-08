@@ -67,6 +67,9 @@
         <activity
             android:name=".activity.CheckedActivity"
             android:label="CheckBox" />
+        <activity
+            android:name=".activity.KotlinActivity"
+            android:label="Kotlin Grammar" />
 
     </application>
 

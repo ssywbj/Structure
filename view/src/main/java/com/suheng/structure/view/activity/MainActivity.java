@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "BlurActivity");
         mStringList.add("CheckedBox");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "CheckedActivity");
+        mStringList.add("Kotlin Grammar");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "KotlinActivity");
 
         //startActivity(new Intent(this, ScrollTrackerActivity.class));
         startActivity(new Intent(this, CheckedActivity.class));

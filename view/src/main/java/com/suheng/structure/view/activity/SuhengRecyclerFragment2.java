@@ -304,7 +304,8 @@ public class SuhengRecyclerFragment2 extends SuhengBaseFragment {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int pst) {
+            final int position = holder.getBindingAdapterPosition();
             Object object = mDataList.get(position);
 
             if ((holder instanceof FooterHolder) && (object instanceof FooterInfo)) {
