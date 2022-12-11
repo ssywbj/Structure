@@ -38,6 +38,9 @@ class KotlinActivity : AppCompatActivity() {
         println(s2)
 
         println("max of $x and $aa is ${this.maxOf2(x, aa)}")
+
+        printProduct("3", "5")
+        printProduct("", "6")
     }
 
     fun main() {
@@ -51,7 +54,7 @@ class KotlinActivity : AppCompatActivity() {
         println("sum of $a and $b is ${a + b}")
     }
 
-    private fun printSum2(a: Int, b: Int) { //无返回值
+    private fun printSum2(a: Int, b: Int) { //无返回值，简写
         println("sum of $a and $b is ${sum(a, b)}")
     }
 
@@ -66,5 +69,26 @@ class KotlinActivity : AppCompatActivity() {
 
     //条件表达式，简写
     private fun maxOf2(a: Int, b: Int) = if (a > b) a else b
+
+    private fun parseInt(str: String): Int? { //返回值可空
+        if (str.isEmpty()) {
+            return null
+        }
+
+        return str.toInt()
+    }
+
+    private fun printProduct(str1: String, str2: String) {
+        val x = this.parseInt(str1)
+        val y = this.parseInt(str2)
+
+        //println(x * y)　//直接使用`x * y`会导致编译错误，因为它们可能为null
+        if (x != null && y != null) { //先使用非空再使用
+            println(x * y)
+        } else {
+            println("$str1 is $x, $str2 is $y")
+        }
+        println("another use null value: ${x!! * y!!}") //或这么使用，当为它们空时不执行
+    }
 
 }
