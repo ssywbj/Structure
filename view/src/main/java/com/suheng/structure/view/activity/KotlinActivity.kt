@@ -41,6 +41,16 @@ class KotlinActivity : AppCompatActivity() {
 
         printProduct("3", "5")
         printProduct("", "6")
+
+        println("getStringLength: " + getStringLength("355"))
+        println("getStringLength: " + getStringLength(9))
+        println("getStringLength2: " + getStringLength2("19"))
+
+        this.forWhile()
+
+        describe(1)
+        println("describe(4659697576999): ${describe(4659697576999)}")
+        println("describe2(465576): ${describe2(465576)}")
     }
 
     fun main() {
@@ -88,7 +98,82 @@ class KotlinActivity : AppCompatActivity() {
         } else {
             println("$str1 is $x, $str2 is $y")
         }
-        println("another use null value: ${x!! * y!!}") //或这么使用，当为它们空时不执行
+        //println("another use null value: ${x!! * y!!}") //或这么使用，当它们为空时不执行。但好像有时候会报空指针异常？
+    }
+
+    //is运算符检测表达式是否某类型的实例。如果一个不可变的局部变量或属性已经判断出为某类型，那么检测后的分支中可以直接当作该类型使用，无需显式转换。
+    private fun getStringLength(obj: Any): Int? {
+        if (obj is String) {
+            return obj.length //`obj`在该条件分支内自动转换成`String`
+        }
+
+        return null
+    }
+
+    private fun getStringLength2(obj: Any): Int? {
+        if (obj !is String) {
+            return null
+        }
+
+        return obj.length
+    }
+
+    private fun getStringLength3(obj: Any): Int? {
+        if (obj is String && obj.length > 0) { //甚至`obj`在`&&`右边自动转换成`String`类型
+            return obj.length
+        }
+
+        return null
+    }
+
+    private fun forWhile() { //for、while表达式
+        val items = listOf("apple", "banana", "kiwifruit")
+        for (item in items) {
+            println("for fruit: $item")
+        }
+
+        for (index in items.indices) {
+            println("for fruit indices: $index, ${items[index]}")
+        }
+
+        val indicator = 4;
+        if (indicator in items.indices) { //区间运算符
+            println("for fruit indices: $indicator, ${items[indicator]}")
+        } else {
+            println("$indicator is out of items.indices")
+        }
+
+        var index = 0
+        while (index < items.size) {
+            println("while fruit $index, ${items[index]}")
+            index++
+        }
+    }
+
+    private fun describe(obj: Any): String = when (obj) { //when表达式
+        1 -> { //代码块
+            val i = 5;
+            println("when obj $i")
+            "One"
+        }
+        "Hello" -> "Greeting"
+        is Long -> "Long"
+        !is String -> "Not a string"
+        else -> "Unknown" //
+    }
+
+    private fun describe2(obj: Any): String {
+        return when (obj) {
+            1 -> {
+                val i = 5;
+                println("when obj $i")
+                "One"
+            }
+            "Hello" -> "Greeting"
+            is Long -> "Long"
+            !is String -> "Not a string"
+            else -> "Unknown"
+        }
     }
 
 }
