@@ -51,6 +51,8 @@ class KotlinActivity : AppCompatActivity() {
         describe(1)
         println("describe(4659697576999): ${describe(4659697576999)}")
         println("describe2(465576): ${describe2(465576)}")
+
+        this.inOperator()
     }
 
     fun main() {
@@ -136,13 +138,6 @@ class KotlinActivity : AppCompatActivity() {
             println("for fruit indices: $index, ${items[index]}")
         }
 
-        val indicator = 4;
-        if (indicator in items.indices) { //区间运算符
-            println("for fruit indices: $indicator, ${items[indicator]}")
-        } else {
-            println("$indicator is out of items.indices")
-        }
-
         var index = 0
         while (index < items.size) {
             println("while fruit $index, ${items[index]}")
@@ -174,6 +169,36 @@ class KotlinActivity : AppCompatActivity() {
             !is String -> "Not a string"
             else -> "Unknown"
         }
+    }
+
+    private fun inOperator() { //区间运算符
+        println("------fits in range------")
+        val x = 10
+        val y = 9
+        if (x in 1..y + 1) {
+            println("fits in range")
+        }
+
+        val list = listOf("a", "b", "c")
+        val indicator = 3;
+        if (indicator in list.indices) { //区间运算符
+            println("for fruit indices: $indicator, ${list[indicator]}")
+        } else {
+            println("$indicator is out of items.indices")
+        }
+        if (-1 !in 0..list.lastIndex) {
+            println("-1 is out of range")
+        }
+
+        for (x in 1..10 step 2) { //从1开始,最大到10,等差数列,差值为2
+            print("$x ")
+        }
+        println()
+        for (x in 9 downTo 0 step 3) { //从9开始,最小到0,每差数列,差值为-3
+            print("$x, ")
+        }
+        println()
+        println("-------fits in range-------")
     }
 
 }
