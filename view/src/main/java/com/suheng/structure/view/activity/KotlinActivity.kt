@@ -1,5 +1,7 @@
 package com.suheng.structure.view.activity
 
+import android.graphics.Rect
+import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -53,6 +55,9 @@ class KotlinActivity : AppCompatActivity() {
         println("describe2(465576): ${describe2(465576)}")
 
         this.inOperator()
+
+        this.demoCollection()
+        this.demoClass()
     }
 
     fun main() {
@@ -128,8 +133,9 @@ class KotlinActivity : AppCompatActivity() {
         return null
     }
 
+    private val items = listOf("apple", "banana", "kiwifruit")
+
     private fun forWhile() { //for、while表达式
-        val items = listOf("apple", "banana", "kiwifruit")
         for (item in items) {
             println("for fruit: $item")
         }
@@ -181,7 +187,7 @@ class KotlinActivity : AppCompatActivity() {
 
         val list = listOf("a", "b", "c")
         val indicator = 3;
-        if (indicator in list.indices) { //区间运算符
+        if (indicator in list.indices) {
             println("for fruit indices: $indicator, ${list[indicator]}")
         } else {
             println("$indicator is out of items.indices")
@@ -199,6 +205,29 @@ class KotlinActivity : AppCompatActivity() {
         }
         println()
         println("-------fits in range-------")
+    }
+
+    private fun demoCollection() { //集合
+        when {
+            "orange" in items -> println("juicy")
+            "apple" in items -> println("apple is fine too")
+        }
+
+        val fruits = listOf("banana", "avocado", "apple", "kiwifruit")
+        //fruits.filter { it.startsWith("a") }.forEach { println(it) }
+        //fruits.filter { it.startsWith("a") }.map { it.uppercase() }.forEach { println(it) }
+        fruits.filter { it.startsWith("a") }.sortedBy { it }.map { it.uppercase() }
+            .forEach { println(it) }
+    }
+
+    private lateinit var mRectF: RectF //先定义，后面再初始化
+    private val mRectF2 = RectF()
+
+    private fun demoClass() { //类
+        val rect = Rect(5, 2, 10, 4)
+        mRectF = RectF(5f, 2f, 10f, 4f)
+        mRectF2.set(5.1f, 2.1f, 10.1f, 4.1f)
+        println("rect: $rect, rectF: ${mRectF.toShortString()}, rectF2: $mRectF2")
     }
 
 }
