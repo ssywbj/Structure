@@ -10,8 +10,8 @@ import com.suheng.structure.view.R
 class KotlinActivity : AppCompatActivity() {
 
     //顶层变量
-    var aa = 11
-    var s1 = "a is $aa" //字符串
+    private var aa = 11
+    private var s1 = "a is $aa" //字符串
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,9 +58,20 @@ class KotlinActivity : AppCompatActivity() {
 
         this.demoCollection()
         this.demoClass()
+
+        this.accustomUse()
+        this.foo() //都使用默认值
+        this.foo(b = "B") //b属性不使用属性值
+        this.foo(45) //a属性不使用属性值：a位置参数列表的第一位，不用像b一样需要显示指定参数名称
+        this.foo(4, "C") //a、b属性都不使用属性值
+        this.filterList()
+        this.mapDemo()
+        println("lazy attr1: $lazyAttr")
+        println("lazy attr1: $lazyAttr")
+        this.lazyAttr2()
     }
 
-    fun main() {
+    private fun main() {
         println("hello world!")
         Log.d("Wbj", "---hello world!")
     }
@@ -196,12 +207,18 @@ class KotlinActivity : AppCompatActivity() {
             println("-1 is out of range")
         }
 
-        for (x in 1..10 step 2) { //从1开始,最大到10,等差数列,差值为2
-            print("$x ")
+        for (k in 0..10 step 2) { //从0开始,最大到10（..，闭区间：包括10）,等差数列,差值为2
+            print("$k ")
         }
         println()
-        for (x in 9 downTo 0 step 3) { //从9开始,最小到0,每差数列,差值为-3
-            print("$x, ")
+        print("until: ")
+        for (j in 0 until 10 step 2) { //从0开始,最大到10（until，半开区间：不包括10）,等差数列,差值为2
+            print("$j ")
+        }
+
+        println()
+        for (i in 9 downTo 0 step 3) { //从9开始,最小到0,每差数列,差值为-3
+            print("$i, ")
         }
         println()
         println("-------fits in range-------")
@@ -220,7 +237,7 @@ class KotlinActivity : AppCompatActivity() {
             .forEach { println(it) }
     }
 
-    private lateinit var mRectF: RectF //先定义，后面再初始化
+    private lateinit var mRectF: RectF //lateinit含义：先定义，后面再初始化
     private val mRectF2 = RectF()
 
     private fun demoClass() { //类
@@ -230,4 +247,81 @@ class KotlinActivity : AppCompatActivity() {
         println("rect: $rect, rectF: ${mRectF.toShortString()}, rectF2: $mRectF2")
     }
 
+    private fun accustomUse() {
+        val customer = Customer("wbj", "123@qq.com")
+        customer.name = "wbj123" //对于var定义的变量还有setter方法
+        //customer.email = "456@qq.com"  //val定义的没有setter方法
+        println("customer: $customer")
+    }
+
+    //习惯用法：start
+    //创建DTOs（POJOs/POCOs）
+    data class Customer(var name: String, val email: String)
+
+    //函数的默认参数
+    private fun foo(a: Int = 3, b: String = "A") {
+        println("foo, a: $a, b: $b")
+    }
+
+    //过滤list
+    private fun filterList() {
+        val list = listOf(-1, 0, 1, 2, 3)
+        val positives = list.filter { x -> x > 0 }
+        print("filter list 1: ")
+        for (i in positives) {
+            print("$i ")
+        }
+        println()
+
+        print("filter list 2: ")
+        for (i in list.filter { it > 0 }) {
+            print("$i ")
+        }
+        println()
+    }
+
+    //map
+    private fun mapDemo() {
+        //val map = mapOf("a" to 1, "b" to 2, "c" to 3) //key、value不可变，大小固定
+        val map = mutableMapOf("a" to 1, "b" to 2, "c" to 3) //key、value均可变，大小不固定
+        println("map, $map")
+
+        println("map[\"a\"] = ${map["a"]}")
+        map["a"] = 11
+        println("map[\"a\"] = ${map["a"]}")
+
+        for (entry in map) {
+            println("map entry, key: ${entry.key}, value: ${entry.value}, key、value: $entry")
+        }
+
+        for ((k, v) in map) {
+            println("map (k, v), key: $k, value: $v, key、value: $k、$v")
+        }
+
+        for (key in map.keys) {
+            println("map key: $key")
+        }
+
+        for (value in map.values) {
+            println("map value: $value")
+        }
+    }
+
+    //延迟属性
+    private val lazyAttr: String by lazy {
+        println("lazy, lazy, lazy!")
+        this.describe2("lazyAttr")
+    }
+
+    private fun lazyAttr2() {
+        //延迟属性
+        val lazyAttr2: String by lazy {
+            println("computed!")
+            "lazy attr2: lazyAttr2"
+        }
+
+        println(lazyAttr2)
+        println(lazyAttr2)
+    }
+    //习惯用法：end
 }
