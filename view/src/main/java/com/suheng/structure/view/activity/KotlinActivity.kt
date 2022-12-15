@@ -69,6 +69,10 @@ class KotlinActivity : AppCompatActivity() {
         println("lazy attr1: $lazyAttr")
         println("lazy attr1: $lazyAttr")
         this.lazyAttr2()
+
+        s1.extensionsMethod()
+        Wei.age = 23
+        println("Wei: ${Wei.age}, ${Wei.name}")
     }
 
     private fun main() {
@@ -323,5 +327,17 @@ class KotlinActivity : AppCompatActivity() {
         println(lazyAttr2)
         println(lazyAttr2)
     }
+
+    //扩展函数：扩展一个类的新功能而无需继承该类。
+    private fun String.extensionsMethod() { //为String添加一个新方法，扩展了它的功能
+        println("extensions String function")
+    }
+
+    //创建单例
+    object Wei {
+        val name = "Wbj"
+        var age = 3
+    }
+
     //习惯用法：end
 }
