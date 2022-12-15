@@ -335,7 +335,7 @@ class KotlinActivity : AppCompatActivity() {
 
     //创建单例
     object Wei {
-        val name = "Wbj"
+        const val name = "Wbj"
         var age = 3
     }
 
