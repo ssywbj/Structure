@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.suheng.structure.view.R
+import java.io.File
 
 class KotlinActivity : AppCompatActivity() {
 
@@ -73,6 +74,8 @@ class KotlinActivity : AppCompatActivity() {
         s1.extensionsMethod()
         Wei.age = 23
         println("Wei: ${Wei.age}, ${Wei.name}")
+
+        this.ifNotNull()
     }
 
     private fun main() {
@@ -228,13 +231,14 @@ class KotlinActivity : AppCompatActivity() {
         println("-------fits in range-------")
     }
 
+    private val fruits = listOf("banana", "avocado", "apple", "kiwifruit")
+
     private fun demoCollection() { //集合
         when {
             "orange" in items -> println("juicy")
             "apple" in items -> println("apple is fine too")
         }
 
-        val fruits = listOf("banana", "avocado", "apple", "kiwifruit")
         //fruits.filter { it.startsWith("a") }.forEach { println(it) }
         //fruits.filter { it.startsWith("a") }.map { it.uppercase() }.forEach { println(it) }
         fruits.filter { it.startsWith("a") }.sortedBy { it }.map { it.uppercase() }
@@ -337,6 +341,37 @@ class KotlinActivity : AppCompatActivity() {
     object Wei {
         const val name = "Wbj"
         var age = 3
+    }
+
+    //if null、if not null写法
+    private fun ifNotNull() {
+        val file = File("test").listFiles()
+        println("ifNotNull,file: $file")
+
+        if (file == null) {
+            println("ifNotNull,file.size: null")
+        } else {
+            println("ifNotNull,file.size: ${file.size}")
+        }
+        println("ifNotNull,file.size: ${file?.size}") //非空调用：语法“?.”，等同以上写法
+
+        val fileSize = file?.size ?: -1 //三目运算符，语法”?:“，如果file为空那么fileSize取值-1，否则取值file.size
+        println("ifNotNull,file.size: ${file?.size ?: "is empty"}, fileSize: $fileSize") //if null，执行一个语句
+
+        file?.let { //if not null，执行一段代码：如果file不为空，会执行里面的代码
+            println("ifNotNull,file?.let1")
+            println("ifNotNull,file?.let2")
+        }
+
+        val firstOrNull = fruits.firstOrNull()
+        val frts = firstOrNull ?: "no fruit" //在可能为空的集合取出第一个元素
+        println("firstOrNull, frts: $frts")
+        val mapped = firstOrNull?.let { //如果该值或其描述结果为空，那么返回defaultValue，否则返回运算的值
+            println("fruits.firstOrNull, then describe(it)")
+            describe(it)
+        } ?: "mapped defaultValue"
+        println("firstOrNull, mapped: $mapped")
+
     }
 
     //习惯用法：end
