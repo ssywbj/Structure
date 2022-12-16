@@ -371,7 +371,6 @@ class KotlinActivity : AppCompatActivity() {
             describe(it)
         } ?: "mapped defaultValue"
         println("firstOrNull, mapped: $mapped")
-
     }
 
     //习惯用法：end
