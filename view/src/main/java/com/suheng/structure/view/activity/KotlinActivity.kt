@@ -76,6 +76,13 @@ class KotlinActivity : AppCompatActivity() {
         println("Wei: ${Wei.age}, ${Wei.name}")
 
         this.ifNotNull()
+
+        this.testTry()
+        println("arrayOfMinusOnes(10): ${this.arrayOfMinusOnes(10)}")
+
+        this.testTurtle()
+
+        this.testApply()
     }
 
     private fun main() {
@@ -371,6 +378,68 @@ class KotlinActivity : AppCompatActivity() {
             describe(it)
         } ?: "mapped defaultValue"
         println("firstOrNull, mapped: $mapped")
+    }
+
+    //"try/catch"表达式
+    private fun testTry() {
+        val result = try {
+            this.describe(13)
+        } catch (e: java.lang.ArithmeticException) {
+            throw IllegalStateException(e)
+        }
+
+        println("try...catch, result: $result")
+    }
+
+    //返回类型为Unit的方法的Builder风格用法
+    private fun arrayOfMinusOnes(size: Int): IntArray {
+        return IntArray(size).apply { fill(-1) }
+    }
+
+    //单表达式函数
+    private fun theAnswer() = 3
+    private fun theAnswer2() = this.maxOf2(7, 8)
+
+    class Turtle {
+        fun penDown() {
+            println("Turtle, penDown")
+        }
+
+        fun penUp() {
+            println("Turtle, penUp")
+        }
+
+        fun turn(degrees: Double) {
+            println("Turtle, turn: $degrees")
+        }
+
+        fun forward(pixels: Double) {
+            println("Turtle, forward: $pixels")
+        }
+    }
+
+    //对一个对象实例调用多个方法(with)
+    private fun testTurtle() {
+        val myTurtle = Turtle()
+        with(myTurtle) { //with
+            penDown()
+            for (i in 1..4) {
+                forward(100.0)
+                turn(90.0)
+            }
+            penUp()
+        }
+    }
+
+    //配置对象的属性(apply):这对于配置未出现在对象构造函数中的属性非常有用
+    private fun testApply() {
+        val rect = Rect().apply { //apply
+            left = 3
+            top = theAnswer()
+            right = theAnswer2()
+        }
+
+        println("testApply, rect: $rect")
     }
 
     //习惯用法：end
