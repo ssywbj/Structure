@@ -2,11 +2,15 @@ package com.suheng.structure.view.activity
 
 import android.graphics.Rect
 import android.graphics.RectF
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.suheng.structure.view.R
 import java.io.File
+import java.math.BigDecimal
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class KotlinActivity : AppCompatActivity() {
 
@@ -83,6 +87,10 @@ class KotlinActivity : AppCompatActivity() {
         this.testTurtle()
 
         this.testApply()
+
+        this.nullableAlso()
+
+        //this.calcTaxes()
     }
 
     private fun main() {
@@ -440,7 +448,45 @@ class KotlinActivity : AppCompatActivity() {
         }
 
         println("testApply, rect: $rect")
+
+        val stream = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            try {
+                Files.newInputStream(Paths.get("/some/file.txt"))
+            } catch (e: Exception) {
+                //throw Exception("===/some/file.txt====")
+                println("reader.readText(), Exception")
+            }
+        } else {
+            TODO("VERSION.SDK_INT < O") //将代码标记为不完整
+        }
+
+        if (stream == null) {
+            println("reader.readText(), stream 111111")
+        } else {
+            println("reader.readText(), stream 222222")
+            /*stream.buffered().reader().use { reader ->
+                println("reader.readText()：${reader.readText()}")
+            }*/
+        }
     }
 
+    private fun nullableAlso() {
+        val b: Boolean? = true //使用可空布尔值:Boolean?
+        if (b == true) {
+            println("nullableBoolean, b: $b")
+        } else {
+            println("nullableBoolean, b is null or false")
+        }
+
+        //交换两个变量:also
+        var c = 11
+        var d = 22
+        println("exchange c: $c, d:$d")
+        c = d.also { d = c }
+        println("exchange c: $c, d:$d")
+    }
+
+    //TODO(String)：将代码标记为不完整
+    private fun calcTaxes(): BigDecimal = TODO("Waiting for feedback from accounting")
     //习惯用法：end
 }
