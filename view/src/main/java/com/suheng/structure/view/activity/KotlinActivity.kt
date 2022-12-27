@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.suheng.structure.view.R
+import com.suheng.structure.view.kt.Person
 import java.io.File
 import java.math.BigDecimal
 import java.nio.file.Files
@@ -91,6 +92,10 @@ class KotlinActivity : AppCompatActivity() {
         this.nullableAlso()
 
         //this.calcTaxes()
+
+        val person = Person("Wbj")
+        //Person(person)
+        Person("Wbj2", Person("11111"))
     }
 
     private fun main() {
