@@ -5,7 +5,10 @@ import android.graphics.RectF
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.SeekBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.suheng.structure.view.PathKtView
 import com.suheng.structure.view.R
 import com.suheng.structure.view.kt.Derived2
 import com.suheng.structure.view.kt.Person
@@ -23,6 +26,8 @@ class KotlinActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kotlin)
+
+        this.initSeekBar()
 
         this.main()
         println("sum = " + sum(3, 9))
@@ -502,4 +507,40 @@ class KotlinActivity : AppCompatActivity() {
     //TODO(String)：将代码标记为不完整
     private fun calcTaxes(): BigDecimal = TODO("Waiting for feedback from accounting")
     //习惯用法：end
+
+    private fun initSeekBar() {
+        val minWith = 150
+        val offsetWith = 350
+
+        val pathKtView: PathKtView = findViewById(R.id.kt_path_view)
+        val layoutParams = pathKtView.layoutParams
+        layoutParams.width = minWith
+        layoutParams.height = layoutParams.width
+        pathKtView.layoutParams = layoutParams
+
+        val seekBar = findViewById<SeekBar>(R.id.kt_seek_bar)
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                layoutParams.width = (minWith + progress / 100f * offsetWith).toInt()
+                layoutParams.height = layoutParams.width
+                pathKtView.layoutParams = layoutParams
+                /*Log.v("Wbj", "onProgressChanged: progress = $progress, fromUser = $fromUser" +
+                        ", layoutParams.width = ${layoutParams.width}")*/
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                Log.d("Wbj", "onStartTrackingTouch: progress = ${seekBar.progress}")
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                Toast.makeText(
+                    this@KotlinActivity,
+                    "stop progress is: " + seekBar.progress,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        })
+    }
+
 }
