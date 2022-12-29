@@ -20,7 +20,7 @@ class Customer private /*@Inject*/ constructor(name: String)
 //主构造函数不能包含任何的代码。初始化的代码可以放到以init关键字作为前缀的初始化块（initializer blocks）中。
 //在实例初始化期间，初始化块按照它们出现在类体中的顺序执行，与属性初始化器交织在一起：
 class Person(name: String) { //name在主构造方法没有用var或val声明，是私有属性（默认是private var），外部访问不到
-    val firstProperty = "First property: $name".also(::println)
+    val firstProperty = "First property: $name".also(::println) //also(::println)，顺便把字符串打印出来
 
     init {
         println("First initializer block that prints $name")
