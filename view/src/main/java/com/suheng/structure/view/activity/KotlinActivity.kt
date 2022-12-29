@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.suheng.structure.view.R
+import com.suheng.structure.view.kt.Derived2
 import com.suheng.structure.view.kt.Person
 import java.io.File
 import java.math.BigDecimal
@@ -94,8 +95,15 @@ class KotlinActivity : AppCompatActivity() {
         //this.calcTaxes()
 
         val person = Person("Wbj")
+        //person.name //name在主构造方法没有用var或val声明，是私有属性，外部访问不到
         //Person(person)
         Person("Wbj2", Person("11111"))
+
+        val derived2 = Derived2("wbj", "world")
+        println("derived2, name: ${derived2.name}, size: ${derived2.size}")
+        //derived2.size
+        //derived2.name
+        derived2.draw()
     }
 
     private fun main() {

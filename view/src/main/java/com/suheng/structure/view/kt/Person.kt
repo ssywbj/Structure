@@ -19,7 +19,7 @@ class Customer private /*@Inject*/ constructor(name: String)
 
 //主构造函数不能包含任何的代码。初始化的代码可以放到以init关键字作为前缀的初始化块（initializer blocks）中。
 //在实例初始化期间，初始化块按照它们出现在类体中的顺序执行，与属性初始化器交织在一起：
-class Person(name: String) {
+class Person(name: String) { //name在主构造方法没有用var或val声明，是私有属性（默认是private var），外部访问不到
     val firstProperty = "First property: $name".also(::println)
 
     init {
@@ -94,5 +94,48 @@ class Polygon : Shape2 {
 
     private fun testVertexCount() {
         vertexCount = 14
+    }
+}
+
+open class Base2(val name: String) {
+    init {
+        println("Initializing Base2")
+    }
+
+    open val size: Int = name.length.also { println("Initializing size in Base2: $it") }
+
+    open fun draw() {
+        println("Base2, draw, draw")
+    }
+}
+
+class Derived2(name: String, lastName: String) :
+    Base2(
+        name.replaceFirstChar { it.titlecase() } //首字母变大写
+            .also { println("Argument for Base2: $it") }) { //also{...}：调用到这个属性的时候，顺便执行一下其它语句
+    init {
+        println("Initializing Derived2")
+    }
+
+    override val size: Int =
+        (super.size + lastName.length).also { println("Initializing size in Derived2: $it") } //"super.size"：使用super关键字访问超类属性或方法
+
+    override fun draw() {
+        println("Derived2, draw, draw")
+        Filler().drawAndFill()
+    }
+
+    inner class Filler { //内部类：inner
+        fun fill() {
+            println("Filling")
+        }
+
+        fun drawAndFill() {
+            //draw() //调用Derived2的draw()实现，而Derived2的draw()又调用了Filler的drawAndFill()，因为会陷入死循环
+            //在一个内部类中访问外部类的超类，可以通过由外部类名限定的super关键字来实现：super@Outer
+            super@Derived2.draw() //调用Base2的draw()实现
+            fill()
+            println("Drawn a filled Base2 with size ${super@Derived2.size}") //使用Base2所实现的size
+        }
     }
 }
