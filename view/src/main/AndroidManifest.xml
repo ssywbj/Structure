@@ -70,6 +70,9 @@
         <activity
             android:name=".activity.KotlinActivity"
             android:label="Kotlin Grammar" />
+        <activity
+            android:name=".activity.SVGPathActivity"
+            android:label="Path Scale" />
 
     </application>
 

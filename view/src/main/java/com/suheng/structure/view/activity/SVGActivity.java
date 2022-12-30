@@ -28,6 +28,13 @@ public class SVGActivity extends AppCompatActivity {
                 startActivity(new Intent(SVGActivity.this, ChinaMapActivity.class));
             }
         });
+
+        findViewById(R.id.btn_path_scale).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SVGActivity.this, SVGPathActivity.class));
+            }
+        });
     }
 
 }
