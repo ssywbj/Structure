@@ -5,12 +5,20 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.PathParser
 import com.suheng.structure.view.R.drawable
+import com.suheng.structure.view.kt.NAME_SPACE1
 import org.xmlpull.v1.XmlPullParser
 
 class PathKtView2 : View {
+    companion object {
+        private const val NAME_SPACE = "http://schemas.android.com/apk/res/android"
+    }
+
+    object Singleton {
+        const val NAME_SPACE2 = "http://schemas.android.com/apk/res/android"
+    }
+
     private val mRect = Rect()
     private val mBitmap: Bitmap
     private lateinit var mPath: Path
@@ -24,15 +32,10 @@ class PathKtView2 : View {
         mBitmap = BitmapManager.get(context, drawable.vector_delete, R.color.colorPrimary)
 
         mPaint = Paint()
-        mPaint.color = ContextCompat.getColor(context, R.color.colorAccent)
+        //mPaint.color = ContextCompat.getColor(context, R.color.colorAccent)
 
         val parser = resources.getXml(R.xml.vector_delete)
-        /*mPath = PathParser.createPathFromPathData(
-            parser.getAttributeValue(
-                "http://schemas.android.com/apk/res/android",
-                "pathData"
-            )
-        )*/
+        //mPath = PathParser.createPathFromPathData(parser.getAttributeValue(NAME_SPACE, "pathData"))
 
         var left = -1f
         var right = -1f
@@ -44,24 +47,12 @@ class PathKtView2 : View {
                 val tagName = parser.name
 
                 if ("vector" == tagName) {
-                    val width = parser.getAttributeValue(
-                        "http://schemas.android.com/apk/res/android",
-                        "width"
-                    )
-                    val height = parser.getAttributeValue(
-                        "http://schemas.android.com/apk/res/android",
-                        "height"
-                    )
+                    val width = parser.getAttributeValue(NAME_SPACE, "width")
+                    val height = parser.getAttributeValue(Singleton.NAME_SPACE2, "height")
                     val viewportWidth =
-                        parser.getAttributeValue(
-                            "http://schemas.android.com/apk/res/android",
-                            "viewportWidth"
-                        )
+                        parser.getAttributeValue(NAME_SPACE, "viewportWidth")
                     val viewportHeight =
-                        parser.getAttributeValue(
-                            "http://schemas.android.com/apk/res/android",
-                            "viewportHeight"
-                        )
+                        parser.getAttributeValue(NAME_SPACE, "viewportHeight")
                     Log.d(
                         "Wbj",
                         "vector: $width, $height, $viewportWidth, $viewportHeight"
@@ -69,19 +60,21 @@ class PathKtView2 : View {
                 }
 
                 if ("path" == tagName) {
+                    mPaint.color =
+                        Color.parseColor(parser.getAttributeValue(NAME_SPACE, "fillColor"))
+
                     mPath = PathParser.createPathFromPathData(
-                        parser.getAttributeValue(
-                            "http://schemas.android.com/apk/res/android",
-                            "pathData"
-                        )
+                        parser.getAttributeValue(NAME_SPACE1, "pathData")
                     )
 
                     mRectPath.setEmpty()
                     mPath.computeBounds(mRectPath, true)
                     left = if (left == -1f) mRectPath.left else left.coerceAtMost(mRectPath.left)
                     top = if (top == -1f) mRectPath.top else top.coerceAtMost(mRectPath.top)
-                    right = if (right == -1f) mRectPath.right else right.coerceAtLeast(mRectPath.right)
-                    bottom = if (bottom == -1f) mRectPath.bottom else bottom.coerceAtLeast(mRectPath.bottom)
+                    right =
+                        if (right == -1f) mRectPath.right else right.coerceAtLeast(mRectPath.right)
+                    bottom =
+                        if (bottom == -1f) mRectPath.bottom else bottom.coerceAtLeast(mRectPath.bottom)
                 }
             }
 

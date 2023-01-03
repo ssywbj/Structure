@@ -1,8 +1,5 @@
 package com.suheng.structure.view.activity
 
-import android.graphics.Rect
-import android.graphics.RectF
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.SeekBar
@@ -10,12 +7,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.suheng.structure.view.PathKtView2
 import com.suheng.structure.view.R
-import com.suheng.structure.view.kt.Derived2
-import com.suheng.structure.view.kt.Person
-import java.io.File
-import java.math.BigDecimal
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class SVGPathActivity : AppCompatActivity() {
 
@@ -35,6 +26,9 @@ class SVGPathActivity : AppCompatActivity() {
         layoutParams.width = minWith
         layoutParams.height = layoutParams.width
         pathKtView.layoutParams = layoutParams
+        pathKtView.setOnClickListener {
+            Toast.makeText(this@SVGPathActivity, "PathKtView", Toast.LENGTH_SHORT).show()
+        }
 
         val seekBar = findViewById<SeekBar>(R.id.kt_seek_bar)
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
