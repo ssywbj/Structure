@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.suheng.structure.view.R
 import com.suheng.structure.view.kt.Derived2
 import com.suheng.structure.view.kt.Person
+import com.suheng.structure.view.kt.Square
 import java.io.File
 import java.math.BigDecimal
 import java.nio.file.Files
@@ -104,6 +105,9 @@ class KotlinActivity : AppCompatActivity() {
         //derived2.size
         //derived2.name
         derived2.draw()
+
+        val square = Square("Wbj Square")
+        square.draw()
     }
 
     private fun main() {

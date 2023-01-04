@@ -105,7 +105,7 @@ open class Base2(val name: String) {
     open val size: Int = name.length.also { println("Initializing size in Base2: $it") }
 
     open fun draw() {
-        println("Base2, draw, draw")
+        println("Base2, draw, draw: $name")
     }
 }
 
@@ -113,6 +113,7 @@ class Derived2(name: String, lastName: String) :
     Base2(
         name.replaceFirstChar { it.titlecase() } //首字母变大写
             .also { println("Argument for Base2: $it") }) { //also{...}：调用到这个属性的时候，顺便执行一下其它语句
+
     init {
         println("Initializing Derived2")
     }
@@ -137,5 +138,40 @@ class Derived2(name: String, lastName: String) :
             fill()
             println("Drawn a filled Base2 with size ${super@Derived2.size}") //使用Base2所实现的size
         }
+    }
+}
+
+interface Polygon2 {
+    fun draw() { //接口成员默认是open
+        println("Polygon2 draw 空实现")
+    }
+
+    fun draw2()
+}
+
+//实现与继承规则：如果一个类从它的直接超类继承相同成员的多个实现，它必须覆盖这个成员并提供其自己的实现（也许用继承来的其中之一）。
+//为了表示采用从哪个超类型继承的实现，使用由尖括号中超类型名限定的super，如super<类>
+class Square(name: String) : Base2(name), Polygon2 { //同时继承Base2与Polygon2
+    override fun draw() {
+        super<Base2>.draw() //Base2.draw()
+        super<Polygon2>.draw() //调用Polygon2.draw()
+    }
+
+    override fun draw2() {}
+}
+
+//抽象类
+abstract class Square2 : Polygon2 {
+    abstract override fun draw() //可以用一个抽象成员覆盖一个非抽象的开放成员
+    abstract fun draw3() //添加自己的抽象方法
+
+    override fun draw2() {}
+}
+
+class Square3 : Square2() {
+    override fun draw() {
+    }
+
+    override fun draw3() {
     }
 }
