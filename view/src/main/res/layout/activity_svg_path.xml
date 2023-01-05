@@ -12,15 +12,16 @@
         android:layout_margin="10dp" />
 
     <com.suheng.structure.view.PathKtView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/kt_path_view"
+        android:layout_width="@dimen/path_delete_icon"
+        android:layout_height="@dimen/path_delete_icon"
         android:layout_margin="10dp"
         android:background="@android:color/holo_red_light" />
 
     <com.suheng.structure.view.PathKtView2
-        android:id="@+id/kt_path_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/kt_path_view2"
+        android:layout_width="@dimen/path_delete_icon"
+        android:layout_height="@dimen/path_delete_icon"
         android:layout_margin="10dp"
         android:background="@android:color/holo_red_light" />
 </LinearLayout>

@@ -27,4 +27,7 @@
     <dimen name="checked_box_wh">48dp</dimen>
     <dimen name="radio_btn_wh">48dp</dimen>
 
+    <dimen name="path_delete_icon">48dp</dimen>
+    <dimen name="path_delete_icon_max">130dp</dimen>
+
 </resources>

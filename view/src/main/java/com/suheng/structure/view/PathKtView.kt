@@ -1,24 +1,21 @@
 package com.suheng.structure.view
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.PaintFlagsDrawFilter
+import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 
 class PathKtView : View {
     private val mBitmap: Bitmap
+    private val mRect = Rect()
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        //mBitmap = BitmapManager.get(context, drawable.vector_delete, R.color.colorPrimary)
+        //mBitmap = BitmapManager.get(context, R.drawable.vector_delete, R.color.colorPrimary)
 
         val drawable = Drawable.createFromXml(resources, resources.getXml(R.xml.vector_delete))
-         mBitmap = Bitmap.createBitmap(
+        mBitmap = Bitmap.createBitmap(
             drawable.intrinsicWidth,
             drawable.intrinsicHeight,
             Bitmap.Config.ARGB_8888
@@ -34,13 +31,19 @@ class PathKtView : View {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        setMeasuredDimension(mBitmap.width, mBitmap.height)
-        Log.v("Wbj", "mBitmap.width = ${mBitmap.width}, mBitmap.height = ${mBitmap.height}")
+        //setMeasuredDimension(mBitmap.width, mBitmap.height) //固定宽高
+        //Log.v("Wbj", "mBitmap.width = ${mBitmap.width}, mBitmap.height = ${mBitmap.height}")
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        mRect.set(0, 0, w, h)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawBitmap(mBitmap, 0f, 0f, null)
+        //canvas.drawBitmap(mBitmap, 0f, 0f, null)
+        canvas.drawBitmap(mBitmap, null, mRect, null)
     }
 
 }
