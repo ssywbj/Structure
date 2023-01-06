@@ -57,11 +57,15 @@ class PathKtView : View {
             width = MeasureSpec.getSize(widthMeasureSpec)
         }
 
-        var height = 0
-        if (heightMode == MeasureSpec.AT_MOST) {
-            height = mBitmap.height
-        } else if (heightMode == MeasureSpec.EXACTLY) {
-            height = MeasureSpec.getSize(heightMeasureSpec)
+        val height: Int = if (heightMode == MeasureSpec.EXACTLY) {
+            MeasureSpec.getSize(heightMeasureSpec)
+        } else {
+            //mBitmap.height
+            if (heightMode == MeasureSpec.AT_MOST) {
+                mBitmap.height
+            } else {
+                MeasureSpec.getSize(heightMeasureSpec)
+            }
         }
 
         Log.v("PathKtView", "width = $width, height = $height")

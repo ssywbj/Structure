@@ -1,12 +1,7 @@
 package com.suheng.structure.view.activity
 
 import android.os.Bundle
-import android.util.Log
-import android.widget.SeekBar
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.suheng.structure.view.PathKtView
-import com.suheng.structure.view.PathKtView2
 import com.suheng.structure.view.R
 
 class SVGPathActivity : AppCompatActivity() {
@@ -26,14 +21,14 @@ class SVGPathActivity : AppCompatActivity() {
         val width = resources.getDimensionPixelOffset(R.dimen.path_delete_icon)
         val maxWidth = resources.getDimensionPixelOffset(R.dimen.path_delete_icon_max)
 
-        val pathKtView2: PathKtView2 = findViewById(R.id.kt_path_view2)
+        /*val pathKtView2: PathKtView2 = findViewById(R.id.kt_path_view2)
         pathKtView2.setOnClickListener {
             Toast.makeText(this@SVGPathActivity, "PathKtView2", Toast.LENGTH_SHORT).show()
-        }
+        }*/
 
-        val pathKtView: PathKtView = findViewById(R.id.kt_path_view)
+        //val pathKtView: PathKtView = findViewById(R.id.kt_path_view)
 
-        val seekBar = findViewById<SeekBar>(R.id.kt_seek_bar)
+        /*val seekBar = findViewById<SeekBar>(R.id.kt_seek_bar)
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 val layoutParams2 = pathKtView2.layoutParams
@@ -56,7 +51,7 @@ class SVGPathActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 Log.d(Singleton.TAG, "onStopTrackingTouch: progress = ${seekBar.progress}")
             }
-        })
+        })*/
     }
 
 }
