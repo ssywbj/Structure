@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 
 class PathKtView : View {
@@ -31,8 +32,40 @@ class PathKtView : View {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        //setMeasuredDimension(mBitmap.width, mBitmap.height) //固定宽高
         //Log.v("Wbj", "mBitmap.width = ${mBitmap.width}, mBitmap.height = ${mBitmap.height}")
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        Log.v(
+            "PathKtView",
+            "widthMeasureSpec = $widthMeasureSpec, heightMeasureSpec = $heightMeasureSpec," +
+                    " widthMode = $widthMode, heightMode = $heightMode"
+        )
+        Log.v(
+            "PathKtView",
+            "MeasureSpec.AT_MOST = ${MeasureSpec.AT_MOST}, MeasureSpec.EXACTLY = ${MeasureSpec.EXACTLY}," +
+                    " MeasureSpec.UNSPECIFIED = ${MeasureSpec.UNSPECIFIED}"
+        )
+
+        /*if (widthMode == MeasureSpec.AT_MOST && heightMode == MeasureSpec.AT_MOST) {
+            setMeasuredDimension(mBitmap.width, mBitmap.height) //固定宽高
+        }*/
+
+        var width = 0
+        if (widthMode == MeasureSpec.AT_MOST) { //wrap_content
+            width = mBitmap.width
+        } else if (widthMode == MeasureSpec.EXACTLY) { //xxdp、match_parent
+            width = MeasureSpec.getSize(widthMeasureSpec)
+        }
+
+        var height = 0
+        if (heightMode == MeasureSpec.AT_MOST) {
+            height = mBitmap.height
+        } else if (heightMode == MeasureSpec.EXACTLY) {
+            height = MeasureSpec.getSize(heightMeasureSpec)
+        }
+
+        Log.v("PathKtView", "width = $width, height = $height")
+        setMeasuredDimension(width, height)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {

@@ -13,8 +13,8 @@
 
     <com.suheng.structure.view.PathKtView
         android:id="@+id/kt_path_view"
-        android:layout_width="@dimen/path_delete_icon"
-        android:layout_height="@dimen/path_delete_icon"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_margin="10dp"
         android:background="@android:color/holo_red_light" />
 
@@ -23,5 +23,5 @@
         android:layout_width="@dimen/path_delete_icon"
         android:layout_height="@dimen/path_delete_icon"
         android:layout_margin="10dp"
-        android:background="@android:color/holo_red_light" />
+        android:background="@android:color/holo_purple" />
 </LinearLayout>
