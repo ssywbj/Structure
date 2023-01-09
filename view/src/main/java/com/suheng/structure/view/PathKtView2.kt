@@ -44,7 +44,7 @@ class PathKtView2 : View {
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)*/
 
-        mPaint = Paint()
+        mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
         val parser = resources.getXml(R.xml.vector_delete)
         //mPath = PathParser.createPathFromPathData(parser.getAttributeValue(NAME_SPACE, "pathData"))
