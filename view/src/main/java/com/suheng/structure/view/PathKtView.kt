@@ -15,6 +15,7 @@ class PathKtView : View {
     private val mBitmap: Bitmap
     private val mRect = Rect()
     private var mHeightMode: Int = 0
+    private var mWidthMode: Int = 0
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
@@ -37,13 +38,13 @@ class PathKtView : View {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        //Log.v("Wbj", "mBitmap.width = ${mBitmap.width}, mBitmap.height = ${mBitmap.height}")
-        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        //Log.v(Singleton.TAG, "mBitmap.width = ${mBitmap.width}, mBitmap.height = ${mBitmap.height}")
+        mWidthMode = MeasureSpec.getMode(widthMeasureSpec)
         mHeightMode = MeasureSpec.getMode(heightMeasureSpec)
         Log.v(
             Singleton.TAG,
             "widthMeasureSpec = $widthMeasureSpec, heightMeasureSpec = $heightMeasureSpec," +
-                    " widthMode = $widthMode, heightMode = $mHeightMode"
+                    " widthMode = $mWidthMode, heightMode = $mHeightMode"
         )
         /*Log.v(
             Singleton.TAG,
@@ -51,12 +52,21 @@ class PathKtView : View {
                     " MeasureSpec.UNSPECIFIED = ${MeasureSpec.UNSPECIFIED}"
         )*/
 
-        //测量模式AT_MOST、EXACTLY、UNSPECIFIED，取决于其所在的父布局中对子View测量模式的定义
-        var width = 0
-        if (widthMode == MeasureSpec.AT_MOST) { //wrap_content
-            width = mBitmap.width
-        } else if (widthMode == MeasureSpec.EXACTLY) { //xxdp、match_parent
-            width = MeasureSpec.getSize(widthMeasureSpec)
+        //测量模式AT_MOST、EXACTLY、UNSPECIFIED，取决于其所在的父布局中对子View测量模式的定义：
+        //在LinearLayout、FrameLayout等不可以滑动的ViewGroup中，AT_MOST对应wrap_content，EXACTLY对应match_parent或xxdp；
+        //在NestedScrollView、HorizontalScrollView、RecyclerView等可以滑动的ViewGroup中，不管设置的是wrap_content、match_parent
+        //或xxdp，测量模式都是MeasureSpec.UNSPECIFIED（以下有说明原因）。
+        val width: Int = if (mWidthMode == MeasureSpec.EXACTLY) {
+            MeasureSpec.getSize(widthMeasureSpec)
+        } else { //MeasureSpec.AT_MOST、MeasureSpec.UNSPECIFIED
+            mBitmap.width
+            /*if (mWidthMode == MeasureSpec.AT_MOST) {
+                mBitmap.width
+            } else {
+                //MeasureSpec.UNSPECIFIED：位于HorizontalScrollView、RecyclerView等可以左右滑动的ViewGroup中，
+                //因为可以左右滑动以展示全部的内容（有多少都可以显示得下），所以不再限制子View的宽度，让子View自己计算出相应的值
+                MeasureSpec.getSize(heightMeasureSpec) * 10
+            }*/
         }
 
         val height: Int = if (mHeightMode == MeasureSpec.EXACTLY) {
@@ -67,8 +77,8 @@ class PathKtView : View {
                 mBitmap.height
             } else {
                 //MeasureSpec.UNSPECIFIED：位于NestedScrollView、RecyclerView等可以上下滑动的ViewGroup中，
-                //因为可以上下滑动以展示全部的内容，所以不再限制子View的高度，让子View自己计算出相应的高度
-                MeasureSpec.getSize(heightMeasureSpec)
+                //因为可以上下滑动以展示全部的内容（有多少都可以显示得下），所以不再限制子View的高度，让子View自己计算出相应的值
+                MeasureSpec.getSize(heightMeasureSpec) * 10
             }*/
         }
 
@@ -79,11 +89,13 @@ class PathKtView : View {
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         Log.v(Singleton.TAG, "w = $w, h = $h, oldw = $oldw, oldh = $oldh")
-        if (mHeightMode == MeasureSpec.UNSPECIFIED) {
-            mRect.set(0, 0, mBitmap.width, h)
-        } else {
-            mRect.set(0, 0, w, h)
-        }
+        mRect.set(
+            0, 0,
+            if (mHeightMode == MeasureSpec.UNSPECIFIED) mBitmap.width else w,
+            if (mWidthMode == MeasureSpec.UNSPECIFIED) mBitmap.height else h
+        )
+
+        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {

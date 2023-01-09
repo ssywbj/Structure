@@ -24,7 +24,6 @@ class PathKtView2 : View {
     private val mPaint: Paint
     private var mScale = 1.0f
 
-    private val mRectPath = RectF()
     private lateinit var mViewportWidth: String
 
     constructor(context: Context) : this(context, null)
@@ -50,11 +49,6 @@ class PathKtView2 : View {
         val parser = resources.getXml(R.xml.vector_delete)
         //mPath = PathParser.createPathFromPathData(parser.getAttributeValue(NAME_SPACE, "pathData"))
 
-        var left = -1f
-        var right = -1f
-        var top = -1f
-        var bottom = -1f
-
         while (parser.eventType != XmlPullParser.END_DOCUMENT) {
             if (parser.eventType == XmlPullParser.START_TAG) {
                 val tagName = parser.name
@@ -79,23 +73,11 @@ class PathKtView2 : View {
                     mPath = PathParser.createPathFromPathData(
                         parser.getAttributeValue(NAME_SPACE1, "pathData")
                     )
-
-                    mRectPath.setEmpty()
-                    mPath.computeBounds(mRectPath, true)
-                    left = if (left == -1f) mRectPath.left else left.coerceAtMost(mRectPath.left)
-                    top = if (top == -1f) mRectPath.top else top.coerceAtMost(mRectPath.top)
-                    right =
-                        if (right == -1f) mRectPath.right else right.coerceAtLeast(mRectPath.right)
-                    bottom =
-                        if (bottom == -1f) mRectPath.bottom else bottom.coerceAtLeast(mRectPath.bottom)
                 }
             }
 
             parser.next()
         }
-
-        Log.v("Wbj", "rectF.toShortString() = ${mRectPath.toShortString()}")
-        Log.v("Wbj", "left = $left, top = $top, right = $right, bottom = $bottom")
 
         parser.close()
     }
