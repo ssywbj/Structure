@@ -16,15 +16,17 @@ class PathKtView2 : View {
 
     object Singleton {
         const val NAME_SPACE2 = "http://schemas.android.com/apk/res/android"
+        const val TAG = "PathKtView2"
     }
 
-    private val mRect = Rect()
     private val mBitmap: Bitmap
     private lateinit var mPath: Path
     private val mPaint: Paint
-    private var mScale = 1.0f
+    private var mScaleX = 1.0f
+    private var mScaleY = 1.0f
 
     private lateinit var mViewportWidth: String
+    private lateinit var mViewportHeight: String
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
@@ -58,11 +60,11 @@ class PathKtView2 : View {
                     val height = parser.getAttributeValue(Singleton.NAME_SPACE2, "height")
                     mViewportWidth =
                         parser.getAttributeValue(NAME_SPACE, "viewportWidth")
-                    val viewportHeight =
+                    mViewportHeight =
                         parser.getAttributeValue(NAME_SPACE, "viewportHeight")
                     Log.d(
-                        "Wbj",
-                        "vector: width = $width, height = $height, viewportWidth = $mViewportWidth, viewportHeight = $viewportHeight"
+                        Singleton.TAG,
+                        "vector: width = $width, height = $height, viewportWidth = $mViewportWidth, viewportHeight = $mViewportHeight"
                     )
                 }
 
@@ -82,13 +84,43 @@ class PathKtView2 : View {
         parser.close()
     }
 
+    private var mWidthMode: Int = 0
+    private var mHeightMode: Int = 0
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        mWidthMode = MeasureSpec.getMode(widthMeasureSpec)
+        mHeightMode = MeasureSpec.getMode(heightMeasureSpec)
+
+        val width = if (mWidthMode == MeasureSpec.EXACTLY) {
+            MeasureSpec.getSize(widthMeasureSpec)
+        } else {
+            144
+        }
+
+        val height = if (mHeightMode == MeasureSpec.EXACTLY) {
+            MeasureSpec.getSize(heightMeasureSpec)
+        } else {
+            144
+        }
+
+        Log.v(
+            Singleton.TAG,
+            "width = $width, height = $height, mWidthMode = $mWidthMode, mHeightMode = $mHeightMode"
+        )
+        setMeasuredDimension(width, height)
+    }
+
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        mRect.set(0, 0, w, h)
-
-        //mScale = 2f
-        mScale = w.toFloat() / mViewportWidth.toFloat()
-        Log.v("Wbj", "onSizeChanged: w = $w, h = $h, oldw = $oldw, oldh = $oldh, mScale = $mScale")
+        mScaleX =
+            if (mHeightMode == MeasureSpec.UNSPECIFIED) 2f else w.toFloat() / mViewportWidth.toFloat()
+        mScaleY =
+            if (mWidthMode == MeasureSpec.UNSPECIFIED) 2f else h.toFloat() / mViewportHeight.toFloat()
+        Log.v(
+            Singleton.TAG,
+            "onSizeChanged: w = $w, h = $h, oldw = $oldw, oldh = $oldh, mScaleX = $mScaleX, mScaleY = $mScaleY"
+        )
 
         invalidate()
     }
@@ -97,9 +129,8 @@ class PathKtView2 : View {
         super.onDraw(canvas)
         canvas.drawBitmap(mBitmap, 0f, 0f, null)
         //canvas.drawBitmap(mBitmap, null, mRect, null) //绘制位图当宽高缩放时有锯齿
-
         canvas.save()
-        canvas.scale(mScale, mScale)
+        canvas.scale(mScaleX, mScaleY)
         canvas.drawPath(mPath, mPaint) //绘制路径当宽高缩放时无锯齿
         canvas.restore()
     }
