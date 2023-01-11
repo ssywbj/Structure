@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import androidx.core.graphics.PathParser
 import com.suheng.structure.view.kt.NAME_SPACE1
@@ -22,11 +23,19 @@ class PathKtView2 : View {
     private val mBitmap: Bitmap
     private lateinit var mPath: Path
     private val mPaint: Paint
-    private var mScaleX = 1.0f
-    private var mScaleY = 1.0f
+    private var mScaleX = 1f
+    private var mScaleY = 1f
+
+    private var mWidthMode: Int = 0
+    private var mHeightMode: Int = 0
 
     private lateinit var mViewportWidth: String
     private lateinit var mViewportHeight: String
+
+    private var mOriginWith: Int = 0
+    private var mOriginHeight: Int = 0
+    private var mOriginScaleX = 1f
+    private var mOriginScaleY = 1f
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
@@ -66,6 +75,39 @@ class PathKtView2 : View {
                         Singleton.TAG,
                         "vector: width = $width, height = $height, viewportWidth = $mViewportWidth, viewportHeight = $mViewportHeight"
                     )
+
+                    val regex = Regex("^\\d+(\\.\\d+)?(dp|dip)$")
+                    val regexNumber = Regex("^\\d+(\\.\\d+)?$")
+                    val regexLetter = Regex("[a-z]+")
+                    if (width.matches(regex)) {
+                        val split = width.split(regexLetter)
+                        /*for (s in split) {
+                            Log.d(Singleton.TAG, "s = $s, ${split.size}")
+                        }*/
+                        if (0 in split.indices && split[0].matches(regexNumber)) {
+                            mOriginWith = TypedValue.applyDimension(
+                                TypedValue.COMPLEX_UNIT_DIP,
+                                split[0].toFloat(),
+                                resources.displayMetrics
+                            ).toInt()
+                        }
+                    }
+                    if (height.matches(regex)) {
+                        val split = height.split(regexLetter)
+                        if (0 in split.indices && split[0].matches(regexNumber)) {
+                            mOriginHeight = TypedValue.applyDimension(
+                                TypedValue.COMPLEX_UNIT_DIP,
+                                split[0].toFloat(),
+                                resources.displayMetrics
+                            ).toInt()
+                        }
+                    }
+                    mOriginScaleX = mOriginWith.toFloat() / mViewportWidth.toFloat()
+                    mOriginScaleY = mOriginHeight.toFloat() / mViewportHeight.toFloat()
+                    Log.d(
+                        Singleton.TAG,
+                        "mOriginWith = $mOriginWith, mOriginHeight = $mOriginHeight, mOriginScaleX = $mOriginScaleX, mOriginScaleY = $mOriginScaleY"
+                    )
                 }
 
                 if ("path" == tagName) {
@@ -84,9 +126,6 @@ class PathKtView2 : View {
         parser.close()
     }
 
-    private var mWidthMode: Int = 0
-    private var mHeightMode: Int = 0
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         mWidthMode = MeasureSpec.getMode(widthMeasureSpec)
@@ -95,13 +134,13 @@ class PathKtView2 : View {
         val width = if (mWidthMode == MeasureSpec.EXACTLY) {
             MeasureSpec.getSize(widthMeasureSpec)
         } else {
-            144
+            mOriginWith
         }
 
         val height = if (mHeightMode == MeasureSpec.EXACTLY) {
             MeasureSpec.getSize(heightMeasureSpec)
         } else {
-            144
+            mOriginHeight
         }
 
         Log.v(
@@ -114,9 +153,9 @@ class PathKtView2 : View {
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         mScaleX =
-            if (mHeightMode == MeasureSpec.UNSPECIFIED) 2f else w.toFloat() / mViewportWidth.toFloat()
+            if (mHeightMode == MeasureSpec.UNSPECIFIED) mOriginScaleX else w.toFloat() / mViewportWidth.toFloat()
         mScaleY =
-            if (mWidthMode == MeasureSpec.UNSPECIFIED) 2f else h.toFloat() / mViewportHeight.toFloat()
+            if (mWidthMode == MeasureSpec.UNSPECIFIED) mOriginScaleY else h.toFloat() / mViewportHeight.toFloat()
         Log.v(
             Singleton.TAG,
             "onSizeChanged: w = $w, h = $h, oldw = $oldw, oldh = $oldh, mScaleX = $mScaleX, mScaleY = $mScaleY"

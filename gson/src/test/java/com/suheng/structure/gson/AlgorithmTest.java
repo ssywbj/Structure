@@ -357,6 +357,19 @@ public class AlgorithmTest {
         } else {
             System.out.println("不符合规范");
         }
+
+        String dimen = "48.34dip";
+        //String dimen = "48.0dip";
+        //String dimen = "48dp";
+        //boolean matches = dimen.matches("^\\d+(\\.\\d+)(dp|dip)$");
+        boolean matches = dimen.matches("^\\d+(\\.\\d+)?(dp|dip)$");
+        System.out.println("matches: " + matches);
+        if (matches) {
+            String[] split = dimen.split("[a-z]+");
+            for (String s : split) {
+                System.out.println("s: " + s + ", " + s.length() + ", " + split.length);
+            }
+        }
     }
 
     @Test
