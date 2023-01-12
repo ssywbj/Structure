@@ -62,11 +62,11 @@ public class GuaguakaView1 extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mRectF.set(0, 0, w, mBitmapOver.getHeight());
-        mBitmapDst = Bitmap.createBitmap(w, mBitmapOver.getHeight(), Bitmap.Config.ARGB_8888);
+        mRectF.set(0, 0, w, h);
+        mBitmapDst = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvasDst = new Canvas(mBitmapDst);
 
-        mBitmapResult = Bitmap.createBitmap(w, mBitmapOver.getHeight(), Bitmap.Config.ARGB_8888);
+        mBitmapResult = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mBitmapResult);
         canvas.drawColor(Color.WHITE);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -74,7 +74,9 @@ public class GuaguakaView1 extends View {
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setColor(Color.BLUE);
         paint.setTextSize(40);
-        canvas.drawText("中奖结果", w / 2f, mBitmapOver.getHeight() / 2f, paint);
+        canvas.drawText("中奖结果", w / 2f, h / 2f, paint);
+
+        invalidate();
     }
 
     private float mX, mY;
@@ -115,14 +117,9 @@ public class GuaguakaView1 extends View {
                 invalidate();
                 break;
         }
-        //performClick();
+
         return super.onTouchEvent(event);
     }
-
-    /*@Override
-    public boolean performClick() {
-        return super.performClick();
-    }*/
 
     @Override
     protected void onDraw(Canvas canvas) {

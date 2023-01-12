@@ -19,12 +19,48 @@
         android:background="@android:color/holo_red_light"
         android:text="TextView" />-->
 
-    <com.suheng.structure.view.PathKtView2
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.suheng.structure.view.PathKtView2
+            android:id="@+id/kt_path_view2"
+            android:layout_width="match_parent"
+            android:layout_height="88dp"
+            android:layout_margin="10dp"
+            android:background="@android:color/holo_purple" />
+
+        <com.suheng.structure.view.GuaguakaView2
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:textSize="33sp"
+            android:background="@android:color/holo_red_light"
+            android:text="TextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTe
+            xtViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTex
+            tViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewT
+            extViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTe
+            xtViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTex
+            tViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewT
+            extViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTe
+            xtViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTex
+            tViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewT
+            extViewTextViewTextViewTextViewTextViewTextView" />
+    </LinearLayout>
+
+
+    <!--<com.suheng.structure.view.PathKtView2
         android:id="@+id/kt_path_view2"
         android:layout_width="match_parent"
         android:layout_height="88dp"
         android:layout_margin="10dp"
-        android:background="@android:color/holo_purple" />
+        android:background="@android:color/holo_purple" />-->
 </androidx.core.widget.NestedScrollView>
 
     <!--<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
