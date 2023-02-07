@@ -1,25 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="6dp">
 
-    <!--<SeekBar
+    <SeekBar
         android:id="@+id/kt_seek_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp" />-->
+        android:layout_margin="10dp" />
 
-    <!--<com.suheng.structure.view.PathKtView
+    <com.suheng.structure.view.PathKtView
         android:id="@+id/kt_path_view"
-        android:layout_width="match_parent"
-        android:layout_height="88dp"
-        android:layout_margin="10dp"
+        android:layout_width="@dimen/path_delete_icon"
+        android:layout_height="@dimen/path_delete_icon"
+        android:layout_margin="5dp"
         android:background="@android:color/holo_red_light"
-        android:text="TextView" />-->
+        android:text="TextView" />
 
-    <LinearLayout
+    <com.suheng.structure.view.PathKtView2
+        android:id="@+id/kt_path_view2"
+        android:layout_width="@dimen/path_delete_icon"
+        android:layout_height="@dimen/path_delete_icon"
+        android:layout_margin="5dp"
+        android:background="@android:color/holo_purple" />
+
+    <ImageView
+        android:id="@+id/kt_path_iv"
+        android:layout_width="@dimen/path_delete_icon"
+        android:layout_height="@dimen/path_delete_icon"
+        android:layout_margin="5dp"
+        android:background="@android:color/holo_red_light" />
+
+    <!--<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -52,16 +66,9 @@
             xtViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTex
             tViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewT
             extViewTextViewTextViewTextViewTextViewTextView" />
-    </LinearLayout>
+    </LinearLayout>-->
 
-
-    <!--<com.suheng.structure.view.PathKtView2
-        android:id="@+id/kt_path_view2"
-        android:layout_width="match_parent"
-        android:layout_height="88dp"
-        android:layout_margin="10dp"
-        android:background="@android:color/holo_purple" />-->
-</androidx.core.widget.NestedScrollView>
+</LinearLayout>
 
     <!--<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
