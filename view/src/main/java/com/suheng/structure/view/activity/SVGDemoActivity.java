@@ -45,7 +45,10 @@ public class SVGDemoActivity extends AppCompatActivity {
     //https://juejin.cn/post/6844903523696525325
     //https://www.cnblogs.com/yuhanghzsd/p/5466846.html
     //https://blog.csdn.net/weixin_41620505/article/details/107255168
+
     //https://www.jianshu.com/p/4707a4738a51
+    //https://zhuanlan.zhihu.com/p/61678845
+    //https://developer.android.com/guide/topics/graphics/drawable-animation?hl=zh-cn
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
