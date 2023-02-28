@@ -6,6 +6,8 @@ struct student{
     float score;
 } stu, stu2, stu3 = {"Wbj3", 25, 100.56}, *pstu3 = &stu3; //struct实例、指针
 
+void average(struct student *pstu, int len); //struct作为函数形参时最好使用结构体指针作为参数，可避免传送时间长和开销空间大风险
+
 int main()
 {
     stu.name = "Wbj";
@@ -37,7 +39,7 @@ int main()
         sch2[i].score = (90 + i);
         printf("sch2[%d] name: %s, score: %.1f\n", i, sch2[i].name, sch2[i].score);
     }
-    int len = sizeof(sch) / sizeof(struct school);
+    int len = sizeof(sch) / sizeof(struct school); //求struct数组长度
     printf("struct array len: %d\n", len);
     for(psch = sch;psch < sch + len;psch++)
     {
@@ -49,6 +51,18 @@ int main()
     } anonymous = {"anonymous struct"}; //匿名struct
     printf("anonymous name: %s\n", anonymous.name);
 
+    struct student stus[] = {stu, stu2, stu3};
+    average(stus, sizeof(stus) / sizeof(struct student));
+
     return 0;
 }
 
+void average(struct student *pstu, int len)
+{
+    float sum;
+    for(int i = 0; i < len; i++)
+    {
+        sum += (pstu + i)->score;
+    }
+    printf("students: %d, score sum: %.1f, average: %f\n", len, sum, sum / len);
+}
