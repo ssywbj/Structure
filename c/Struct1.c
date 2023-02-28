@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 struct student{
     char *name;
@@ -35,7 +36,13 @@ int main()
     printf("sch[0] name: %s, score: %.1f\n", sch[0].name, sch[0].score);
     for(int i = 0; i<2; i++)
     {
-        sch2[i].name = "Sss";
+        char istr[4];
+        sprintf(istr, "%d", i + 100);
+        //printf("istr: %s\n", istr);
+        char str[7] = "Sss";
+        strcat(str, istr);
+        //sch2[i].name = "Sss";
+        sch2[i].name = str;
         sch2[i].score = (90 + i);
         printf("sch2[%d] name: %s, score: %.1f\n", i, sch2[i].name, sch2[i].score);
     }
@@ -59,7 +66,7 @@ int main()
 
 void average(struct student *pstu, int len)
 {
-    float sum;
+    float sum = 0;
     for(int i = 0; i < len; i++)
     {
         sum += (pstu + i)->score;
