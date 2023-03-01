@@ -34,10 +34,10 @@ int main()
     sch[0].name = "Ssy yy";
     sch[0].score = 100;
     printf("sch[0] name: %s, score: %.1f\n", sch[0].name, sch[0].score);
-    for(int i = 0; i<2; i++)
+    for(int i = 0; i < 2; i++)
     {
         char istr[4];
-        sprintf(istr, "%d", i + 100);
+        sprintf(istr, "%d", i + 100); //integer to string
         //printf("istr: %s\n", istr);
         char str[7] = "Sss";
         strcat(str, istr);
