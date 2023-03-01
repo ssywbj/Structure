@@ -45,26 +45,26 @@ int main()
     //但一旦定义了就不能再改变了，所以变长数组的容量也是不能扩大或缩小的，它仍然是静态数组。
     char str3[str3len];
     strcpy(str3, str); //先通过strcpy函数向数组赋值
-    printf("before strcat str3: %s, len: %llu\n", str3, strlen(str3));
+    printf("before strcat str3: %s, len: %lu\n", str3, strlen(str3));
     strcat(str3, ch0); //再向数组追加内容
-    printf("after strcat str3: %s, len: %llu\n", str3, strlen(str3));
+    printf("after strcat str3: %s, len: %lu\n", str3, strlen(str3));
 
     puts("-----------dynamic array: malloc、 realloc-----------");
     //动态数组：用动态分配内存法实现变长数组，然后使用realloc实现内存的再次分配，此时的数组可以看成是动态数组。
     //T* arr = (T*)malloc(len * sizeof(T)); //T是类型，如int；len变量是长度
     char* str4 = (char*) malloc(str3len * sizeof(char)); //malloc分配堆内存空间
-    printf("str3len: %d, str3len * sizeof(char): %llu\n", str3len, str3len * sizeof(char));
+    printf("str3len: %d, str3len * sizeof(char): %lu\n", str3len, str3len * sizeof(char));
     strcpy(str4, str); //先通过strcpy函数赋值
-    printf("before strcat str4: %s, len: %llu\n", str4, strlen(str4));
+    printf("before strcat str4: %s, len: %lu\n", str4, strlen(str4));
     strcat(str4, ch0); //再追加
-    printf("after strcat str4: %s, len: %llu\n", str4, strlen(str4));
+    printf("after strcat str4: %s, len: %lu\n", str4, strlen(str4));
     //free(str4);
 
     char append[] = "Suheng Children";
     //不断向str4追加内容，但str4的内存空间并不足以显示那么多内容，此时要需要为str4扩容
     str4 = (char*) realloc(str4, (str3len + strlen(append)) * sizeof(char)); //realloc重新分配堆内存空间
     strcat(str4, "Suheng Children");
-    printf("over str4: %s, len: %llu\n", str4, strlen(str4));
+    printf("over str4: %s, len: %lu\n", str4, strlen(str4));
 
     free(str4); //务必使用free()函数释放内存
 
