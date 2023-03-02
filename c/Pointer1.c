@@ -1,10 +1,27 @@
 #include <stdio.h>
 
-int max(int a, int b);
+//int max(int a, int b);
 
 int max(int x, int y)
 {
     return (x > y) ? x : y;
+}
+
+int min(int x, int y)
+{
+    return (x < y) ? x : y;
+}
+
+int one(int x)
+{
+    return x;
+}
+
+void pfunParams(int (*pfun)(int, int), int (*pfun2)(int)){
+    int a = 9, b = 10;
+    int pfunValue = (*pfun)(a, b);
+    int pfunValue2 = (*pfun2)(a);
+    printf("pfunValue: %d, pfunValue2: %d\n", pfunValue, pfunValue2);
 }
 
 int main()
@@ -47,6 +64,29 @@ int main()
     scanf("%d%d", &x, &y); //scanf:输入函数,x:保存输入的变量,&x:存放的地址
     int z = max(x, y);
     printf("input x: %d, y: %d, max: %d\n", x, y, z);
-    
+
+    //指向函数的指针:Type (*pointer)(param list);
+    //int (*pfun)(int x, int y); //定义函数指针变量pfun
+    //pfun = max; //pfun指向max函数所在内存区域的首地址
+    int (*pfun)(int, int) = max;
+    z = (*pfun)(x, y);
+    printf("input x: %d, y: %d, max: %d, pfun addr: %p\n", x, y, z, pfun);
+    pfun = min;
+    //pfun = min2; //参数个数不匹配，不能被赋值
+    z = (*pfun)(x, y);
+    printf("input x: %d, y: %d, min: %d, pfun addr: %p\n", x, y, z, pfun);
+    printf("fun min addr: %p, fun max addr: %p\n", min, max);
+
+    pfunParams(max, one);
+
+    int *returnPointer(int *a, int *b); //返回值是指针的函数
+    int *addr = returnPointer(&x, &y);
+    printf("x addr: %p, y addr: %p\n", &x, &y);
+    printf("return pointer: %p, *addr: %d\n", addr, *addr);
+
     return 0;
+}
+
+int *returnPointer(int *a, int *b){
+    return (*a > *b) ? a : b;
 }
