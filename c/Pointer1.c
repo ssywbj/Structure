@@ -21,7 +21,7 @@ void pfunParams(int (*pfun)(int, int), int (*pfun2)(int)){
     int a = 9, b = 10;
     int pfunValue = (*pfun)(a, b);
     int pfunValue2 = (*pfun2)(a);
-    printf("pfunValue: %d, pfunValue2: %d\n", pfunValue, pfunValue2);
+    printf("pfunParams, Value: %d, Value2: %d\n", pfunValue, pfunValue2);
 }
 
 int main()
