@@ -1,5 +1,12 @@
 #include <stdio.h>
 
+int max(int a, int b);
+
+int max(int x, int y)
+{
+    return (x > y) ? x : y;
+}
+
 int main()
 {
     int a = 100;
@@ -36,5 +43,10 @@ int main()
     }
     printf("\n");
 
+    int x, y;
+    scanf("%d%d", &x, &y); //scanf:输入函数,x:保存输入的变量,&x:存放的地址
+    int z = max(x, y);
+    printf("input x: %d, y: %d, max: %d\n", x, y, z);
+    
     return 0;
 }
