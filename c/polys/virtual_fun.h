@@ -1,10 +1,10 @@
 #ifndef VIRTUAL_FUN
 #define VIRTUAL_FUN
 
-//typedef void (*play)();
+typedef void (*play)();
 
 typedef struct behavior {
-    //play pl;
+    play pl;
 } beh;
 
 #endif

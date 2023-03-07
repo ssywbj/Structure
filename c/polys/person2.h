@@ -10,8 +10,10 @@ struct person2 {
     beh bh;
 };
 
-void pplay(beh (*bh)());
+void bplay();
 
-void play(beh *bh);
+//void pplay(beh (*bh)());
+
+//void play(beh *bh);
 
 #endif

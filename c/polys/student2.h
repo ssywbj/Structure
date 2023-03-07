@@ -8,4 +8,6 @@ struct student2 {
     float score;
 };
 
+void splay();
+
 #endif
