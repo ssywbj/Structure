@@ -12,8 +12,6 @@ struct person2 {
 
 void bplay();
 
-//void pplay(beh (*bh)());
-
-//void play(beh *bh);
+typedef void (*pointer)(); //利用指向函数的指针实现方法的重载
 
 #endif

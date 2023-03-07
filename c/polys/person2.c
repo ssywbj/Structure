@@ -2,22 +2,13 @@
 
 #include "person2.h"
 
-/*
-void pplay(beh (*bh)())
-{
-    puts("-----parent playing!!!!-----");
-};
-
-void play(beh *bh)
-{
-    puts("-----parent playing-----");
-};
-
-beh pl(){}
-*/
-
 void bplay(){
     puts("parent playing...");
+}
+
+void bplay2(pointer p)
+{
+    p();
 }
 
 /*
@@ -29,10 +20,8 @@ int main()
     per2.bh.pl = bplay;
     per2.bh.pl();
 
-    //play(&per2.bh);
-
-    //beh (*b)() = pl;
-    //pplay(b);
+    bplay2(bplay);
 
     return 0;
-}*/
+}
+*/

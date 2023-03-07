@@ -66,7 +66,7 @@ int main()
     printf("input x: %d, y: %d, max: %d\n", x, y, z);
 
     //指向函数的指针:Type (*pointer)(param list);
-    //int (*pfun)(int x, int y); //定义函数指针变量pfun
+    //int (*pfun)(int x, int y); //定义函数指针变量pfun，它可以指向形参是两个int类型且返回值是int类型的任意函数
     //pfun = max; //pfun指向max函数所在内存区域的首地址
     int (*pfun)(int, int) = max;
     z = (*pfun)(x, y);

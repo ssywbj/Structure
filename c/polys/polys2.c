@@ -26,5 +26,10 @@ int main()
     pl = tch.psn.bh.pl;
     pl();
 
+    extern void bplay2(pointer p);
+    bplay2(bplay);
+    bplay2(splay);
+    bplay2(tplay);
+
     return 0;
 }
