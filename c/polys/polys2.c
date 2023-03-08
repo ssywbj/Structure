@@ -14,7 +14,7 @@ int main()
     pl = per2.bh.pl;
     pl();
 
-    struct student2 stu2 = {{"Suheng", 6 , splay}, 99.9};
+    struct student stu2 = {{"Suheng", 6 , splay}, 99.9};
     printf("student, name: %s, age: %d, score: %.1f\n", stu2.psn.name, stu2.psn.age, stu2.score);
     //stu2.psn.bh.pl();
     pl = stu2.psn.bh.pl;
@@ -25,11 +25,6 @@ int main()
     //tch.psn.bh.pl();
     pl = tch.psn.bh.pl;
     pl();
-
-    extern void bplay2(pointer p);
-    bplay2(bplay);
-    bplay2(splay);
-    bplay2(tplay);
 
     return 0;
 }

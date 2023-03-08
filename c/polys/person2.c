@@ -6,11 +6,6 @@ void bplay(){
     puts("parent playing...");
 }
 
-void bplay2(pointer p)
-{
-    p();
-}
-
 /*
 int main()
 {
@@ -19,8 +14,6 @@ int main()
     printf("person2, name: %s, age: %d \n", per2.name, per2.age);
     per2.bh.pl = bplay;
     per2.bh.pl();
-
-    bplay2(bplay);
 
     return 0;
 }
