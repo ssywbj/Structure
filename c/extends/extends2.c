@@ -13,11 +13,14 @@ int main()
     struct teacher tch = {psn, 15487};
     printf("teacher, name: %s, age: %d, wages: %.1f\n", tch.psn.name, tch.psn.age, tch.wages);
 
+    puts("-------------------------------------------");
+
     struct person *pper;
-    pper = &stu.psn;
+    //pper = &stu.psn;
+    pper = (struct person *)&stu;
     printf("pstu, name: %s, age: %d\n", pper->name, pper->age);
-    //printf("psn, name: %s, age: %d, score: %.1f\n", pper->name, pper->age, pper->score);
-    pper = &tch.psn;
+    //pper = &tch.psn;
+    pper = (struct person *)&tch;
     printf("ptch, name: %s, age: %d\n", pper->name, pper->age);
 
     return 0;
