@@ -6,40 +6,22 @@ int main()
     const int len = sizeof(arr) / sizeof(arr[0]);
     for(int i = 0; i < len; i++)
     {
-        printf("%d ", arr[i]);
+        printf("%-2d", arr[i]);
     }
     printf("\n");
 
     for(int j = 1; j < len; j++)
     {
         int key = arr[j];
-        int i = j - 1;
-        while(i >= 0 && arr[i] > key)
+        int i = j - 1; //前面(j - 1)个数是已经排序好的
+        while(i >= 0 && arr[i] > key) //依次取出前面的数和比较的数比较
         {
-            arr[i + 1] = arr[i];
-            i--;
+            arr[i + 1] = arr[i]; //如果前面的数大于key,则它的位置被后移
+            i--; //--:在排好的数中从后向前取出数据
         }
 
-        arr[i + 1] = key;
+        arr[i + 1] = key; //被比较的数放在合适的位置
     }
-
-    /*for(int j = 1; j < 3; j++)
-    {
-        int key = arr[j];
-        int i = 0;
-        while(i < j)
-        {
-            if(arr[i] > key)
-            {
-                arr[i + 1] = arr[i];
-            }
-
-            i++;
-            printf("i: %d, v: %d\n", i, arr[i]);
-        }
-
-        arr[i - 1] = key;
-    }*/
 
     for(int i = 0; i < len; i++)
     {
