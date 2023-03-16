@@ -90,7 +90,7 @@ void merge2(int *arr, int p, int q, int r)
 
 void merge_sort(int *arr, int p, int r)
 {
-    printf("p: %d, r: %d\n", p, r);
+    //printf("p: %d, r: %d\n", p, r);
 
     if(p < r)
     {
@@ -129,21 +129,28 @@ void mergeSort_conquer(int *array, int left, int mid, int right, int *temp) {
 }
 
 //分治-分
-void mergeSort_divide(int *array, int left, int right, int *temp) {
+int mergeSort_divide(int *array, int left, int right, int *temp, char *proc) {
+    printf("proc: %s, left: %d, right: %d\n", proc, left, right);
+
+    int mid = 0;
     if (left < right) {
-        int mid = left + (right - left) / 2;
+        mid = left + (right - left) / 2;
         //左边归并排序
-        mergeSort_divide(array, left, mid, temp);
+        mergeSort_divide(array, left, mid, temp, "left");
         //右边归并排序
-        mergeSort_divide(array, mid + 1, right, temp);
+        //mergeSort_divide(array, mid + 1, right, temp, "right");
         //合并两个有序序列
-        mergeSort_conquer(array, left, mid, right, temp);
+        //mergeSort_conquer(array, left, mid, right, temp);
     }
+    printf("proc: %s, left: %d, right: %d, mid: %d\n", proc, left, right, mid);
+
+    return mid;
 }
 
 void mergeSort(int *array, int size) {
     int *temp = (int *) malloc(sizeof(int) * size);
-    mergeSort_divide(array, 0, size - 1, temp);
+    int rValue = mergeSort_divide(array, 0, size - 1, temp, NULL);
+    printf("mergeSort, rValue: %d\n", rValue);
 }
 
 int main()
