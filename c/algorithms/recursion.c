@@ -1,23 +1,37 @@
 #include <stdio.h>
 
-int sum(int n) {
+int sum_rec(int n) {
     if(n == 1) {
         return 1;
     }
 
-    return n + sum(n - 1);
+    return n + sum_rec(n - 1);
 }
 
-int sum_tail(int n, int sum) { //tail recursion
+int sum_cyc(int n) {
+    int sum = 0;
+    while(n > 0){
+        sum += n;
+        n--;
+    }
+
+    return sum;
+}
+
+int sum_rec_tail(int n, int sum) { //tail recursion
     if(n == 0) {
         return sum;
     }
 
-    sum += n; //direct calc result
-    return sum_tail(n - 1, sum);
+    sum += n; //direct calc result，尾递归的本质是循环
+    return sum_rec_tail(n - 1, sum);
 }
 
-int fibonacci_item(unsigned int n) { //F0=0, F1=1, Fn=F(n-1)+F(n-2)(n>=2)
+int sum_rec_tail_invoke(int n) { //invoke tail recursion
+    return sum_rec_tail(n, 0);
+}
+
+unsigned int fibonacci_item_rec(unsigned int n) { //F0=0, F1=1, Fn=F(n-1)+F(n-2)(n>=2)
     if(n == 0) { //nothing item, F0
         return 0;
     }
@@ -26,22 +40,36 @@ int fibonacci_item(unsigned int n) { //F0=0, F1=1, Fn=F(n-1)+F(n-2)(n>=2)
         return 1;
     }
 
-    return fibonacci_item(n - 1) + fibonacci_item(n - 2); //Fn(n>=2)
+    return fibonacci_item_rec(n - 1) + fibonacci_item_rec(n - 2); //Fn(n>=2)
 }
 
-int fibonacci_item_tail(unsigned int n, unsigned int f1, unsigned int f2) { //F0=0, F1=1, Fn=F(n-1)+F(n-2)(n>=2)
-    if(n == 0) { //nothing item, F0
-        return f1;
+unsigned int fibonacci_item_cyc(unsigned int n) { //F0=0, F1=1, Fn=F(n-1)+F(n-2)(n>=2)
+    int tmp = 0, f = 0, f_next = 1;
+    while(n > 0){
+        tmp = f;
+        f = f_next;
+        f_next += tmp;
+
+        n--;
+        printf("n = %d, tmp = %d, f = %d, f_next = %d\n", n, tmp, f, f_next);
     }
 
-    if(n == 1) { //first item, F1
-        return f2;
+    return f;
+}
+
+unsigned int fibonacci_item_rec_tail(unsigned int n, unsigned int f, unsigned int f_next) {
+    if(n == 0) {
+        return f;
     }
 
-    int tmp = f1;
-    f1 = f2;
-    f2 += tmp;
-    return fibonacci_item_tail(n - 1, f1, f2); //Fn(n>=2)
+    int tmp = f;
+    f = f_next;
+    f_next += tmp;
+    return fibonacci_item_rec_tail(n - 1, f, f_next);
+}
+
+unsigned int fibonacci_item_rec_tail_invoke(unsigned int n) {
+    return fibonacci_item_rec_tail(n, 0, 1);
 }
 
 int *fibonacci(unsigned int n, int *arr) { //F0=0, F1=1, Fn=F(n-1)+F(n-2)(n>=2)
@@ -55,20 +83,22 @@ int *fibonacci(unsigned int n, int *arr) { //F0=0, F1=1, Fn=F(n-1)+F(n-2)(n>=2)
         return arr;
     }
 
-    *(arr + n - 1) = fibonacci_item(n - 1) + fibonacci_item(n - 2);
+    *(arr + n - 1) = fibonacci_item_rec(n - 1) + fibonacci_item_rec(n - 2);
     return fibonacci(n - 1, arr); //Fn(n>=2)
 }
 
 int main() {
-    int result = sum(9);
-    int result_tail = sum_tail(9, 0);
-    printf("result: %d, result_tail: %d\n", result, result_tail);
+    const int add = 11;
+    int result = sum_rec(add);
+    int result_cyc = sum_cyc(add);
+    int result_rec_tail = sum_rec_tail_invoke(add);
+    printf("result: %d, result_cyc: %d, result_rec_tail: %d\n", result, result_cyc, result_rec_tail);
 
-    const int item = 5, item2 = item;
-    int fib_item = fibonacci_item(item);
-    printf("fibonacci_item: %d\n", fib_item);
-    int fib_item_tail = fibonacci_item_tail(item2, 0, 1);
-    printf("fibonacci_item_tail: %d\n", fib_item_tail);
+    const int item = 14, item2 = item;
+    int fib_item_rec = fibonacci_item_rec(item);
+    int fib_item_cyc = fibonacci_item_cyc(item);
+    int fib_item_rec_tail = fibonacci_item_rec_tail_invoke(item2);
+    printf("fib_item_rec: %d, fib_item_cyc: %d, fib_item_rec_cyc: %d\n", fib_item_rec, fib_item_cyc, fib_item_rec_tail);
 
     printf("-------fibonacci array---------\n");
     int arr[item2];
