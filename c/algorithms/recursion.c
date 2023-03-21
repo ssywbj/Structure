@@ -72,6 +72,22 @@ unsigned int fibonacci_item_rec_tail_invoke(unsigned int n) {
     return fibonacci_item_rec_tail(n, 0, 1);
 }
 
+int *fibonacci_cyc(unsigned int n, int *arr) {
+    int tmp = 0, f = 0, f_next = 1;
+    unsigned int index = 0;
+    while(n > 0){
+        tmp = f;
+        f = f_next;
+        f_next += tmp;
+
+        n--;
+        *(arr + index) = f;
+        index++;
+    }
+
+    return arr;
+}
+
 int *fibonacci(unsigned int n, int *arr) { //F0=0, F1=1, Fn=F(n-1)+F(n-2)(n>=2)
     if(n == 0) { //nothing item, F0
         *arr = 1;
@@ -94,22 +110,19 @@ int main() {
     int result_rec_tail = sum_rec_tail_invoke(add);
     printf("result: %d, result_cyc: %d, result_rec_tail: %d\n", result, result_cyc, result_rec_tail);
 
-    const int item = 14, item2 = item;
+    const int item = 6;
     int fib_item_rec = fibonacci_item_rec(item);
     int fib_item_cyc = fibonacci_item_cyc(item);
-    int fib_item_rec_tail = fibonacci_item_rec_tail_invoke(item2);
+    int fib_item_rec_tail = fibonacci_item_rec_tail_invoke(item);
     printf("fib_item_rec: %d, fib_item_cyc: %d, fib_item_rec_cyc: %d\n", fib_item_rec, fib_item_cyc, fib_item_rec_tail);
 
-    printf("-------fibonacci array---------\n");
-    int arr[item2];
-    //fibonacci(item2, arr);
-    //for(int *i = arr, j = 1;i < (arr + item2); i++, j++){
-    //    *i = j;
-    //}
-    //for(int *i = arr;i < (arr + item2); i++){
-    //    printf("%d ", *i);
-    //}
-    //printf("\n");
+    printf("-------fibonacci array---------, item = %d\n", item);
+    int arr[item];
+    fibonacci_cyc(item, arr);
+    for(int *i = arr;i < (arr + item);i++){
+        printf("%d ", *i);
+    }
+    printf("\n");
     //printf("over: %d, item2: %d\n", *(arr - 1), item2);
 
     return 0;

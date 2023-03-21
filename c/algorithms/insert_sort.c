@@ -8,12 +8,13 @@ int main()
     {
         printf("%-2d", arr[i]);
     }
+    printf(", array len: %d", len);
     printf("\n");
 
     for(int j = 1; j < len; j++)
     {
         int key = arr[j];
-        int i = j - 1; //前面(j - 1)个数是已经排序好的
+        int i = j - 1; //前面j个数是已经排序好的
         while(i >= 0 && arr[i] > key) //依次取出前面的数和比较的数比较，升序
         //while(i >= 0 && arr[i] < key) //依次取出前面的数和比较的数比较，降序
         {
@@ -22,13 +23,14 @@ int main()
         }
 
         arr[i + 1] = key; //被比较的数放在合适的位置
-    }
 
-    for(int i = 0; i < len; i++)
-    {
-        printf("%d ", arr[i]);
+        printf("j = %d, key = %d-->", j, key);
+        for(int i = 0; i < len; i++)
+        {
+            printf("%d ", arr[i]);
+        }
+        printf("\n");
     }
-    printf("\n");
 
     return 0;
 }
