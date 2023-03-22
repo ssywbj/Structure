@@ -8,6 +8,18 @@ int sum_rec(int n) {
     return n + sum_rec(n - 1);
 }
 
+int sum_rec_proc(int n) { //print recursion process for sum
+    int sum = 1;
+    if(n == 1) {
+        printf("sum_rec_proc, n = %d, sum = %d\n", n, sum);
+        return sum;
+    }
+
+    sum = n + sum_rec_proc(n - 1);
+    printf("sum_rec_proc, n = %d, sum = %d\n", n, sum);
+    return sum;
+}
+
 int sum_cyc(int n) {
     int sum = 0;
     while(n > 0){
@@ -44,14 +56,14 @@ unsigned int fibonacci_item_rec(unsigned int n) { //F0=0, F1=1, Fn=F(n-1)+F(n-2)
 }
 
 unsigned int fibonacci_item_cyc(unsigned int n) { //F0=0, F1=1, Fn=F(n-1)+F(n-2)(n>=2)
-    int tmp = 0, f = 0, f_next = 1;
+    int f_pre = 0, f = 0, f_next = 1;
     while(n > 0){
-        tmp = f;
+        f_pre = f;
         f = f_next;
-        f_next += tmp;
+        f_next = f_pre + f;
 
+        printf("n = %d, f_pre = %d, f = %d, f_next = %d, n' = %d\n", n, f_pre, f, f_next, n - 1);
         n--;
-        printf("n = %d, tmp = %d, f = %d, f_next = %d\n", n, tmp, f, f_next);
     }
 
     return f;
@@ -62,9 +74,9 @@ unsigned int fibonacci_item_rec_tail(unsigned int n, unsigned int f, unsigned in
         return f;
     }
 
-    int tmp = f;
+    int f_pre = f;
     f = f_next;
-    f_next += tmp;
+    f_next = f_pre + f;
     return fibonacci_item_rec_tail(n - 1, f, f_next);
 }
 
@@ -73,12 +85,12 @@ unsigned int fibonacci_item_rec_tail_invoke(unsigned int n) {
 }
 
 int *fibonacci_cyc(unsigned int n, int *arr) {
-    int tmp = 0, f = 0, f_next = 1;
+    int f_pre = 0, f = 0, f_next = 1;
     unsigned int index = 0;
     while(n > 0){
-        tmp = f;
+        f_pre = f;
         f = f_next;
-        f_next += tmp;
+        f_next = f_pre + f;
 
         n--;
         *(arr + index) = f;
@@ -106,11 +118,12 @@ int *fibonacci(unsigned int n, int *arr) { //F0=0, F1=1, Fn=F(n-1)+F(n-2)(n>=2)
 int main() {
     const int add = 11;
     int result = sum_rec(add);
+    int rec_proc = sum_rec_proc(add);
     int result_cyc = sum_cyc(add);
     int result_rec_tail = sum_rec_tail_invoke(add);
-    printf("result: %d, result_cyc: %d, result_rec_tail: %d\n", result, result_cyc, result_rec_tail);
+    printf("result: %d, rec_proc: %d, result_cyc: %d, result_rec_tail: %d\n", result, rec_proc, result_cyc, result_rec_tail);
 
-    const int item = 6;
+    const int item = 7;
     int fib_item_rec = fibonacci_item_rec(item);
     int fib_item_cyc = fibonacci_item_cyc(item);
     int fib_item_rec_tail = fibonacci_item_rec_tail_invoke(item);
