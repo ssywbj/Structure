@@ -129,28 +129,47 @@ void mergeSort_conquer(int *array, int left, int mid, int right, int *temp) {
 }
 
 //分治-分
-int mergeSort_divide(int *array, int left, int right, int *temp, char *proc) {
+void mergeSort_divide(int *array, int left, int right, int *temp, char *proc) {
     printf("proc: %s, left: %d, right: %d\n", proc, left, right);
+
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+        //左边归并排序
+        mergeSort_divide(array, left, mid, temp, "left");
+        printf("proc: %s, left: %d, right: %d, mid: %d\n", proc, left, right, mid);
+        //右边归并排序
+        mergeSort_divide(array, mid + 1, right, temp, "right");
+        printf("proc: %s, left: %d, right: %d, mid: %d\n", proc, left, right, mid);
+        //合并两个有序序列
+        //mergeSort_conquer(array, left, mid, right, temp);
+    }
+}
+
+//分治-分
+int mergeSort_divide2(int *array, int left, int right, int *temp, char *proc) {
+    printf("proc<<%s>> in, left: %d, right: %d\n", proc, left, right);
 
     int mid = 0;
     if (left < right) {
         mid = left + (right - left) / 2;
         //左边归并排序
-        mergeSort_divide(array, left, mid, temp, "left");
+        mergeSort_divide2(array, left, mid, temp, "left");
         //右边归并排序
-        //mergeSort_divide(array, mid + 1, right, temp, "right");
+        mergeSort_divide2(array, mid + 1, right, temp, "right");
         //合并两个有序序列
         //mergeSort_conquer(array, left, mid, right, temp);
     }
-    printf("proc: %s, left: %d, right: %d, mid: %d\n", proc, left, right, mid);
 
+    printf("proc<<%s>> out, left: %d, right: %d, mid: %d\n", proc, left, right, mid);
     return mid;
 }
 
 void mergeSort(int *array, int size) {
     int *temp = (int *) malloc(sizeof(int) * size);
-    int rValue = mergeSort_divide(array, 0, size - 1, temp, NULL);
-    printf("mergeSort, rValue: %d\n", rValue);
+    int rValue = mergeSort_divide2(array, 0, size - 1, temp, "start");
+    printf("mergeSort, rValue: %d, size: %d\n", rValue, size);
+
+    //mergeSort_divide(array, 0, size - 1, temp, "start");
 }
 
 int main()
@@ -164,7 +183,8 @@ int main()
     merge2(arr3, 0, 3, 11);
     puts("3333333333333322222222222222");
 
-    int arr_src[] = {5, 2, 4, 7, 1, 3, 2, 6, 0};
+    //int arr_src[] = {5, 2, 4, 7, 1, 3, 2, 6, 0};
+    int arr_src[] = {5, 2, 4};
     const int len = sizeof(arr_src) / sizeof(arr_src[0]);
 
     int arr4[len];
