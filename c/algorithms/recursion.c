@@ -115,6 +115,21 @@ int *fibonacci(unsigned int n, int *arr) { //F0=0, F1=1, Fn=F(n-1)+F(n-2)(n>=2)
     return fibonacci(n - 1, arr); //Fn(n>=2)
 }
 
+void invokeTwoRec(int n, char *proc, int *p){
+    printf("\033[1;32m");
+    printf("proc: (%s) in, n = %d, invokeCount = %d\n", proc, n, *p);
+
+    if(n > 0){
+        (*p)++;
+        invokeTwoRec(n - 1, "n-1", p);
+        (*p)++;
+        invokeTwoRec(n - 2, "n-2", p);
+    }
+
+    printf("\033[1;31m");
+    printf("proc: (%s) out, n = %d, invokeCount = %d\n", proc, n, *p);
+}
+
 int main() {
     const int add = 11;
     int result = sum_rec(add);
@@ -138,5 +153,7 @@ int main() {
     printf("\n");
     //printf("over: %d, item2: %d\n", *(arr - 1), item2);
 
+    int invokeCount = 1;
+    invokeTwoRec(4, "start", &invokeCount);
     return 0;
 }
