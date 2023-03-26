@@ -60,6 +60,7 @@ int main()
     }
     printf("\n");
 
+    puts("input two numbers:");
     int x, y;
     scanf("%d%d", &x, &y); //scanf:输入函数,x:保存输入的变量,&x:存放的地址
     int z = max(x, y);
