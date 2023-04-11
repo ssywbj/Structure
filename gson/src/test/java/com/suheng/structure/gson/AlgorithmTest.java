@@ -420,7 +420,7 @@ public class AlgorithmTest {
 
     public int[] splitMatrix(int[][] matrix) {
         final int rows = matrix.length, columns = matrix[0].length;
-        System.out.println("matrix rows: " + rows + ", column: " + columns);
+        System.out.println("matrix rows: " + rows + ", columns: " + columns);
         int[] dst = new int[rows * columns];
         this.splitMatrix(matrix, 0, columns - 1, 0, rows - 1, dst, 0);
         return dst;
@@ -452,7 +452,7 @@ public class AlgorithmTest {
      * @param dst         保存读取结果
      * @param dstIndex    dst索引
      */
-    private void splitMatrix(int[][] matrix, int leftIndex, int rightIndex, int topIndex, int bottomIndex, final int[] dst, int dstIndex) {
+    private void splitMatrix(int[][] matrix, int leftIndex, int rightIndex, int topIndex, int bottomIndex, int[] dst, int dstIndex) {
         if (leftIndex > rightIndex || topIndex > bottomIndex) {
             return;
         }
