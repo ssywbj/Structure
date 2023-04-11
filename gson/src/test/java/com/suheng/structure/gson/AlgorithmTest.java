@@ -377,8 +377,23 @@ public class AlgorithmTest {
         int[][] matrix = {{1, 2, 3, 4}, {12, 13, 14, 5}, {11, 16, 15, 6}, {10, 9, 8, 7}};
         int[] dst = this.splitMatrix(matrix);
         System.out.println(Arrays.toString(dst));
+        int[][] matrix2 = {{1, 2, 3}, {10, 11, 4}, {9, 12, 5}, {8, 7, 6}};
+        dst = this.splitMatrix(matrix2);
+        System.out.println(Arrays.toString(dst));
+        int[][] matrix3 = {{1, 2, 3, 4}, {10, 11, 12, 5}, {9, 8, 7, 6}};
+        dst = this.splitMatrix(matrix3);
+        System.out.println(Arrays.toString(dst));
+        int[][] matrix4 = {{1, 2, 3, 4, 5}, {12, 13, 14, 15, 6}, {11, 10, 9, 8, 7}};
+        dst = this.splitMatrix(matrix4);
+        System.out.println(Arrays.toString(dst));
+        int[][] matrix5 = {{1, 2}, {10, 3}, {9, 4}, {8, 5}, {7, 6}};
+        dst = this.splitMatrix(matrix5);
+        System.out.println(Arrays.toString(dst));
+        int[][] matrix6 = {{1, 2, 3, 4, 5}, {10, 9, 8, 7, 6}};
+        dst = this.splitMatrix(matrix6);
+        System.out.println(Arrays.toString(dst));
 
-        System.out.println("----111111111111111111111111111111111111111111111111111111111111");
+        /*System.out.println("----111111111111111111111111111111111111111111111111111111111111");
 
         int[][] result = this.buildMatrix(7);
         for (int[] arr : result) {
@@ -400,13 +415,14 @@ public class AlgorithmTest {
         for (int[] arr : result) {
             System.out.println(Arrays.toString(arr));
         }
-        System.out.println(Arrays.toString(this.splitMatrix(result)));
+        System.out.println(Arrays.toString(this.splitMatrix(result)));*/
     }
 
-    public int[] splitMatrix(final int[][] matrix) {
-        final int len = matrix.length;
-        final int[] dst = new int[len * len];
-        this.splitMatrix(matrix, 0, len, dst, 0);
+    public int[] splitMatrix(int[][] matrix) {
+        final int rows = matrix.length, columns = matrix[0].length;
+        System.out.println("matrix rows: " + rows + ", column: " + columns);
+        int[] dst = new int[rows * columns];
+        this.splitMatrix(matrix, 0, columns - 1, 0, rows - 1, dst, 0);
         return dst;
     }
 
@@ -425,44 +441,45 @@ public class AlgorithmTest {
      * 输出：1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
      * </pre>
      * <p>
-     * 思路：先按顶部、右边、底部、左边的顺序顺时针读取一圈，然后left索引加1（往后、往下）right减1（往前）递归读取。
+     * 思路：先按矩阵的上边、右边、下边、左边顺时针读取一圈，然后左边加1（往后）右边减1（往前）上边加1（往下）下边减1（往上），缩小一圈递归读取。
      * 当left > right时，说明完全读取。
      *
-     * @param matrix   要读取的矩阵
-     * @param left     矩阵左边索引
-     * @param right    矩阵右边边界
-     * @param dst      保存读取结果
-     * @param dstIndex dst索引
+     * @param matrix      用一个二维数组表示矩阵
+     * @param leftIndex   矩阵左边索引
+     * @param rightIndex  矩阵右边索引
+     * @param topIndex    矩阵上边索引
+     * @param bottomIndex 矩阵下边索引
+     * @param dst         保存读取结果
+     * @param dstIndex    dst索引
      */
-    private void splitMatrix(final int[][] matrix, int left, int right, final int[] dst, int dstIndex) {
-        if (left > right) {
+    private void splitMatrix(int[][] matrix, int leftIndex, int rightIndex, int topIndex, int bottomIndex, final int[] dst, int dstIndex) {
+        if (leftIndex > rightIndex || topIndex > bottomIndex) {
             return;
         }
 
-        for (int i = left; i < right; i++) { //读取顶部数字
-            dst[dstIndex] = matrix[left][i];
+        for (int i = leftIndex; i <= rightIndex; i++) { //读取顶部数字
+            dst[dstIndex] = matrix[leftIndex][i];
             dstIndex++;
         }
 
-        for (int i = left + 1; i < right; i++) { //读取右边数字
-            dst[dstIndex] = matrix[i][right - 1];
+        for (int i = topIndex + 1; i <= bottomIndex; i++) { //读取右边数字
+            dst[dstIndex] = matrix[i][rightIndex];
             dstIndex++;
         }
 
-        for (int i = right - 2; i >= left; i--) { //读取底部数字
-            dst[dstIndex] = matrix[right - 1][i];
+        if (topIndex < bottomIndex) {
+            for (int i = rightIndex - 1; i >= leftIndex; i--) { //读取底部数字
+                dst[dstIndex] = matrix[bottomIndex][i];
+                dstIndex++;
+            }
+        }
+
+        for (int i = bottomIndex - 1; i >= topIndex + 1; i--) { //读取左边数字
+            dst[dstIndex] = matrix[i][leftIndex];
             dstIndex++;
         }
 
-        for (int i = right - 2; i > left; i--) { //读取左边数字
-            dst[dstIndex] = matrix[i][left];
-            dstIndex++;
-        }
-
-        left += 1;
-        right -= 1;
-
-        splitMatrix(matrix, left, right, dst, dstIndex);
+        splitMatrix(matrix, leftIndex + 1, rightIndex - 1, topIndex + 1, bottomIndex - 1, dst, dstIndex);
     }
 
     public int[][] buildMatrix(final int len) {
