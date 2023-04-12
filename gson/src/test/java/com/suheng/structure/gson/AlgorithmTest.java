@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -375,23 +374,40 @@ public class AlgorithmTest {
     @Test
     public void testSnakeMatrix() {
         int[][] matrix = {{1, 2, 3, 4}, {12, 13, 14, 5}, {11, 16, 15, 6}, {10, 9, 8, 7}};
-        int[] dst = this.splitMatrix(matrix);
-        System.out.println(Arrays.toString(dst));
+        /*int[] dst = this.splitMatrix(matrix);
+        System.out.println(Arrays.toString(dst));*/
+        List<Integer> list = this.spiralOrder(matrix);
+        System.out.println(list.toString());
+
         int[][] matrix2 = {{1, 2, 3}, {10, 11, 4}, {9, 12, 5}, {8, 7, 6}};
-        dst = this.splitMatrix(matrix2);
-        System.out.println(Arrays.toString(dst));
+        /*dst = this.splitMatrix(matrix2);
+        System.out.println(Arrays.toString(dst));*/
+        list = this.spiralOrder(matrix2);
+        System.out.println(list.toString());
+
         int[][] matrix3 = {{1, 2, 3, 4}, {10, 11, 12, 5}, {9, 8, 7, 6}};
-        dst = this.splitMatrix(matrix3);
-        System.out.println(Arrays.toString(dst));
+        /*dst = this.splitMatrix(matrix3);
+        System.out.println(Arrays.toString(dst));*/
+        list = this.spiralOrder(matrix3);
+        System.out.println(list.toString());
+
         int[][] matrix4 = {{1, 2, 3, 4, 5}, {12, 13, 14, 15, 6}, {11, 10, 9, 8, 7}};
-        dst = this.splitMatrix(matrix4);
-        System.out.println(Arrays.toString(dst));
+        /*dst = this.splitMatrix(matrix4);
+        System.out.println(Arrays.toString(dst));*/
+        list = this.spiralOrder(matrix4);
+        System.out.println(list.toString());
+
         int[][] matrix5 = {{1, 2}, {10, 3}, {9, 4}, {8, 5}, {7, 6}};
-        dst = this.splitMatrix(matrix5);
-        System.out.println(Arrays.toString(dst));
+        /*dst = this.splitMatrix(matrix5);
+        System.out.println(Arrays.toString(dst));*/
+        list = this.spiralOrder(matrix5);
+        System.out.println(list.toString());
+
         int[][] matrix6 = {{1, 2, 3, 4, 5}, {10, 9, 8, 7, 6}};
-        dst = this.splitMatrix(matrix6);
-        System.out.println(Arrays.toString(dst));
+        /*dst = this.splitMatrix(matrix6);
+        System.out.println(Arrays.toString(dst));*/
+        list = this.spiralOrder(matrix6);
+        System.out.println(list.toString());
 
         /*System.out.println("----111111111111111111111111111111111111111111111111111111111111");
 
@@ -424,6 +440,40 @@ public class AlgorithmTest {
         int[] dst = new int[rows * columns];
         this.splitMatrix(matrix, 0, columns - 1, 0, rows - 1, dst, 0);
         return dst;
+    }
+
+    public List<Integer> spiralOrder(int[][] matrix) {
+        final int rows = matrix.length, columns = matrix[0].length;
+        System.out.println("matrix rows: " + rows + ", columns: " + columns);
+        List<Integer> list = new ArrayList<>();
+        this.splitMatrix(matrix, 0, columns - 1, 0, rows - 1, list);
+        return list;
+    }
+
+    private void splitMatrix(int[][] matrix, int leftIndex, int rightIndex, int topIndex, int bottomIndex, List<Integer> list) {
+        if (leftIndex > rightIndex || topIndex > bottomIndex) {
+            return;
+        }
+
+        for (int i = leftIndex; i <= rightIndex; i++) { //读取顶部数字
+            list.add(matrix[leftIndex][i]);
+        }
+
+        for (int i = topIndex + 1; i <= bottomIndex; i++) { //读取右边数字
+            list.add(matrix[i][rightIndex]);
+        }
+
+        if (topIndex < bottomIndex) {
+            for (int i = rightIndex - 1; i >= leftIndex; i--) { //读取底部数字
+                list.add(matrix[bottomIndex][i]);
+            }
+        }
+
+        for (int i = bottomIndex - 1; i >= topIndex + 1; i--) { //读取左边数字
+            list.add(matrix[i][leftIndex]);
+        }
+
+        splitMatrix(matrix, leftIndex + 1, rightIndex - 1, topIndex + 1, bottomIndex - 1, list);
     }
 
     /**
