@@ -22,13 +22,13 @@ import java.util.Arrays;
 @RunWith(Parameterized.class)
 public class Parameterized2Test {
 
-    private final int one, two;
+    private final int one, two; //传入两个参数
 
     @NonNull
     @Parameterized.Parameters
     public static Iterable<Integer[]> parameters() {
         //return Arrays.asList(new Integer[]{7, 5}, new Integer[]{7, 4}, new Integer[]{7, 3}, new Integer[]{7, 2});
-        return Arrays.asList(new Integer[][]{{7, 5}, {7, 4}, {7, 3}, {7, 2}});
+        return Arrays.asList(new Integer[][]{{7, 5}, {7, 4}, {7, 3}, {7, 2}}); //一维数组里的值表示传入的实参，二维数组里的值表示传入的实参有多少组。
     }
 
     public Parameterized2Test(int one, int two) {
