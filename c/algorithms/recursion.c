@@ -123,6 +123,8 @@ void invokeTwoRec(int n, char *proc, int *p){
         (*p)++;
         invokeTwoRec(n - 1, "n-1", p);
         (*p)++;
+        printf("\033[1;33m");
+        printf("print, n = %d, invokeCount = %d\n", n, *p);
         invokeTwoRec(n - 2, "n-2", p);
     }
 

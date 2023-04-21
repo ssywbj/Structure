@@ -94,9 +94,14 @@ public class BinaryTreeTest {
         TreeNode2 nodeB = new TreeNode2("B", nodeD, nodeE);
         TreeNode2 nodeC = new TreeNode2("C", nodeF, nodeG);
 
+        /*TreeNode2 nodeB = new TreeNode2("B", null, null);
+        TreeNode2 nodeC = new TreeNode2("C", null, null);*/
+
         TreeNode2 nodeA = new TreeNode2("A", nodeB, nodeC);
 
         this.inorderTraversal(nodeA);
+        System.out.println();
+        this.postorderTraversal(nodeA);
         System.out.println();
     }
 
@@ -113,6 +118,14 @@ public class BinaryTreeTest {
             inorderTraversal(treeNode.left);
             System.out.print(treeNode.key + " ");
             inorderTraversal(treeNode.right);
+        }
+    }
+
+    public void postorderTraversal(TreeNode2 treeNode) {
+        if (treeNode != null) {
+            postorderTraversal(treeNode.left);
+            postorderTraversal(treeNode.right);
+            System.out.print(treeNode.key + " ");
         }
     }
 
