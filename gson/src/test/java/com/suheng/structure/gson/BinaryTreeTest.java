@@ -4,60 +4,38 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  * https://leetcode.cn/problems/binary-tree-inorder-traversal/
  * https://leetcode.cn/problems/binary-tree-postorder-traversal/
+ * https://leetcode.cn/problems/binary-tree-preorder-traversal/
+ * https://leetcode.cn/problems/binary-tree-level-order-traversal/
  * https://www.cnblogs.com/zhi-leaf/p/10813048.html
  */
 public class BinaryTreeTest {
 
-    class TreeNode {
-        int val;
+    static class TreeNode {
+        String key;
         TreeNode left;
         TreeNode right;
 
         public TreeNode() {
         }
 
-        public TreeNode(int val) {
-            this.val = val;
-        }
-
-        public TreeNode(int val, TreeNode left, TreeNode right) {
-            this.val = val;
-            this.left = left;
-            this.right = right;
-        }
-    }
-
-    class TreeNode2 {
-        String key;
-        TreeNode2 left;
-        TreeNode2 right;
-
-        public TreeNode2() {
-        }
-
-        public TreeNode2(String key) {
+        public TreeNode(String key) {
             this.key = key;
         }
 
-        public TreeNode2(String key, TreeNode2 left, TreeNode2 right) {
+        public TreeNode(String key, TreeNode left, TreeNode right) {
             this.key = key;
             this.left = left;
             this.right = right;
-        }
-
-        @Override
-        public String toString() {
-            return "TreeNode2{" +
-                    "key='" + key + '\'' +
-                    ", left=" + left +
-                    ", right=" + right +
-                    '}';
         }
     }
 
@@ -73,61 +51,97 @@ public class BinaryTreeTest {
 
     @Test
     public void testInorderTraversal() {
-        TreeNode treeNode3 = new TreeNode(3);
+        TreeNode nodeH = new TreeNode("H");
+        TreeNode nodeI = new TreeNode("I");
+        TreeNode nodeJ = new TreeNode("J");
+        TreeNode nodeK = new TreeNode("K");
 
-        TreeNode treeNode2 = new TreeNode(2, treeNode3, null);
+        TreeNode nodeD = new TreeNode("D", null, nodeH);
+        TreeNode nodeE = new TreeNode("E", null, nodeI);
+        TreeNode nodeF = new TreeNode("F", nodeJ, nodeK);
+        TreeNode nodeG = new TreeNode("G");
 
-        TreeNode treeNode1 = new TreeNode(1, null, treeNode2);
+        TreeNode nodeB = new TreeNode("B", nodeD, nodeE);
+        TreeNode nodeC = new TreeNode("C", nodeF, nodeG);
 
-        this.inorderTraversal(treeNode1);
-        System.out.println();
+        /*TreeNode nodeB = new TreeNode("B", null, null);
+        TreeNode nodeC = new TreeNode("C", null, null);*/
 
-        TreeNode2 nodeH = new TreeNode2("H");
-        TreeNode2 nodeI = new TreeNode2("I");
-        TreeNode2 nodeJ = new TreeNode2("J");
-        TreeNode2 nodeK = new TreeNode2("K");
-
-        TreeNode2 nodeD = new TreeNode2("D", null, nodeH);
-        TreeNode2 nodeE = new TreeNode2("E", null, nodeI);
-        TreeNode2 nodeF = new TreeNode2("F", nodeJ, nodeK);
-        TreeNode2 nodeG = new TreeNode2("G");
-
-        TreeNode2 nodeB = new TreeNode2("B", nodeD, nodeE);
-        TreeNode2 nodeC = new TreeNode2("C", nodeF, nodeG);
-
-        /*TreeNode2 nodeB = new TreeNode2("B", null, null);
-        TreeNode2 nodeC = new TreeNode2("C", null, null);*/
-
-        TreeNode2 nodeA = new TreeNode2("A", nodeB, nodeC);
+        TreeNode nodeA = new TreeNode("A", nodeB, nodeC);
 
         this.inorderTraversal(nodeA);
         System.out.println();
         this.postorderTraversal(nodeA);
         System.out.println();
+        this.preorderTraversal(nodeA);
+        System.out.println();
+
+        //List<List<String>> lists2 = this.levelOrderTraversal(null);
+        //List<List<String>> lists2 = this.levelOrderTraversal(new TreeNode2());
+        List<List<String>> lists2 = this.levelOrderTraversal(nodeA);
+        System.out.println(lists2);
     }
 
     public void inorderTraversal(TreeNode treeNode) {
         if (treeNode != null) {
             inorderTraversal(treeNode.left);
-            System.out.print(treeNode.val + "  ");
-            inorderTraversal(treeNode.right);
-        }
-    }
-
-    public void inorderTraversal(TreeNode2 treeNode) {
-        if (treeNode != null) {
-            inorderTraversal(treeNode.left);
             System.out.print(treeNode.key + " ");
             inorderTraversal(treeNode.right);
         }
     }
 
-    public void postorderTraversal(TreeNode2 treeNode) {
+    public void postorderTraversal(TreeNode treeNode) {
         if (treeNode != null) {
             postorderTraversal(treeNode.left);
             postorderTraversal(treeNode.right);
             System.out.print(treeNode.key + " ");
         }
+    }
+
+    public void preorderTraversal(TreeNode treeNode) {
+        if (treeNode != null) {
+            System.out.print(treeNode.key + " ");
+            preorderTraversal(treeNode.left);
+            preorderTraversal(treeNode.right);
+        }
+    }
+
+    public List<List<String>> levelOrderTraversal(TreeNode treeNode) {
+        ArrayList<List<String>> resultList = new ArrayList<>();
+
+        if (treeNode == null) {
+            return resultList;
+        }
+        this.levelOrderTraversal(Collections.singletonList(treeNode), resultList);
+        return resultList;
+
+        /*this.levelOrderTraversal(Collections.singletonList(treeNode), resultList);
+        return resultList;*/
+    }
+
+    private void levelOrderTraversal(List<TreeNode> nodes, List<List<String>> resultList) {
+        if (nodes == null || nodes.isEmpty()) {
+            return;
+        }
+
+        List<TreeNode> params = new ArrayList<>();
+        List<String> result = new ArrayList<>();
+        for (TreeNode treeNode : nodes) {
+            if (treeNode != null) {
+                //System.out.print(treeNode.key + " ");
+                result.add(treeNode.key);
+                if (treeNode.left != null) {
+                    params.add(treeNode.left);
+                }
+                if (treeNode.right != null) {
+                    params.add(treeNode.right);
+                }
+            }
+        }
+
+        //System.out.println();
+        resultList.add(result);
+        levelOrderTraversal(params, resultList);
     }
 
 }
