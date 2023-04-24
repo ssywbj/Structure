@@ -535,4 +535,18 @@ public class AlgorithmTest {
         buildSpiralMatrix(matrix, left, right, startValue);
     }
 
+    @Test
+    public void testDivide() {
+        divide(0, 8);
+    }
+
+    void divide(int left, int right) {
+        if (left < right) {
+            int mid = left + (right - left) / 2;
+            divide(left, mid);
+            //divide(mid + 1, right);
+            System.out.println("left: " + left + ", mid: " + mid);
+        }
+    }
+
 }
