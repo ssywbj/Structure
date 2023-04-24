@@ -544,8 +544,8 @@ public class AlgorithmTest {
         if (left < right) {
             int mid = left + (right - left) / 2;
             divide(left, mid);
-            //divide(mid + 1, right);
-            System.out.println("left: " + left + ", mid: " + mid);
+            divide(mid + 1, right);
+            System.out.println("left: " + left + ", mid: " + mid  + ", mid+1: " + (mid + 1)+ ", right: " + right);
         }
     }
 
