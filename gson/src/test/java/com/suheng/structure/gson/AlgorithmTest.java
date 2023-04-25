@@ -462,7 +462,7 @@ public class AlgorithmTest {
      * @param rightIndex  矩阵右边索引
      * @param topIndex    矩阵上边索引
      * @param bottomIndex 矩阵下边索引
-     * @param list         保存读取结果
+     * @param list        保存读取结果
      */
     private void splitMatrix(int[][] matrix, int leftIndex, int rightIndex, int topIndex, int bottomIndex, List<Integer> list) {
         if (leftIndex > rightIndex || topIndex > bottomIndex) {
@@ -537,15 +537,74 @@ public class AlgorithmTest {
 
     @Test
     public void testDivide() {
-        divide(0, 8);
+        divide(0, 4);
     }
 
-    void divide(int left, int right) {
+    //https://zh.wikipedia.org/wiki/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F
+    private void divide(int left, int right) {
         if (left < right) {
             int mid = left + (right - left) / 2;
             divide(left, mid);
             divide(mid + 1, right);
-            System.out.println("left: " + left + ", mid: " + mid  + ", mid+1: " + (mid + 1)+ ", right: " + right);
+            System.out.println("left: " + left + ", mid: " + mid + ", right: " + right);
+        }
+    }
+
+    @Test
+    public void testMerge() {
+        int[] arr1 = {1, 2, 3, 0, 0, 0};
+        int[] aar2 = {2, 5, 6};
+        this.merge(arr1, 3, aar2, aar2.length);
+        for (int i : arr1) {
+            System.out.print(i + " ");
+        }
+        System.out.println();
+
+        arr1 = new int[]{1};
+        this.merge(arr1, 1, null, 0);
+        for (int i : arr1) {
+            System.out.print(i + " ");
+        }
+        System.out.println();
+
+        arr1 = new int[]{0};
+        aar2 = new int[]{1};
+        this.merge(arr1, 0, aar2, aar2.length);
+        for (int i : arr1) {
+            System.out.print(i + " ");
+        }
+        System.out.println();
+    }
+
+    //https://leetcode.cn/problems/merge-sorted-array/submissions/
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        if (nums1 == null || nums1.length == 0) {
+            return;
+        }
+
+        if (nums2 == null || n == 0) {
+            return;
+        }
+
+        int[] temp = new int[m];
+        System.arraycopy(nums1, 0, temp, 0, temp.length);
+
+        int indexTemp = 0, indexArr2 = 0, indexArr1 = 0;
+        while (indexTemp < temp.length && indexArr2 < nums2.length) {
+            if (temp[indexTemp] <= nums2[indexArr2]) {
+                nums1[indexArr1] = temp[indexTemp++];
+            } else {
+                nums1[indexArr1] = nums2[indexArr2++];
+            }
+            indexArr1++;
+        }
+
+        for (int i = indexTemp; i < temp.length; i++) {
+            nums1[indexArr1++] = temp[i];
+        }
+
+        for (int i = indexArr2; i < nums2.length; i++) {
+            nums1[indexArr1++] = nums2[i];
         }
     }
 
