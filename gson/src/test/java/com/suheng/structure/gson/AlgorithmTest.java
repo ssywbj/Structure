@@ -12,7 +12,7 @@ import java.util.List;
  * Example local unit test, which will execute on the development machine (host).
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- *
+ * <p>
  * https://blog.csdn.net/weixin_51182518/article/details/114578329
  * https://blog.csdn.net/weixin_45627369/article/details/124074552
  */
@@ -537,7 +537,8 @@ public class AlgorithmTest {
 
     @Test
     public void testDivide() {
-        divide(0, 4);
+        int[] arr = {6, 5, 1, 3};
+        divide(0, 3);
     }
 
     //https://zh.wikipedia.org/wiki/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F
@@ -548,6 +549,82 @@ public class AlgorithmTest {
             divide(mid + 1, right);
             System.out.println("left: " + left + ", mid: " + mid + ", right: " + right);
         }
+    }
+
+    private void divide(int[] arr, int left, int right, int[] temp) {
+        if (left < right) {
+            int mid = left + (right - left) / 2;
+            divide(arr, left, mid, temp);
+            divide(arr, mid + 1, right, temp);
+            System.out.println("left: " + left + ", mid: " + mid + ", right: " + right);
+            this.merge2(arr, left, mid, right, temp);
+        }
+    }
+
+    @Test
+    public void testMerge2() {
+        //int[] arr = {6, 5, 3, 1};
+        int[] arr = {6, 5, 3, 1, 2, 7, 4, 0};
+        this.merge2(arr);
+        for (int i : arr) {
+            System.out.print(i + " ");
+        }
+        System.out.println();
+    }
+
+    //left: 0, mid: 0, right: 1
+    //left: 0, mid: 1, right: 2
+    //left: 3, mid: 3, right: 4
+    //left: 3, mid: 4, right: 5
+    //left: 0, mid: 2, right: 5
+    private void merge2(int[] arr) {
+        int[] temp = new int[arr.length];
+        this.divide(arr, 0, arr.length - 1, temp);
+
+        /*this.divide(0, arr.length - 1);
+        this.merge2(arr, 0, 0, 1, temp);
+        for (int i : arr) {
+            System.out.print(i + " ");
+        }
+        System.out.println();
+        this.merge2(arr, 0, 1, 2, temp);
+        for (int i : arr) {
+            System.out.print(i + " ");
+        }
+        System.out.println();
+        this.merge2(arr, 3, 3, 4, temp);
+        for (int i : arr) {
+            System.out.print(i + " ");
+        }
+        System.out.println();
+        this.merge2(arr, 0, 2, 4, temp);
+        for (int i : arr) {
+            System.out.print(i + " ");
+        }
+        System.out.println();*/
+    }
+
+    private void merge2(int[] arr, int leftIndex, int midIndex, int rightIndex, int[] temp) {
+        int i = leftIndex, j = midIndex + 1, indexTemp = 0;
+        while (i <= midIndex && j <= rightIndex) {
+            if (arr[i] <= arr[j]) {
+                temp[indexTemp++] = arr[i];
+                i++;
+            } else {
+                temp[indexTemp++] = arr[j];
+                j++;
+            }
+        }
+
+        for (; i <= midIndex; i++) {
+            temp[indexTemp++] = arr[i];
+        }
+
+        for (; j <= rightIndex; j++) {
+            temp[indexTemp++] = arr[j];
+        }
+
+        System.arraycopy(temp, 0, arr, leftIndex, indexTemp);
     }
 
     @Test
@@ -599,12 +676,12 @@ public class AlgorithmTest {
             indexArr1++;
         }
 
-        for (int i = indexTemp; i < temp.length; i++) {
-            nums1[indexArr1++] = temp[i];
+        for (; indexTemp < temp.length; indexTemp++) {
+            nums1[indexArr1++] = temp[indexTemp];
         }
 
-        for (int i = indexArr2; i < nums2.length; i++) {
-            nums1[indexArr1++] = nums2[i];
+        for (; indexArr2 < nums2.length; indexArr2++) {
+            nums1[indexArr1++] = nums2[indexArr2];
         }
     }
 
