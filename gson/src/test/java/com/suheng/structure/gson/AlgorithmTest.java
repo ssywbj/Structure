@@ -536,75 +536,41 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testDivide() {
-        int[] arr = {6, 5, 1, 3};
-        divide(0, 3);
-    }
-
-    //https://zh.wikipedia.org/wiki/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F
-    private void divide(int left, int right) {
-        if (left < right) {
-            int mid = left + (right - left) / 2;
-            divide(left, mid);
-            divide(mid + 1, right);
-            System.out.println("left: " + left + ", mid: " + mid + ", right: " + right);
-        }
-    }
-
-    private void divide(int[] arr, int left, int right, int[] temp) {
-        if (left < right) {
-            int mid = left + (right - left) / 2;
-            divide(arr, left, mid, temp);
-            divide(arr, mid + 1, right, temp);
-            System.out.println("left: " + left + ", mid: " + mid + ", right: " + right);
-            this.merge2(arr, left, mid, right, temp);
-        }
-    }
-
-    @Test
     public void testMerge2() {
         //int[] arr = {6, 5, 3, 1};
-        int[] arr = {6, 5, 3, 1, 2, 7, 4, 0};
-        this.merge2(arr);
+        int[] arr = {6, 5, 3, 1, 2, 7, 4, 0, 8, 9, 10, 11, 12, 13, 14, 15};
+        this.merge(arr);
         for (int i : arr) {
             System.out.print(i + " ");
         }
         System.out.println();
     }
 
-    //left: 0, mid: 0, right: 1
-    //left: 0, mid: 1, right: 2
-    //left: 3, mid: 3, right: 4
-    //left: 3, mid: 4, right: 5
-    //left: 0, mid: 2, right: 5
-    private void merge2(int[] arr) {
+    private void merge(int[] arr) {
         int[] temp = new int[arr.length];
         this.divide(arr, 0, arr.length - 1, temp);
-
-        /*this.divide(0, arr.length - 1);
-        this.merge2(arr, 0, 0, 1, temp);
-        for (int i : arr) {
-            System.out.print(i + " ");
-        }
-        System.out.println();
-        this.merge2(arr, 0, 1, 2, temp);
-        for (int i : arr) {
-            System.out.print(i + " ");
-        }
-        System.out.println();
-        this.merge2(arr, 3, 3, 4, temp);
-        for (int i : arr) {
-            System.out.print(i + " ");
-        }
-        System.out.println();
-        this.merge2(arr, 0, 2, 4, temp);
-        for (int i : arr) {
-            System.out.print(i + " ");
-        }
-        System.out.println();*/
     }
 
-    private void merge2(int[] arr, int leftIndex, int midIndex, int rightIndex, int[] temp) {
+    //leftIndex: 0, midIndex: 0, rightIndex: 1
+    //leftIndex: 2, midIndex: 2, rightIndex: 3
+    //leftIndex: 0, midIndex: 1, rightIndex: 3
+    //leftIndex: 4, midIndex: 4, rightIndex: 5
+    //leftIndex: 6, midIndex: 6, rightIndex: 7
+    //leftIndex: 4, midIndex: 5, rightIndex: 7
+    //leftIndex: 0, midIndex: 3, rightIndex: 7
+    //https://zh.wikipedia.org/wiki/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F
+    //https://www.cnblogs.com/onepixel/articles/7674659.html
+    private void divide(int[] arr, int leftIndex, int rightIndex, int[] temp) {
+        if (leftIndex < rightIndex) {
+            int midIndex = leftIndex + (rightIndex - leftIndex) / 2;
+            divide(arr, leftIndex, midIndex, temp);
+            divide(arr, midIndex + 1, rightIndex, temp);
+            System.out.println("leftIndex: " + leftIndex + ", midIndex: " + midIndex + ", rightIndex: " + rightIndex);
+            this.merge(arr, leftIndex, midIndex, rightIndex, temp);
+        }
+    }
+
+    private void merge(int[] arr, int leftIndex, int midIndex, int rightIndex, int[] temp) {
         int i = leftIndex, j = midIndex + 1, indexTemp = 0;
         while (i <= midIndex && j <= rightIndex) {
             if (arr[i] <= arr[j]) {
