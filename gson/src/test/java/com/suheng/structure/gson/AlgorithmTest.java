@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -648,6 +649,113 @@ public class AlgorithmTest {
 
         for (; indexArr2 < nums2.length; indexArr2++) {
             nums1[indexArr1++] = nums2[indexArr2];
+        }
+    }
+
+    @Test
+    public void testHeapSort() {
+        //int[] arr = {16, 14, 10, 8, 7, 9, 3, 2, 4, 1};
+
+        int[] arr = {16, 4, 10, 14, 7, 9, 3, 2, 8, 1};
+        //this.maxHeap(arr, arr.length, 1);
+        System.out.println(Arrays.toString(arr));
+
+        arr = new int[]{4, 1, 3, 2, 16, 9, 10, 14, 8, 7};
+        //this.buildMaxHeap(arr);
+        System.out.println(Arrays.toString(arr));
+
+        arr = new int[]{4, 1, 3, 2, 16, 9, 10, 14, 8, 7};
+        this.heapSort(arr);
+        System.out.println(Arrays.toString(arr));
+
+        arr = new int[]{4, 1, 3, 2, 16, 9, 10, 14, 8, 7};
+        mHeapSize = arr.length;
+        this.heapSort2(arr);
+        System.out.println(Arrays.toString(arr));
+    }
+
+    private int leftChildIndex(int index) {
+        return index * 2 + 1;
+        //return index << 1 + 1;
+    }
+
+    private int rightChildIndex(int index) {
+        return index * 2 + 2;
+        //return index << 1 + 2;
+    }
+
+    private void maxHeap(int[] arr, final int heapSize, final int index) {
+        final int leftChildIndex = this.leftChildIndex(index);
+        final int rightChildIndex = this.rightChildIndex(index);
+        int largestIndex = index;
+        //System.err.println("leftChildIndex < heapSize: " + (leftChildIndex < heapSize) + ", leftChildIndex: " + leftChildIndex);
+        if (leftChildIndex < heapSize && arr[leftChildIndex] > arr[index]) {
+            largestIndex = leftChildIndex;
+        }
+        //System.err.println("rightChildIndex < heapSize: " + (rightChildIndex < heapSize) + ", rightChildIndex: " + rightChildIndex);
+        if (rightChildIndex < heapSize && arr[rightChildIndex] > arr[largestIndex]) {
+            largestIndex = rightChildIndex;
+        }
+        if (largestIndex != index) {
+            int temp = arr[index];
+            arr[index] = arr[largestIndex];
+            arr[largestIndex] = temp;
+            this.maxHeap(arr, heapSize, largestIndex);
+        }
+    }
+
+    private void buildMaxHeap(int[] arr) {
+        final int heapSize = arr.length;
+        for (int i = heapSize / 2 - 1; i >= 0; i--) {
+            this.maxHeap(arr, heapSize, i);
+        }
+    }
+
+    public void heapSort(int[] arr) {
+        this.buildMaxHeap(arr);
+        for (int i = arr.length - 1; i >= 1; i--) {
+            int temp = arr[0];
+            arr[0] = arr[i];
+            arr[i] = temp;
+            System.out.println("heapSize: " + i + ", leftChildIndex: " + this.leftChildIndex(0) + ", rightChildIndex: " + this.rightChildIndex(0));
+            this.maxHeap(arr, i, 0);
+        }
+    }
+
+    private int mHeapSize;
+
+    private void maxHeap(int[] arr, int index) {
+        final int leftChildIndex = this.leftChildIndex(index);
+        final int rightChildIndex = this.rightChildIndex(index);
+        int largestIndex = index;
+        if (leftChildIndex < mHeapSize && arr[leftChildIndex] > arr[index]) {
+            largestIndex = leftChildIndex;
+        }
+        if (rightChildIndex < mHeapSize && arr[rightChildIndex] > arr[largestIndex]) {
+            largestIndex = rightChildIndex;
+        }
+        if (largestIndex != index) {
+            int temp = arr[index];
+            arr[index] = arr[largestIndex];
+            arr[largestIndex] = temp;
+            this.maxHeap(arr, largestIndex);
+        }
+    }
+
+    private void buildMaxHeap2(int[] arr) {
+        for (int i = mHeapSize / 2 - 1; i >= 0; i--) {
+            this.maxHeap(arr, i);
+        }
+    }
+
+    public void heapSort2(int[] arr) {
+        this.buildMaxHeap2(arr);
+        for (int i = arr.length - 1; i >= 1; i--) {
+            int temp = arr[0];
+            arr[0] = arr[i];
+            arr[i] = temp;
+            mHeapSize--;
+            this.maxHeap(arr, 0);
         }
     }
 

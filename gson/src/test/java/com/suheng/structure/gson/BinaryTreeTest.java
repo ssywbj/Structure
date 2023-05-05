@@ -144,4 +144,9 @@ public class BinaryTreeTest {
         levelOrderTraversal(params, resultList);
     }
 
+    //https://leetcode.cn/problems/zhong-jian-er-cha-shu-lcof/
+    private void buildTree() {
+
+    }
+
 }
