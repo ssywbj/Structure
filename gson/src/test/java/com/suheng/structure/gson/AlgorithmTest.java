@@ -759,4 +759,68 @@ public class AlgorithmTest {
         }
     }
 
+    @Test
+    public void testQuickSort() {
+        int[] arr = {16, 4, 10, 14, 7, 9, 3, 2, 8, 1};
+        this.quickSort(arr);
+    }
+
+    public void quickSort(int[] arr) {
+
+    }
+
+    @Test
+    public void testBubbleSort() {
+        int[] arr = {4, 10, 14, 16, 7, 9, 3, 2, 8, 1/*, -1, 0, 17, 11*/};
+        this.bubbleSort(arr);
+        System.err.println(Arrays.toString(arr));
+
+        this.testBubbleSortRec();
+    }
+
+    public void bubbleSort(int[] arr) {
+        int sortedSize;
+        for (sortedSize = 0; sortedSize <= arr.length - 2; sortedSize++) {
+            for (int i = 0; i < arr.length - 1 - sortedSize; i++) {
+                if (arr[i] > arr[i + 1]) {
+                    int temp = arr[i];
+                    arr[i] = arr[i + 1];
+                    arr[i + 1] = temp;
+                }
+            }
+            System.out.println(Arrays.toString(arr) + ", sortedSize: " + sortedSize);
+        }
+
+        System.out.println("----sortedSize: " + sortedSize);
+    }
+
+    @Test
+    public void testBubbleSortRec() {
+        int[] arr = {4, 10, 14, 16, 7, 9, 3, 2, 8, 1/*, -1, 0, 17, 11*/};
+        this.bubbleSortRec(arr);
+        System.err.println(Arrays.toString(arr));
+    }
+
+    public void bubbleSortRec(int[] arr) {
+        this.bubbleSort(arr, 0);
+    }
+
+    private void bubbleSort(int[] arr, int sortedSize) {
+        if (sortedSize >= arr.length - 1) {
+            System.out.println("rec ----sortedSize: " + sortedSize);
+            return;
+        }
+
+        for (int i = 0; i < arr.length - 1 - sortedSize; i++) {
+            if (arr[i] > arr[i + 1]) {
+                int temp = arr[i];
+                arr[i] = arr[i + 1];
+                arr[i + 1] = temp;
+            }
+        }
+
+        System.out.println(Arrays.toString(arr) + ", rec sortedSize: " + sortedSize);
+        bubbleSort(arr, sortedSize + 1);
+    }
+
 }
