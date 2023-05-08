@@ -761,12 +761,45 @@ public class AlgorithmTest {
 
     @Test
     public void testQuickSort() {
-        int[] arr = {16, 4, 10, 14, 7, 9, 3, 2, 8, 1};
+        //int[] arr = {4, 10, 14, 16, 7, 9, 3, 2, 8, 1};
+        //int[] arr = {4, 1, 5, 7, 2, 3};
+        int[] arr = {2, 8, 7, 1, 3, 5, 6, 4};
+        //this.partition(arr, 0, arr.length - 1);
         this.quickSort(arr);
+        System.out.println(Arrays.toString(arr));
     }
 
     public void quickSort(int[] arr) {
+        this.quickSort(arr, 0, arr.length - 1);
+    }
 
+    public void quickSort(int[] arr, int leftIndex, int rightIndex) {
+        if (leftIndex < rightIndex) {
+            int partition = this.partition(arr, leftIndex, rightIndex);
+            this.quickSort(arr, leftIndex, partition - 1);
+            this.quickSort(arr, partition + 1, rightIndex);
+        }
+    }
+
+    public int partition(int[] arr, int leftIndex, int rightIndex) {
+        final int pivot = arr[rightIndex];
+        int partition = leftIndex - 1;
+        for (int index = leftIndex; index <= rightIndex - 1; index++) {
+            if (arr[index] < pivot) {
+                partition++;
+                int temp = arr[partition];
+                arr[partition] = arr[index];
+                arr[index] = temp;
+                //System.out.println(Arrays.toString(arr));
+            }
+        }
+
+        int temp = arr[++partition];
+        arr[partition] = pivot;
+        arr[rightIndex] = temp;
+        System.err.println(Arrays.toString(arr) + ", partition: " + partition);
+
+        return partition;
     }
 
     @Test
