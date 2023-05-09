@@ -765,7 +765,8 @@ public class AlgorithmTest {
         //int[] arr = {4, 1, 5, 7, 2, 3};
         int[] arr = {2, 8, 7, 1, 3, 5, 6, 4};
         //this.partition(arr, 0, arr.length - 1);
-        this.quickSort(arr);
+        //this.quickSort(arr);
+        this.randomizedQuickSort(arr);
         System.out.println(Arrays.toString(arr));
     }
 
@@ -773,7 +774,7 @@ public class AlgorithmTest {
         this.quickSort(arr, 0, arr.length - 1);
     }
 
-    public void quickSort(int[] arr, int leftIndex, int rightIndex) {
+    private void quickSort(int[] arr, int leftIndex, int rightIndex) {
         if (leftIndex < rightIndex) {
             int partition = this.partition(arr, leftIndex, rightIndex);
             this.quickSort(arr, leftIndex, partition - 1);
@@ -781,25 +782,47 @@ public class AlgorithmTest {
         }
     }
 
-    public int partition(int[] arr, int leftIndex, int rightIndex) {
+    private int partition(int[] arr, int leftIndex, int rightIndex) {
         final int pivot = arr[rightIndex];
-        int partition = leftIndex - 1;
+        int partition = leftIndex;
         for (int index = leftIndex; index <= rightIndex - 1; index++) {
             if (arr[index] < pivot) {
-                partition++;
                 int temp = arr[partition];
                 arr[partition] = arr[index];
                 arr[index] = temp;
+                partition++;
                 //System.out.println(Arrays.toString(arr));
             }
         }
 
-        int temp = arr[++partition];
+        int temp = arr[partition];
         arr[partition] = pivot;
         arr[rightIndex] = temp;
         System.err.println(Arrays.toString(arr) + ", partition: " + partition);
 
         return partition;
+    }
+
+    public void randomizedQuickSort(int[] arr) {
+        this.randomizedQuickSort(arr, 0, arr.length - 1);
+    }
+
+    private void randomizedQuickSort(int[] arr, int leftIndex, int rightIndex) {
+        if (leftIndex < rightIndex) {
+            int partition = this.randomizedPartition(arr, leftIndex, rightIndex);
+            this.randomizedQuickSort(arr, leftIndex, partition - 1);
+            this.randomizedQuickSort(arr, partition + 1, rightIndex);
+        }
+    }
+
+    private int randomizedPartition(int[] arr, int leftIndex, int rightIndex) {
+        //Random random = new Random();
+        //int ran = random.nextInt(rightIndex - leftIndex + 1) + leftIndex;
+        int ran = (int) (Math.random() * (rightIndex - leftIndex + 1)) + leftIndex;
+        int temp = arr[ran];
+        arr[ran] = arr[rightIndex];
+        arr[rightIndex] = temp;
+        return this.partition(arr, leftIndex, rightIndex);
     }
 
     @Test
@@ -854,6 +877,46 @@ public class AlgorithmTest {
 
         System.out.println(Arrays.toString(arr) + ", rec sortedSize: " + sortedSize);
         bubbleSort(arr, sortedSize + 1);
+    }
+
+    @Test
+    public void testCountingSort() {
+        //int[] arr = {4, 10, 14, 16, 7, 9, 3, 2, 8, 1/*, -1, 0, 17, 11*/};
+        int[] arr = {2, 5, 3, 0, 2, 3, 0, 3/*, -1, 0, 17, 11*/};
+        int[] countingSort = this.countingSort(arr);
+        System.out.println("countingSort: " + Arrays.toString(countingSort));
+    }
+
+    public int[] countingSort(int[] arr) {
+        int max = arr[0];
+        for (int i = 0; i < arr.length - 1; i++) {
+            if (max < arr[i + 1]) {
+                max = arr[i + 1];
+            }
+        }
+
+        return this.countingSort(arr, max + 1);
+    }
+
+    private int[] countingSort(int[] a, int k) {
+        int[] c = new int[k];
+        for (int i = 0; i < a.length; i++) {
+            c[a[i]]++;
+        }
+        System.out.println(Arrays.toString(c));
+
+        for (int i = 1; i < c.length; i++) {
+            c[i] = c[i] + c[i - 1];
+        }
+        System.out.println(Arrays.toString(c));
+
+        int[] b = new int[a.length];
+        for (int j = a.length - 1; j >= 0; j--) {
+            b[c[a[j]] - 1] = a[j];
+            c[a[j]]--;
+        }
+
+        return b;
     }
 
 }
