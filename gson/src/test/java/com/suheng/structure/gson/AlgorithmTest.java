@@ -881,42 +881,78 @@ public class AlgorithmTest {
 
     @Test
     public void testCountingSort() {
-        //int[] arr = {4, 10, 14, 16, 7, 9, 3, 2, 8, 1/*, -1, 0, 17, 11*/};
-        int[] arr = {2, 5, 3, 0, 2, 3, 0, 3/*, -1, 0, 17, 11*/};
+        int[] arr = {6, 5, 3, 2, 7, 3, 2, 3, 4};
+        //int[] arr = {2, 5, 3, 0, 2, 3, 0, 3};
         int[] countingSort = this.countingSort(arr);
         System.out.println("countingSort: " + Arrays.toString(countingSort));
+        this.countingSort2(arr);
+        System.out.println("countingSort2, arr: " + Arrays.toString(arr));
     }
 
     public int[] countingSort(int[] arr) {
+        if (arr == null || arr.length < 2) {
+            return arr;
+        }
+
         int max = arr[0];
-        for (int i = 0; i < arr.length - 1; i++) {
-            if (max < arr[i + 1]) {
-                max = arr[i + 1];
+        for (int i = 1; i < arr.length; i++) {
+            if (max < arr[i]) {
+                max = arr[i];
             }
         }
 
-        return this.countingSort(arr, max + 1);
+        int[] count = new int[max + 1];
+        for (int value : arr) {
+            count[value]++;
+        }
+        System.out.println(Arrays.toString(count));
+
+        for (int i = 1; i < count.length; i++) {
+            count[i] = count[i] + count[i - 1];
+        }
+        System.out.println(Arrays.toString(count));
+
+        int[] dst = new int[arr.length];
+        for (int j = arr.length - 1; j >= 0; j--) {
+            dst[count[arr[j]] - 1] = arr[j];
+            count[arr[j]]--;
+        }
+
+        return dst;
     }
 
-    private int[] countingSort(int[] a, int k) {
-        int[] c = new int[k];
-        for (int i = 0; i < a.length; i++) {
-            c[a[i]]++;
-        }
-        System.out.println(Arrays.toString(c));
 
-        for (int i = 1; i < c.length; i++) {
-            c[i] = c[i] + c[i - 1];
-        }
-        System.out.println(Arrays.toString(c));
-
-        int[] b = new int[a.length];
-        for (int j = a.length - 1; j >= 0; j--) {
-            b[c[a[j]] - 1] = a[j];
-            c[a[j]]--;
+    public void countingSort2(int[] arr) {
+        if (arr == null || arr.length < 2) {
+            return;
         }
 
-        return b;
+        int max = arr[0], min = max;
+        for (int i = 1; i < arr.length; i++) {
+            int a = arr[i];
+            if (max < a) {
+                max = a;
+            }
+            if (min > a) {
+                min = a;
+            }
+        }
+        System.out.println("countingSort2, min: " + min + ", max: " + max);
+
+        int k = max - min + 1;
+        int[] count = new int[k];
+        for (int value : arr) {
+            count[value - min]++;
+        }
+        System.out.println(Arrays.toString(count));
+
+        int dstIndex = 0;
+        for (int index = 0; index < count.length; index++) {
+            while (count[index] > 0) {
+                arr[dstIndex++] = index + min;
+                count[index]--;
+            }
+        }
     }
 
 }
