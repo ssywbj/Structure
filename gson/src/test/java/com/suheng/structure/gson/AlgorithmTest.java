@@ -922,7 +922,6 @@ public class AlgorithmTest {
         return dst;
     }
 
-
     public void countingSort2(int[] arr) {
         if (arr == null || arr.length < 2) {
             return;
@@ -953,6 +952,57 @@ public class AlgorithmTest {
                 arr[dstIndex++] = index + min;
                 count[index]--;
             }
+        }
+    }
+
+    @Test
+    public void testRadixSort() {
+        int[] arr = {1282, 259, 319, 14, 1579};
+        this.radixSort(arr);
+        this.radixSortRec(arr);
+    }
+
+    public void radixSort(int[] arr) {
+        int[] dst = new int[arr.length];
+        int[] dstCopy = new int[arr.length];
+        System.arraycopy(arr, 0, dstCopy, 0, dstCopy.length);
+
+        int digits = 4;
+        for (int pow = 0; pow < digits; pow++) {
+            int dstIndex = 0;
+            for (int index = 0; index < 10; index++) {
+                for (int value : dstCopy) {
+                    if ((value / (int) Math.pow(10, pow)) % 10 == index) {
+                        dst[dstIndex++] = value;
+                    }
+                }
+            }
+
+            System.arraycopy(dst, 0, dstCopy, 0, dstCopy.length);
+            System.out.println("dstCopy: " + Arrays.toString(dstCopy));
+        }
+        System.out.println("dst: " + Arrays.toString(dst));
+    }
+
+    public void radixSortRec(int[] arr) {
+        this.radixSort(arr, 0, 4);
+    }
+
+    private void radixSort(int[] arr, int pow, int digit) {
+        if (pow < digit) {
+            int[] dst = new int[arr.length];
+            int dstIndex = 0;
+            for (int index = 0; index < 10; index++) {
+                for (int value : arr) {
+                    if ((value / (int) Math.pow(10, pow)) % 10 == index) {
+                        dst[dstIndex++] = value;
+                    }
+                }
+            }
+            System.out.println("dst: " + Arrays.toString(dst) + ", pow: " + pow);
+            this.radixSort(dst, pow + 1, digit);
+        } else {
+            System.out.println("dst: " + Arrays.toString(arr) + ", rec abort");
         }
     }
 
