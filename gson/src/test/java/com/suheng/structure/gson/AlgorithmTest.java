@@ -674,14 +674,15 @@ public class AlgorithmTest {
         System.out.println(Arrays.toString(arr));
     }
 
+    //https://www.cnblogs.com/gw811/archive/2012/10/13/2722752.html，运算符优先级
     private int leftChildIndex(int index) {
-        return index * 2 + 1;
-        //return index << 1 + 1;
+        //return index * 2 + 1;
+        return (index << 1) + 1; //位移优先级小于加减乘除
     }
 
     private int rightChildIndex(int index) {
-        return index * 2 + 2;
-        //return index << 1 + 2;
+        //return index * 2 + 2;
+        return (index << 1) + 2;
     }
 
     private void maxHeap(int[] arr, final int heapSize, final int index) {
@@ -1004,6 +1005,16 @@ public class AlgorithmTest {
         } else {
             System.out.println("dst: " + Arrays.toString(arr) + ", rec abort");
         }
+    }
+
+    @Test
+    public void testExchangeNumbers() {
+        int[] arr = {6, 5, 3, 2, 7, 3, 2, 3, 4};
+        //int[] arr = {2, 5, 3, 0, 2, 3, 0, 3};
+        this.bucketSort(arr);
+    }
+
+    public void bucketSort(int[] arr) {
     }
 
 }
