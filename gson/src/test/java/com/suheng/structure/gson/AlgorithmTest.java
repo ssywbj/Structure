@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -1009,12 +1010,31 @@ public class AlgorithmTest {
 
     @Test
     public void testExchangeNumbers() {
-        int[] arr = {6, 5, 3, 2, 7, 3, 2, 3, 4};
+        int[] arr = {78, 17, 39, 26, 72, 94, 21, 12, 23, 68, 1};
         //int[] arr = {2, 5, 3, 0, 2, 3, 0, 3};
         this.bucketSort(arr);
     }
 
     public void bucketSort(int[] arr) {
+        List<Integer>[] buckets = new ArrayList[10];
+        for (int i = 0; i < 10; i++) {
+            buckets[i] = new ArrayList<>(arr.length / buckets.length + 1);
+        }
+        for (int value : arr) {
+            buckets[value / 10].add(value);
+        }
+        int[] dst = new int[arr.length];
+        int dstIndex = 0;
+        for (List<Integer> bucket : buckets) {
+            System.out.println("bucket: " + bucket);
+            if (!bucket.isEmpty()) {
+                Collections.sort(bucket);
+                for (Integer integer : bucket) {
+                    dst[dstIndex++] = integer;
+                }
+            }
+        }
+        System.out.println("dst: " + Arrays.toString(dst));
     }
 
 }
