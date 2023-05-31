@@ -12,25 +12,52 @@ class TimeDemoView3 @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr), LifecycleOwner {
+) : View(context, attrs, defStyleAttr), LifecycleOwner, ViewModelStoreOwner {
 
     private var mViewModel: CountViewModel? = null
 
     private val mPaint = Paint()
     private val mRectSmall = Rect()
 
+    private val mRectSmall2 by lazy {
+        Rect()
+    }
+
+    private val mPaint2: Paint = Paint().apply {
+        isAntiAlias = true
+        typeface = Typeface.DEFAULT_BOLD
+        color = Color.BLACK
+    }
+
+    private val mPaint3 by lazy {
+        Paint().apply {
+            isAntiAlias = true
+            typeface = Typeface.DEFAULT_BOLD
+            color = Color.RED
+        }
+    }
+
     init {
         mPaint.isAntiAlias = true
         mPaint.typeface = Typeface.DEFAULT_BOLD
         mPaint.color = Color.BLACK
+        //_modelStoreOwner = ViewModelStore()
+        //ViewTreeViewModelStoreOwner.set(this, this)
     }
+
+    /*private fun View.findViewTreeViewModelStoreOwner(): ViewModelStoreOwner? =
+        ViewTreeViewModelStoreOwner.get(this)*/
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        //modelStoreOwner = ViewModelStore()
+        ViewTreeViewModelStoreOwner.set(this, this)
+
         mRegistry.currentState = Lifecycle.State.CREATED
-        mViewModel = findViewTreeViewModelStoreOwner()?.let {
+        /*mViewModel = findViewTreeViewModelStoreOwner()?.let {
             ViewModelProvider(it).get(CountViewModel::class.java)
-        }
+        }*/
+        mViewModel = ViewModelProvider(this)[CountViewModel::class.java]
 
         mViewModel?.mCountLive?.observe(this) { invalidate() }
         mViewModel?.startObserver()
@@ -38,10 +65,10 @@ class TimeDemoView3 @JvmOverloads constructor(
 
     override fun onVisibilityAggregated(isVisible: Boolean) {
         super.onVisibilityAggregated(isVisible)
-        if (visibility == VISIBLE) {
+        if (isVisible) {
             mRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
             mRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        } else if (visibility == GONE || visibility == INVISIBLE) {
+        } else {
             mRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
             mRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         }
@@ -52,9 +79,6 @@ class TimeDemoView3 @JvmOverloads constructor(
         mRegistry.currentState = Lifecycle.State.DESTROYED
     }
 
-    private fun View.findViewTreeViewModelStoreOwner(): ViewModelStoreOwner? =
-        ViewTreeViewModelStoreOwner.get(this)
-
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         mPaint.textSize = 40f
@@ -64,8 +88,8 @@ class TimeDemoView3 @JvmOverloads constructor(
         val left = ((w - rect.width()) / 2f).toInt()
         var top = 15
         mRectSmall[left, top, left + rect.width()] = rect.height().let { top += it; top }
-        mPaint.textSize = 60f
-        mPaint.getTextBounds(text, 0, text.length, rect)
+        mPaint3.textSize = 60f
+        mPaint3.getTextBounds(text, 0, text.length, rect)
     }
 
     override fun draw(canvas: Canvas) {
@@ -74,14 +98,23 @@ class TimeDemoView3 @JvmOverloads constructor(
         //val second: Int = mViewModel.mCountLive.getValue()
         //val text = "Text"
         val text = mViewModel?.mCountLive?.value.toString()
-        mPaint.textSize = 40f
-        canvas.drawText(text, mRectSmall.left.toFloat(), mRectSmall.bottom.toFloat(), mPaint)
+        //mPaint.textSize = 40f
+        mPaint3.textSize = 40f
+        canvas.drawText(text, mRectSmall.left.toFloat(), mRectSmall.bottom.toFloat(), mPaint3)
     }
 
     private val mRegistry = LifecycleRegistry(this)
 
     override fun getLifecycle(): Lifecycle {
         return mRegistry
+    }
+
+    private var _modelStoreOwner: ViewModelStore = ViewModelStore()
+
+    //private val modelStoreOwner2 get() = _modelStoreOwner
+
+    override fun getViewModelStore(): ViewModelStore {
+        return _modelStoreOwner
     }
 
 }

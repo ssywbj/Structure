@@ -13,7 +13,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import com.suheng.structure.view.PathKtView
 import com.suheng.structure.view.PathKtView2
 import com.suheng.structure.view.R
@@ -26,7 +25,7 @@ class SVGPathActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        ViewTreeViewModelStoreOwner.set(window.decorView,this)
+        //ViewTreeViewModelStoreOwner.set(window.decorView,this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_svg_path)
 
