@@ -9,19 +9,13 @@ import com.suheng.structure.view.utils.CountViewModel
 import java.util.*
 
 class TimeDemoView3 @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr), LifecycleOwner, ViewModelStoreOwner {
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+) : View(context, attrs, defStyleAttr), LifecycleOwner {
 
     private var mViewModel: CountViewModel? = null
 
     private val mPaint = Paint()
     private val mRectSmall = Rect()
-
-    private val mRectSmall2 by lazy {
-        Rect()
-    }
 
     private val mPaint2: Paint = Paint().apply {
         isAntiAlias = true
@@ -41,26 +35,23 @@ class TimeDemoView3 @JvmOverloads constructor(
         mPaint.isAntiAlias = true
         mPaint.typeface = Typeface.DEFAULT_BOLD
         mPaint.color = Color.BLACK
-        //_modelStoreOwner = ViewModelStore()
-        //ViewTreeViewModelStoreOwner.set(this, this)
     }
 
-    /*private fun View.findViewTreeViewModelStoreOwner(): ViewModelStoreOwner? =
-        ViewTreeViewModelStoreOwner.get(this)*/
+    private fun View.findViewTreeViewModelStoreOwner(): ViewModelStoreOwner? =
+        ViewTreeViewModelStoreOwner.get(this)
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        //modelStoreOwner = ViewModelStore()
-        ViewTreeViewModelStoreOwner.set(this, this)
-
         mRegistry.currentState = Lifecycle.State.CREATED
-        /*mViewModel = findViewTreeViewModelStoreOwner()?.let {
+        //mViewModel = ViewTreeViewModelStoreOwner.get(this)?.let {
+        mViewModel = findViewTreeViewModelStoreOwner()?.let {
             ViewModelProvider(it).get(CountViewModel::class.java)
-        }*/
-        mViewModel = ViewModelProvider(this)[CountViewModel::class.java]
+        }
 
-        mViewModel?.mCountLive?.observe(this) { invalidate() }
-        mViewModel?.startObserver()
+        mViewModel?.let {
+            it.mCountLive.observe(this) { invalidate() }
+            it.startObserver()
+        }
     }
 
     override fun onVisibilityAggregated(isVisible: Boolean) {
@@ -107,14 +98,6 @@ class TimeDemoView3 @JvmOverloads constructor(
 
     override fun getLifecycle(): Lifecycle {
         return mRegistry
-    }
-
-    private var _modelStoreOwner: ViewModelStore = ViewModelStore()
-
-    //private val modelStoreOwner2 get() = _modelStoreOwner
-
-    override fun getViewModelStore(): ViewModelStore {
-        return _modelStoreOwner
     }
 
 }
