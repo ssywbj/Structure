@@ -73,4 +73,14 @@ dependencies {
     implementation(name: 'renderscript-toolkit-release', ext: 'aar')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     //renderscript-toolkit需要用到kotlin库
+
+    //https://juejin.cn/post/7051856553171189791
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
+
+    //https://blog.csdn.net/yu540135101/article/details/113246177
+    //https://blog.csdn.net/vitaviva/article/details/108897278
+    //https://developer.android.com/topic/libraries/architecture/coroutines?hl=zh-cn
+    //https://developer.android.com/kotlin/coroutines?hl=zh-cn
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
 }

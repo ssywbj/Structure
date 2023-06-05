@@ -5,8 +5,14 @@ import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 class CountViewModel : ViewModel() {
+
+    init {
+        viewModelScope.launch { }
+    }
 
     private val mHandler by lazy {
         Handler(Looper.getMainLooper())

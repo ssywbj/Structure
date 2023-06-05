@@ -13,10 +13,17 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.suheng.structure.view.PathKtView
 import com.suheng.structure.view.PathKtView2
 import com.suheng.structure.view.R
 import com.suheng.structure.view.utils.CountViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class SVGPathActivity : AppCompatActivity() {
 
@@ -141,6 +148,40 @@ class SVGPathActivity : AppCompatActivity() {
             mTextTime.text = "$value"
         }
         mViewModel.startObserver()
+
+        //this.coroutines()
+        //this.coroutines2()
+
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+
+            }
+        }
+
+    }
+
+    private fun coroutines() {
+
+        GlobalScope.launch {
+            delay(3000L)
+            println("GlobalScope, World")
+            Log.d(Singleton.TAG, "GlobalScope, World")
+        }
+        Log.d(Singleton.TAG, "GlobalScope, Hello")
+        //Thread.sleep(2000L)
+        runBlocking {
+            delay(2000L)
+        }
+    }
+
+    private fun coroutines2() = runBlocking<Unit> {
+        GlobalScope.launch {
+            delay(3000L)
+            println("GlobalScope, World")
+            Log.d(Singleton.TAG, "GlobalScope, World")
+        }
+        Log.d(Singleton.TAG, "GlobalScope, Hello")
+        delay(2000L)
     }
 
 }
