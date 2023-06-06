@@ -10,6 +10,7 @@ import com.suheng.structure.view.R
 import com.suheng.structure.view.kt.Derived2
 import com.suheng.structure.view.kt.Person
 import com.suheng.structure.view.kt.Square
+import kotlinx.coroutines.*
 import java.io.File
 import java.math.BigDecimal
 import java.nio.file.Files
@@ -108,6 +109,10 @@ class KotlinActivity : AppCompatActivity() {
 
         val square = Square("Wbj Square")
         square.draw()
+
+        //this.coroutines2()
+        //this.coroutines3()
+        this.coroutines5()
     }
 
     private fun main() {
@@ -506,4 +511,71 @@ class KotlinActivity : AppCompatActivity() {
     //TODO(String)：将代码标记为不完整
     private fun calcTaxes(): BigDecimal = TODO("Waiting for feedback from accounting")
     //习惯用法：end
+
+    private fun coroutines() {
+        GlobalScope.launch {
+            delay(3000L)
+            Log.d("Wbj_", "GlobalScope, World")
+        }
+        Log.d("Wbj_", "GlobalScope, Hello")
+        //Thread.sleep(2000L)
+        runBlocking {
+            delay(1000L)
+        }
+    }
+
+    private fun coroutines2() = runBlocking {
+        GlobalScope.launch {
+            delay(3000L)
+            Log.d("Wbj_", "GlobalScope, World")
+        }
+        Log.d("Wbj_", "GlobalScope, Hello")
+        delay(2000L)
+        Log.d("Wbj_", "GlobalScope, Hello333")
+    }
+
+    private fun coroutines3() = runBlocking {
+        val job = GlobalScope.launch {
+            delay(3000L)
+            Log.d("Wbj_", "GlobalScope, World")
+        }
+        Log.d("Wbj_", "GlobalScope, Hello")
+        job.join()
+        Log.d("Wbj_", "GlobalScope, Hello222")
+    }
+
+    private fun coroutines4() = runBlocking {
+        launch {
+            delay(3000L)
+            Log.d("Wbj_", "GlobalScope, World")
+        }
+        Log.d("Wbj_", "GlobalScope, Hello")
+    }
+
+    private fun coroutines5() = runBlocking {
+        /*val job = launch {
+            delay(3000L)
+            Log.d("Wbj_", "GlobalScope, World")
+        }
+        delay(2000)
+        Log.d("Wbj_", "GlobalScope, Hello")
+        //job.cancel()
+        //job.join()
+        job.cancelAndJoin()*/
+
+        val job = launch {
+            try {
+                repeat(1000) { i ->
+                    Log.d("Wbj_", "job: I'm sleeping $i ...")
+                    delay(500L)
+                }
+            } finally {
+                Log.d("Wbj_", "job: I'm running finally")
+            }
+        }
+        delay(1300L) // 延迟一段时间
+        Log.d("Wbj_", "main: I'm tired of waiting!")
+        job.cancelAndJoin() // 取消该作业并且等待它结束
+        Log.d("Wbj_", "main: Now I can quit.")
+    }
 }

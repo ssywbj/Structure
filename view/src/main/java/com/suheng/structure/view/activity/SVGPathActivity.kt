@@ -19,10 +19,7 @@ import com.suheng.structure.view.PathKtView2
 import com.suheng.structure.view.R
 import com.suheng.structure.view.utils.CountViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 class SVGPathActivity : AppCompatActivity() {
@@ -143,45 +140,46 @@ class SVGPathActivity : AppCompatActivity() {
         val countObserver = Observer<Int> { t -> mTextTime.text = "$t" }
         mCountLive.observe(this, countObserver)*/
 
-
         mViewModel.mCountLive.observe(this) { value ->
             mTextTime.text = "$value"
         }
         mViewModel.startObserver()
 
-        //this.coroutines()
-        //this.coroutines2()
-
         lifecycleScope.launch {
+            Log.d("Wbj_", "++lifecycleScope launch launch, ${Thread.currentThread().name}")
             withContext(Dispatchers.IO) {
-
+                Log.d("Wbj_", "IO thread, ${Thread.currentThread().name}")
             }
         }
 
-    }
-
-    private fun coroutines() {
-
-        GlobalScope.launch {
-            delay(3000L)
-            println("GlobalScope, World")
-            Log.d(Singleton.TAG, "GlobalScope, World")
+        lifecycleScope.launch {
+            Log.d("Wbj_", "--lifecycleScope launch thread, ${Thread.currentThread().name}")
+            withContext(Dispatchers.Main) {
+                Log.d("Wbj_", "main thread, ${Thread.currentThread().name}")
+            }
         }
-        Log.d(Singleton.TAG, "GlobalScope, Hello")
-        //Thread.sleep(2000L)
-        runBlocking {
-            delay(2000L)
-        }
-    }
 
-    private fun coroutines2() = runBlocking<Unit> {
-        GlobalScope.launch {
-            delay(3000L)
-            println("GlobalScope, World")
-            Log.d(Singleton.TAG, "GlobalScope, World")
-        }
-        Log.d(Singleton.TAG, "GlobalScope, Hello")
-        delay(2000L)
+        /*lifecycleScope.launch {
+            val async = async(Dispatchers.IO) {
+                Log.d("Wbj_", "async thread: ${Thread.currentThread().name}")
+                return@async FileUtil.loadPets(resources)
+            }
+            val recAdapter = MainRecAdapter(this@MainActivity, async.await())
+            recyclerView.adapter = recAdapter
+        }*/
+
+        /*lifecycleScope.launch(Dispatchers.IO) {
+            val petList = suspendCoroutine {
+                Log.d("Wbj_", "suspendCoroutine thread: ${Thread.currentThread().name}")
+                it.resume(FileUtil.loadPets(resources))
+            }
+
+            withContext(Dispatchers.Main) {
+                val recAdapter = MainRecAdapter(this@MainActivity, petList)
+                recyclerView.adapter = recAdapter
+            }
+        }*/
+
     }
 
 }

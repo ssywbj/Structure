@@ -78,7 +78,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
 
     //https://blog.csdn.net/yu540135101/article/details/113246177
-    //https://blog.csdn.net/vitaviva/article/details/108897278
+    //https://rengwuxian.com/kotlin-coroutines-1/
     //https://developer.android.com/topic/libraries/architecture/coroutines?hl=zh-cn
     //https://developer.android.com/kotlin/coroutines?hl=zh-cn
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
