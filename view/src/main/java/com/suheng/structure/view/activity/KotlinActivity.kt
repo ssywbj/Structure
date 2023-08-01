@@ -113,6 +113,34 @@ class KotlinActivity : AppCompatActivity() {
         //this.coroutines2()
         //this.coroutines3()
         this.coroutines5()
+
+        var operation = this.operation(2, 4, ::plus)
+        Log.d("Wbj", "operation, plus: $operation")
+        operation = this.operation(2, 4, ::minus)
+        Log.d("Wbj", "operation, minus: $operation")
+        operation = this.operation(3, 6) { num_a, num_b ->
+            num_a + num_b
+        }
+        Log.d("Wbj", "operation, Lambda, plus: $operation")
+        operation = this.operation(3, 6) { num_a, num_b ->
+            num_a - num_b
+        }
+        Log.d("Wbj", "operation, Lambda, minus: $operation")
+
+        Log.d("Wbj", "operation, funType: $funType")
+        Log.d("Wbj", "operation, funType: ${funType(1, 4)}")
+        funType = ::minus
+        Log.d("Wbj", "operation, funType: $funType")
+        Log.d("Wbj", "operation, funType: ${funType(1, 4)}")
+        Log.d("Wbj", "operation, funType: $funType2")
+        Log.d("Wbj", "operation, funType: ${funType2(11, 4)}")
+        funType2 = { funA1: Int, funA2: Int -> funA1 - funA2 }
+        Log.d("Wbj", "operation, funType: $funType2")
+        Log.d("Wbj", "operation, funType: ${funType2(11, 4)}")
+
+        val returnFunType = this.returnFunType(0)
+        Log.d("Wbj", "operation, returnFunType: ${returnFunType(1, 4)}")
+        Log.d("Wbj", "operation, returnFunType: ${this.returnFunType(1)(1, 4)}")
     }
 
     private fun main() {
@@ -578,4 +606,29 @@ class KotlinActivity : AppCompatActivity() {
         job.cancelAndJoin() // 取消该作业并且等待它结束
         Log.d("Wbj_", "main: Now I can quit.")
     }
+
+    fun plus(a: Int, b: Int): Int = a + b
+
+    fun minus(a: Int, b: Int): Int {
+        return a - b
+    }
+
+    //参数是函数类型的高阶函数
+    private fun operation(a: Int, b: Int, func: (Int, Int) -> Int): Int {
+        return func(a, b)
+    }
+
+    //返回值是函数类型的高阶函数
+    private fun returnFunType(type: Int): (Int, Int) -> Int {
+        return if (type == 0) {
+            ::plus
+        } else {
+            ::minus
+        }
+    }
+
+    //函数类型变量
+    private var funType: (Int, Int) -> Int = ::plus
+    private var funType2: (Int, Int) -> Int = { a: Int, b: Int -> a + b }
+
 }
