@@ -10,6 +10,7 @@ import com.suheng.structure.view.R
 import com.suheng.structure.view.kt.Derived2
 import com.suheng.structure.view.kt.Person
 import com.suheng.structure.view.kt.Square
+import com.suheng.structure.view.kt.generic.*
 import kotlinx.coroutines.*
 import java.io.File
 import java.math.BigDecimal
@@ -141,6 +142,28 @@ class KotlinActivity : AppCompatActivity() {
         val returnFunType = this.returnFunType(0)
         Log.d("Wbj", "operation, returnFunType: ${returnFunType(1, 4)}")
         Log.d("Wbj", "operation, returnFunType: ${this.returnFunType(1)(1, 4)}")
+
+        val production1: Production<Food> = FoodStore()
+        production1.produce()
+        val production2: Production<Food> = FastFoodStore()
+        production2.produce()
+        val production3: Production<Food> = BurgerStore()
+        production3.produce()
+
+        /*val production1: Production<Burger> = FoodStore() //Error
+        val production2: Production<Burger> = FastFoodStore() //Error
+        val production3: Production<Burger> = InOutBurger()*/
+
+        val consumer1: Consumer<Burger> = Everybody()
+        consumer1.consume(Burger())
+        val consumer2: Consumer<Burger> = ModernPeople()
+        consumer2.consume(Burger())
+        val consumer3: Consumer<Burger> = American()
+        consumer3.consume(Burger())
+
+        /*val consumer1: Consumer<Food> = Everybody()
+        val consumer2: Consumer<Food> = ModernPeople() //Error
+        val consumer3: Consumer<Food> = American() //Error*/
     }
 
     private fun main() {
