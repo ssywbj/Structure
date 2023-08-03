@@ -7,9 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.suheng.structure.view.R
-import com.suheng.structure.view.kt.Derived2
-import com.suheng.structure.view.kt.Person
-import com.suheng.structure.view.kt.Square
+import com.suheng.structure.view.kt.*
 import com.suheng.structure.view.kt.generic.*
 import kotlinx.coroutines.*
 import java.io.File
@@ -80,7 +78,6 @@ class KotlinActivity : AppCompatActivity() {
         println("lazy attr1: $lazyAttr")
         this.lazyAttr2()
 
-        s1.extensionsMethod()
         Wei.age = 23
         println("Wei: ${Wei.age}, ${Wei.name}")
 
@@ -164,6 +161,10 @@ class KotlinActivity : AppCompatActivity() {
         /*val consumer1: Consumer<Food> = Everybody()
         val consumer2: Consumer<Food> = ModernPeople() //Error
         val consumer3: Consumer<Food> = American() //Error*/
+
+        Log.d("Wbj", "lastTwoChar fun: ${"hello world!".lastTwoChar()}")
+        Log.d("Wbj", "lastChar attr: ${"hello world!".lastChar}")
+        Log.d("Wbj", "lastChar attr: ${"hello world!".lastChar2}")
     }
 
     private fun main() {
@@ -418,11 +419,6 @@ class KotlinActivity : AppCompatActivity() {
 
         println(lazyAttr2)
         println(lazyAttr2)
-    }
-
-    //扩展函数：扩展一个类的新功能而无需继承该类。
-    private fun String.extensionsMethod() { //为String添加一个新方法，扩展了它的功能
-        println("extensions String function")
     }
 
     //创建单例
