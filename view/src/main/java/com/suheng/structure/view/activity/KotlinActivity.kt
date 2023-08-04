@@ -140,6 +140,16 @@ class KotlinActivity : AppCompatActivity() {
         Log.d("Wbj", "operation, returnFunType: ${returnFunType(1, 4)}")
         Log.d("Wbj", "operation, returnFunType: ${this.returnFunType(1)(1, 4)}")
 
+        intArrayOf(2, 1, 3).forEach(action2)
+        intArrayOf(2, 1, 3).forEach(::printInt) //直接把"::printInt"传进来
+        intArrayOf(2, 1, 3).forEach(action)
+        //对action简化2：如果Lambda表达式只有一个参数，那么可以直接用it来代替，并且不需要声明参数名
+        intArrayOf(2, 1, 3).forEach({ Log.d("Wbj", "simple2 value, $it") })
+        //对action简化3：如果Lambda参数是函数的最后一个参数，那么可以将Lambda表达式移到函数括号的外面
+        intArrayOf(2, 1, 3).forEach() { Log.d("Wbj", "simple3 value, $it") }
+        //对action简化4：如果Lambda表达式是函数的唯一一个参数，那么可以将函数的括号省略
+        intArrayOf(2, 1, 3).forEach { Log.d("Wbj", "simple4 value, $it") }
+
         val production1: Production<Food> = FoodStore()
         production1.produce()
         val production2: Production<Food> = FastFoodStore()
@@ -649,5 +659,13 @@ class KotlinActivity : AppCompatActivity() {
     //函数类型变量
     private var funType: (Int, Int) -> Int = ::plus
     private var funType2: (Int, Int) -> Int = { a: Int, b: Int -> a + b }
+
+    //private val action: (Int) -> Unit = { value: Int -> Log.d("Wbj", "action value, $value") }
+    //对action简化1：Kotlin有类型推到机制，Int可以去掉
+    private val action: (Int) -> Unit = { value -> Log.d("Wbj", "action value, $value") }
+    private val action2: (Int) -> Unit = ::printInt
+    private fun printInt(value: Int) {
+        Log.d("Wbj", "action2 value, $value")
+    }
 
 }
