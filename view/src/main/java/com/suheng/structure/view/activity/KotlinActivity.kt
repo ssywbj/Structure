@@ -175,6 +175,13 @@ class KotlinActivity : AppCompatActivity() {
         Log.d("Wbj", "lastTwoChar fun: ${"hello world!".lastTwoChar()}")
         Log.d("Wbj", "lastChar attr: ${"hello world!".lastChar}")
         Log.d("Wbj", "lastChar attr: ${"hello world!".lastChar2}")
+
+        val takeIf = "hello world!".takeIf { it.startsWith("kko") }
+        val takeUnless = "hello world!".takeUnless { it.startsWith("kko") }
+        Log.d("Wbj", "takeIf: $takeIf, takeUnless: $takeUnless")
+        repeat(3) {
+            Log.d("Wbj", "repeat time: $it")
+        }
     }
 
     private fun main() {
