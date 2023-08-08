@@ -141,7 +141,8 @@ class KotlinActivity : AppCompatActivity() {
         Log.d("Wbj", "operation, returnFunType: ${this.returnFunType(1)(1, 4)}")
 
         intArrayOf(2, 1, 3).forEach(action2)
-        intArrayOf(2, 1, 3).forEach(::printInt) //直接把"::printInt"传进来
+        intArrayOf(2, 1, 3).forEach(::printInt) //直接把自定义的printInt方法传进来
+        intArrayOf(2, 1, 3).forEach(::println) //直接把标准库的println方法传进来
         intArrayOf(2, 1, 3).forEach(action)
         //对action简化2：如果Lambda表达式只有一个参数，那么可以直接用it来代替，并且不需要声明参数名
         intArrayOf(2, 1, 3).forEach({ Log.d("Wbj", "simple2 value, $it") })
@@ -182,6 +183,19 @@ class KotlinActivity : AppCompatActivity() {
         repeat(3) {
             Log.d("Wbj", "repeat time: $it")
         }
+
+        val str = "hello wo rld!"
+        str.filter { !it.isWhitespace() }
+            .let { Log.d("Wbj", "filter: $it") } //return string
+        str.filter { !it.isWhitespace() }.groupBy { it }  //return map
+            .let { Log.d("Wbj", "filter groupBy: $it") }
+        str.filter { !it.isWhitespace() }.groupBy { it }
+            .map { it.key to it.value.size } //return list
+            .let { Log.d("Wbj", "filter groupBy map: $it, element 2: ${it[1]}") }
+        str.filter { !it.isWhitespace() }.toList().sorted().groupBy { it }
+            .map { it.key to it.value.size }
+            .let { Log.d("Wbj", "filter toList sorted groupBy, map: $it, element 2: ${it[1]}") }
+        str.toSortedSet().let { Log.d("Wbj", "toSortedSet: $it") }
     }
 
     private fun main() {
@@ -419,6 +433,7 @@ class KotlinActivity : AppCompatActivity() {
         for (value in map.values) {
             println("map value: $value")
         }
+
     }
 
     //延迟属性
