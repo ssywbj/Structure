@@ -196,6 +196,9 @@ class KotlinActivity : AppCompatActivity() {
             .map { it.key to it.value.size }
             .let { Log.d("Wbj", "filter toList sorted groupBy, map: $it, element 2: ${it[1]}") }
         str.toSortedSet().let { Log.d("Wbj", "toSortedSet: $it") }
+
+        getPeople<People2>().printName()
+        getPeople<People3>().printName()
     }
 
     private fun main() {
@@ -688,6 +691,10 @@ class KotlinActivity : AppCompatActivity() {
     private val action2: (Int) -> Unit = ::printInt
     private fun printInt(value: Int) {
         Log.d("Wbj", "action2 value, $value")
+    }
+
+    private inline fun <reified T : People> getPeople(): People {
+        return T::class.java.newInstance()
     }
 
 }
