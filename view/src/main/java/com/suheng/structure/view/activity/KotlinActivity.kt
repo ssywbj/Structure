@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.suheng.structure.view.R
 import com.suheng.structure.view.kt.*
 import com.suheng.structure.view.kt.generic.*
@@ -199,6 +200,21 @@ class KotlinActivity : AppCompatActivity() {
 
         getPeople<People2>().printName()
         getPeople<People3>().printName()
+
+        lifecycleScope.launch {
+            val avatar = getAvatar()
+            val companyLogo = getCompanyLogo()
+            Log.d("Wbj", "avatar: $avatar, companyLogo: $companyLogo")
+            val avatar2 = async { getAvatar() }
+            val companyLogo2 = async(Dispatchers.IO) {
+                Log.d("Wbj", "getCompanyLogo2 thread: ${Thread.currentThread().name}")
+                getCompanyLogo()
+            }
+            Log.d(
+                "Wbj",
+                "avatar2: ${avatar2.await()}, companyLogo2: ${companyLogo2.await()}, thread: ${Thread.currentThread().name}"
+            )
+        }
     }
 
     private fun main() {
@@ -649,7 +665,7 @@ class KotlinActivity : AppCompatActivity() {
             try {
                 repeat(1000) { i ->
                     Log.d("Wbj_", "job: I'm sleeping $i ...")
-                    delay(500L)
+                    delay(2000L)
                 }
             } finally {
                 Log.d("Wbj_", "job: I'm running finally")
@@ -695,6 +711,16 @@ class KotlinActivity : AppCompatActivity() {
 
     private inline fun <reified T : People> getPeople(): People {
         return T::class.java.newInstance()
+    }
+
+    private suspend fun getAvatar(): Int = withContext(Dispatchers.IO) {
+        Log.d("Wbj", "getAvatar thread: ${Thread.currentThread().name}")
+        return@withContext 1
+    }
+
+    private suspend fun getCompanyLogo(): Int {
+        Log.d("Wbj", "getCompanyLogo thread: ${Thread.currentThread().name}")
+        return 2
     }
 
 }
