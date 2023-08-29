@@ -10,11 +10,13 @@ import androidx.lifecycle.lifecycleScope
 import com.suheng.structure.view.R
 import com.suheng.structure.view.kt.*
 import com.suheng.structure.view.kt.generic.*
+import kotlinx.android.synthetic.main.activity_kotlin.*
 import kotlinx.coroutines.*
 import java.io.File
 import java.math.BigDecimal
 import java.nio.file.Files
 import java.nio.file.Paths
+import kotlin.system.measureTimeMillis
 
 class KotlinActivity : AppCompatActivity() {
 
@@ -201,21 +203,76 @@ class KotlinActivity : AppCompatActivity() {
         getPeople<People2>().printName()
         getPeople<People3>().printName()
 
-        lifecycleScope.launch {
-            val avatar = getAvatar()
-            val companyLogo = getCompanyLogo()
-            Log.d("Wbj", "avatar: $avatar, companyLogo: $companyLogo")
-            val avatar2 = async { getAvatar() }
-            val companyLogo2 = async(Dispatchers.IO) {
-                Log.d("Wbj", "getCompanyLogo2 thread: ${Thread.currentThread().name}")
-                getCompanyLogo()
+        btnAsync.setOnClickListener {
+            lifecycleScope.launch {
+                val currentTimeMillis = System.currentTimeMillis()
+                Log.d(
+                    "Wbj",
+                    "avatar, companyLogo, start: ${Thread.currentThread().name}, currentTimeMillis: $currentTimeMillis"
+                )
+                val avatar = getAvatar()
+                val companyLogo = getCompanyLogo()
+                Log.d(
+                    "Wbj",
+                    "avatar: $avatar, companyLogo: $companyLogo, end: ${Thread.currentThread().name}" +
+                            ", take time: ${1.0 * (System.currentTimeMillis() - currentTimeMillis) / 1000}s"
+                )
+
+                Log.i("Wbj", "---sync start---")
+                measureTimeMillis {
+                    val avatar2 = getAvatar()
+                    val companyLogo2 = getCompanyLogo()
+                    Log.i(
+                        "Wbj",
+                        "avatar2: $avatar2, companyLogo2: $companyLogo2, end: ${Thread.currentThread().name}"
+                    )
+                }.also {
+                    Log.i("Wbj", "sync take time: ${1.0 * it / 1000}s")
+                }
+
+                Log.w("Wbj", "---async await start---")
+                measureTimeMillis {
+                    val avatar2 = async { getAvatar() }
+                    val companyLogo2 = async { getCompanyLogo() }
+                    Log.w(
+                        "Wbj",
+                        "avatar2: ${avatar2.await()}, companyLogo2: ${companyLogo2.await()}, end: ${Thread.currentThread().name}"
+                    )
+                }.also {
+                    Log.w("Wbj", "async take time: ${1.0 * it / 1000}s")
+                }
+
+                deferredAvatar2 = async(start = CoroutineStart.LAZY) { getAvatar() }
+                deferredCompanyLogo2 = async(start = CoroutineStart.LAZY) { getCompanyLogo() }
+                /*val await = deferredAvatar2!!.await()
+                val await1 = deferredCompanyLogo2!!.await()
+                Log.w(
+                    "Wbj",
+                    "lazy avatar2: $await, companyLogo2: $await1, end: ${Thread.currentThread().name}"
+                )*/
             }
-            Log.d(
-                "Wbj",
-                "avatar2: ${avatar2.await()}, companyLogo2: ${companyLogo2.await()}, thread: ${Thread.currentThread().name}"
-            )
         }
+
+        btnAsyncLazy.setOnClickListener {
+            lifecycleScope.launch {
+                Log.w("Wbj", "---lazy async await start---")
+                measureTimeMillis {
+                    deferredAvatar2?.start()
+                    deferredCompanyLogo2?.start()
+                    Log.w(
+                        "Wbj",
+                        "avatar2: ${deferredAvatar2?.await()}, companyLogo2: ${deferredCompanyLogo2?.await()}, end: ${Thread.currentThread().name}"
+                    )
+                }.also {
+                    Log.w("Wbj", "lazy async take time: ${1.0 * it / 1000}s")
+                }
+            }
+        }
+
     }
+
+    private var deferredAvatar2: Deferred<Int>? = null
+    private var deferredCompanyLogo2: Deferred<Int>? = null
 
     private fun main() {
         println("hello world!")
@@ -714,13 +771,17 @@ class KotlinActivity : AppCompatActivity() {
     }
 
     private suspend fun getAvatar(): Int = withContext(Dispatchers.IO) {
-        Log.d("Wbj", "getAvatar thread: ${Thread.currentThread().name}")
+        //delay(2000) //delay是一个特殊的挂起函数，它不会造成线程阻塞，但是会挂起协程，并且只能在协程中使用。
+        Thread.sleep(2000) //sleep会阻塞线程。因此要把它放在子线程中，不然会阻塞主线程。
+        Log.v("Wbj", "getAvatar thread: ${Thread.currentThread().name}")
         return@withContext 1
     }
 
-    private suspend fun getCompanyLogo(): Int {
-        Log.d("Wbj", "getCompanyLogo thread: ${Thread.currentThread().name}")
-        return 2
+    private suspend fun getCompanyLogo(): Int = withContext(Dispatchers.IO) {
+        //delay(2000)
+        Thread.sleep(3000)
+        Log.v("Wbj", "getCompanyLogo thread: ${Thread.currentThread().name}")
+        return@withContext 2
     }
 
 }

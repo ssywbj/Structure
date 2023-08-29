@@ -4,4 +4,27 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="6dp">
+
+    <Button
+        android:id="@+id/btnAsync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:drawable/btn_default"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="Async"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btnAsyncLazy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="4dp"
+        android:background="@android:drawable/btn_default"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="AsyncLazy"
+        android:textAllCaps="false" />
 </LinearLayout>
