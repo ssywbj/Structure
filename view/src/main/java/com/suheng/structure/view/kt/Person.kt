@@ -3,7 +3,9 @@ package com.suheng.structure.view.kt
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
+import kotlin.reflect.KProperty
 
 //class Empty //类声明由类名、类头（指定其类型参数、主构造函数等）以及由花括号包围的类休构成。类头与类体都是可选的：如果一个类没有类体，可以省略花括号。
 
@@ -105,7 +107,7 @@ open class Base2(val name: String) {
     open val size: Int = name.length.also { println("Initializing size in Base2: $it") }
 
     open fun draw() {
-        println("Base2, draw, draw: $name")
+        Log.d("Wbj", "Base2, draw, draw: $name")
     }
 }
 
@@ -143,7 +145,7 @@ class Derived2(name: String, lastName: String) :
 
 interface Polygon2 {
     fun draw() { //接口成员默认是open
-        println("Polygon2 draw 空实现")
+        Log.d("Wbj", "Polygon2 draw 空实现")
     }
 
     fun draw2()
@@ -158,6 +160,14 @@ class Square(name: String) : Base2(name), Polygon2 { //同时继承Base2与Polyg
     }
 
     override fun draw2() {}
+
+    operator fun getValue(clazz: Any, property: KProperty<*>): String {
+        return "Hello from delegate!"
+    }
+
+    operator fun setValue(clazz: Any, property: KProperty<*>, value: String) {
+        Log.i("Wbj", "Setting value to $value, clazz: $clazz")
+    }
 }
 
 //抽象类
@@ -170,8 +180,91 @@ abstract class Square2 : Polygon2 {
 
 class Square3 : Square2() {
     override fun draw() {
+        Log.i("Wbj", "Square3, draw()")
     }
 
     override fun draw3() {
+    }
+}
+
+class MyOtherClass : Polygon2 by Square("Delegate interface") //类委托：指定类
+class MyOtherClass2(private val polygon2: Polygon2) : Polygon2 by polygon2 {
+    override fun draw() {
+        Log.i("Wbj", "$polygon2, draw()")
+        polygon2.draw()
+    }
+}//类委托：指定类型
+
+class MyClass { //属性委托
+    var myProperty: String by Square("Delegate property")
+}
+
+class MapObject(val map: MutableMap<String, Any>) { //委托的一个示例
+    var myProperty: String by map //key、value均为String
+    var myOtherProperty: Int by map //key为String，value为Int
+}
+
+//https://blog.csdn.net/willway_wang/article/details/120795321
+//https://juejin.cn/post/7226629911351132215?from=search-suggest
+class Counting2<E> : MutableSet<E> {
+    private val innerSet = HashSet<E>()
+    private var objectAdded = 0
+    override val size: Int get() = 10
+
+    override fun add(element: E): Boolean {
+        objectAdded++
+        return innerSet.add(element)
+    }
+
+    override fun addAll(elements: Collection<E>): Boolean {
+        objectAdded += elements.size
+        return innerSet.addAll(elements)
+    }
+
+    override fun clear() {
+        innerSet.clear()
+    }
+
+    override fun iterator(): MutableIterator<E> {
+        return innerSet.iterator()
+    }
+
+    override fun remove(element: E): Boolean {
+        return innerSet.remove(element)
+    }
+
+    override fun removeAll(elements: Collection<E>): Boolean {
+        return innerSet.removeAll(elements)
+    }
+
+    override fun retainAll(elements: Collection<E>): Boolean {
+        return innerSet.retainAll(elements)
+    }
+
+    override fun contains(element: E): Boolean {
+        return innerSet.contains(element)
+    }
+
+    override fun containsAll(elements: Collection<E>): Boolean {
+        return innerSet.containsAll(elements)
+    }
+
+    override fun isEmpty(): Boolean {
+        return innerSet.isEmpty()
+    }
+}
+
+class Counting3<E>(private val innerSet: MutableSet<E> = HashSet()) : MutableSet<E> by innerSet {
+    private var objectAdded = 0
+    override val size: Int get() = 10
+
+    override fun add(element: E): Boolean {
+        objectAdded++
+        return innerSet.add(element)
+    }
+
+    override fun addAll(elements: Collection<E>): Boolean {
+        objectAdded += elements.size
+        return innerSet.addAll(elements)
     }
 }

@@ -267,6 +267,23 @@ class KotlinActivity : AppCompatActivity() {
                     Log.w("Wbj", "lazy async take time: ${1.0 * it / 1000}s")
                 }
             }
+
+            Square("Wbj Square").draw()
+            MyOtherClass().draw()
+            MyOtherClass2(Square("Delegate class")).draw()
+            MyOtherClass2(Square3()).draw()
+            var myProperty = MyClass().myProperty
+            Log.i("Wbj", "myProperty: $myProperty")
+            MyClass().myProperty = "set delegate from out"
+            myProperty = MyClass().myProperty
+            Log.i("Wbj", "myProperty: $myProperty")
+
+            val mapObj = MapObject(mutableMapOf())
+            mapObj.myProperty = "Hello"
+            mapObj.myOtherProperty = 12
+            Log.i("Wbj", "mapObj myProperty: ${mapObj.myProperty}")
+            Log.i("Wbj", "mapObj myOtherProperty: ${mapObj.myOtherProperty}")
+            Log.i("Wbj", "mapObj map: ${mapObj.map}")
         }
 
     }
