@@ -286,6 +286,35 @@ class KotlinActivity : AppCompatActivity() {
             Log.i("Wbj", "mapObj map: ${mapObj.map}")
         }
 
+        with2(btnAsyncLazy) {
+            isEnabled
+            "DDDDD"
+        }.also { Log.i("Wbj", "with2Result: $it") }
+        btnAsyncLazy?.let2 {
+            it.isEnabled
+        }.also {
+            Log.i("Wbj", "let2Result: $it")
+        }
+        btnAsyncLazy?.run2 {
+            textScaleX
+        }.also {
+            Log.i("Wbj", "let2Result: $it")
+        }
+        btnAsyncLazy.apply2 {
+            text = "$text, 1"
+        }.also {
+            Log.i("Wbj", "apply2Result: $it")
+        }
+        btnAsyncLazy?.run2 {
+            textScaleX
+        }.also2 {
+            Log.i("Wbj", "also2 log: $it")
+        }
+        btnAsyncLazy.apply2 {
+            text = "$text, 1"
+        }.also2 {
+            Log.i("Wbj", "also2 log: $it")
+        }
     }
 
     private var deferredAvatar2: Deferred<Int>? = null
@@ -800,5 +829,4 @@ class KotlinActivity : AppCompatActivity() {
         Log.v("Wbj", "getCompanyLogo thread: ${Thread.currentThread().name}")
         return@withContext 2
     }
-
 }
