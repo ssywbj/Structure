@@ -1,6 +1,6 @@
 package com.suheng.structure.view.kt
 
-import com.suheng.structure.view.R
+import kotlin.reflect.KProperty
 
 //扩展函数
 fun String.lastTwoChar(): String {
@@ -34,3 +34,10 @@ inline fun <T> T.also2(block: (T) -> Unit): T {
     block(this)
     return this
 }
+
+var formattedString: String = ""
+operator fun Delegate.setValue(thisRef: Any, property: KProperty<*>, value: String) =
+    format(this, value).also { formattedString = it }
+
+operator fun Delegate.getValue(thisRef: Any, property: KProperty<*>) =
+    formattedString + "-" + formattedString.length

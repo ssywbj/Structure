@@ -284,6 +284,21 @@ class KotlinActivity : AppCompatActivity() {
             Log.i("Wbj", "mapObj myProperty: ${mapObj.myProperty}")
             Log.i("Wbj", "mapObj myOtherProperty: ${mapObj.myOtherProperty}")
             Log.i("Wbj", "mapObj map: ${mapObj.map}")
+
+            val psn = Person6()
+            psn.name = "wbj"
+            psn.lastname = "wei"
+            Log.i(
+                "Wbj",
+                "person name: ${psn.name}, lastname: ${psn.lastname}, updateCount: ${psn.updateCount}, person: $psn"
+            )
+            val student = Student4()
+            student.name = "sbj"
+            student.lastname = "sei"
+            Log.i(
+                "Wbj",
+                "student name: ${student.name}, lastname: ${student.lastname}, updateCount: ${student.updateCount}, student: $student}"
+            )
         }
 
         with2(btnAsyncLazy) {

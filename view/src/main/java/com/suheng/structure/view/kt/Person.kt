@@ -5,6 +5,8 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import kotlin.properties.Delegates
+import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 //class Empty //类声明由类名、类头（指定其类型参数、主构造函数等）以及由花括号包围的类休构成。类头与类体都是可选的：如果一个类没有类体，可以省略花括号。
@@ -254,6 +256,7 @@ class Counting2<E> : MutableSet<E> {
     }
 }
 
+//类委托虽然看起来很简洁，但是它自身有一些限制：类必须实现一个接口，委托类必须是类所实现接口的子类型。
 class Counting3<E>(private val innerSet: MutableSet<E> = HashSet()) : MutableSet<E> by innerSet {
     private var objectAdded = 0
     override val size: Int get() = 10
@@ -268,3 +271,171 @@ class Counting3<E>(private val innerSet: MutableSet<E> = HashSet()) : MutableSet
         return innerSet.addAll(elements)
     }
 }
+
+class Person2 {
+    var updateCount = 0
+    var name: String = ""
+        set(value) {
+            field = format(value)
+        }
+        get() {
+            return getter(field)
+        }
+
+    var lastname: String = ""
+        set(value) {
+            field = format(value)
+        }
+        get() {
+            return getter(field)
+        }
+
+    private fun format(value: String): String {
+        updateCount++
+        return value.lowercase().replaceFirstChar { it.uppercase() }
+    }
+
+    private fun getter(value: String): String {
+        return "$value-${value.length}"
+    }
+}
+
+class Person4 {
+    var updateCount = 0
+    private val delegate = Delegate()
+    var name: String = ""
+        set(value) {
+            field = delegate.format(this, value)
+        }
+        get() {
+            return delegate.getter(field)
+        }
+
+    var lastname: String = ""
+        set(value) {
+            field = delegate.format(this, value)
+        }
+        get() {
+            return delegate.getter(field)
+        }
+}
+
+class Student4 {
+    var updateCount = 0
+    private val delegate = Delegate()
+    var name: String = ""
+        set(value) {
+            field = delegate.format(this, value)
+        }
+        get() {
+            return delegate.getter(field)
+        }
+
+    var lastname: String = ""
+        set(value) {
+            field = delegate.format(this, value)
+        }
+        get() {
+            return delegate.getter(field)
+        }
+}
+
+class Delegate {
+    fun format(thisRef: Any, value: String): String {
+        if (thisRef is Person4) {
+            thisRef.updateCount++
+        } else if (thisRef is Student4) {
+            thisRef.updateCount++
+        }
+        return value.lowercase().replaceFirstChar { it.uppercase() }
+    }
+
+    fun getter(value: String): String {
+        return "$value-${value.length}"
+    }
+}
+
+class Person5 {
+    private val nameDelegate = Delegate2()
+    private val lastnameDelegate = Delegate2()
+    var name: String
+        set(value) {
+            nameDelegate.setValue(this, value)
+        }
+        get() {
+            return nameDelegate.getValue()
+        }
+
+    var lastname: String
+        set(value) {
+            lastnameDelegate.setValue(this, value)
+        }
+        get() {
+            return lastnameDelegate.getValue()
+        }
+    var updateCount = 0
+}
+
+class Delegate2 {
+    var formattedString: String = ""
+    fun setValue(thisRef: Any, value: String) {
+        if (thisRef is Person5) {
+            thisRef.updateCount++
+        } else if (thisRef is Student4) {
+            thisRef.updateCount++
+        }
+        formattedString = value.lowercase().replaceFirstChar { it.uppercase() }
+    }
+
+    fun getValue(): String {
+        return formattedString + "-" + formattedString.length
+    }
+}
+
+//委托属性的基本语法
+/*class Foo {
+    var p: Type by Delegate()
+}
+等价于
+class Foo {
+    private val delegate = Delegate()
+    var p: Type set(value: Type) = delegate.setValue(this, ..., value)
+    get() = delegate.getValue(this, ...)
+}*/
+
+class Delegate3 : ReadWriteProperty<Any, String> {
+    private var formattedString = ""
+    override fun getValue(thisRef: Any, property: KProperty<*>): String {
+        return formattedString + "-" + formattedString.length
+    }
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: String) {
+        if (thisRef is Person6) {
+            thisRef.updateCount++
+        }
+        formattedString = value.lowercase().replaceFirstChar { it.uppercase() }
+    }
+}
+
+class Person6 {
+    var name: String by Delegate3()
+    var lastname: String by Delegate4()
+    //var lastname: String by Delegate()
+    var lastname2: String by Delegates.notNull()
+    var updateCount = 0
+}
+
+class Delegate4 {
+    private var formattedString = ""
+    operator fun getValue(thisRef: Any, property: KProperty<*>): String {
+        return formattedString + "-" + formattedString.length
+    }
+
+    operator fun setValue(thisRef: Any, property: KProperty<*>, value: String) {
+        if (thisRef is Person6) {
+            thisRef.updateCount++
+        }
+        formattedString = value.lowercase().replaceFirstChar { it.uppercase() }
+    }
+}
+
