@@ -4,11 +4,11 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.suheng.structure.view.ModelView
 import kotlinx.coroutines.launch
 
-class CountViewModel : ViewModel() {
+class CountViewModel : ModelView() {
 
     init {
         viewModelScope.launch { }

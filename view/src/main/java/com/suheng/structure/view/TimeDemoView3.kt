@@ -3,25 +3,17 @@ package com.suheng.structure.view
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.view.View
-import androidx.lifecycle.*
 import com.suheng.structure.view.utils.CountViewModel
 import java.util.*
 
 class TimeDemoView3 @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr), LifecycleOwner {
+) : LifeModelView(context, attrs, defStyleAttr) {
 
     private var mViewModel: CountViewModel? = null
 
     private val mPaint = Paint()
     private val mRectSmall = Rect()
-
-    private val mPaint2: Paint = Paint().apply {
-        isAntiAlias = true
-        typeface = Typeface.DEFAULT_BOLD
-        color = Color.BLACK
-    }
 
     private val mPaint3 by lazy {
         Paint().apply {
@@ -37,37 +29,12 @@ class TimeDemoView3 @JvmOverloads constructor(
         mPaint.color = Color.BLACK
     }
 
-    private fun View.findViewTreeViewModelStoreOwner(): ViewModelStoreOwner? =
-        ViewTreeViewModelStoreOwner.get(this)
-
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        mRegistry.currentState = Lifecycle.State.CREATED
-        //mViewModel = ViewTreeViewModelStoreOwner.get(this)?.let {
-        mViewModel = findViewTreeViewModelStoreOwner()?.let {
-            ViewModelProvider(it).get(CountViewModel::class.java)
-        }
-
-        mViewModel?.let {
+        mViewModel = viewModel<CountViewModel>()?.also {
             it.mCountLive.observe(this) { invalidate() }
             it.startObserver()
         }
-    }
-
-    override fun onVisibilityAggregated(isVisible: Boolean) {
-        super.onVisibilityAggregated(isVisible)
-        if (isVisible) {
-            mRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
-            mRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        } else {
-            mRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-            mRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
-        }
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        mRegistry.currentState = Lifecycle.State.DESTROYED
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -92,12 +59,6 @@ class TimeDemoView3 @JvmOverloads constructor(
         //mPaint.textSize = 40f
         mPaint3.textSize = 40f
         canvas.drawText(text, mRectSmall.left.toFloat(), mRectSmall.bottom.toFloat(), mPaint3)
-    }
-
-    private val mRegistry = LifecycleRegistry(this)
-
-    override fun getLifecycle(): Lifecycle {
-        return mRegistry
     }
 
 }

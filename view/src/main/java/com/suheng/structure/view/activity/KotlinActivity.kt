@@ -200,8 +200,14 @@ class KotlinActivity : AppCompatActivity() {
             .let { Log.d("Wbj", "filter toList sorted groupBy, map: $it, element 2: ${it[1]}") }
         str.toSortedSet().let { Log.d("Wbj", "toSortedSet: $it") }
 
-        getPeople<People2>().printName()
-        getPeople<People3>().printName()
+        var people = getPeople<People2>()
+        people.printName()
+        (people as People2).printName2()
+        people = getPeople<People3>()
+        people.printName()
+        (people as People3).printName3()
+        getPeople2<People2>().printName2()
+        getPeople2<People3>().printName3()
 
         btnAsync.setOnClickListener {
             lifecycleScope.launch {
@@ -828,6 +834,10 @@ class KotlinActivity : AppCompatActivity() {
     }
 
     private inline fun <reified T : People> getPeople(): People {
+        return T::class.java.newInstance()
+    }
+
+    private inline fun <reified T : People> getPeople2(): T {
         return T::class.java.newInstance()
     }
 
