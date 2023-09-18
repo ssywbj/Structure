@@ -3,6 +3,7 @@ package com.suheng.structure.view
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
 import com.suheng.structure.view.utils.CountViewModel
 import java.util.*
 
@@ -31,10 +32,15 @@ class TimeDemoView3 @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        mViewModel = viewModel<CountViewModel>()?.also {
+        mViewModel = modelView<CountViewModel>()?.also {
             it.mCountLive.observe(this) { invalidate() }
             it.startObserver()
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        Log.v("Wbj", "mViewModel: $mViewModel")
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {

@@ -12,6 +12,7 @@ import com.suheng.structure.view.kt.*
 import com.suheng.structure.view.kt.generic.*
 import kotlinx.android.synthetic.main.activity_kotlin.*
 import kotlinx.coroutines.*
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.math.BigDecimal
 import java.nio.file.Files
@@ -200,14 +201,16 @@ class KotlinActivity : AppCompatActivity() {
             .let { Log.d("Wbj", "filter toList sorted groupBy, map: $it, element 2: ${it[1]}") }
         str.toSortedSet().let { Log.d("Wbj", "toSortedSet: $it") }
 
-        var people = getPeople<People2>()
-        people.printName()
-        (people as People2).printName2()
-        people = getPeople<People3>()
-        people.printName()
-        (people as People3).printName3()
+        people3 = getPeople<People2>()
+        people3!!.printName()
+        (people3 as People2).printName2()
+        people3 = getPeople<People3>()
+        people3!!.printName()
+        (people3 as People3).printName3()
         getPeople2<People2>().printName2()
         getPeople2<People3>().printName3()
+        p1 = people3
+        p2 = people3
 
         btnAsync.setOnClickListener {
             lifecycleScope.launch {
@@ -336,6 +339,35 @@ class KotlinActivity : AppCompatActivity() {
         }.also2 {
             Log.i("Wbj", "also2 log: $it")
         }
+
+        assets.open("use_func.txt").use {
+            val outputStream = ByteArrayOutputStream()
+            val buffer = ByteArray(1024 * 4)
+            var len: Int = it.read(buffer)
+            while (len != -1) {
+                outputStream.write(buffer, 0, len)
+                len = it.read(buffer)
+            }
+            String(outputStream.use { output ->
+                output.toByteArray()
+            })
+        }.also {
+            Log.i("Wbj", "read result: $it")
+        }
+
+    }
+
+    var people3: People? = null
+    var p1: People? = null
+    var p2: People? = null
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("Wbj", "people3: $people3")
+        people3 = null
+        Log.d("Wbj", "people3: $people3")
+        Log.d("Wbj", "p1: $p1")
+        Log.d("Wbj", "p2: $p2")
     }
 
     private var deferredAvatar2: Deferred<Int>? = null

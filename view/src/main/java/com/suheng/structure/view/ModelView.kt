@@ -1,16 +1,20 @@
 package com.suheng.structure.view
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 
 abstract class ModelView : ViewModel() {
 
-    fun onAttachedToWindow() {
+    fun onAttached() {
+        Log.v("Wbj", "mv, onAttached")
     }
 
     fun onVisibilityAggregated(isVisible: Boolean) {
+        Log.d("Wbj", "mv, onVisibilityAggregated: $isVisible")
     }
 
-    fun onDetachedFromWindow() {
+    fun onDetached() {
+        Log.d("Wbj", "mv, onDetached")
     }
 
 }

@@ -2,13 +2,14 @@ package com.suheng.structure.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.*
 
 open class LifeModelView constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     View(context, attrs, defStyleAttr), LifecycleOwner {
 
-    protected var viewModel: ModelView? = null
+    protected var modelView: ModelView? = null
 
     //private val mRegistry: LifecycleRegistry = LifecycleRegistry(this)
     private val mRegistry by lazy {
@@ -18,7 +19,6 @@ open class LifeModelView constructor(context: Context, attrs: AttributeSet?, def
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         mRegistry.currentState = Lifecycle.State.CREATED
-        //viewModel?.onAttachedToWindow()
     }
 
     override fun onVisibilityAggregated(isVisible: Boolean) {
@@ -30,26 +30,29 @@ open class LifeModelView constructor(context: Context, attrs: AttributeSet?, def
             mRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
             mRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         }
-        viewModel?.onVisibilityAggregated(isVisible)
+        modelView?.onVisibilityAggregated(isVisible)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         mRegistry.currentState = Lifecycle.State.DESTROYED
-        //viewModel?.onDetachedFromWindow()
+        modelView?.onDetached()
+        Log.v("Wbj", "modelView: $modelView")
+        modelView = null
+        Log.v("Wbj", "modelView: $modelView")
     }
 
     override fun getLifecycle(): Lifecycle {
         return mRegistry
     }
 
-    protected inline fun <reified T : ModelView> viewModel(): T? {
-        if (viewModel == null) {
-            viewModel = ViewTreeViewModelStoreOwner.get(this)?.let {
+    protected inline fun <reified T : ModelView> modelView(): T? {
+        if (modelView == null) {
+            modelView = ViewTreeViewModelStoreOwner.get(this)?.let {
                 ViewModelProvider(it)[T::class.java]
-            }
+            }?.also { it.onAttached() }
         }
-        return viewModel as T?
+        return modelView as T?
     }
 
 }
