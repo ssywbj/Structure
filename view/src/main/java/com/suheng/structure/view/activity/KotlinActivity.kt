@@ -355,6 +355,10 @@ class KotlinActivity : AppCompatActivity() {
             Log.i("Wbj", "read result: $it")
         }
 
+        val people31 = People3(10)
+        val people32 = People3(20)
+        val people33 = people31 + people32
+        Log.i("Wbj", "people33: ${people33.age}, > result: ${people31 > people32}")
     }
 
     var people3: People? = null
