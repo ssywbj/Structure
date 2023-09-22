@@ -12,6 +12,7 @@ import com.suheng.structure.view.kt.*
 import com.suheng.structure.view.kt.generic.*
 import kotlinx.android.synthetic.main.activity_kotlin.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -365,6 +366,27 @@ class KotlinActivity : AppCompatActivity() {
         val people32 = People3(20)
         val people33 = people31 + people32
         Log.i("Wbj", "people33: ${people33.age}, > result: ${people31 > people32}")
+
+        val flow = flow<String> {
+            for (i in 1..3) {
+                delay(1000)
+                Log.d("Wbj", "emit thread:　${Thread.currentThread().name}")
+                emit("emit value: $i")
+            }
+            //throw IllegalStateException("IllegalStateException") //异常会回调到catch，也会回调onCompletion
+            //deferredAvatar2!!.await() //异常会回调到catch，也会回调onCompletion
+            //什么都不发送(emit)会回调onEmpty
+            //正常发送、不发送和异常情况都会回调到onStart和onCompletion
+        }.onStart { Log.i("Wbj", "onStart onStart:　${Thread.currentThread().name}") }
+            .onCompletion { Log.i("Wbj", "onCompletion onCompletion:　${Thread.currentThread().name}") }
+            .onEmpty { Log.d("Wbj", "onEmpty onEmpty:　${Thread.currentThread().name}") }
+            .catch { Log.d("Wbj", "catch catch:　${Thread.currentThread().name}") }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            flow.collect {
+                Log.v("Wbj", "flow result: $it, collect thread: ${Thread.currentThread().name}")
+            }
+        }
     }
 
     var people3: People? = null
