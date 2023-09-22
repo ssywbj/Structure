@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_kotlin.*
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
 import java.math.BigDecimal
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -340,7 +341,12 @@ class KotlinActivity : AppCompatActivity() {
             Log.i("Wbj", "also2 log: $it")
         }
 
-        assets.open("use_func.txt").use {
+        try {
+            assets.open("use_func.txt")
+        } catch (e: IOException) { //try...catch...表达式
+            Log.e("Wbj", "read assets file error: $e")
+            null
+        }?.use {
             val outputStream = ByteArrayOutputStream()
             val buffer = ByteArray(1024 * 4)
             var len: Int = it.read(buffer)
