@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.*
 import androidx.recyclerview.widget.DiffUtil
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.suheng.structure.view.R
 import com.suheng.structure.view.paging.GithubService
+import com.suheng.structure.view.paging.Paging2VM
 import com.suheng.structure.view.paging.Repo
 import com.suheng.structure.view.paging.RepoPagingSource
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +29,9 @@ class Paging3Activity : AppCompatActivity() {
     //https://developer.android.com/codelabs/android-paging?hl=zh-cn#0
     //https://blog.csdn.net/guolin_blog/article/details/114707250
     private val repoAdapter = RepoAdapter()
+    private val viewModel by lazy {
+        ViewModelProvider(this)[Paging2VM::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,14 +65,18 @@ class Paging3Activity : AppCompatActivity() {
                 Log.d("Wbj", "repo: $it")
             }
 
-            getPagingData().collect {
-                Log.d("Wbj", "collect: $it")
+            viewModel.getPagingData().collect {
+                Log.d("Wbj", "collect: $it, thread name:${Thread.currentThread().name}")
                 repoAdapter.submitData(it)
             }
+            /*getPagingData().collect {
+                Log.d("Wbj", "collect: $it, thread name:${Thread.currentThread().name}")
+                repoAdapter.submitData(it)
+            }*/
         }
     }
 
-    private val PAGE_SIZE = 5
+    private val PAGE_SIZE = 10
 
     private val gitHubService = GithubService.create()
 
