@@ -62,7 +62,9 @@
         <activity android:name=".activity.ScrollGestureActivity" />
         <activity android:name=".activity.DampingActivity" />
         <activity android:name=".activity.SVGDemoActivity" />
-        <activity android:name=".activity.Paging3Activity" />
+        <activity
+            android:name=".activity.Paging3Activity"
+            android:label="Paging3+Flow" />
         <activity
             android:name=".activity.BlurActivity"
             android:label="Dynamic Blur" />

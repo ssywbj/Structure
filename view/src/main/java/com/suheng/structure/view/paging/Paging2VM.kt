@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 class Paging2VM : ViewModel() {
 
+    var clickedIndex: Int = -1
+
     fun getPagingData(): Flow<PagingData<Repo>> {
         return Repository.getPagingData().cachedIn(viewModelScope)
     }

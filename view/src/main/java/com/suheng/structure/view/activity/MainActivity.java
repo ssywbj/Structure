@@ -88,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "CheckedActivity");
         mStringList.add("Kotlin Grammar");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "KotlinActivity");
+        mStringList.add("Paging3+Flow");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "Paging3Activity");
 
         //startActivity(new Intent(this, SVGPathActivity.class));
         startActivity(new Intent(this, Paging3Activity.class));

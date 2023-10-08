@@ -21,6 +21,7 @@ import com.suheng.structure.view.paging.Paging2VM
 import com.suheng.structure.view.paging.Repo
 import com.suheng.structure.view.paging.RepoPagingSource
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -28,7 +29,7 @@ class Paging3Activity : AppCompatActivity() {
 
     //https://developer.android.com/codelabs/android-paging?hl=zh-cn#0
     //https://blog.csdn.net/guolin_blog/article/details/114707250
-    private val repoAdapter = RepoAdapter()
+    private val repoAdapter = RepoAdapter(::setClickedItem)
     private val viewModel by lazy {
         ViewModelProvider(this)[Paging2VM::class.java]
     }
@@ -58,7 +59,7 @@ class Paging3Activity : AppCompatActivity() {
             }
         }
 
-        lifecycleScope.launch(Dispatchers.IO) {
+        job = lifecycleScope.launch(Dispatchers.IO) {
             GithubService.create().searchRepos(1, 10).items.also {
                 Log.d("Wbj", "searchRepos size: ${it.size}")
             }.forEach {
@@ -87,7 +88,8 @@ class Paging3Activity : AppCompatActivity() {
         ).flow
     }
 
-    class RepoAdapter : PagingDataAdapter<Repo, RecyclerView.ViewHolder>(COMPARATOR) {
+    class RepoAdapter(val onItemClick: (Int) -> Unit) :
+        PagingDataAdapter<Repo, RecyclerView.ViewHolder>(COMPARATOR) {
         companion object {
             private val COMPARATOR = object : DiffUtil.ItemCallback<Repo>() {
                 override fun areItemsTheSame(oldItem: Repo, newItem: Repo): Boolean =
@@ -111,6 +113,7 @@ class Paging3Activity : AppCompatActivity() {
                     holder.description.text = it.description
                     holder.starCount.text = it.starCount.toString()
                 }
+                holder.itemView.setOnClickListener { onItemClick(position) }
             }
         }
 
@@ -146,6 +149,27 @@ class Paging3Activity : AppCompatActivity() {
             holder.retryButton.visibility =
                 if (loadState is LoadState.Error) View.VISIBLE else View.GONE
         }
+    }
+
+    private var clickedIndex: Int = -1
+
+    private fun setClickedItem(clickedIndex: Int) {
+        viewModel.clickedIndex = clickedIndex
+        this.clickedIndex = clickedIndex
+        Log.d("Wbj", "setClickedItem clickedIndex: $clickedIndex")
+    }
+
+    private lateinit var job: Job
+
+    override fun onStop() {
+        super.onStop()
+        job.takeIf { it.isActive }?.cancel()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        //Activity重建，ViewModel中的数据会自动保存，Activity中的不会
+        Log.d("Wbj", "act clickedIndex: $clickedIndex, vm clickedIndex: ${viewModel.clickedIndex}, this: $this")
     }
 
 }
