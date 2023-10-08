@@ -19,6 +19,7 @@ open class LifeModelView constructor(context: Context, attrs: AttributeSet?, def
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         mRegistry.currentState = Lifecycle.State.CREATED
+        //mRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
     }
 
     override fun onVisibilityAggregated(isVisible: Boolean) {
@@ -36,6 +37,7 @@ open class LifeModelView constructor(context: Context, attrs: AttributeSet?, def
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         mRegistry.currentState = Lifecycle.State.DESTROYED
+        //mRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         modelView?.onDetached()
         Log.v("Wbj", "modelView: $modelView")
         modelView = null

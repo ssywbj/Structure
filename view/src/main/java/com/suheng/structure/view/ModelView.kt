@@ -10,11 +10,11 @@ abstract class ModelView : ViewModel() {
     }
 
     fun onVisibilityAggregated(isVisible: Boolean) {
-        Log.d("Wbj", "mv, onVisibilityAggregated: $isVisible")
+        Log.v("Wbj", "mv, onVisibilityAggregated: $isVisible")
     }
 
     fun onDetached() {
-        Log.d("Wbj", "mv, onDetached")
+        Log.v("Wbj", "mv, onDetached")
     }
 
 }

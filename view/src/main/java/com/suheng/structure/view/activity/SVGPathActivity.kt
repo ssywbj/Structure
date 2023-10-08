@@ -140,10 +140,12 @@ class SVGPathActivity : AppCompatActivity() {
         val countObserver = Observer<Int> { t -> mTextTime.text = "$t" }
         mCountLive.observe(this, countObserver)*/
 
+        //Activity中的CountViewModel和TimeDemoView3的是同一个对象
+        Log.v("Wbj", "Activity lifecycle: $lifecycle, ViewModel: $mViewModel")
         mViewModel.mCountLive.observe(this) { value ->
             mTextTime.text = "$value"
+            Log.d("Wbj_", "mViewModel.mCountLive, $value")
         }
-        mViewModel.startObserver()
 
         lifecycleScope.launch {
             Log.d("Wbj_", "++lifecycleScope launch launch, ${Thread.currentThread().name}")

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
+import androidx.lifecycle.Observer
 import com.suheng.structure.view.utils.CountViewModel
 import java.util.*
 
@@ -33,14 +34,38 @@ class TimeDemoView3 @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         mViewModel = modelView<CountViewModel>()?.also {
-            it.mCountLive.observe(this) { invalidate() }
-            it.startObserver()
+            //it.create()
+            lifecycle.addObserver(it)
+            Log.v("Wbj", "CountViewModel lifecycle: $lifecycle, ViewModel: $it")
+        }
+    }
+
+    private val observer = Observer<Int> {
+        invalidate()
+    }
+
+    override fun onVisibilityAggregated(isVisible: Boolean) {
+        super.onVisibilityAggregated(isVisible)
+        if (isVisible) {
+            mViewModel?.let {
+                it.mCountLive.observe(this, observer)
+                //it.start()
+            }
+        } else {
+            mViewModel?.let {
+                it.mCountLive.removeObserver(observer)
+                //it.stop()
+            }
         }
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        Log.v("Wbj", "mViewModel: $mViewModel")
+        Log.v("Wbj", "CountViewModel: $mViewModel")
+        mViewModel?.let {
+            //it.destroy()
+            lifecycle.removeObserver(it)
+        }
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
