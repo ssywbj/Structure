@@ -23,5 +23,19 @@
                 android:resource="@xml/watch_face_config" />
         </service>
 
+        <service
+            android:name=".VapWallpaper"
+            android:exported="true"
+            android:label="Vap Wallpaper"
+            android:permission="android.permission.BIND_WALLPAPER">
+
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/vap_wallpaper_config" />
+        </service>
     </application>
 </manifest>
