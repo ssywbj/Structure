@@ -2,6 +2,7 @@ package com.suheng.wallpaper.myhealth;
 
 import android.app.Presentation;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.display.DisplayManager;
@@ -14,6 +15,12 @@ import com.tencent.qgame.animplayer.AnimView;
 import com.tencent.qgame.animplayer.util.ScaleType;
 
 public class VapWallpaper extends WallpaperService {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        startService(new Intent(this, VapService.class));
+    }
 
     @Override
     public Engine onCreateEngine() {
@@ -84,6 +91,18 @@ public class VapWallpaper extends WallpaperService {
         }
 
         @Override
+        public void onSurfaceDestroyed(SurfaceHolder holder) {
+            super.onSurfaceDestroyed(holder);
+            Log.d("Wbj", "onSurfaceDestroyed, onSurfaceDestroyed");
+        }
+
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+            Log.d("Wbj", "onDestroy, onDestroy");
+        }
+
+        @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
             if (visible) {
@@ -107,6 +126,5 @@ public class VapWallpaper extends WallpaperService {
                 }
             }
         }
-
     }
 }

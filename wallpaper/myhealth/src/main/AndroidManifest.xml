@@ -37,5 +37,9 @@
                 android:name="android.service.wallpaper"
                 android:resource="@xml/vap_wallpaper_config" />
         </service>
+
+        <service
+            android:name=".VapService"
+            android:exported="true" />
     </application>
 </manifest>

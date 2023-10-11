@@ -27,4 +27,15 @@
         android:padding="6dp"
         android:text="AsyncLazy"
         android:textAllCaps="false" />
+
+    <com.suheng.structure.view.VapTextureView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:padding="6dp" />
+
+    <!--<com.suheng.structure.view.VapTextureView2
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:padding="6dp" />-->
+
 </LinearLayout>
