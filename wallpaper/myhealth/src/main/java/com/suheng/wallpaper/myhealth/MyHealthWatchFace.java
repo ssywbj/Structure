@@ -1,5 +1,6 @@
 package com.suheng.wallpaper.myhealth;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -17,6 +18,12 @@ import com.suheng.wallpaper.basic.utils.DimenUtil;
 import java.util.Calendar;
 
 public class MyHealthWatchFace extends AnimWallpaperService {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        startService(new Intent(this, VapService.class));
+    }
 
     @Override
     public Engine onCreateEngine() {

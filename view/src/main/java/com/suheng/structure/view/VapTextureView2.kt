@@ -29,22 +29,72 @@ class VapTextureView2 @JvmOverloads constructor(
             val pkgHome = "com.suheng.wallpaper.myhealth"
             `package` = pkgHome
             setClassName(pkgHome, "${pkgHome}.VapService")
-            putExtra("vap_surface", Surface(surface))
+
+            putExtra("onSurfaceTextureAvailable", Surface(surface))
+            putExtra("vap_width", width)
+            putExtra("vap_height", height)
         }
         context.startService(intent)
     }
 
     override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
         Log.v(TAG, "onSurfaceTextureSizeChanged")
+        val intent = Intent().apply {
+            val pkgHome = "com.suheng.wallpaper.myhealth"
+            `package` = pkgHome
+            setClassName(pkgHome, "${pkgHome}.VapService")
+
+            putExtra("onSurfaceTextureSizeChanged", Surface(surface))
+            putExtra("vap_width", width)
+            putExtra("vap_height", height)
+        }
+        context.startService(intent)
     }
 
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
         Log.v(TAG, "onSurfaceTextureDestroyed")
-        return false
+        //surface.release()
+
+        val flagDestroyed = false
+        val intent = Intent().apply {
+            val pkgHome = "com.suheng.wallpaper.myhealth"
+            `package` = pkgHome
+            setClassName(pkgHome, "${pkgHome}.VapService")
+
+            putExtra("onSurfaceTextureDestroyed", flagDestroyed)
+        }
+        context.startService(intent)
+        return flagDestroyed
     }
 
     override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
         Log.v(TAG, "onSurfaceTextureUpdated")
+    }
+
+    override fun onVisibilityAggregated(isVisible: Boolean) {
+        super.onVisibilityAggregated(isVisible)
+        Log.v(TAG, "onVisibilityAggregated, isVisible = $isVisible")
+        val intent = Intent().apply {
+            val pkgHome = "com.suheng.wallpaper.myhealth"
+            `package` = pkgHome
+            setClassName(pkgHome, "${pkgHome}.VapService")
+
+            putExtra("onVisibilityAggregated", isVisible)
+        }
+        context.startService(intent)
+    }
+
+    override fun onScreenStateChanged(screenState: Int) {
+        super.onScreenStateChanged(screenState)
+        Log.v(TAG, "onScreenStateChanged, screenState = $screenState")
+        val intent = Intent().apply {
+            val pkgHome = "com.suheng.wallpaper.myhealth"
+            `package` = pkgHome
+            setClassName(pkgHome, "${pkgHome}.VapService")
+
+            putExtra("onScreenStateChanged", screenState)
+        }
+        context.startService(intent)
     }
 
 }
