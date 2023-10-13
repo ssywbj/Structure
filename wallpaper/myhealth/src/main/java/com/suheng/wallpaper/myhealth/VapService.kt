@@ -3,18 +3,13 @@ package com.suheng.wallpaper.myhealth;
 import android.app.Presentation
 import android.app.Service
 import android.content.Intent
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.hardware.display.DisplayManager
-import android.os.Handler
+import android.hardware.display.VirtualDisplay
 import android.os.IBinder
-import android.os.Looper
 import android.os.Parcelable
 import android.util.Log
-import android.util.TypedValue
 import android.view.Surface
 import android.view.View
 import com.tencent.qgame.animplayer.AnimView
@@ -32,11 +27,21 @@ class VapService : Service() {
 
         const val ON_VISIBILITY_AGGREGATED = "onVisibilityAggregated"
         const val ON_SCREEN_STATE_CHANGED = "onScreenStateChanged"
+
+        const val EXTRA_ON_CLICK = "onClick"
+        const val EVENT_ON_CLICK = "com.suheng.wallpaper.event.ON_CLICK"
+        const val EXTRA_ON_LONG_CLICK = "onLongClick"
+        const val EVENT_ON_LONG_CLICK = "com.suheng.wallpaper.event.ON_LONG_CLICK"
+
+        const val EXTRA_PROTOCOL = "protocol"
     }
 
-    private var surface: Surface? = null
-    private var animView: AnimView? = null
+    private lateinit var displayManager: DisplayManager
+    private var virtualDisplay: VirtualDisplay? = null
     private var presentation: Presentation? = null
+
+    private var animView: AnimView? = null
+    private var isVisible: Boolean = false
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -45,161 +50,120 @@ class VapService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "VapService, onCreate")
+        displayManager = getSystemService(DISPLAY_SERVICE) as DisplayManager
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        //Log.d(TAG, "onStartCommand: flags = $flags, startId = $startId, intent = $intent")
-        intent?.takeIf { it.getParcelableExtra<Parcelable>(EXTRA_SURFACE_AVAILABLE) is Surface }
-            ?.let {
-                surface = it.getParcelableExtra(EXTRA_SURFACE_AVAILABLE)
-                //handler.post(runnable)
-
-                val width = it.getIntExtra(EXTRA_VAP_WIDTH, 0)
-                val height = it.getIntExtra(EXTRA_VAP_HEIGHT, 0)
-                Log.d(
-                    TAG,
-                    "onStartCommand, onSurfaceTextureAvailable: width = $width, height = $height, surface = $surface"
-                )
-                surface.takeIf { width > 0 && height > 0 }?.let { sf ->
-                    this.onSurfaceTextureAvailable(sf, width, height)
-                }
-
-            }
-
-        intent?.takeIf { it.getParcelableExtra<Parcelable>(EXTRA_SURFACE_CHANGED) is Surface }
-            ?.let {
-                val surface = it.getParcelableExtra<Surface>(EXTRA_SURFACE_CHANGED)
-                val width = it.getIntExtra(EXTRA_VAP_WIDTH, 0)
-                val height = it.getIntExtra(EXTRA_VAP_HEIGHT, 0)
-                Log.d(
-                    TAG,
-                    "onStartCommand, onSurfaceTextureSizeChanged: width = $width, height = $height, surface = $surface"
-                )
-                surface.takeIf { width > 0 && height > 0 }?.let { sf ->
-                    this.onSurfaceTextureSizeChanged(sf, width, height)
+        Log.d(TAG, "onStartCommand: intent = $intent, flags = $flags, startId = $startId")
+        intent?.extras?.let {
+            (it.getParcelable<Parcelable>(EXTRA_SURFACE_AVAILABLE) as? Surface)?.run {
+                val width = it.getInt(EXTRA_VAP_WIDTH, 0)
+                val height = it.getInt(EXTRA_VAP_HEIGHT, 0)
+                Log.d(TAG, "surface create: $this, width = $width, height = $height")
+                if (width > 0 && height > 0) {
+                    onSurfaceTextureAvailable(this, width, height)
                 }
             }
 
-        intent?.takeIf { it.hasExtra(EXTRA_SURFACE_DESTROYED) }?.let {
-            val flagDestroyed = it.getBooleanExtra(EXTRA_SURFACE_DESTROYED, false)
-            Log.d(TAG, "onStartCommand: onSurfaceTextureDestroyed = $flagDestroyed")
-            this.onSurfaceTextureDestroyed(null)
-        }
+            (it.getParcelable<Parcelable>(EXTRA_SURFACE_CHANGED) as? Surface)?.run {
+                val width = it.getInt(EXTRA_VAP_WIDTH, 0)
+                val height = it.getInt(EXTRA_VAP_HEIGHT, 0)
+                Log.d(TAG, "surface change: $this, width = $width, height = $height")
+                if (width > 0 && height > 0) {
+                    onSurfaceTextureSizeChanged(this, width, height)
+                }
+            }
 
-        intent?.takeIf { it.hasExtra(ON_VISIBILITY_AGGREGATED) }?.let {
-            val isVisible = it.getBooleanExtra(ON_VISIBILITY_AGGREGATED, false)
-            Log.d(TAG, "onStartCommand: onVisibilityAggregated = $isVisible")
-            this.onVisibilityAggregated(isVisible)
-        }
+            (intent.hasExtra(EXTRA_SURFACE_DESTROYED)).takeIf { bool -> bool }?.run {
+                val flagDestroyed = it.getBoolean(EXTRA_SURFACE_DESTROYED, false)
+                Log.d(TAG, "surface destroy = $flagDestroyed")
+                onSurfaceTextureDestroyed(null)
+            }
 
-        intent?.takeIf { it.hasExtra(ON_SCREEN_STATE_CHANGED) }?.let {
-            val screenState = it.getIntExtra(ON_SCREEN_STATE_CHANGED, View.SCREEN_STATE_OFF)
-            Log.d(TAG, "onStartCommand: screenState = $screenState")
-            this.onScreenStateChanged(screenState)
+            (intent.hasExtra(ON_VISIBILITY_AGGREGATED)).takeIf { bool -> bool }?.run {
+                val isVisible = it.getBoolean(ON_VISIBILITY_AGGREGATED, false)
+                Log.d(TAG, "visibility = $isVisible")
+                onVisibilityAggregated(isVisible)
+            }
+
+            (intent.hasExtra(ON_SCREEN_STATE_CHANGED)).takeIf { bool -> bool }?.run {
+                val screenState = it.getInt(ON_SCREEN_STATE_CHANGED, View.SCREEN_STATE_OFF)
+                Log.d(TAG, "screenState = $screenState")
+                onScreenStateChanged(screenState)
+            }
+
+            if (it.getString(EXTRA_ON_CLICK) == EVENT_ON_CLICK) {
+                onClick()
+            }
+            if (it.getString(EXTRA_ON_LONG_CLICK) == EVENT_ON_LONG_CLICK) {
+                onLongClick()
+            }
+
+            (it.getString(EXTRA_PROTOCOL))?.run {
+                protocol(this)
+            }
         }
 
         return super.onStartCommand(intent, flags, startId)
     }
 
     private fun onSurfaceTextureAvailable(surface: Surface, width: Int, height: Int) {
-        val displayManager = getSystemService(DISPLAY_SERVICE) as DisplayManager
-        val virtualDisplay =
-            displayManager.createVirtualDisplay(
-                TAG,
-                width,
-                height,
-                resources.displayMetrics.densityDpi,
-                surface,
-                0
-            )
-        presentation = Presentation(this, virtualDisplay.display).apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setContentView(R.layout.vap_wallpaper)
+        virtualDisplay = displayManager.createVirtualDisplay(
+            TAG, width, height,
+            resources.displayMetrics.densityDpi, surface, 0
+        )
+        virtualDisplay?.let {
+            presentation = Presentation(this, it.display).apply {
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                setContentView(R.layout.vap_wallpaper)
 
-            animView = findViewById<AnimView>(R.id.animView).apply {
-                setLoop(Int.MAX_VALUE)
-                setScaleType(ScaleType.FIT_CENTER)
+                this@VapService.animView = findViewById<AnimView>(R.id.animView).apply {
+                    setLoop(Int.MAX_VALUE)
+                    setScaleType(ScaleType.FIT_CENTER)
+                }
             }
         }
-
-        if (isVisible) {
+        animView.takeIf { isVisible }?.let {
             this.onVisibilityAggregated(true)
         }
     }
 
     private fun onSurfaceTextureSizeChanged(surface: Surface, width: Int, height: Int) {
-        Log.d(
-            TAG,
-            "onStartCommand, onSurfaceTextureSizeChanged: surface = $surface, width = $width, height = $height"
-        )
     }
 
     private fun onSurfaceTextureDestroyed(surface: Surface?) {
         this.onVisibilityAggregated(false)
-        //this.surface?.release()
-        animView = null
-        presentation = null
-        this.surface = null
+        virtualDisplay?.release()
+        virtualDisplay = null
     }
-
-    private var isVisible: Boolean = false
 
     private fun onVisibilityAggregated(isVisible: Boolean) {
         this.isVisible = isVisible
 
-        if (isVisible) {
-            presentation?.show()
-            animView?.startPlay(assets, "demo.mp4")
-        } else {
-            animView?.takeIf { it.isRunning() }?.stopPlay()
-            presentation?.takeIf { it.isShowing }?.dismiss()
+        virtualDisplay?.let {
+            if (isVisible) {
+                presentation?.show()
+                animView?.startPlay(assets, "demo.mp4")
+            } else {
+                animView?.takeIf { it.isRunning() }?.stopPlay()
+                presentation?.takeIf { it.isShowing }?.dismiss()
+            }
         }
     }
 
     private fun onScreenStateChanged(screenState: Int) {
     }
 
-    private lateinit var paint: Paint
-    private val handler by lazy {
-        paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            textSize = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_SP,
-                20f,
-                resources.displayMetrics
-            )
-            color = Color.RED
-        }
-
-        Handler(Looper.getMainLooper())
-    }
-    private val runnable = Runnable {
-        surface?.let {
-            var canvas: Canvas? = null
-            try {
-                canvas = it.lockCanvas(null)
-                this.onDraw(canvas)
-            } catch (e: Exception) {
-                Log.e(TAG, e.toString())
-            } finally {
-                if (canvas != null) {
-                    it.unlockCanvasAndPost(canvas)
-                }
-            }
-        }
+    private fun onClick() {
+        Log.d(TAG, "onClick")
     }
 
-    private fun onDraw(canvas: Canvas) {
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        canvas.translate(canvas.width / 2f, canvas.height / 2f)
-        val text = System.currentTimeMillis().toString()
-        canvas.drawText(
-            text,
-            -paint.measureText(text) / 2,
-            -(paint.descent() + paint.ascent()) / 2,
-            paint
-        )
+    private fun onLongClick() {
+        Log.d(TAG, "onLongClick")
+    }
 
-        handler.postDelayed(runnable, 1000)
+    private fun protocol(protocol: String) {
+        Log.d(TAG, "protocol: $protocol")
     }
 
 }

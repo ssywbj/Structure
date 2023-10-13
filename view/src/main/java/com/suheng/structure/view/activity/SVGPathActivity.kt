@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import com.suheng.structure.view.PathKtView
 import com.suheng.structure.view.PathKtView2
 import com.suheng.structure.view.R
+import com.suheng.structure.view.VapTextureView2
 import com.suheng.structure.view.utils.CountViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -82,6 +83,15 @@ class SVGPathActivity : AppCompatActivity() {
                 Log.d(Singleton.TAG, "onStopTrackingTouch: progress = ${seekBar.progress}")
             }
         })
+
+        val vapTextureView = findViewById<VapTextureView2>(R.id.vap_texture_view2).also {
+            it.postEvent("protocol: create texture view")
+        }
+        vapTextureView.setOnClickListener {
+        }
+        /*vapTextureView.setOnLongClickListener {
+            true
+        }*/
     }
 
     private val mHandler by lazy {

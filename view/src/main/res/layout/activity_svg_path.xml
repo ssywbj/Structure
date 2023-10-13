@@ -83,15 +83,16 @@
             extViewTextViewTextViewTextViewTextViewTextView" />
     </LinearLayout>-->
 
-    <com.suheng.structure.view.VapTextureView
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:padding="6dp" />
-
-    <!--<com.suheng.structure.view.VapTextureView2
+    <!--<com.suheng.structure.view.VapTextureView
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:padding="6dp" />-->
+
+    <com.suheng.structure.view.VapTextureView2
+        android:id="@+id/vap_texture_view2"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:padding="6dp" />
 </LinearLayout>
 
     <!--<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"

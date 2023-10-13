@@ -16,6 +16,8 @@ import com.tencent.qgame.animplayer.util.ScaleType;
 
 public class VapWallpaper extends WallpaperService {
 
+    private static final String TAG = VapWallpaper.class.getSimpleName();
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -37,82 +39,63 @@ public class VapWallpaper extends WallpaperService {
         @Override
         public void onCreate(SurfaceHolder surfaceHolder) {
             super.onCreate(surfaceHolder);
+            Log.d(TAG, "Engine, onCreate: " + this);
             displayManager = (DisplayManager) VapWallpaper.this.getSystemService(Context.DISPLAY_SERVICE);
-            /*virtualDisplay = displayManager.createVirtualDisplay("VirtualDisplayWallpaper", 100
-                    , 100, 100, surfaceHolder.getSurface(), DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESENTATION);*/
-            /*presentation = new Presentation(getBaseContext(), virtualDisplay.getDisplay());
-            presentation.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            presentation.setContentView(R.layout.myhealth_watchface);
-            animView = presentation.findViewById(R.id.animView);
-            animView.setLoop(Integer.MAX_VALUE);
-            animView.setScaleType(ScaleType.FIT_CENTER);*/
         }
 
         @Override
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             super.onSurfaceChanged(holder, format, width, height);
             int densityDpi = getResources().getDisplayMetrics().densityDpi;
-            Log.d("Wbj", "onSurfaceChanged: width = " + width + ", height = " + height
+            Log.d(TAG, "onSurfaceChanged: width = " + width + ", height = " + height
                     + ", densityDpi = " + densityDpi + ", flag = " + DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC
                     + ", flag2 = " + DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESENTATION
                     + ", flag3 = " + DisplayManager.VIRTUAL_DISPLAY_FLAG_SECURE
                     + ", flag4 = " + DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY
-                    + ", flag5 = " + DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR);
+                    + ", flag5 = " + DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR + ", " + this);
             if (virtualDisplay == null) {
-                virtualDisplay = displayManager.createVirtualDisplay("VirtualDisplayWallpaper", width
+                virtualDisplay = displayManager.createVirtualDisplay(TAG, width
                         , height, densityDpi, holder.getSurface(), 0);
-                presentation = new Presentation(VapWallpaper.this, virtualDisplay.getDisplay());
-                presentation.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-                presentation.setContentView(R.layout.vap_wallpaper);
-                animView = presentation.findViewById(R.id.animView);
-                animView.setLoop(Integer.MAX_VALUE);
-                animView.setScaleType(ScaleType.FIT_CENTER);
             } else {
-                //virtualDisplay.release();
                 virtualDisplay.setSurface(holder.getSurface());
                 virtualDisplay.resize(width, height, densityDpi);
-                presentation = new Presentation(VapWallpaper.this, virtualDisplay.getDisplay());
-
-                presentation.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                presentation.setContentView(R.layout.vap_wallpaper);
-                animView = presentation.findViewById(R.id.animView);
-                animView.setLoop(Integer.MAX_VALUE);
-                animView.setScaleType(ScaleType.FIT_CENTER);
-
-                /*virtualDisplay.resize(width, height, densityDpi);
-                Window window = presentation.getWindow();
-                WindowManager.LayoutParams layoutParams = presentation.getWindow().getAttributes();
-                layoutParams.width = width;
-                layoutParams.height = height;
-                layoutParams.format = format;
-                window.setAttributes(layoutParams);*/
             }
+            presentation = new Presentation(VapWallpaper.this, virtualDisplay.getDisplay());
+            presentation.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            presentation.setContentView(R.layout.vap_wallpaper);
+            animView = presentation.findViewById(R.id.animView);
+            animView.setLoop(Integer.MAX_VALUE);
+            animView.setScaleType(ScaleType.FIT_CENTER);
         }
 
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
             super.onSurfaceDestroyed(holder);
-            Log.d("Wbj", "onSurfaceDestroyed, onSurfaceDestroyed");
+            Log.d(TAG, "Engine, onSurfaceDestroyed: " + this);
         }
 
         @Override
         public void onDestroy() {
             super.onDestroy();
-            Log.d("Wbj", "onDestroy, onDestroy");
+            Log.d(TAG, "Engine, onDestroy: " + this);
+            if (virtualDisplay != null) {
+                virtualDisplay.release();
+                virtualDisplay = null;
+            }
         }
 
         @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
+            Log.d(TAG, "onVisibilityChanged, visible = " + visible + ", " + this);
+            if (virtualDisplay == null) {
+                return;
+            }
             if (visible) {
                 if (presentation != null) {
                     presentation.show();
                 }
                 if (animView != null) {
-                    if (animView.isRunning()) {
-                        return;
-                    }
                     animView.startPlay(VapWallpaper.this.getAssets(), "demo.mp4");
                 }
             } else {
@@ -126,5 +109,6 @@ public class VapWallpaper extends WallpaperService {
                 }
             }
         }
+
     }
 }
