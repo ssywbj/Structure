@@ -2,7 +2,10 @@
 apply from: "config.gradle"//若要引用config.gradle文件里的变量，还需要在这里配置
 
 buildscript {
-    ext.kotlin_version = "1.7.20"
+    ext {
+        compose_ui_version = '1.5.4'
+        kotlin_version = "1.7.20"
+    }
     repositories {
         google()
         //jcenter()

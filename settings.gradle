@@ -44,3 +44,4 @@ include ':watchface:sundiary'
 include ':watchface:svendandersen'
 include ':watchface:timerace'
 include ':watchface:x-sports'*/
+include ':compose'
