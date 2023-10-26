@@ -1,5 +1,6 @@
 package com.suheng.compose
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -109,7 +110,7 @@ fun greeting(name: String) {
         }
 
         Button(
-            onClick = {},
+            onClick = { context.startActivity(Intent(context, MixUiActivity::class.java)) },
             colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Green),
             shape = CircleShape,
             elevation = ButtonDefaults.elevation(

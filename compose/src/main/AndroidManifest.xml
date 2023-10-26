@@ -8,10 +8,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Structure">
+
         <activity
             android:name=".ComposeActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.Structure">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,6 +23,34 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
+        <service
+            android:name=".ComposeWallpaper"
+            android:exported="true"
+            android:label="Compose Wallpaper"
+            android:permission="android.permission.BIND_WALLPAPER">
+
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/compose_wallpaper_config" />
+        </service>
+
+        <receiver
+            android:name=".ComposeWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/compose_widget_config" />
+        </receiver>
+
+        <activity android:name=".MixUiActivity" />
     </application>
 
 </manifest>
