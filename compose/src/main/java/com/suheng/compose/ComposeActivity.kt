@@ -1,7 +1,9 @@
 package com.suheng.compose
 
 import android.content.Intent
+import android.graphics.Paint
 import android.os.Bundle
+import android.util.TypedValue
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,13 +22,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -217,6 +224,53 @@ fun greeting(name: String) {
                 Text("+0 12345678")
                 Text("XYZ city.", color = Color.Gray)
             }
+        }
+
+        val textMeasurer = rememberTextMeasurer()
+        Canvas(modifier = Modifier.width(150.dp).height(200.dp).background(Color.Gray)) {
+            val quadrantSize = size / 2f
+            drawCircle(color = Color.Green)
+            drawRect(color = Color.Magenta, size = (quadrantSize))
+
+            val strokeWidth = 10.dp.toPx()
+            drawCircle(
+                brush = Brush.sweepGradient(
+                    listOf(Color.Red, Color.Green, Color.Red),
+                ),
+                style = Stroke(
+                    width = strokeWidth
+                ),
+                radius = (size.minDimension - strokeWidth) / 2f
+            )
+
+            val text = "Text"
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = android.graphics.Color.BLACK
+                textSize = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_SP,
+                    20f,
+                    context.resources.displayMetrics
+                )
+            }
+            val nativeCanvas = drawContext.canvas.nativeCanvas
+            nativeCanvas.save()
+            nativeCanvas.translate(size.width / 2f, size.height / 2f)
+            paint.measureText(text)
+            nativeCanvas.drawText(
+                text,
+                -paint.measureText(text) / 2f,
+                -(paint.descent() + paint.ascent()) / 2f,
+                paint
+            )
+            nativeCanvas.restore()
+
+            val text2 = "Text2"
+            val measure = textMeasurer.measure(text2)
+            drawText(
+                textMeasurer = textMeasurer,
+                text2,
+                topLeft = Offset((size.width - measure.size.width) / 2f, 10f)
+            )
         }
 
     }
