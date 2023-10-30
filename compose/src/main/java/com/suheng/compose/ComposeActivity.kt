@@ -26,9 +26,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -227,7 +229,8 @@ fun greeting(name: String) {
         }
 
         val textMeasurer = rememberTextMeasurer()
-        Canvas(modifier = Modifier.width(150.dp).height(200.dp).background(Color.Gray)) {
+        //Canvas(modifier = Modifier.width(150.dp).height(200.dp).background(Color.Gray)) {
+        Canvas(modifier = Modifier.requiredSize(150.dp, 200.dp).background(Color.Gray)) {
             val quadrantSize = size / 2f
             drawCircle(color = Color.Green)
             drawRect(color = Color.Magenta, size = (quadrantSize))
@@ -243,33 +246,46 @@ fun greeting(name: String) {
                 radius = (size.minDimension - strokeWidth) / 2f
             )
 
-            val text = "Text"
             val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = android.graphics.Color.BLACK
+                color = android.graphics.Color.BLUE
                 textSize = TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_SP,
-                    20f,
+                    18f,
                     context.resources.displayMetrics
                 )
             }
+            val textArea = paint.descent() + paint.ascent()
+            val text = "Txp${String.format("%.2f", textArea)}"
             val nativeCanvas = drawContext.canvas.nativeCanvas
             nativeCanvas.save()
             nativeCanvas.translate(size.width / 2f, size.height / 2f)
-            paint.measureText(text)
-            nativeCanvas.drawText(
-                text,
-                -paint.measureText(text) / 2f,
-                -(paint.descent() + paint.ascent()) / 2f,
-                paint
-            )
+            //nativeCanvas.drawText(text, -paint.measureText(text) / 2f, -textArea / 2f, paint) //居中
+            nativeCanvas.drawText(text, -paint.measureText(text) / 2f, textArea * 1.2f, paint)
             nativeCanvas.restore()
 
-            val text2 = "Text2"
-            val measure = textMeasurer.measure(text2)
-            drawText(
-                textMeasurer = textMeasurer,
-                text2,
-                topLeft = Offset((size.width - measure.size.width) / 2f, 10f)
+            translate(size.width / 2f, size.height / 2f) {
+                val textStyle = TextStyle(fontSize = 18.sp, color = Color.White)
+                val textSize = textMeasurer.measure(text, style = textStyle).size
+                drawText(
+                    textMeasurer = textMeasurer,
+                    text,
+                    //topLeft = Offset(-textSize.center.x.toFloat(), -textSize.center.y.toFloat()),
+                    topLeft = Offset(-textSize.width / 2f, -textSize.height / 2f),
+                    //style = textStyle.copy(color = Color.White),
+                    style = textStyle,
+                )
+
+                drawLine(
+                    start = Offset(0f, -size.height / 2),
+                    end = Offset(0f, size.height),
+                    color = Color.Black
+                )
+            }
+
+            drawLine(
+                start = Offset(0f, size.height / 2),
+                end = Offset(size.width, size.height / 2),
+                color = Color.LightGray
             )
         }
 
