@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,8 +67,19 @@ class ComposeActivity : ComponentActivity() {
                         BottomAppBar {
                             Text("Bottom Bar")
                         }
-                    }) {
-                    greeting("Android")
+                    },
+                    floatingActionButton = {
+                        FloatingActionButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "fab icon"
+                            )
+                        }
+                    },
+                ) {
+                    Box(modifier = Modifier.padding(it)) {
+                        greeting("Android")
+                    }
                 }
 
             }
@@ -184,7 +197,7 @@ fun greeting(name: String) {
 
         Spacer(Modifier.size(4.dp))
 
-        Row {
+        Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
             Image(
                 painter = painterResource(R.drawable.girl_gaitubao),
                 contentDescription = null,
@@ -207,9 +220,7 @@ fun greeting(name: String) {
                     )
                 )
             )
-        }
 
-        Row {
             Image(
                 painter = painterResource(R.drawable.girl_gaitubao),
                 contentDescription = null,
@@ -234,126 +245,191 @@ fun greeting(name: String) {
                 contentDescription = null,
                 modifier = Modifier.blur(10.dp, BlurredEdgeTreatment(RoundedCornerShape(10.dp)))
             )
-
-            val values = floatArrayOf(
-                1f, 0f, 0f, 0f, 0f,
-                0f, 0f, 0f, 0f, 0f,
-                0f, 0f, 0f, 0f, 0f,
-                0f, 0f, 0f, 1f, 0f
-            )
-            Image(
-                painter = painterResource(R.drawable.girl_gaitubao),
-                contentDescription = null,
-                colorFilter = ColorFilter.colorMatrix(ColorMatrix(values))
-            )
         }
 
-        Row {
-            var values = floatArrayOf(
-                0f, 0f, 0f, 0f, 0f,
-                0f, 1f, 0f, 0f, 0f,
-                0f, 0f, 1f, 0f, 0f,
-                0f, 0f, 0f, 1f, 0f
-            )
-            Image(
-                painter = painterResource(R.drawable.girl_gaitubao),
-                contentDescription = null,
-                colorFilter = ColorFilter.colorMatrix(ColorMatrix(values))
-            )
+        Spacer(Modifier.size(4.dp))
 
-            values = floatArrayOf(
-                0f, 1f, 0f, 0f, 0f,
-                1f, 0f, 0f, 0f, 0f,
-                0f, 0f, 1f, 0f, 0f,
-                0f, 0f, 0f, 1f, 0f
-            )
-            Image(
-                painter = painterResource(R.drawable.girl_gaitubao),
-                contentDescription = null,
-                colorFilter = ColorFilter.colorMatrix(ColorMatrix(values))
-            )
+        Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+            Box {
+                Row {
+                    Image(
+                        painter = painterResource(R.drawable.girl_gaitubao),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.colorMatrix(
+                            ColorMatrix(
+                                floatArrayOf(
+                                    1f, 0f, 0f, 0f, 0f,
+                                    0f, 0f, 0f, 0f, 0f,
+                                    0f, 0f, 0f, 0f, 0f,
+                                    0f, 0f, 0f, 1f, 0f
+                                )
+                            )
+                        )
+                    )
 
-            val contrast = 0.5f
-            values = floatArrayOf(
-                contrast, 0f, 0f, 0f, 0f,
-                0f, contrast, 0f, 0f, 0f,
-                0f, 0f, contrast, 0f, 0f,
-                0f, 0f, 0f, 1f, 0f
-            )
+                    Image(
+                        painter = painterResource(R.drawable.girl_gaitubao),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.colorMatrix(
+                            ColorMatrix(
+                                floatArrayOf(
+                                    0f, 0f, 0f, 0f, 0f,
+                                    0f, 1f, 0f, 0f, 0f,
+                                    0f, 0f, 1f, 0f, 0f,
+                                    0f, 0f, 0f, 1f, 0f
+                                )
+                            )
+                        )
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.girl_gaitubao),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.colorMatrix(
+                            ColorMatrix(
+                                floatArrayOf(
+                                    0f, 1f, 0f, 0f, 0f,
+                                    1f, 0f, 0f, 0f, 0f,
+                                    0f, 0f, 1f, 0f, 0f,
+                                    0f, 0f, 0f, 1f, 0f
+                                )
+                            )
+                        )
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.girl_gaitubao),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.colorMatrix(
+                            ColorMatrix(
+                                floatArrayOf(
+                                    1f, 0f, 0f, 0f, 100f,
+                                    0f, 1f, 0f, 0f, 0f,
+                                    0f, 0f, 1f, 0f, 0f,
+                                    0f, 0f, 0f, 1f, 0f
+                                )
+                            )
+                        )
+                    )
+                }
+
+                Text(
+                    text = "Color Style",
+                    fontSize = 20.sp,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
+            Spacer(Modifier.size(6.dp))
+
+            var contrast = 0.6f
             Image(
                 painter = painterResource(id = R.drawable.girl_gaitubao),
                 contentDescription = null,
-                colorFilter = ColorFilter.colorMatrix(ColorMatrix(values))
+                colorFilter = ColorFilter.colorMatrix(
+                    ColorMatrix(
+                        floatArrayOf(
+                            contrast, 0f, 0f, 0f, 0f,
+                            0f, contrast, 0f, 0f, 0f,
+                            0f, 0f, contrast, 0f, 0f,
+                            0f, 0f, 0f, 1f, 0f
+                        )
+                    )
+                )
             )
-        }
 
-        Row {
-            val contrast = 1.5f
-            var values = floatArrayOf(
-                contrast, 0f, 0f, 0f, 0f,
-                0f, contrast, 0f, 0f, 0f,
-                0f, 0f, contrast, 0f, 0f,
-                0f, 0f, 0f, 1f, 0f
-            )
+            contrast = 1.7f
             Image(
                 painter = painterResource(id = R.drawable.girl_gaitubao),
                 contentDescription = null,
-                colorFilter = ColorFilter.colorMatrix(ColorMatrix(values))
+                colorFilter = ColorFilter.colorMatrix(
+                    ColorMatrix(
+                        floatArrayOf(
+                            contrast, 0f, 0f, 0f, 0f,
+                            0f, contrast, 0f, 0f, 0f,
+                            0f, 0f, contrast, 0f, 0f,
+                            0f, 0f, 0f, 1f, 0f
+                        )
+                    )
+                )
             )
 
-            var brightness = 100f
-            values = floatArrayOf(
-                1f, 0f, 0f, 0f, brightness,
-                0f, 1f, 0f, 0f, brightness,
-                0f, 0f, 1f, 0f, brightness,
-                0f, 0f, 0f, 1f, 0f
-            )
+            Spacer(Modifier.size(6.dp))
+
+            var brightness = -50f
             Image(
                 painter = painterResource(id = R.drawable.girl_gaitubao),
                 contentDescription = null,
-                colorFilter = ColorFilter.colorMatrix(ColorMatrix(values))
+                colorFilter = ColorFilter.colorMatrix(
+                    ColorMatrix(
+                        floatArrayOf(
+                            1f, 0f, 0f, 0f, brightness,
+                            0f, 1f, 0f, 0f, brightness,
+                            0f, 0f, 1f, 0f, brightness,
+                            0f, 0f, 0f, 1f, 0f
+                        )
+                    )
+                )
             )
 
-            brightness = -50f
-            values = floatArrayOf(
-                1f, 0f, 0f, 0f, brightness,
-                0f, 1f, 0f, 0f, brightness,
-                0f, 0f, 1f, 0f, brightness,
-                0f, 0f, 0f, 1f, 0f
-            )
+            brightness = 100f
             Image(
                 painter = painterResource(id = R.drawable.girl_gaitubao),
                 contentDescription = null,
-                colorFilter = ColorFilter.colorMatrix(ColorMatrix(values))
+                colorFilter = ColorFilter.colorMatrix(
+                    ColorMatrix(
+                        floatArrayOf(
+                            1f, 0f, 0f, 0f, brightness,
+                            0f, 1f, 0f, 0f, brightness,
+                            0f, 0f, 1f, 0f, brightness,
+                            0f, 0f, 0f, 1f, 0f
+                        )
+                    )
+                )
             )
-        }
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+            Spacer(Modifier.size(6.dp))
+
             val alpha = 0.4f
-            var values = floatArrayOf(
-                1f, 0f, 0f, 0f, 0f,
-                0f, 1f, 0f, 0f, 0f,
-                0f, 0f, 1f, 0f, 0f,
-                0f, 0f, 0f, alpha, 0f
-            )
             Image(
                 painter = painterResource(id = R.drawable.girl_gaitubao),
                 contentDescription = null,
-                colorFilter = ColorFilter.colorMatrix(ColorMatrix(values))
+                colorFilter = ColorFilter.colorMatrix(
+                    ColorMatrix(
+                        floatArrayOf(
+                            1f, 0f, 0f, 0f, 0f,
+                            0f, 1f, 0f, 0f, 0f,
+                            0f, 0f, 1f, 0f, 0f,
+                            0f, 0f, 0f, alpha, 0f
+                        )
+                    )
+                )
             )
 
-            values = floatArrayOf(
-                -1f, 0f, 0f, 0f, 255f,
-                0f, -1f, 0f, 0f, 255f,
-                0f, 0f, -1f, 0f, 255f,
-                0f, 0f, 0f, 1f, 0f
-            )
+            Spacer(Modifier.size(6.dp))
+
             Image(
                 painter = painterResource(id = R.drawable.girl_gaitubao),
                 contentDescription = null,
-                colorFilter = ColorFilter.colorMatrix(ColorMatrix(values))
+                colorFilter = ColorFilter.colorMatrix(
+                    ColorMatrix(
+                        floatArrayOf(
+                            -1f, 0f, 0f, 0f, 255f,
+                            0f, -1f, 0f, 0f, 255f,
+                            0f, 0f, -1f, 0f, 255f,
+                            0f, 0f, 0f, 1f, 0f
+                        )
+                    )
+                )
             )
+        }
 
+        Spacer(Modifier.size(4.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.horizontalScroll(rememberScrollState())
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.girl_gaitubao),
                 contentDescription = null,
@@ -365,30 +441,34 @@ fun greeting(name: String) {
                         RectangleShape
                     )
             )
-        }
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+            Spacer(Modifier.size(4.dp))
+
             val modifier =
-                Modifier.size(120.dp).border(BorderStroke(5.dp, Color.Gray), RectangleShape)
+                Modifier.border(BorderStroke(5.dp, Color.Gray), RectangleShape)
             Image(
                 painter = painterResource(id = R.drawable.girl_gaitubao),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
-                modifier = modifier
+                modifier = modifier.size(90.dp)
             )
+
+            Spacer(Modifier.size(4.dp))
 
             Image(
                 painter = painterResource(id = R.drawable.girl_gaitubao),
                 contentDescription = null,
                 contentScale = ContentScale.FillHeight,
-                modifier = modifier
+                modifier = modifier.size(100.dp)
             )
+
+            Spacer(Modifier.size(4.dp))
 
             Image(
                 painter = painterResource(id = R.drawable.girl_gaitubao),
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
-                modifier = modifier
+                modifier = modifier.size(120.dp)
             )
         }
 
