@@ -25,7 +25,7 @@
         </activity>
 
         <service
-            android:name=".ComposeWallpaper"
+            android:name=".service.ComposeWallpaper"
             android:exported="true"
             android:label="Compose Wallpaper"
             android:permission="android.permission.BIND_WALLPAPER">
@@ -40,7 +40,7 @@
         </service>
 
         <receiver
-            android:name=".ComposeWidgetReceiver"
+            android:name=".receiver.ComposeWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -50,7 +50,12 @@
                 android:resource="@xml/compose_widget_config" />
         </receiver>
 
-        <activity android:name=".MixUiActivity" />
+        <activity
+            android:name=".MixUiActivity"
+            android:label="MixUi"
+            android:theme="@style/Theme.DarkActionBar" />
+
+        <activity android:name=".ListGridActivity" />
     </application>
 
 </manifest>

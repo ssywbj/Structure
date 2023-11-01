@@ -12,10 +12,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +30,7 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
@@ -49,39 +49,12 @@ class ComposeActivity : ComponentActivity() {
         setContent {
             structureTheme {
                 // A surface container using the 'background' color from the theme
-
-                /*Surface(
+                Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
                     greeting("Android")
-                }*/
-
-                Scaffold(
-                    topBar = {
-                        TopAppBar(
-                            title = { Text("Suheng Compose") },
-                        )
-                    },
-                    bottomBar = {
-                        BottomAppBar {
-                            Text("Bottom Bar")
-                        }
-                    },
-                    floatingActionButton = {
-                        FloatingActionButton(onClick = {}) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "fab icon"
-                            )
-                        }
-                    },
-                ) {
-                    Box(modifier = Modifier.padding(it)) {
-                        greeting("Android")
-                    }
                 }
-
             }
         }
     }
@@ -94,6 +67,8 @@ fun greeting(name: String) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize().padding(6.dp).verticalScroll(rememberScrollState())
     ) {
+        val context = LocalContext.current
+
         Text(
             text = "Hello $name!",
             color = Color(0, 0xFF, 0),
@@ -101,6 +76,7 @@ fun greeting(name: String) {
             fontStyle = FontStyle.Italic,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.background(Color.Yellow).padding(all = 20.dp).width(100.dp)
+                .clickable { context.startActivity(Intent(context, ListGridActivity::class.java)) }
         )
 
         Spacer(Modifier.background(Color.Red).size(10.dp))
@@ -112,6 +88,21 @@ fun greeting(name: String) {
         )
 
         Spacer(Modifier.background(Color.Red).size(8.dp))
+
+        val clickText = remember { mutableStateOf("ClickableText") }
+        ClickableText(
+            text = AnnotatedString(clickText.value),
+            style = TextStyle(
+                color = Color.DarkGray,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        ) {
+            clickText.value = "$it"
+            Toast.makeText(context, "${clickText.value}, it: $it", Toast.LENGTH_SHORT).show()
+        }
+
+        Spacer(Modifier.background(Color.Red).size(6.dp))
 
         SelectionContainer {
             Text(
@@ -137,7 +128,6 @@ fun greeting(name: String) {
             label = { Text("TextField") },
         )
 
-        val context = LocalContext.current
         val btnText = remember { mutableStateOf("Click") }
         Button(onClick = {
             Toast.makeText(context, btnText.value, Toast.LENGTH_SHORT).show()

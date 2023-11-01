@@ -2,6 +2,7 @@ package com.suheng.compose
 
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -26,6 +27,7 @@ class MixUiActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        actionBar?.setDisplayHomeAsUpEnabled(true)
         val binding = ActivityMixUiBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.composeView.setContent {
@@ -69,6 +71,13 @@ class MixUiActivity : ComponentActivity() {
             }
 
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 }

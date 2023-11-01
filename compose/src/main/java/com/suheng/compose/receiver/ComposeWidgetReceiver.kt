@@ -1,4 +1,4 @@
-package com.suheng.compose
+package com.suheng.compose.receiver
 
 import android.content.Context
 import androidx.compose.runtime.Composable

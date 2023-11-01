@@ -1,4 +1,4 @@
-package com.suheng.compose
+package com.suheng.compose.service
 
 import android.graphics.Color
 import android.graphics.Matrix
@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import androidx.compose.ui.platform.ComposeView
+import com.suheng.compose.R
 import com.suheng.compose.ui.PaperFlameLayout
 import java.lang.reflect.InvocationTargetException
 
