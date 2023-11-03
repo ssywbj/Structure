@@ -6,7 +6,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -15,15 +18,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ChainStyle
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.suheng.compose.ui.theme.structureTheme
 
 class ListGridActivity : ComponentActivity() {
@@ -59,7 +65,8 @@ class ListGridActivity : ComponentActivity() {
                             "The simplest solution would be to add a Spacer with Modifier.weight(1f) between",
                             "what you want to achieve, an example how this might look like",
                             "For example following code",
-                            "As I said remaining"
+                            "As I said remaining",
+                            "1111111111111111111",
                         ) + ((0..100).map { mit -> mit.toString() })
                         lazyList(listOf)
                     }
@@ -80,46 +87,84 @@ class ListGridActivity : ComponentActivity() {
             }
 
             items(items = dataList) { data ->
-                Row(
-                    modifier = Modifier.fillParentMaxWidth().clickable {
-                        Toast.makeText(context, " $data", Toast.LENGTH_SHORT).show()
-                    }.padding(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.iz0rltfp),
-                        contentDescription = "beauty icon",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.padding(end = 8.dp).requiredSize(54.dp)
-                            .clip(CircleShape)
+                ConstraintLayout(modifier = Modifier.fillParentMaxWidth().clickable {
+                    Toast.makeText(context, " $data", Toast.LENGTH_SHORT).show()
+                }.padding(10.dp)) {
+
+                    val (avatarRef, titleRef, subtitleRef, describeRef, progressRef, arrowRightRefs) = createRefs()
+                    createVerticalChain(
+                        titleRef,
+                        subtitleRef,
+                        progressRef,
+                        chainStyle = ChainStyle.Spread
                     )
 
-                    Column {
-                        Text(
-                            text = data,
-                            fontSize = 18.sp,
-                            color = Color.Black,
-                        )
+                    Image(painter = painterResource(id = R.drawable.iz0rltfp),
+                        contentDescription = "beauty avatar",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.padding(end = 8.dp).requiredSize(56.dp)
+                            .clip(CircleShape)
+                            .constrainAs(avatarRef) {
+                                top.linkTo(parent.top)
+                                start.linkTo(parent.start)
+                                bottom.linkTo(parent.bottom)
+                            }
+                    )
 
-                        Text(
-                            text = data,
-                            fontSize = 16.sp,
-                            color = Color(0xFF999999),
-                        )
-                    }
+                    Text(
+                        text = data,
+                        modifier = Modifier.constrainAs(titleRef) {
+                            start.linkTo(avatarRef.end)
+                            end.linkTo(describeRef.start)
+                            width = Dimension.fillToConstraints
+                        },
+                        fontSize = 17.sp,
+                    )
 
-                    Spacer(Modifier.weight(1f))
+                    Text(
+                        text = data,
+                        modifier = Modifier.constrainAs(subtitleRef) {
+                            top.linkTo(titleRef.bottom)
+                            start.linkTo(titleRef.start)
+                            end.linkTo(titleRef.end)
+                            width = Dimension.fillToConstraints
+                        },
+                        style = TextStyle(color = Color(0xFF666666), fontSize = 15.sp)
+                    )
+
+                    LinearProgressIndicator(
+                        progress = 0.7f,
+                        modifier = Modifier.constrainAs(progressRef) {
+                            top.linkTo(subtitleRef.bottom)
+                            start.linkTo(titleRef.start)
+                            end.linkTo(titleRef.end)
+                            width = Dimension.fillToConstraints
+                        }.padding(top = 8.dp)
+                    )
+
+                    Text(
+                        text = "describe",
+                        modifier = Modifier.constrainAs(describeRef) {
+                            top.linkTo(parent.top)
+                            end.linkTo(arrowRightRefs.start)
+                            bottom.linkTo(parent.bottom)
+                        }.padding(start = 12.dp),
+                        style = TextStyle(color = Color(0xFF999999), fontSize = 13.sp)
+                    )
 
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowRight,
                         contentDescription = "fab icon",
+                        modifier = Modifier.constrainAs(arrowRightRefs) {
+                            top.linkTo(parent.top)
+                            end.linkTo(parent.end)
+                            bottom.linkTo(parent.bottom)
+                        }
                     )
                 }
 
             }
-
         }
-    }
 
+    }
 }
