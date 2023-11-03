@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.suheng.structure.view.R
+import com.suheng.structure.view.kt.asEntity
+import com.suheng.structure.view.kt.asEntity2
 import com.suheng.structure.view.paging.GithubService
 import com.suheng.structure.view.paging.Paging2VM
 import com.suheng.structure.view.paging.Repo
@@ -62,6 +64,9 @@ class Paging3Activity : AppCompatActivity() {
         job = lifecycleScope.launch(Dispatchers.IO) {
             GithubService.create().searchRepos(1, 10).items.also {
                 Log.d("Wbj", "searchRepos size: ${it.size}")
+                it.map(Repo::asEntity).forEach { item -> Log.v("Wbj", "asEntity: $item") }
+                it.map { repo -> repo.asEntity2() }
+                    .forEach { item -> Log.v("Wbj", "asEntity2: $item") }
             }.forEach {
                 Log.d("Wbj", "repo: $it")
             }

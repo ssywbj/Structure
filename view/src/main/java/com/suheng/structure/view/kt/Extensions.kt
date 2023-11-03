@@ -3,6 +3,8 @@ package com.suheng.structure.view.kt
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
+import com.suheng.structure.view.paging.AdtItem
+import com.suheng.structure.view.paging.Repo
 import kotlin.reflect.KProperty
 
 //扩展函数
@@ -80,3 +82,11 @@ inline fun Canvas.saveLayerAlpha(
     block()
     restoreToCount(saveLayer)
 }
+
+fun Repo.asEntity() =
+    AdtItem(id = id, name = name, description = description, starCount = starCount)
+
+inline fun <R> Repo.mapItem(block: (Repo) -> R): R = block(this)
+
+fun Repo.asEntity2() =
+    mapItem { AdtItem(id = id, name = name, description = description, starCount = starCount) }
