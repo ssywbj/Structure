@@ -5,12 +5,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -67,7 +66,7 @@ class ListGridActivity : ComponentActivity() {
                             "For example following code",
                             "As I said remaining",
                             "1111111111111111111",
-                        ) + ((0..100).map { mit -> mit.toString() })
+                        ) + ((0..8).map { mit -> mit.toString() })
                         lazyList(listOf)
                     }
                 }
@@ -80,10 +79,31 @@ class ListGridActivity : ComponentActivity() {
         val context = LocalContext.current
         LazyColumn(modifier = Modifier.fillMaxSize()) {
 
-            item { Text(text = "First item") }
+            item {
+                Text(
+                    text = "Title",
+                    fontSize = 19.sp,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                )
+            }
 
-            items(5) { index ->
-                Text(text = "Item: $index")
+            item {
+                LazyRow(modifier = Modifier.wrapContentHeight()) {
+                    items(10) { index ->
+                        Text(
+                            text = "Row:$index",
+                            fontSize = 18.sp,
+                            color = Color.White,
+                            modifier = Modifier.background(
+                                color = Color(
+                                    (0xFF * (1.0 * index / 10)).toInt(),
+                                    0x00,
+                                    0x00
+                                )
+                            ).padding(horizontal = 14.dp, vertical = 7.dp)
+                        )
+                    }
+                }
             }
 
             items(items = dataList) { data ->
@@ -162,9 +182,9 @@ class ListGridActivity : ComponentActivity() {
                         }
                     )
                 }
-
             }
-        }
 
+        }
     }
+
 }
