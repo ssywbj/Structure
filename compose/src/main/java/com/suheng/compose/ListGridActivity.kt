@@ -10,6 +10,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -24,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ChainStyle
@@ -67,7 +72,24 @@ class ListGridActivity : ComponentActivity() {
                             "As I said remaining",
                             "1111111111111111111",
                         ) + ((0..8).map { mit -> mit.toString() })
-                        lazyList(listOf)
+                        //lazyList(listOf)
+
+                        ((0..27).map { mit ->
+                            if (mit % 10 == 0) {
+                                AdtItem(title = "Title$mit", type = 1)
+                            } else {
+                                if (mit == 9) {
+                                    AdtItem(contentMore = (0..6).map { moreIndex ->
+                                        "more$moreIndex"
+                                    })
+                                } else {
+                                    AdtItem(content = "Content$mit")
+                                }
+                            }
+                        }).also { dataList ->
+                            lazyListGrid(dataList)
+                        }
+
                     }
                 }
             }
@@ -187,4 +209,65 @@ class ListGridActivity : ComponentActivity() {
         }
     }
 
+    @Composable
+    fun lazyListGrid(dataList: List<AdtItem>) {
+        LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.fillMaxSize()) {
+            //LazyVerticalGrid(columns = GridCells.Adaptive(200.dp), modifier = Modifier.fillMaxSize()) {
+
+            itemsIndexed(
+                items = dataList,
+                span = { _, item ->
+                    if (item.type == 1) GridItemSpan(maxLineSpan) else GridItemSpan(1)
+                },
+                contentType = { _, item -> item.type },
+                itemContent = { _, item ->
+                    if (item.type == 1) {
+                        Text(
+                            text = item.title,
+                            fontSize = 18.sp,
+                            modifier = Modifier.background(color = Color.Red)
+                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                        )
+                    } else {
+                        if (item.contentMore == null) {
+                            Text(
+                                text = item.content,
+                                fontSize = 16.sp,
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.requiredHeight(130.dp).background(
+                                    color = Color.White
+                                )
+                            )
+                        } else {
+                            LazyRow(
+                                modifier = Modifier.requiredHeight(130.dp).background(
+                                    color = Color.Gray
+                                )
+                            ) {
+                                items(item.contentMore) { moreCtt ->
+                                    Text(
+                                        text = moreCtt,
+                                        fontSize = 14.sp,
+                                        color = Color.Red,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.background(color = Color.Black)
+                                            .padding(4.dp)
+                                    )
+                                }
+                            }
+
+                        }
+                    }
+                })
+        }
+    }
+
 }
+
+data class AdtItem(
+    val title: String = "",
+    val content: String = "",
+    val contentMore: List<String>? = null,
+    val type: Int = 0,
+)
