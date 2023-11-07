@@ -212,7 +212,7 @@ class ListGridActivity : ComponentActivity() {
 
     @Composable
     fun lazyListGrid(dataList: List<AdtItem>) {
-        LazyVerticalGrid(columns = GridCells.Fixed(4), modifier = Modifier.fillMaxSize()) {
+        LazyVerticalGrid(columns = GridCells.Fixed(6), modifier = Modifier.fillMaxSize()) {
             //LazyVerticalGrid(columns = GridCells.Adaptive(200.dp), modifier = Modifier.fillMaxSize()) {
 
             itemsIndexed(
@@ -226,7 +226,7 @@ class ListGridActivity : ComponentActivity() {
                     when (item.type) {
                         1 -> GridItemSpan(maxLineSpan)
                         2 -> GridItemSpan(maxLineSpan / 2)
-                        else -> GridItemSpan(1)
+                        else -> GridItemSpan(maxLineSpan / 3)
                     }
                 },
                 contentType = { _, item -> item.type },
