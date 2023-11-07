@@ -1,6 +1,7 @@
 package com.suheng.compose
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -78,12 +79,12 @@ class ListGridActivity : ComponentActivity() {
                             if (mit % 10 == 0) {
                                 AdtItem(title = "Title$mit", type = 1)
                             } else {
-                                if (mit == 9) {
-                                    AdtItem(contentMore = (0..6).map { moreIndex ->
+                                when (mit) {
+                                    9 -> AdtItem(contentMore = (0..6).map { moreIndex ->
                                         "more$moreIndex"
                                     })
-                                } else {
-                                    AdtItem(content = "Content$mit")
+                                    in 11..19 -> AdtItem(content = "Content$mit", type = 2)
+                                    else -> AdtItem(content = "Content$mit")
                                 }
                             }
                         }).also { dataList ->
@@ -211,13 +212,22 @@ class ListGridActivity : ComponentActivity() {
 
     @Composable
     fun lazyListGrid(dataList: List<AdtItem>) {
-        LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.fillMaxSize()) {
+        LazyVerticalGrid(columns = GridCells.Fixed(4), modifier = Modifier.fillMaxSize()) {
             //LazyVerticalGrid(columns = GridCells.Adaptive(200.dp), modifier = Modifier.fillMaxSize()) {
 
             itemsIndexed(
                 items = dataList,
+                key = { index, _ ->
+                    index.also {
+                        Log.d("Wbj", "lazyListGrid, index: $it")
+                    }
+                },
                 span = { _, item ->
-                    if (item.type == 1) GridItemSpan(maxLineSpan) else GridItemSpan(1)
+                    when (item.type) {
+                        1 -> GridItemSpan(maxLineSpan)
+                        2 -> GridItemSpan(maxLineSpan / 2)
+                        else -> GridItemSpan(1)
+                    }
                 },
                 contentType = { _, item -> item.type },
                 itemContent = { _, item ->
