@@ -1,10 +1,13 @@
 package com.suheng.structure.view.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewOverlay;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +15,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
 
 import com.suheng.structure.view.R;
+import com.suheng.structure.view.drawable.ProgressDrawable;
 
 public class DrawableActivity extends AppCompatActivity {
 
@@ -47,6 +51,19 @@ public class DrawableActivity extends AppCompatActivity {
                 maskCircleDrawable.startTransition();
                 imageView.setImageDrawable(drawable);
             }
+        });
+
+        findViewById(R.id.imageView).setOnClickListener(view -> {
+            ViewOverlay overlay = view.getOverlay();
+            ProgressDrawable drawable = new ProgressDrawable(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    overlay.clear();
+                }
+            });
+            drawable.setBounds(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+            overlay.add(drawable);
         });
     }
 
