@@ -19,12 +19,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.suheng.compose.ui.theme.colorsPalette
 import com.suheng.compose.ui.theme.structureTheme
 
 class ListGridActivity : ComponentActivity() {
@@ -42,16 +45,51 @@ class ListGridActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val primaryColor = colorsPalette().primary
+            window.statusBarColor = primaryColor.toArgb()
+
             structureTheme {
                 Scaffold(
                     topBar = {
                         TopAppBar(
                             title = { Text("Lazy List, Grid") },
+                            navigationIcon = {
+                                IconButton(onClick = { finish() }) {
+                                    Icon(
+                                        imageVector = Icons.Filled.ArrowBack,
+                                        contentDescription = "Back"
+                                    )
+                                }
+                            },
+                            backgroundColor = primaryColor
                         )
                     },
                     bottomBar = {
-                        BottomAppBar {
+                        /*BottomAppBar {
                             Text("Bottom Bar")
+                        }*/
+                        val selectedIndex = remember { mutableStateOf(0) }
+                        BottomNavigation {
+                            BottomNavigationItem(
+                                icon = { Icon(imageVector = Icons.Default.Home, "Home") },
+                                label = { Text(text = "Home") },
+                                onClick = { selectedIndex.value = 0 },
+                                selected = (selectedIndex.value == 0)
+                            )
+
+                            BottomNavigationItem(
+                                icon = { Icon(imageVector = Icons.Default.Favorite, "Favorite") },
+                                label = { Text(text = "Favorite") },
+                                onClick = { selectedIndex.value = 1 },
+                                selected = (selectedIndex.value == 1)
+                            )
+
+                            BottomNavigationItem(
+                                icon = { Icon(imageVector = Icons.Default.Person, "Profile") },
+                                label = { Text(text = "Profile") },
+                                onClick = { selectedIndex.value = 2 },
+                                selected = (selectedIndex.value == 2)
+                            )
                         }
                     },
                     floatingActionButton = {
@@ -212,7 +250,13 @@ class ListGridActivity : ComponentActivity() {
 
     @Composable
     fun lazyListGrid(dataList: List<AdtItem>) {
-        LazyVerticalGrid(columns = GridCells.Fixed(6), modifier = Modifier.fillMaxSize()) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(6),
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+            horizontalArrangement = Arrangement.spacedBy(1.dp),
+            contentPadding = PaddingValues(1.dp)
+        ) {
             //LazyVerticalGrid(columns = GridCells.Adaptive(200.dp), modifier = Modifier.fillMaxSize()) {
 
             itemsIndexed(
@@ -246,7 +290,7 @@ class ListGridActivity : ComponentActivity() {
                                 color = Color.Black,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.requiredHeight(130.dp).background(
-                                    color = Color.White
+                                    color = Color.Blue
                                 )
                             )
                         } else {

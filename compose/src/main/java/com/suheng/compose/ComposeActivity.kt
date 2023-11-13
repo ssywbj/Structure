@@ -462,13 +462,56 @@ fun greeting(name: String) {
             )
         }
 
-        Card(elevation = 6.dp, modifier = Modifier.padding(all = 10.dp)) {
-            Column(modifier = Modifier.padding(all = 10.dp)) {
-                Text("AB CDE", fontWeight = FontWeight.W700)
-                Text("+0 12345678")
-                Text("XYZ city.", color = Color.Gray)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 10.dp)
+        ) {
+            Card(elevation = 6.dp) {
+                Column(modifier = Modifier.padding(all = 2.dp)) {
+                    Text("AB CDE", fontWeight = FontWeight.W700)
+                    Text("+0 12345678")
+                    Text("XYZ city.", color = Color.Gray)
+                }
+            }
+
+            Spacer(Modifier.size(6.dp))
+
+            Card(
+                elevation = 2.dp,
+                contentColor = Color.Blue,
+            ) {
+                Box {
+                    Image(
+                        painter = painterResource(id = R.drawable.girl_gaitubao),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.matchParentSize()
+                    )
+                    Column(modifier = Modifier.padding(all = 4.dp)) {
+                        Text("AB CDE", fontWeight = FontWeight.W700)
+                        Text("+0 12345678")
+                        Text("XYZ city.", color = Color.Red)
+                    }
+                }
+            }
+
+            Spacer(Modifier.size(6.dp))
+
+            Card(
+                elevation = 0.dp,
+                backgroundColor = Color.Green,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth().fillMaxWidth() //fillMaxXxx：占满剩下的空间
+            ) {
+                Column(modifier = Modifier.padding(all = 10.dp)) {
+                    Text("AB CDE", fontWeight = FontWeight.W700)
+                    Text("+0 12345678")
+                    Text("XYZ city.", color = Color.Red)
+                }
             }
         }
+
+        Spacer(Modifier.size(10.dp))
 
         val textMeasurer = rememberTextMeasurer()
         //Canvas(modifier = Modifier.width(150.dp).height(200.dp).background(Color.Gray)) {
