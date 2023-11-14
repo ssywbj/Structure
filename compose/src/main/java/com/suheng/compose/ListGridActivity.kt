@@ -37,18 +37,37 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.suheng.compose.ui.theme.colorsPalette
 import com.suheng.compose.ui.theme.structureTheme
 
 class ListGridActivity : ComponentActivity() {
 
+    companion object {
+        private const val LABEL_HOME = "Home"
+        private const val LABEL_FAVORITE = "Favorite"
+        private const val LABEL_PROFILE = "Profile"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val listOf = listOf(
+            "The simplest solution would be to add a Spacer with Modifier.weight(1f) between",
+            "what you want to achieve, an example how this might look like",
+            "For example following code",
+            "As I said remaining",
+            "1111111111111111111",
+        ) + ((0..8).map { mit -> mit.toString() })
+
         setContent {
             val primaryColor = colorsPalette().primary
             window.statusBarColor = primaryColor.toArgb()
 
             structureTheme {
+                val navController = rememberNavController()
                 Scaffold(
                     topBar = {
                         TopAppBar(
@@ -71,23 +90,43 @@ class ListGridActivity : ComponentActivity() {
                         val selectedIndex = remember { mutableStateOf(0) }
                         BottomNavigation {
                             BottomNavigationItem(
-                                icon = { Icon(imageVector = Icons.Default.Home, "Home") },
-                                label = { Text(text = "Home") },
-                                onClick = { selectedIndex.value = 0 },
+                                icon = { Icon(imageVector = Icons.Default.Home, LABEL_HOME) },
+                                label = { Text(text = LABEL_HOME) },
+                                onClick = {
+                                    selectedIndex.value = 0
+                                    navController.navigate(LABEL_HOME) {
+                                        launchSingleTop = true
+                                    }
+                                },
                                 selected = (selectedIndex.value == 0)
                             )
 
                             BottomNavigationItem(
-                                icon = { Icon(imageVector = Icons.Default.Favorite, "Favorite") },
-                                label = { Text(text = "Favorite") },
-                                onClick = { selectedIndex.value = 1 },
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Favorite,
+                                        LABEL_FAVORITE
+                                    )
+                                },
+                                label = { Text(text = LABEL_FAVORITE) },
+                                onClick = {
+                                    selectedIndex.value = 1
+                                    navController.navigate(LABEL_FAVORITE) {
+                                        launchSingleTop = true
+                                    }
+                                },
                                 selected = (selectedIndex.value == 1)
                             )
 
                             BottomNavigationItem(
-                                icon = { Icon(imageVector = Icons.Default.Person, "Profile") },
-                                label = { Text(text = "Profile") },
-                                onClick = { selectedIndex.value = 2 },
+                                icon = { Icon(imageVector = Icons.Default.Person, LABEL_PROFILE) },
+                                label = { Text(text = LABEL_PROFILE) },
+                                onClick = {
+                                    selectedIndex.value = 2
+                                    navController.navigate(LABEL_PROFILE) {
+                                        launchSingleTop = true
+                                    }
+                                },
                                 selected = (selectedIndex.value == 2)
                             )
                         }
@@ -104,31 +143,31 @@ class ListGridActivity : ComponentActivity() {
                     },
                 ) {
                     Box(modifier = Modifier.padding(it)) {
-                        val listOf = listOf(
-                            "The simplest solution would be to add a Spacer with Modifier.weight(1f) between",
-                            "what you want to achieve, an example how this might look like",
-                            "For example following code",
-                            "As I said remaining",
-                            "1111111111111111111",
-                        ) + ((0..8).map { mit -> mit.toString() })
-                        //lazyList(listOf)
-
-                        ((0..27).map { mit ->
-                            if (mit % 10 == 0) {
-                                AdtItem(title = "Title$mit", type = 1)
-                            } else {
-                                when (mit) {
-                                    9 -> AdtItem(contentMore = (0..6).map { moreIndex ->
-                                        "more$moreIndex"
-                                    })
-                                    in 11..19 -> AdtItem(content = "Content$mit", type = 2)
-                                    else -> AdtItem(content = "Content$mit")
+                        NavHost(navController, startDestination = LABEL_HOME) {
+                            composable(LABEL_HOME) {
+                                lazyList(listOf)
+                            }
+                            composable(LABEL_FAVORITE) {
+                                ((0..27).map { mit ->
+                                    if (mit % 10 == 0) {
+                                        AdtItem(title = "Title$mit", type = 1)
+                                    } else {
+                                        when (mit) {
+                                            9 -> AdtItem(contentMore = (0..6).map { moreIndex ->
+                                                "more$moreIndex"
+                                            })
+                                            in 11..19 -> AdtItem(content = "Content$mit", type = 2)
+                                            else -> AdtItem(content = "Content$mit")
+                                        }
+                                    }
+                                }).also { dataList ->
+                                    lazyListGrid(dataList)
                                 }
                             }
-                        }).also { dataList ->
-                            lazyListGrid(dataList)
+                            composable(LABEL_PROFILE) {
+                                greeting("Navigation")
+                            }
                         }
-
                     }
                 }
             }
