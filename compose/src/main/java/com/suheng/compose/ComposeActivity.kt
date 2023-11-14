@@ -53,7 +53,7 @@ class ComposeActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    greeting("Android")
+                    Greeting("Android")
                 }
             }
         }
@@ -62,7 +62,7 @@ class ComposeActivity : ComponentActivity() {
 }
 
 @Composable
-fun greeting(name: String) {
+fun Greeting(name: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize().padding(6.dp).verticalScroll(rememberScrollState())
@@ -580,8 +580,8 @@ fun greeting(name: String) {
 
 @Preview(showBackground = true)
 @Composable
-fun defaultPreview() {
+fun DefaultPreview() {
     structureTheme {
-        greeting("Android")
+        Greeting("Android")
     }
 }

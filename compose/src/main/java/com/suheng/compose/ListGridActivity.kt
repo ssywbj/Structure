@@ -165,7 +165,7 @@ class ListGridActivity : ComponentActivity() {
                                 }
                             }
                             composable(LABEL_PROFILE) {
-                                greeting("Navigation")
+                                Greeting("Navigation")
                             }
                         }
                     }

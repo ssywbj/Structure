@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,13 +31,13 @@ class MixUiActivity : ComponentActivity() {
         val binding = ActivityMixUiBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.composeView.setContent {
-            MaterialTheme { mixUi() }
+            MaterialTheme { MixUi() }
         }
     }
 
     @Composable
-    private fun mixUi() {
-        val state = remember { mutableStateOf(0) }
+    private fun MixUi() {
+        val state = remember { mutableIntStateOf(0) }
         Column(modifier = Modifier.padding(4.dp)) {
             Text(
                 "TextCompose",
@@ -49,8 +49,8 @@ class MixUiActivity : ComponentActivity() {
                     text = "TextView"
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                     setOnClickListener {
-                        text = "${text}${state.value}"
-                        state.value++
+                        text = "${text}${state.intValue}"
+                        state.intValue++
                     }
                 }
             }, modifier = Modifier.align(alignment = Alignment.End).padding(horizontal = 10.dp))
