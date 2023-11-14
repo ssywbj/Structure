@@ -21,7 +21,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -87,18 +87,18 @@ class ListGridActivity : ComponentActivity() {
                         /*BottomAppBar {
                             Text("Bottom Bar")
                         }*/
-                        val selectedIndex = remember { mutableStateOf(0) }
+                        val selectedIndex = remember { mutableIntStateOf(0) }
                         BottomNavigation {
                             BottomNavigationItem(
                                 icon = { Icon(imageVector = Icons.Default.Home, LABEL_HOME) },
                                 label = { Text(text = LABEL_HOME) },
                                 onClick = {
-                                    selectedIndex.value = 0
+                                    selectedIndex.intValue = 0
                                     navController.navigate(LABEL_HOME) {
                                         launchSingleTop = true
                                     }
                                 },
-                                selected = (selectedIndex.value == 0)
+                                selected = (selectedIndex.intValue == 0)
                             )
 
                             BottomNavigationItem(
@@ -110,24 +110,24 @@ class ListGridActivity : ComponentActivity() {
                                 },
                                 label = { Text(text = LABEL_FAVORITE) },
                                 onClick = {
-                                    selectedIndex.value = 1
+                                    selectedIndex.intValue = 1
                                     navController.navigate(LABEL_FAVORITE) {
                                         launchSingleTop = true
                                     }
                                 },
-                                selected = (selectedIndex.value == 1)
+                                selected = (selectedIndex.intValue == 1)
                             )
 
                             BottomNavigationItem(
                                 icon = { Icon(imageVector = Icons.Default.Person, LABEL_PROFILE) },
                                 label = { Text(text = LABEL_PROFILE) },
                                 onClick = {
-                                    selectedIndex.value = 2
+                                    selectedIndex.intValue = 2
                                     navController.navigate(LABEL_PROFILE) {
                                         launchSingleTop = true
                                     }
                                 },
-                                selected = (selectedIndex.value == 2)
+                                selected = (selectedIndex.intValue == 2)
                             )
                         }
                     },
@@ -145,7 +145,7 @@ class ListGridActivity : ComponentActivity() {
                     Box(modifier = Modifier.padding(it)) {
                         NavHost(navController, startDestination = LABEL_HOME) {
                             composable(LABEL_HOME) {
-                                lazyList(listOf)
+                                LazyList(listOf)
                             }
                             composable(LABEL_FAVORITE) {
                                 ((0..27).map { mit ->
@@ -161,7 +161,7 @@ class ListGridActivity : ComponentActivity() {
                                         }
                                     }
                                 }).also { dataList ->
-                                    lazyListGrid(dataList)
+                                    LazyListGrid(dataList)
                                 }
                             }
                             composable(LABEL_PROFILE) {
@@ -175,7 +175,7 @@ class ListGridActivity : ComponentActivity() {
     }
 
     @Composable
-    fun lazyList(dataList: List<String>) {
+    fun LazyList(dataList: List<String>) {
         val context = LocalContext.current
         LazyColumn(modifier = Modifier.fillMaxSize()) {
 
@@ -288,7 +288,7 @@ class ListGridActivity : ComponentActivity() {
     }
 
     @Composable
-    fun lazyListGrid(dataList: List<AdtItem>) {
+    fun LazyListGrid(dataList: List<AdtItem>) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(6),
             modifier = Modifier.fillMaxSize(),
