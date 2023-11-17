@@ -9,13 +9,10 @@ import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.View;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HourMinuteView extends View {
     private final PointF mPointPaintCenter = new PointF();
@@ -72,7 +69,7 @@ public class HourMinuteView extends View {
         final int widgetWidth = bitmap.getWidth() * 4 + mBitmapManager.get(mTimeDivideResId).getWidth();
         mRatio = 1.0f * measuredWidth / widgetWidth;
 
-        final int measuredHeight = mBitmapManager.get(mTimePictureRes[0], mRatio).getHeight();
+        final int measuredHeight = mBitmapManager.getScale(mTimePictureRes[0], mRatio).getHeight();
         setMeasuredDimension(measuredWidth, measuredHeight);
 
         this.calcDimens(measuredWidth, measuredHeight);
@@ -89,7 +86,7 @@ public class HourMinuteView extends View {
         super.onDraw(canvas);
         int color = ContextCompat.getColor(getContext(), android.R.color.white);
         canvas.translate(getWidth() / 2f, getHeight() / 2f);
-        Bitmap bitmap = mBitmapManager.get(mTimeDivideResId, color, mRatio);
+        Bitmap bitmap = mBitmapManager.getScale(mTimeDivideResId, color, mRatio);
         final float colonHalfWidth = bitmap.getWidth() / 2f;
         float left = -colonHalfWidth;
         canvas.drawBitmap(bitmap, left, -bitmap.getHeight() / 2f, null);
@@ -124,7 +121,7 @@ public class HourMinuteView extends View {
 
     public void drawTimeShadeBg(Canvas canvas, float left) {
         if (mTimeShadeBgId != 0) {
-            Bitmap bitmapShade = mBitmapManager.get(mTimeShadeBgId, Color.parseColor("#33FFFFFF"), mRatio);
+            Bitmap bitmapShade = mBitmapManager.getScale(mTimeShadeBgId, Color.parseColor("#33FFFFFF"), mRatio);
             canvas.drawBitmap(bitmapShade, left, -bitmapShade.getHeight() / 2f, null);
         }
     }
@@ -139,89 +136,12 @@ public class HourMinuteView extends View {
         }
 
         Bitmap getNumberBitmap(int number, int color, float scale) {
-            return get(mTimePictureRes[number], color, scale);
+            return getScale(mTimePictureRes[number], color, scale);
         }
     }
 
     public interface ResourcesObtain {
         int[] getTimePictureRes();
-    }
-
-    public static class BitmapManager {
-
-        private final Context mContext;
-        private final Map<String, Bitmap> mMapBitmap;
-
-        public BitmapManager(Context context) {
-            mContext = context;
-            mMapBitmap = new HashMap<>();
-        }
-
-        public Bitmap get(@DrawableRes int resId, int color, float scale, float degrees) {
-            String key = resId + "_" + color + "_" + scale + "_" + degrees;
-            if (mMapBitmap.containsKey(key)) {
-                return mMapBitmap.get(key);
-            } else {
-                Bitmap bitmap = BitmapHelper.get(mContext, resId, color, scale, degrees);
-                mMapBitmap.put(key, bitmap);
-                return bitmap;
-            }
-        }
-
-        public Bitmap get(@DrawableRes int resId, int color, float scale) {
-            return get(resId, color, scale, 0);
-        }
-
-        public Bitmap get(@DrawableRes int resId, int color) {
-            return get(resId, color, 1);
-        }
-
-        public Bitmap get(@DrawableRes int resId, float scale) {
-            return get(resId, Integer.MAX_VALUE, scale);
-        }
-
-        public Bitmap get(@DrawableRes int resId) {
-            return get(resId, Integer.MAX_VALUE);
-        }
-
-        public Bitmap getRotate(@DrawableRes int resId, int color, float scale, float degrees) {
-            return get(resId, color, scale, degrees);
-        }
-
-        public Bitmap getRotate(@DrawableRes int resId, float scale, float degrees) {
-            return getRotate(resId, Integer.MAX_VALUE, scale, degrees);
-        }
-
-        public Bitmap getRotate(@DrawableRes int resId, float degrees) {
-            return getRotate(resId, 1, degrees);
-        }
-
-        public void clear() {
-            for (Map.Entry<String, Bitmap> bitmapEntry : mMapBitmap.entrySet()) {
-                Bitmap bitmap = bitmapEntry.getValue();
-                if (!bitmap.isRecycled()) {
-                    bitmap.recycle();
-                }
-            }
-
-            mMapBitmap.clear();
-        }
-
-        public Bitmap getMerge(@DrawableRes int leftId, int leftColor, float leftScale, @DrawableRes int rightId, int rightColor, float rightScale) {
-            String key = leftId + "_" + leftColor + "_" + leftScale + "_" + rightId + "_" + rightColor + "_" + rightScale;
-            if (mMapBitmap.containsKey(key)) {
-                return mMapBitmap.get(key);
-            } else {
-                Bitmap bitmap = BitmapHelper.mergeLeftRight(this.get(leftId, leftColor, leftScale), this.get(rightId, rightColor, rightScale));
-                mMapBitmap.put(key, bitmap);
-                return bitmap;
-            }
-        }
-
-        public Bitmap getMerge(@DrawableRes int leftId, int leftColor, @DrawableRes int rightId, int rightColor) {
-            return getMerge(leftId, leftColor, 1, rightId, rightColor, 1);
-        }
-
     }
 
 }

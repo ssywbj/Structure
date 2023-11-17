@@ -29,4 +29,14 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:layout_marginTop="4dp" />
+
+    <com.suheng.structure.view.wheel.DigitalBeatView
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="4dp" />
+
+    <com.suheng.structure.view.wheel.DigitalBeatView2
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="4dp" />
 </LinearLayout>
