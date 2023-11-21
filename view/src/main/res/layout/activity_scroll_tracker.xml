@@ -6,7 +6,8 @@
 
     <com.suheng.structure.view.ScrollerTrackerView
         android:layout_width="match_parent"
-        android:layout_height="150dp" />
+        android:layout_height="150dp"
+        android:visibility="gone"/>
 
     <com.suheng.structure.view.ScrollerTrackerView2
         android:layout_width="match_parent"
@@ -23,7 +24,8 @@
     <com.suheng.structure.view.ScrollerTrackerView4
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="4dp"
+        android:visibility="gone"/>
 
     <com.suheng.structure.view.ScrollerTrackerView5
         android:layout_width="match_parent"
@@ -41,6 +43,11 @@
         android:layout_marginTop="4dp" />
 
     <com.suheng.structure.view.wheel.DigitalBeatView3
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="4dp" />
+
+    <com.suheng.structure.view.wheel.DigitalBeatView4
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_marginTop="4dp" />

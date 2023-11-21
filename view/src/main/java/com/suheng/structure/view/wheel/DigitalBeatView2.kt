@@ -13,7 +13,6 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.core.content.ContextCompat
 import com.suheng.structure.view.R
-import com.suheng.structure.view.kt.save
 import java.util.*
 
 class DigitalBeatView2 @JvmOverloads constructor(
@@ -110,31 +109,28 @@ class DigitalBeatView2 @JvmOverloads constructor(
     }
 
     private fun drawSeconds(canvas: Canvas) {
-        canvas.save {
-            val startSecond = currentSecond - SECOND_MIDDLE_OFFSET
-            val endSecond = currentSecond + SECOND_MIDDLE_OFFSET
-
-            val sb = StringBuilder()
-            var outsideOffsetX = -secondWidth * SECOND_NUMBERS_OUTSIDE //减掉屏幕外数字的宽度，让数字从屏幕外开始绘制
-            for (second in startSecond..endSecond) { //1.屏幕内显示5个，屏幕外两侧各显示一个，一共7个；2.当前秒数在中间，它的前后各有3个数字
-                val number = (second + SECOND_SCALES) % SECOND_SCALES
-                sb.append(number).append(" ")
-                val bitmap =
-                    bitmapManager.getSecondBitmap(
-                        number,
-                        R.color.os_text_primary_color,
-                        scaleRatio
-                    )
-                drawBitmap(
-                    bitmap,
-                    outsideOffsetX - offsetSecond + itemPaddingHorizontal,
-                    0f,
-                    null
+        val startSecond = currentSecond - SECOND_MIDDLE_OFFSET
+        val endSecond = currentSecond + SECOND_MIDDLE_OFFSET
+        val sb = StringBuilder()
+        var outsideOffsetX = -secondWidth * SECOND_NUMBERS_OUTSIDE //减掉屏幕外数字的宽度，让数字从屏幕外开始绘制
+        for (second in startSecond..endSecond) { //1.屏幕内显示5个，屏幕外两侧各显示一个，一共7个；2.当前秒数在中间，它的前后各有3个数字
+            val number = (second + SECOND_SCALES) % SECOND_SCALES
+            sb.append(number).append(" ")
+            val bitmap =
+                bitmapManager.getSecondBitmap(
+                    number,
+                    R.color.os_text_primary_color,
+                    scaleRatio
                 )
-                outsideOffsetX += secondWidth
-            }
-            //Log.w(TAG, "drawSeconds: $sb, startSecond: $startSecond, endSecond: $endSecond, currentSecond: $currentSecond")
+            canvas.drawBitmap(
+                bitmap,
+                outsideOffsetX - offsetSecond + itemPaddingHorizontal,
+                0f,
+                null
+            )
+            outsideOffsetX += secondWidth
         }
+        //Log.w(TAG, "drawSeconds: $sb, startSecond: $startSecond, endSecond: $endSecond, currentSecond: $currentSecond")
     }
 
     private fun releaseAnim(animator: ValueAnimator) {
