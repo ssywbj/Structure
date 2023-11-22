@@ -8,7 +8,9 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
+import android.view.VelocityTracker
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.animation.LinearInterpolator
 import android.widget.OverScroller
 import androidx.core.content.ContextCompat
@@ -41,15 +43,30 @@ class DigitalBeatView4 @JvmOverloads constructor(
     private var scroller: OverScroller
     private val listRect = ArrayList<Rect>(SECOND_NUMBERS_INSIDE)
 
+    private var velocityTracker: VelocityTracker
+    private var maximumVelocity = 0
+    private var minimumVelocity = 0
+
     init {
         bitmapManager = DigitalBeatBitmapManager(context)
         currentSecond = Calendar.getInstance()[Calendar.SECOND]
         scroller = OverScroller(context, LinearInterpolator())
+
+        velocityTracker = VelocityTracker.obtain()
+        val viewConfiguration = ViewConfiguration.get(context)
+        maximumVelocity = viewConfiguration.scaledMaximumFlingVelocity //滑动的最大速度
+        minimumVelocity = viewConfiguration.scaledMinimumFlingVelocity //滑动的最小速度
+        Log.v(
+            TAG, "maximumVelocity：" + maximumVelocity + ", minimumVelocity: "
+                    + minimumVelocity + ", scaledTouchSlop: " + viewConfiguration.scaledTouchSlop
+        )
     }
 
     private var downX = 0
     private var scrolledIndex = -1
     private var offsetX = 0
+    private var isFlinging = false
+    //private var scrollTo = 0
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val x = event.x.toInt()
@@ -57,15 +74,31 @@ class DigitalBeatView4 @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 downX = x
                 offsetX = 0
+                velocityTracker.addMovement(event)
+                isFlinging = false
             }
             MotionEvent.ACTION_MOVE -> {
                 offsetX = downX - x
                 //Log.d(TAG, "offsetX: $offsetX")
-                scrollTo(offsetX, 0)
+                scrollTo(offsetX + scroller.finalX, 0)
+                velocityTracker.addMovement(event)
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                scroller.startScroll(scrollX, 0, -offsetX, 0, 500)
-                invalidate()
+                velocityTracker.computeCurrentVelocity(1000, maximumVelocity.toFloat())
+                val xVelocity = velocityTracker.xVelocity.toInt()
+                velocityTracker.clear()
+                Log.i(
+                    TAG,
+                    "offsetX: $offsetX, fling xVelocity：$xVelocity, width: $width, scrollX: $scrollX"
+                )
+                if (abs(xVelocity) > 5 * width) {
+                    scroller.fling(scrollX, 0, -xVelocity, 0, Int.MIN_VALUE, Int.MAX_VALUE, 0, 0)
+                    isFlinging = true
+                } else {
+                    Log.w(TAG, "up, scrollX: $scrollX, finalX: ${scroller.finalX}")
+                    scroller.startScroll(scrollX, 0, -offsetX, 0, 500)
+                    invalidate()
+                }
             }
         }
 
@@ -75,13 +108,22 @@ class DigitalBeatView4 @JvmOverloads constructor(
     override fun computeScroll() {
         super.computeScroll()
         val scrollOffset = scroller.computeScrollOffset()
-        //Log.i(TAG, "computeScroll, finished: $finished, scrollOffset: $scrollOffset")
+        //Log.i(TAG, "computeScroll, finished: ${scroller.isFinished}, scrollOffset: $scrollOffset")
         if (scrollOffset) {
             val currX = scroller.currX //滚动中的水平方向相对于原点的偏移量，即当前的X坐标。
+            /*Log.e(
+                TAG,
+                "computeScroll, currX: $currX, isFinished: ${scroller.isFinished}, computeScrollOffset: ${scroller.computeScrollOffset()}"
+            )*/
             scrollTo(currX, 0)
             invalidate()
+
+            /*if (scroller.isFinished) {
+                scrollBy(secondWidth / 3, 0)
+            }*/
         } else {
             //scrolledIndex = -1
+            isFlinging = false
         }
     }
 
@@ -123,25 +165,27 @@ class DigitalBeatView4 @JvmOverloads constructor(
     }
 
     private fun drawSeconds(canvas: Canvas) {
-        //val scrollOffset =
-        /*Log.e(
-            TAG,
-            "drawSeconds, isFinished: ${scroller.isFinished}, scrollOffset: $scrollOffset, scrollX: $scrollX"
-        )*/
+        if (scroller.isFinished) {
+            val scrollOffset = scroller.computeScrollOffset()
+            Log.e(TAG, "drawSeconds, scrollOffset: $scrollOffset, scrollX: $scrollX, currVelocity: ${scroller.currVelocity}")
+        }
 
         var scrollIndex = -1
         for (rect in listRect) {
-            if (rect.contains(abs(scrollX), rect.top)) {
-                scrollIndex = listRect.indexOf(rect)
-                //Log.i(TAG, "scrollX: $scrollX, scrollIndex: $scrollIndex")
+            val absScrollX = abs(scrollX)
+            val xCoordinate = absScrollX % width
+            if (rect.contains(xCoordinate, rect.top)) {
+                val pages = absScrollX / width
+                scrollIndex = listRect.indexOf(rect) + pages * SECOND_NUMBERS_INSIDE
+                /*Log.i(
+                    TAG,
+                    "scrollX: $scrollX, xCoordinate: $xCoordinate, page: $pages, scrollIndex: $scrollIndex, scrolledIndex: $$scrolledIndex"
+                )*/
                 break
             }
         }
+
         if (scrollIndex != -1 && scrolledIndex != scrollIndex) {
-            Log.i(
-                TAG,
-                "scrolledIndex: $scrolledIndex, scrollIndex: $scrollIndex, scrollX: $scrollX"
-            )
             if (scrolledIndex != -1) {
                 val units = scrollIndex - scrolledIndex
                 if (scrollX < 0) {
@@ -153,13 +197,15 @@ class DigitalBeatView4 @JvmOverloads constructor(
                 }
                 Log.w(
                     TAG,
-                    "units: $units, currentSecond: $currentSecond, offsetSecond: $offsetSecond"
+                    "units: $units, currentSecond: $currentSecond, offsetSecond: $offsetSecond, scrollX: $scrollX"
                 )
             }
+
             scrolledIndex = scrollIndex
         }
 
         var offsetX = 0
+        currentSecond %= SECOND_SCALES
         val startSecond = currentSecond - SECOND_MIDDLE_OFFSET
         val endSecond = currentSecond + SECOND_MIDDLE_OFFSET
         for (second in startSecond..endSecond) { //1.屏幕内显示5个，屏幕外两侧各显示一个，一共7个；2.当前秒数在中间，它的前后各有3个数字
@@ -178,10 +224,6 @@ class DigitalBeatView4 @JvmOverloads constructor(
             )
             offsetX += secondWidth
         }
-        /*Log.w(
-            TAG,
-            "drawSeconds: $sb, startSecond: $startSecond, endSecond: $endSecond, currentSecond: $currentSecond"
-        )*/
     }
 
     private fun releaseAnim() {
@@ -191,6 +233,7 @@ class DigitalBeatView4 @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         releaseAnim()
+        velocityTracker.recycle()
     }
 
 }
