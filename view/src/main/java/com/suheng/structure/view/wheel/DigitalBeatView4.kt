@@ -1,10 +1,7 @@
 package com.suheng.structure.view.wheel
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.PorterDuff
-import android.graphics.Rect
+import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -15,6 +12,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.OverScroller
 import androidx.core.content.ContextCompat
 import com.suheng.structure.view.R
+import com.suheng.structure.view.kt.save
 import java.util.*
 import kotlin.math.abs
 
@@ -31,9 +29,12 @@ class DigitalBeatView4 @JvmOverloads constructor(
         private const val SECOND_NUMBERS_OUTSIDE = 1 //屏蔽外两侧各显示1个
         private const val SECOND_MIDDLE_OFFSET =
             SECOND_NUMBERS_INSIDE / 2 + SECOND_NUMBERS_OUTSIDE //以中间刻度为基准，两侧显示的个数
+        private const val START_SCALE = 0f
+        private const val END_SCALE = 1f
     }
 
     private var secondWidth = 0
+    private var itemHeight = 0
     private var offsetSecond = 0
     private var currentSecond = 0
     private var outsideOffsetX = 0
@@ -46,6 +47,11 @@ class DigitalBeatView4 @JvmOverloads constructor(
     private var velocityTracker: VelocityTracker
     private var maximumVelocity = 0
     private var minimumVelocity = 0
+
+    private var downX = 0
+    private var scrolledIndex = -1
+    private var offsetX = 0
+
 
     init {
         bitmapManager = DigitalBeatBitmapManager(context)
@@ -62,11 +68,42 @@ class DigitalBeatView4 @JvmOverloads constructor(
         )
     }
 
-    private var downX = 0
-    private var scrolledIndex = -1
-    private var offsetX = 0
-    private var isFlinging = false
-    //private var scrollTo = 0
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        secondWidth = w / SECOND_NUMBERS_INSIDE
+        outsideOffsetX = secondWidth * SECOND_NUMBERS_OUTSIDE //减掉屏幕外数字的宽度，让数字从屏幕外开始绘制
+        val secondAvailableWidth = secondWidth - itemPaddingHorizontal * 2
+        ContextCompat.getDrawable(context, R.drawable.number_second_0)?.let {
+            val originSecondWidth = it.intrinsicWidth * 2
+            scaleRatio = secondAvailableWidth / originSecondWidth
+            itemHeight = (it.intrinsicHeight * scaleRatio).toInt()
+            Log.d(
+                TAG,
+                "w: $w, h: $h, secondWidth: $secondWidth, secondAvailableWidth: $secondAvailableWidth" +
+                        ", originSecondWidth: $originSecondWidth, scaleRatio: $scaleRatio, outsideOffsetX: $outsideOffsetX"
+            )
+        }
+
+        listRect.clear()
+        for (i in 0 until SECOND_NUMBERS_INSIDE) {
+            listRect.add(Rect(i * secondWidth, 0, (i + 1) * secondWidth, h))
+        }
+        listRect.forEach { Log.d(TAG, "rect: ${it.toShortString()}") }
+    }
+
+    override fun onVisibilityAggregated(isVisible: Boolean) {
+        super.onVisibilityAggregated(isVisible)
+        if (isVisible) {
+        } else {
+            releaseAnim()
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        releaseAnim()
+        velocityTracker.recycle()
+    }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val x = event.x.toInt()
@@ -75,7 +112,6 @@ class DigitalBeatView4 @JvmOverloads constructor(
                 downX = x
                 offsetX = 0
                 velocityTracker.addMovement(event)
-                isFlinging = false
             }
             MotionEvent.ACTION_MOVE -> {
                 offsetX = downX - x
@@ -93,7 +129,6 @@ class DigitalBeatView4 @JvmOverloads constructor(
                 )
                 if (abs(xVelocity) > 5 * width) {
                     scroller.fling(scrollX, 0, -xVelocity, 0, Int.MIN_VALUE, Int.MAX_VALUE, 0, 0)
-                    isFlinging = true
                 } else {
                     Log.w(TAG, "up, scrollX: $scrollX, finalX: ${scroller.finalX}")
                     scroller.startScroll(scrollX, 0, -offsetX, 0, 500)
@@ -123,37 +158,6 @@ class DigitalBeatView4 @JvmOverloads constructor(
             }*/
         } else {
             //scrolledIndex = -1
-            isFlinging = false
-        }
-    }
-
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        secondWidth = w / SECOND_NUMBERS_INSIDE
-        outsideOffsetX = secondWidth * SECOND_NUMBERS_OUTSIDE //减掉屏幕外数字的宽度，让数字从屏幕外开始绘制
-        val secondAvailableWidth = secondWidth - itemPaddingHorizontal * 2
-        ContextCompat.getDrawable(context, R.drawable.number_second_0)?.let {
-            val originSecondWidth = it.intrinsicWidth * 2
-            scaleRatio = secondAvailableWidth / originSecondWidth
-            Log.d(
-                TAG,
-                "w: $w, h: $h, secondWidth: $secondWidth, secondAvailableWidth: $secondAvailableWidth" +
-                        ", originSecondWidth: $originSecondWidth, scaleRatio: $scaleRatio, outsideOffsetX: $outsideOffsetX"
-            )
-        }
-
-        listRect.clear()
-        for (i in 0 until SECOND_NUMBERS_INSIDE) {
-            listRect.add(Rect(i * secondWidth, 0, (i + 1) * secondWidth, h))
-        }
-        listRect.forEach { Log.d(TAG, "rect: ${it.toShortString()}") }
-    }
-
-    override fun onVisibilityAggregated(isVisible: Boolean) {
-        super.onVisibilityAggregated(isVisible)
-        if (isVisible) {
-        } else {
-            releaseAnim()
         }
     }
 
@@ -167,7 +171,10 @@ class DigitalBeatView4 @JvmOverloads constructor(
     private fun drawSeconds(canvas: Canvas) {
         if (scroller.isFinished) {
             val scrollOffset = scroller.computeScrollOffset()
-            Log.e(TAG, "drawSeconds, scrollOffset: $scrollOffset, scrollX: $scrollX, currVelocity: ${scroller.currVelocity}")
+            Log.e(
+                TAG,
+                "drawSeconds, scrollOffset: $scrollOffset, scrollX: $scrollX, currVelocity: ${scroller.currVelocity}"
+            )
         }
 
         var scrollIndex = -1
@@ -216,24 +223,45 @@ class DigitalBeatView4 @JvmOverloads constructor(
                     R.color.os_text_primary_color,
                     scaleRatio
                 )
-            canvas.drawBitmap(
-                bitmap,
-                -outsideOffsetX + offsetSecond + offsetX + itemPaddingHorizontal,
-                0f,
-                null
-            )
+
+            canvas.save {
+                val scaleRatio = 1f
+                scale(1f, scaleRatio)
+                //translate(0f, height / 2f / scaleRatio)
+                drawBitmap(
+                    bitmap,
+                    -outsideOffsetX + offsetSecond + offsetX + itemPaddingHorizontal,
+                    height / 2f / scaleRatio - itemHeight / 2f,
+                    //-itemHeight / 2f,
+                    null
+                )
+            }
+
             offsetX += secondWidth
+        }
+
+        canvas.save {
+            translate(scrollX.toFloat(), 0f)
+            drawLine(0f, height / 2f, width.toFloat(), height / 2f, paintLine)
+            drawLine(width / 2f, 0f, width / 2f, height.toFloat(), paintLine)
         }
     }
 
-    private fun releaseAnim() {
-        scroller.takeUnless { it.isFinished }?.abortAnimation()
+    private val paintLine = Paint().apply {
+        color = Color.RED
+        strokeWidth = 3f
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        releaseAnim()
-        velocityTracker.recycle()
+    //https://github.com/commandiron/WheelPickerCompose
+    //https://github.com/open-android/WheelPicker
+    //https://github.com/AigeStudio/WheelPicker
+
+    //https://www.gcssloop.com/customview/Matrix_Basic.html
+    //https://www.gcssloop.com/customview/Matrix_Method.html
+    //https://www.gcssloop.com/customview/matrix-3d-camera.html
+    //https://github.com/xanderwang/elasticity
+    private fun releaseAnim() {
+        scroller.takeUnless { it.isFinished }?.abortAnimation()
     }
 
 }
