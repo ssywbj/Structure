@@ -35,12 +35,14 @@ class DigitalBeatView4 @JvmOverloads constructor(
 
     private var secondWidth = 0
     private var itemHeight = 0
+    private var itemWidth = 0
     private var offsetSecond = 0
     private var currentSecond = 0
     private var outsideOffsetX = 0
     private var bitmapManager: DigitalBeatBitmapManager
     private var scaleRatio = 0.0f
-    private var itemPaddingHorizontal = 10 * 3f
+    //private var itemPaddingHorizontal = 10 * 3f
+    private var itemPaddingHorizontal = 0 * 3f
     private var scroller: OverScroller
     private val listRect = ArrayList<Rect>(SECOND_NUMBERS_INSIDE)
 
@@ -51,7 +53,6 @@ class DigitalBeatView4 @JvmOverloads constructor(
     private var downX = 0
     private var scrolledIndex = -1
     private var offsetX = 0
-
 
     init {
         bitmapManager = DigitalBeatBitmapManager(context)
@@ -77,6 +78,7 @@ class DigitalBeatView4 @JvmOverloads constructor(
             val originSecondWidth = it.intrinsicWidth * 2
             scaleRatio = secondAvailableWidth / originSecondWidth
             itemHeight = (it.intrinsicHeight * scaleRatio).toInt()
+            itemWidth = (originSecondWidth * scaleRatio).toInt()
             Log.d(
                 TAG,
                 "w: $w, h: $h, secondWidth: $secondWidth, secondAvailableWidth: $secondAvailableWidth" +
@@ -184,10 +186,10 @@ class DigitalBeatView4 @JvmOverloads constructor(
             if (rect.contains(xCoordinate, rect.top)) {
                 val pages = absScrollX / width
                 scrollIndex = listRect.indexOf(rect) + pages * SECOND_NUMBERS_INSIDE
-                /*Log.i(
+                Log.i(
                     TAG,
                     "scrollX: $scrollX, xCoordinate: $xCoordinate, page: $pages, scrollIndex: $scrollIndex, scrolledIndex: $$scrolledIndex"
-                )*/
+                )
                 break
             }
         }
@@ -215,6 +217,7 @@ class DigitalBeatView4 @JvmOverloads constructor(
         currentSecond %= SECOND_SCALES
         val startSecond = currentSecond - SECOND_MIDDLE_OFFSET
         val endSecond = currentSecond + SECOND_MIDDLE_OFFSET
+        val sBuilder: StringBuilder = StringBuilder()
         for (second in startSecond..endSecond) { //1.屏幕内显示5个，屏幕外两侧各显示一个，一共7个；2.当前秒数在中间，它的前后各有3个数字
             val number = (second + SECOND_SCALES) % SECOND_SCALES
             val bitmap =
@@ -223,22 +226,20 @@ class DigitalBeatView4 @JvmOverloads constructor(
                     R.color.os_text_primary_color,
                     scaleRatio
                 )
-
             canvas.save {
-                val scaleRatio = 1f
-                scale(1f, scaleRatio)
-                //translate(0f, height / 2f / scaleRatio)
-                drawBitmap(
-                    bitmap,
-                    -outsideOffsetX + offsetSecond + offsetX + itemPaddingHorizontal,
-                    height / 2f / scaleRatio - itemHeight / 2f,
-                    //-itemHeight / 2f,
-                    null
+                val scaleRatio = 0.6f
+                //val scaleRatio = 0.4f + scrollX / width.toFloat()
+                scale(scaleRatio, scaleRatio)
+                translate(
+                    (-secondWidth / 2f + offsetSecond + offsetX) / scaleRatio,
+                    height / 2f / scaleRatio
                 )
+                drawBitmap(bitmap, -itemWidth / 2f, -itemHeight / 2f, null)
+                sBuilder.append(offsetX).append(" ")
+                offsetX += secondWidth
             }
-
-            offsetX += secondWidth
         }
+        //Log.i(TAG, "offsetX: $sBuilder")
 
         canvas.save {
             translate(scrollX.toFloat(), 0f)
