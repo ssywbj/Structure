@@ -25,12 +25,13 @@ class DigitalBeatView4 @JvmOverloads constructor(
     companion object {
         private val TAG = DigitalBeatView4::class.java.simpleName
         private const val SECOND_SCALES = 60 //秒刻度数
-        private const val SECOND_NUMBERS_INSIDE = 5 //屏蔽内显示5个
-        private const val SECOND_NUMBERS_OUTSIDE = 1 //屏蔽外两侧各显示1个
+        private const val SECOND_NUMBERS_INSIDE = 5 //屏幕内显示5个
+        private const val SECOND_NUMBERS_OUTSIDE = 1 //屏幕外两侧各显示1个
         private const val SECOND_MIDDLE_OFFSET =
             SECOND_NUMBERS_INSIDE / 2 + SECOND_NUMBERS_OUTSIDE //以中间刻度为基准，两侧显示的个数
-        private const val START_SCALE = 0f
+        private const val START_SCALE = 0.6f
         private const val END_SCALE = 1f
+        private const val UNIT_SCALE = (END_SCALE - START_SCALE) / (SECOND_NUMBERS_INSIDE / 2)
     }
 
     private var secondWidth = 0
@@ -41,8 +42,9 @@ class DigitalBeatView4 @JvmOverloads constructor(
     private var outsideOffsetX = 0
     private var bitmapManager: DigitalBeatBitmapManager
     private var scaleRatio = 0.0f
-    //private var itemPaddingHorizontal = 10 * 3f
-    private var itemPaddingHorizontal = 0 * 3f
+    private var itemPaddingHorizontal = 3 * 3f
+
+    //private var itemPaddingHorizontal = 0 * 3f
     private var scroller: OverScroller
     private val listRect = ArrayList<Rect>(SECOND_NUMBERS_INSIDE)
 
@@ -72,7 +74,7 @@ class DigitalBeatView4 @JvmOverloads constructor(
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         secondWidth = w / SECOND_NUMBERS_INSIDE
-        outsideOffsetX = secondWidth * SECOND_NUMBERS_OUTSIDE //减掉屏幕外数字的宽度，让数字从屏幕外开始绘制
+        outsideOffsetX = secondWidth * SECOND_NUMBERS_OUTSIDE //屏幕外数字的宽度
         val secondAvailableWidth = secondWidth - itemPaddingHorizontal * 2
         ContextCompat.getDrawable(context, R.drawable.number_second_0)?.let {
             val originSecondWidth = it.intrinsicWidth * 2
@@ -83,6 +85,7 @@ class DigitalBeatView4 @JvmOverloads constructor(
                 TAG,
                 "w: $w, h: $h, secondWidth: $secondWidth, secondAvailableWidth: $secondAvailableWidth" +
                         ", originSecondWidth: $originSecondWidth, scaleRatio: $scaleRatio, outsideOffsetX: $outsideOffsetX"
+                        + ", UNIT_SCALE: $UNIT_SCALE"
             )
         }
 
@@ -171,17 +174,17 @@ class DigitalBeatView4 @JvmOverloads constructor(
     }
 
     private fun drawSeconds(canvas: Canvas) {
-        if (scroller.isFinished) {
+        /*if (scroller.isFinished) {
             val scrollOffset = scroller.computeScrollOffset()
             Log.e(
                 TAG,
                 "drawSeconds, scrollOffset: $scrollOffset, scrollX: $scrollX, currVelocity: ${scroller.currVelocity}"
             )
-        }
+        }*/
 
         var scrollIndex = -1
+        val absScrollX = abs(scrollX)
         for (rect in listRect) {
-            val absScrollX = abs(scrollX)
             val xCoordinate = absScrollX % width
             if (rect.contains(xCoordinate, rect.top)) {
                 val pages = absScrollX / width
@@ -213,7 +216,7 @@ class DigitalBeatView4 @JvmOverloads constructor(
             scrolledIndex = scrollIndex
         }
 
-        var offsetX = 0
+        var offsetX = -outsideOffsetX
         currentSecond %= SECOND_SCALES
         val startSecond = currentSecond - SECOND_MIDDLE_OFFSET
         val endSecond = currentSecond + SECOND_MIDDLE_OFFSET
@@ -227,19 +230,38 @@ class DigitalBeatView4 @JvmOverloads constructor(
                     scaleRatio
                 )
             canvas.save {
-                val scaleRatio = 0.6f
-                //val scaleRatio = 0.4f + scrollX / width.toFloat()
+                val rectMiddleLeft = listRect[SECOND_NUMBERS_INSIDE / 2].left
+                val units = abs(offsetX - rectMiddleLeft) / secondWidth
+                var scaleRatio = END_SCALE - UNIT_SCALE * units
+                val scaleDelta = UNIT_SCALE * (absScrollX % secondWidth).toFloat() / secondWidth
+                if (scrollX < 0) {
+                    if (offsetX < rectMiddleLeft) {
+                        scaleRatio += scaleDelta
+                    } else {
+                        scaleRatio -= scaleDelta
+                    }
+                } else {
+                    if (offsetX <= rectMiddleLeft) {
+                        scaleRatio -= scaleDelta
+                    } else {
+                        scaleRatio += scaleDelta
+                    }
+                }
+                //scaleRatio = 1f
                 scale(scaleRatio, scaleRatio)
-                translate(
-                    (-secondWidth / 2f + offsetSecond + offsetX) / scaleRatio,
-                    height / 2f / scaleRatio
+                translate((offsetSecond + offsetX) / scaleRatio, height / 2f / scaleRatio)
+                drawBitmap(
+                    bitmap,
+                    secondWidth / 2f / scaleRatio - itemWidth / 2f,
+                    -itemHeight / 2f,
+                    null
                 )
-                drawBitmap(bitmap, -itemWidth / 2f, -itemHeight / 2f, null)
-                sBuilder.append(offsetX).append(" ")
+                sBuilder.append(offsetX).append("&").append(scaleRatio).append("&").append(scaleDelta)
+                    .append(", ")
                 offsetX += secondWidth
             }
         }
-        //Log.i(TAG, "offsetX: $sBuilder")
+        Log.i(TAG, "offsetX: ${sBuilder.delete(sBuilder.length - 2, sBuilder.length)}")
 
         canvas.save {
             translate(scrollX.toFloat(), 0f)
