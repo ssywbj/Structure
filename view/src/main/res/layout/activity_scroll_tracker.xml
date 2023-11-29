@@ -57,12 +57,4 @@
         android:layout_height="80dp"
         android:layout_marginTop="4dp" />
 
-    <ImageView
-        android:id="@+id/iView"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_margin="6dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/girl_gaitubao" />
-
 </LinearLayout>
