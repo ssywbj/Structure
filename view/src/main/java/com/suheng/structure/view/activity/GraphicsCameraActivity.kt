@@ -1,58 +1,42 @@
-package com.suheng.structure.view.activity;
+package com.suheng.structure.view.activity
 
-import android.os.Bundle;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
+import android.os.Bundle
+import android.view.View
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
+import androidx.appcompat.app.AppCompatActivity
+import com.suheng.structure.view.R
+import com.suheng.structure.view.wheel.CameraRotateAnimation
+import com.suheng.structure.view.wheel.CurvedImage
+import com.suheng.structure.view.wheel.Rotate3DImage
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.suheng.structure.view.R;
-import com.suheng.structure.view.wheel.CameraRotateAnimation;
-
-public class GraphicsCameraActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_graphic_camera);
-
-        findViewById(R.id.iView).setOnClickListener(v -> {
-            Object tag = v.getTag();
-            if (tag == null) {
-                v.setTag(0);
-            }
-            int status = 0;
-            if (tag instanceof Integer) {
-                status = (int) tag;
-            }
-            final float fromDegrees = status == 0 ? 0 : -180;
-            final float toDegrees = status == 0 ? -180 : 0;
-            final CameraRotateAnimation rotation = new CameraRotateAnimation(v, fromDegrees, toDegrees);
-            rotation.setDuration(1000);
-            rotation.setFillAfter(true);
-            rotation.setInterpolator(new LinearInterpolator());
-            rotation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    Object tag = v.getTag();
-                    if (tag instanceof Integer) {
-                        int status = (int) tag;
-                        v.setTag(status == 0 ? 1 : 0);
+class GraphicsCameraActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_graphic_camera)
+        findViewById<View>(R.id.iView).setOnClickListener { v: View ->
+            val status = (v.tag as? Int) ?: 0.also { v.tag = 0 }
+            val fromDegrees = (if (status == 0) 0 else 180).toFloat()
+            val toDegrees = (if (status == 0) 180 else 0).toFloat()
+            CameraRotateAnimation(v, fromDegrees, toDegrees).apply {
+                duration = 1000
+                fillAfter = true
+                interpolator = LinearInterpolator()
+                setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationStart(animation: Animation) {}
+                    override fun onAnimationEnd(animation: Animation) {
+                        (v.tag as? Int)?.let {
+                            v.tag = if (it == 0) 1 else 0
+                        }
                     }
-                }
 
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-            rotation.startAnimation();
-        });
+                    override fun onAnimationRepeat(animation: Animation) {}
+                })
+                startAnimation()
+            }
+        }
 
+        findViewById<View>(R.id.rotate3DImage).setOnClickListener { v: View -> (v as? Rotate3DImage)?.startAnimation() }
+        findViewById<View>(R.id.ciView).setOnClickListener { v: View -> (v as? CurvedImage)?.startAnimation() }
     }
-
 }

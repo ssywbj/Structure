@@ -14,14 +14,14 @@ class CameraRotateAnimation @JvmOverloads constructor(
 ) : Animation() {
 
     private lateinit var camera: Camera
-    private var scale = 1.0f
+    private var density = 1.0f
     private var centerX: Float = 0f
     private var centerY: Float = 0f
 
     override fun initialize(width: Int, height: Int, parentWidth: Int, parentHeight: Int) {
         super.initialize(width, height, parentWidth, parentHeight)
         camera = Camera()
-        scale = view.resources.displayMetrics.density
+        density = view.resources.displayMetrics.density
         centerX = view.width / 2f
         centerY = view.height / 2f
     }
@@ -44,14 +44,14 @@ class CameraRotateAnimation @JvmOverloads constructor(
 
         //修正失真，主要修改MPERSP_0和MPERSP_1
         FloatArray(9).also {
-            matrix.getValues(it) //获取数值
-            it[6] = it[6] / scale //数值修正
-            it[7] = it[7] / scale //数值修正
+            matrix.getValues(it)
+            it[6] = it[6] / density //数值修正
+            it[7] = it[7] / density //数值修正
             matrix.setValues(it)
         }
 
-        matrix.preTranslate(-centerX, -centerY)
-        matrix.postTranslate(centerX, centerY)
+        matrix.preTranslate(-centerX, -centerY) //将旋转中心移动到和Camera位置相同
+        matrix.postTranslate(centerX, centerY) //将图片(View)移动到原来的位置
     }
 
     fun startAnimation() {

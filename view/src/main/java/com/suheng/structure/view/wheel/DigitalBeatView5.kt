@@ -258,34 +258,35 @@ class DigitalBeatView5 @JvmOverloads constructor(
                     }
                 }
 
-                scaleRatio = 1f
-                //scale(scaleRatio, scaleRatio)
-                //translate((offsetSecond + offsetX) / scaleRatio, height / 2f / scaleRatio)
-
-                camera.save()
-                val fl = (1 - scaleRatio) * 300f
-                camera.translate(
-                    //offsetSecond + offsetX.toFloat(),
-                    (offsetSecond + offsetX.toFloat()),
-                    -height / 2f,
-                    fl
+                matrixCamera.reset()
+                matrixCamera.preScale(scaleRatio, scaleRatio)
+                matrixCamera.preTranslate(
+                    (offsetSecond + offsetX) / scaleRatio,
+                    height / 2f / scaleRatio
                 )
+
+                /*camera.save()
+                camera.translate((offsetSecond + offsetX) / scaleRatio, 0f, 0f)
                 camera.getMatrix(matrixCamera)
                 camera.restore()
-
+                floatArray.also {
+                    matrixCamera.getValues(it)
+                    it[6] = it[6] / resources.displayMetrics.density //数值修正
+                    it[7] = it[7] / resources.displayMetrics.density //数值修正
+                    matrixCamera.setValues(it)
+                }
                 matrixCamera.preTranslate(-width / 2f, -height / 2f)
-                matrixCamera.postTranslate(width / 2f, height / 2f)
+                matrixCamera.postTranslate(width / 2f, height / 2f)*/
+
                 concat(matrixCamera)
 
                 drawBitmap(
                     bitmap,
-                    secondWidth / 2f - itemWidth / 2f,
+                    secondWidth / 2f / scaleRatio - itemWidth / 2f,
                     -itemHeight / 2f,
                     null
                 )
-                sBuilder.append(offsetX).append("&").append(scaleRatio).append("&")
-                    .append(fl)
-                    .append(", ")
+                sBuilder.append(offsetX).append("&").append(scaleRatio).append(", ")
                 offsetX += secondWidth
             }
         }
@@ -297,6 +298,8 @@ class DigitalBeatView5 @JvmOverloads constructor(
             drawLine(width / 2f, 0f, width / 2f, height.toFloat(), paintLine)
         }
     }
+
+    private val floatArray = FloatArray(9)
 
     private val paintLine = Paint().apply {
         color = Color.RED

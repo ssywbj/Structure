@@ -23,7 +23,7 @@ public class MatrixTest {
     @Test
     public void testUnitMatrix() {
         Matrix matrix = new Matrix();//新建一个矩阵，默认是单位矩阵
-        Log.d(TAG, "unit matrix: " + matrix.toString() + "\n" + matrix.toShortString());
+        Log.d(TAG, "unit matrix: " + matrix + "\n" + matrix.toShortString());
     }
 
     @Test
@@ -38,13 +38,13 @@ public class MatrixTest {
         Log.d(TAG, "points变换之后: " + Arrays.toString(points));
 
         float[] src = {0, 0, 80, 100, 400, 300};
-        float[] dst = new float[6];
+        float[] dst = new float[src.length];
         Log.d(TAG, "dst变换之前: " + Arrays.toString(dst));
         matrix.mapPoints(dst, src);
         Log.d(TAG, "dst变换之后: " + Arrays.toString(dst));
 
         src = new float[]{0, 0, 80, 100, 400, 300};
-        dst = new float[6];
+        dst = new float[src.length];
         //int dstIndex：从目标数组的第几个开始写入
         //int srcIndex：从源数组第几个开始变换；int pointCount：变换的点的个数（一个点用两个数值表示）
         matrix.mapPoints(dst, 0, src, 2, 1);
@@ -140,13 +140,13 @@ public class MatrixTest {
     @Test
     public void testMapRect() {
         RectF rectF = new RectF(100, 100, 500, 600);
-        Log.i(TAG, "origin rect: " + rectF.toString());
+        Log.i(TAG, "origin rect: " + rectF);
 
         Matrix matrix = new Matrix();
         matrix.setScale(0.5f, 0.8f);
         Log.v(TAG, "set scale matrix: " + matrix.toShortString());
         boolean result = matrix.mapRect(rectF);//变换之后是否还是矩形
-        Log.d(TAG, "scale result: " + result + ", " + rectF.toString());
+        Log.d(TAG, "scale result: " + result + ", " + rectF);
 
         rectF = new RectF(100, 100, 500, 600);
 
@@ -156,14 +156,14 @@ public class MatrixTest {
         matrix.postTranslate(20, 30);
         Log.v(TAG, "setScale postTranslate matrix: " + matrix.toShortString());
         result = matrix.mapRect(dst, rectF);
-        Log.i(TAG, "setScale postTranslate result: " + result + ", " + dst.toString());
+        Log.i(TAG, "setScale postTranslate result: " + result + ", " + dst);
 
         matrix.reset();
         matrix.setScale(0.5f, 0.8f);
         matrix.preTranslate(20, 30);
         Log.d(TAG, "setScale preTranslate matrix: " + matrix.toShortString());
         result = matrix.mapRect(dst, rectF);
-        Log.v(TAG, "setScale preTranslate result: " + result + ", " + dst.toString());
+        Log.v(TAG, "setScale preTranslate result: " + result + ", " + dst);
 
         //复合变换：非单位矩阵的后乘、前乘结果不一致（即就是平时所说的矩阵乘法不满足乘法交换率）
     }
@@ -174,52 +174,50 @@ public class MatrixTest {
     @Test
     public void testComplexMulti() {
         RectF src = new RectF(100, 100, 500, 600);
-        Log.i(TAG, "origin rect: " + src.toString());
+        Log.i(TAG, "origin rect: " + src);
         RectF dst = new RectF();
 
         Log.w(TAG, "pre post---------------------------------------------");
         Matrix matrix = new Matrix();
         matrix.preScale(0.5f, 0.8f);
         matrix.mapRect(dst, src);
-        Log.i(TAG, "preScale result: " + dst.toString());
+        Log.i(TAG, "preScale result: " + dst);
         matrix.postTranslate(20, 30); //translate矩阵乘以前面scale后的矩阵
         Log.v(TAG, "preScale postTranslate matrix: " + matrix.toShortString());
         matrix.mapRect(dst, src);
-        Log.d(TAG, "preScale postTranslate result: " + dst.toString());
+        Log.d(TAG, "preScale postTranslate result: " + dst);
 
         Log.w(TAG, "post pre---------------------------------------------");
         matrix.reset();
         matrix.postScale(0.5f, 0.8f);
         matrix.mapRect(dst, src);
-        Log.i(TAG, "postScale result: " + dst.toString());
+        Log.i(TAG, "postScale result: " + dst);
         matrix.preTranslate(20, 30); //前面scale后的矩阵乘以translate矩阵
         Log.v(TAG, "postScale preTranslate matrix: " + matrix.toShortString());
         matrix.mapRect(dst, src);
-        Log.d(TAG, "postScale preTranslate result: " + dst.toString());
+        Log.d(TAG, "postScale preTranslate result: " + dst);
 
         Log.w(TAG, "post post--------------------------------------------");
         matrix.reset();
         matrix.postScale(0.5f, 0.8f);
         matrix.mapRect(dst, src);
-        Log.i(TAG, "postScale result: " + dst.toString());
+        Log.i(TAG, "postScale result: " + dst);
         matrix.postTranslate(20, 30);
         Log.v(TAG, "postScale postTranslate matrix: " + matrix.toShortString());
         matrix.mapRect(dst, src);
-        Log.d(TAG, "postScale postTranslate result: " + dst.toString());
+        Log.d(TAG, "postScale postTranslate result: " + dst);
 
         Log.w(TAG, "pre pre----------------------------------------------");
         matrix.reset();
         matrix.preScale(0.5f, 0.8f);
         matrix.mapRect(dst, src);
-        Log.i(TAG, "preScale result: " + dst.toString());
+        Log.i(TAG, "preScale result: " + dst);
         matrix.preTranslate(20, 30);
         Log.v(TAG, "preScale preTranslate matrix: " + matrix.toShortString());
         matrix.mapRect(dst, src);
-        Log.d(TAG, "preScale preTranslate result: " + dst.toString());
+        Log.d(TAG, "preScale preTranslate result: " + dst);
 
         //pre、post与post、post结果一样，post、pre与pre、pre结果一样
-        //感觉pre、post与字面理解效果一样，如："preScale(0.5f, 0.8f)，postTranslate(20, 30)"按字面理解就
-        //是先缩放括号里面的指定数值再平移括号里面的指定数值，想法可能不正确，持续探究中
     }
 
 }
