@@ -9,8 +9,10 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.view.animation.LinearInterpolator
 import com.suheng.structure.view.R
@@ -27,6 +29,8 @@ class CurvedImage @JvmOverloads constructor(
     private val paintLine = Paint().apply {
         color = Color.RED
         strokeWidth = 3f
+        textSize =
+            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 20f, resources.displayMetrics)
     }
     private val camera = Camera()
     private val matrixCamera = Matrix()
@@ -45,9 +49,10 @@ class CurvedImage @JvmOverloads constructor(
             }
         }
     }
-
-    //private var centerX = 1
-    //private var centerY = 1
+    private var centerX = 1f
+    private var centerY = 1f
+    private val rectTextIn: Rect = Rect()
+    private val rectText: Rect = Rect()
 
     init {
         displayDensity = resources.displayMetrics.density
@@ -56,18 +61,21 @@ class CurvedImage @JvmOverloads constructor(
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         rect.set(0f, 0f, w.toFloat(), h.toFloat())
-        //centerX = w / 2
-        //centerY = h / 2
-        //Log.e(TAG, "onDraw, centerX: $centerX, w: $w")
+        centerX = w / 2f
+        centerY = h / 2f
+
+        val rectDimen =
+            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 40f, resources.displayMetrics)
+                .toInt()
+        rectTextIn.left = 30
+        rectTextIn.top = 30
+        rectTextIn.right = rectTextIn.left + rectDimen
+        rectTextIn.bottom = rectTextIn.top + rectDimen
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawColor(Color.CYAN)
-
-        //for (i in 0..width step 50) {
-        //val ratio = i / (width / 2f)
-        //Log.d(TAG, "onDraw, ratio: $ratio, width: $width")
         canvas.save {
             camera.save()
             camera.translate(0f, 0f, depthZ)
@@ -82,17 +90,56 @@ class CurvedImage @JvmOverloads constructor(
                 matrixCamera.setValues(it)
             }
 
-            matrixCamera.preTranslate(-width / 2f, -height / 2f)
-            matrixCamera.postTranslate(width / 2f, height / 2f)
+            matrixCamera.preTranslate(-centerX, -centerY)
+            matrixCamera.postTranslate(centerX, centerY)
 
             concat(matrixCamera)
             drawBitmap(bitmap, null, rect, null)
         }
-        //}
+
+        /*canvas.save {
+            drawRect(rectTextIn, paintLine)
+            paintLine.color = Color.BLACK
+            val text = "48"
+            paintLine.getTextBounds(text, 0, text.length, rectText)
+            val textCenterX = rectTextIn.centerX().toFloat()
+            val textCentreY =
+                rectTextIn.top.toFloat() + rectText.height() + rectTextIn.height() / 2f
+            translate(textCenterX, textCentreY)
+            rotate(depthZ)
+            drawText(text, -rectText.width() / 2f, -rectText.height() / 2f, paintLine)
+        }*/
 
         canvas.save {
-            drawLine(0f, height / 2f, width.toFloat(), height / 2f, paintLine)
-            drawLine(width / 2f, 0f, width / 2f, height.toFloat(), paintLine)
+            drawRect(rectTextIn, paintLine)
+            paintLine.color = Color.BLACK
+            val text = "48"
+            paintLine.getTextBounds(text, 0, text.length, rectText)
+            val textCenterX = rectTextIn.centerX().toFloat()
+            val textCentreY =
+                rectTextIn.top.toFloat() + rectText.height() + rectTextIn.height() / 2f
+
+            camera.save()
+            //camera.translate(0f, 0f, depthZ)
+            camera.rotateY(depthZ)
+            camera.getMatrix(matrixCamera)
+            camera.restore()
+            floatArray.also {
+                matrixCamera.getValues(it)
+                it[6] = it[6] / displayDensity //数值修正
+                it[7] = it[7] / displayDensity //数值修正
+                matrixCamera.setValues(it)
+            }
+            //matrixCamera.preTranslate(-textCenterX, -textCentreY)
+            matrixCamera.postTranslate(textCenterX, textCentreY)
+            concat(matrixCamera)
+            drawText(text, -rectText.width() / 2f, -rectText.height() / 2f, paintLine)
+        }
+
+        canvas.save {
+            paintLine.color = Color.RED
+            drawLine(0f, centerY, width.toFloat(), centerY, paintLine)
+            drawLine(centerX, 0f, centerX, height.toFloat(), paintLine)
         }
     }
 
