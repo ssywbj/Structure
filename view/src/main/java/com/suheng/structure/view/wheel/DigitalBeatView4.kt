@@ -1,7 +1,11 @@
 package com.suheng.structure.view.wheel
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -13,13 +17,11 @@ import android.widget.OverScroller
 import androidx.core.content.ContextCompat
 import com.suheng.structure.view.R
 import com.suheng.structure.view.kt.save
-import java.util.*
+import java.util.Calendar
 import kotlin.math.abs
 
 class DigitalBeatView4 @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet?,
-    defStyleAttr: Int = 0
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
     companion object {
@@ -118,12 +120,14 @@ class DigitalBeatView4 @JvmOverloads constructor(
                 offsetX = 0
                 velocityTracker.addMovement(event)
             }
+
             MotionEvent.ACTION_MOVE -> {
                 offsetX = downX - x
                 //Log.d(TAG, "offsetX: $offsetX")
                 scrollTo(offsetX + scroller.finalX, 0)
                 velocityTracker.addMovement(event)
             }
+
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 velocityTracker.computeCurrentVelocity(1000, maximumVelocity.toFloat())
                 val xVelocity = velocityTracker.xVelocity.toInt()
@@ -223,12 +227,9 @@ class DigitalBeatView4 @JvmOverloads constructor(
         val sBuilder: StringBuilder = StringBuilder()
         for (second in startSecond..endSecond) { //1.屏幕内显示5个，屏幕外两侧各显示一个，一共7个；2.当前秒数在中间，它的前后各有3个数字
             val number = (second + SECOND_SCALES) % SECOND_SCALES
-            val bitmap =
-                bitmapManager.getSecondBitmap(
-                    number,
-                    R.color.os_text_primary_color,
-                    scaleRatio
-                )
+            val bitmap = bitmapManager.getSecondBitmap(
+                number, R.color.os_text_primary_color, scaleRatio
+            )
             canvas.save {
                 val rectMiddleLeft = listRect[SECOND_NUMBERS_INSIDE / 2].left
                 val units = abs(offsetX - rectMiddleLeft) / secondWidth
@@ -251,13 +252,10 @@ class DigitalBeatView4 @JvmOverloads constructor(
                 scale(scaleRatio, scaleRatio)
                 translate((offsetSecond + offsetX) / scaleRatio, height / 2f / scaleRatio)
                 drawBitmap(
-                    bitmap,
-                    secondWidth / 2f / scaleRatio - itemWidth / 2f,
-                    -itemHeight / 2f,
-                    null
+                    bitmap, secondWidth / 2f / scaleRatio - itemWidth / 2f, -itemHeight / 2f, null
                 )
-                sBuilder.append(offsetX).append("&").append(scaleRatio).append("&").append(scaleDelta)
-                    .append(", ")
+                sBuilder.append(offsetX).append("&").append(scaleRatio).append("&")
+                    .append(scaleDelta).append(", ")
                 offsetX += secondWidth
             }
         }
