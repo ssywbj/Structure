@@ -91,7 +91,7 @@ class DigitalBeatView5 @JvmOverloads constructor(
                 TAG,
                 "w: $w, h: $h, secondWidth: $secondWidth, secondAvailableWidth: $secondAvailableWidth" +
                         ", originSecondWidth: $originSecondWidth, scaleRatio: $scaleRatio, outsideOffsetX: $outsideOffsetX"
-                        + ", UNIT_SCALE: $UNIT_SCALE"
+                        + ", UNIT_SCALE: $UNIT_SCALE" + ", itemWidth: $itemWidth"
             )
         }
 
@@ -252,29 +252,25 @@ class DigitalBeatView5 @JvmOverloads constructor(
                         scaleRatio += scaleDelta
                     }
                 }
+                //scaleRatio = 1f
 
-                matrixCamera.reset()
-                matrixCamera.preScale(scaleRatio, scaleRatio)
-                matrixCamera.preTranslate(
-                    (secondWidth / 2f + offsetSecond + offsetX) / scaleRatio,
-                    height / 2f / scaleRatio
-                )
-
-                /*camera.save()
-                camera.translate((offsetSecond + offsetX) / scaleRatio, 0f, 0f)
+                val centerX = secondWidth / 2f + offsetSecond + offsetX
+                val centerY = height / 2f
+                camera.save()
+                camera.translate(0f, 0f, 800 * (1 - scaleRatio))
+                if (offsetX <= rectMiddleLeft) {
+                    camera.rotateY(-120f * (1 - scaleRatio))
+                } else {
+                    camera.rotateY(120f * (1 - scaleRatio))
+                }
                 camera.getMatrix(matrixCamera)
                 camera.restore()
-                floatArray.also {
-                    matrixCamera.getValues(it)
-                    it[6] = it[6] / resources.displayMetrics.density //数值修正
-                    it[7] = it[7] / resources.displayMetrics.density //数值修正
-                    matrixCamera.setValues(it)
-                }
-                matrixCamera.preTranslate(-width / 2f, -height / 2f)
-                matrixCamera.postTranslate(width / 2f, height / 2f)*/
-
+                matrixCamera.preTranslate(-centerX, -centerY)
+                matrixCamera.postTranslate(centerX, centerY)
+                matrixCamera.preTranslate(centerX, centerY)
                 concat(matrixCamera)
 
+                //translate(centerX, centerY)
                 drawBitmap(bitmap, -itemWidth / 2f, -itemHeight / 2f, null)
                 sBuilder.append(offsetX).append("&").append(scaleRatio).append(", ")
                 offsetX += secondWidth

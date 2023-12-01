@@ -3,6 +3,7 @@ package com.suheng.structure.view.wheel
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.Rect
@@ -249,11 +250,30 @@ class DigitalBeatView4 @JvmOverloads constructor(
                     }
                 }
                 //scaleRatio = 1f
-                scale(scaleRatio, scaleRatio)
-                translate((offsetSecond + offsetX) / scaleRatio, height / 2f / scaleRatio)
-                drawBitmap(
-                    bitmap, secondWidth / 2f / scaleRatio - itemWidth / 2f, -itemHeight / 2f, null
-                )
+
+                /*scale(scaleRatio, scaleRatio)
+                translate(
+                    (secondWidth / 2f + offsetSecond + offsetX) / scaleRatio,
+                    height / 2f / scaleRatio
+                )*/
+
+                matrixTransform.reset()
+                /*matrixTransform.preScale(scaleRatio, scaleRatio)
+                matrixTransform.preTranslate(
+                    (secondWidth / 2f + offsetSecond + offsetX) / scaleRatio,
+                    height / 2f / scaleRatio
+                ) //前乘*/
+                matrixTransform.preScale(scaleRatio, scaleRatio)
+                //matrixTransform.postScale(scaleRatio, scaleRatio)
+                matrixTransform.postTranslate(
+                    (secondWidth / 2f + offsetSecond + offsetX),
+                    height / 2f
+                ) //后乘
+                canvas.concat(matrixTransform)
+                //注意前乘pre与后乘post的区别，都是前乘的话效果等同于先后调用canvas的scale和translate方法；前乘再后乘的话，
+                //前乘的scaleRatio会作用到后乘上，因为后乘操作不再用除以scaleRatio
+
+                drawBitmap(bitmap, -itemWidth / 2f, -itemHeight / 2f, null)
                 sBuilder.append(offsetX).append("&").append(scaleRatio).append("&")
                     .append(scaleDelta).append(", ")
                 offsetX += secondWidth
@@ -267,6 +287,8 @@ class DigitalBeatView4 @JvmOverloads constructor(
             drawLine(width / 2f, 0f, width / 2f, height.toFloat(), paintLine)
         }
     }
+
+    private val matrixTransform = Matrix()
 
     private val paintLine = Paint().apply {
         color = Color.RED

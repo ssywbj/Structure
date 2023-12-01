@@ -156,6 +156,7 @@ class CurvedImage @JvmOverloads constructor(
             paintLine.getTextBounds(text, 0, text.length, rectText)
             matrixCamera.preTranslate(rectTextIn.centerX(), rectTextIn.centerY())
             concat(matrixCamera)
+
             paintLine.color = Color.BLACK
             drawText(
                 text,
@@ -197,9 +198,9 @@ class CurvedImage @JvmOverloads constructor(
             }
             matrixCamera.preTranslate(-rectBitmap.centerX(), -rectBitmap.centerY())
             matrixCamera.postTranslate(rectBitmap.centerX(), rectBitmap.centerY())
-
-            matrixCamera.preTranslate(rectBitmap.centerX(), rectBitmap.centerY())
             concat(matrixCamera)
+
+            translate(rectBitmap.centerX(), rectBitmap.centerY())
             drawBitmap(bitmap70, -bitmap70.width / 2f, -bitmap70.height / 2f, null)
         }
 
