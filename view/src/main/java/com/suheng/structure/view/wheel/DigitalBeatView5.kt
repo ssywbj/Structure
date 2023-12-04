@@ -35,7 +35,12 @@ class DigitalBeatView5 @JvmOverloads constructor(
             SECOND_NUMBERS_INSIDE / 2 + SECOND_NUMBERS_OUTSIDE //以中间刻度为基准，两侧显示的个数
         private const val START_SCALE = 0.6f
         private const val END_SCALE = 1f
-        private const val UNIT_SCALE = (END_SCALE - START_SCALE) / (SECOND_NUMBERS_INSIDE / 2)
+        private const val CROSS_SCALE = END_SCALE - START_SCALE
+        private const val UNIT_SCALE = CROSS_SCALE / (SECOND_NUMBERS_INSIDE / 2)
+        private const val START_CURVED_DEGREES = -50f
+        private const val END_CURVED_DEGREES = 0f
+        private const val CURVED_DEGREES = (END_CURVED_DEGREES - START_CURVED_DEGREES) / CROSS_SCALE
+        private const val DEPTH_Z = 210 / CROSS_SCALE
     }
 
     private var secondWidth = 0
@@ -257,19 +262,20 @@ class DigitalBeatView5 @JvmOverloads constructor(
                 val centerX = secondWidth / 2f + offsetSecond + offsetX
                 val centerY = height / 2f
                 camera.save()
-                camera.translate(0f, 0f, 800 * (1 - scaleRatio))
+                val ratioToFull = 1 - scaleRatio
+                camera.translate(0f, 0f, DEPTH_Z * ratioToFull)
                 if (offsetX <= rectMiddleLeft) {
-                    camera.rotateY(-120f * (1 - scaleRatio))
+                    camera.rotateY(-CURVED_DEGREES * ratioToFull)
                 } else {
-                    camera.rotateY(120f * (1 - scaleRatio))
+                    camera.rotateY(CURVED_DEGREES * ratioToFull)
                 }
                 camera.getMatrix(matrixCamera)
                 camera.restore()
                 matrixCamera.preTranslate(-centerX, -centerY)
                 matrixCamera.postTranslate(centerX, centerY)
+
                 matrixCamera.preTranslate(centerX, centerY)
                 concat(matrixCamera)
-
                 //translate(centerX, centerY)
                 drawBitmap(bitmap, -itemWidth / 2f, -itemHeight / 2f, null)
                 sBuilder.append(offsetX).append("&").append(scaleRatio).append(", ")
