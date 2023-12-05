@@ -16,9 +16,10 @@ class GraphicsCameraActivity : AppCompatActivity() {
         setContentView(R.layout.activity_graphic_camera)
         findViewById<View>(R.id.iView).setOnClickListener { v: View ->
             val status = (v.tag as? Int) ?: 0.also { v.tag = 0 }
-            val fromDegrees = (if (status == 0) 0 else 180).toFloat()
-            val toDegrees = (if (status == 0) 180 else 0).toFloat()
-            CameraRotateAnimation(v, fromDegrees, toDegrees).apply {
+            val degrees = 180
+            val fromDegrees = (if (status == 0) 0 else degrees).toFloat()
+            val toDegrees = (if (status == 0) degrees else 0).toFloat()
+            CameraRotateAnimation(v, fromDegrees, toDegrees, 1).apply {
                 duration = 1000
                 fillAfter = true
                 interpolator = LinearInterpolator()
