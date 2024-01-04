@@ -251,35 +251,43 @@ class DigitalBeatView4 @JvmOverloads constructor(
                 }
                 //scaleRatio = 1f
 
+                //先缩放，再平移
                 /*scale(scaleRatio, scaleRatio)
                 translate(
                     (secondWidth / 2f + offsetSecond + offsetX) / scaleRatio,
                     height / 2f / scaleRatio
                 )*/
-
-                matrixTransform.reset()
-                /*matrixTransform.preScale(scaleRatio, scaleRatio)
+                /*matrixTransform.reset()
+                matrixTransform.preScale(scaleRatio, scaleRatio)
                 matrixTransform.preTranslate(
                     (secondWidth / 2f + offsetSecond + offsetX) / scaleRatio,
                     height / 2f / scaleRatio
                 ) //前乘*/
+                /*matrixTransform.reset()
                 matrixTransform.preScale(scaleRatio, scaleRatio)
-                //matrixTransform.postScale(scaleRatio, scaleRatio)
                 matrixTransform.postTranslate(
                     (secondWidth / 2f + offsetSecond + offsetX),
                     height / 2f
-                ) //后乘
-                canvas.concat(matrixTransform)
+                ) //后乘*/
                 //注意前乘pre与后乘post的区别，都是前乘的话效果等同于先后调用canvas的scale和translate方法；前乘再后乘的话，
                 //前乘的scaleRatio会作用到后乘上，因为后乘操作不再用除以scaleRatio
 
+                //先平移，再缩放
+                /*translate((secondWidth / 2f + offsetSecond + offsetX), height / 2f)
+                scale(scaleRatio, scaleRatio)*/
+                matrixTransform.reset()
+                matrixTransform.preTranslate((secondWidth / 2f + offsetSecond + offsetX), height / 2f)
+                matrixTransform.preScale(scaleRatio, scaleRatio)
+
+                canvas.concat(matrixTransform)
+
+                Log.i(TAG, "offsetX: $offsetX, second: $second, scaleRatio: $scaleRatio")
                 drawBitmap(bitmap, -itemWidth / 2f, -itemHeight / 2f, null)
                 sBuilder.append(offsetX).append("&").append(scaleRatio).append("&")
                     .append(scaleDelta).append(", ")
                 offsetX += secondWidth
             }
         }
-        Log.i(TAG, "offsetX: ${sBuilder.delete(sBuilder.length - 2, sBuilder.length)}")
 
         canvas.save {
             translate(scrollX.toFloat(), 0f)
