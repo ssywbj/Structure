@@ -1,5 +1,6 @@
 package com.suheng.structure.view.wheel
 
+import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Bitmap
@@ -41,20 +42,42 @@ class CurvedImage @JvmOverloads constructor(
     private val floatArray = FloatArray(9)
     private var displayDensity = 1f
     private val animator = ValueAnimator.ofFloat(0f, 180f, 0f).apply {
-        duration = 1800
+        duration = 2000
         interpolator = LinearInterpolator()
         addUpdateListener { animation ->
             (animation.animatedValue as? Float)?.let {
                 depthZ = it
-                invalidate()
             }
         }
     }
+
+    private var rotateY = 0f
+    private var depthZ2 = 0f
+    private val animator2 =
+        ValueAnimator.ofPropertyValuesHolder(
+            PropertyValuesHolder.ofFloat("rotateY", 0f, 360f),
+            PropertyValuesHolder.ofFloat("depthZ", 0f, -300f, 0f)
+        ).apply {
+            duration = animator.duration
+            interpolator = LinearInterpolator()
+            addUpdateListener { animation ->
+                (animation.getAnimatedValue("rotateY") as? Float)?.let {
+                    rotateY = it
+                }
+                (animation.getAnimatedValue("depthZ") as? Float)?.let {
+                    depthZ2 = it
+                }
+                invalidate()
+            }
+        }
+
     private var centerX = 1f
     private var centerY = 1f
     private val rectTextIn: RectF = RectF()
     private val rectText: Rect = Rect()
     private val rectBitmap: RectF = RectF()
+    private val rectBitmap2: RectF = RectF()
+    private val rectBitmap3: RectF = RectF()
     private val bitmap7: Bitmap = BitmapHelper.get(getContext(), R.drawable.number_second_7, 0.4f)
     private val bitmap0: Bitmap = BitmapHelper.get(getContext(), R.drawable.number_second_0, 0.4f)
     private val bitmap70: Bitmap = BitmapHelper.mergeLeftRight(bitmap7, bitmap0)
@@ -81,6 +104,16 @@ class CurvedImage @JvmOverloads constructor(
         rectBitmap.top = rectTextIn.top
         rectBitmap.right = rectBitmap.left + bitmap70.width.toFloat() + 30
         rectBitmap.bottom = rectBitmap.top + bitmap70.height.toFloat() + 30
+
+        rectBitmap2.left = rectBitmap.right
+        rectBitmap2.top = rectBitmap.top
+        rectBitmap2.right = rectBitmap2.left + rectBitmap.width()
+        rectBitmap2.bottom = rectBitmap2.top + rectBitmap.height()
+
+        rectBitmap3.left = rectBitmap2.right
+        rectBitmap3.top = rectBitmap2.top
+        rectBitmap3.right = rectBitmap3.left + rectBitmap.width()
+        rectBitmap3.bottom = rectBitmap3.top + rectBitmap.height()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -210,6 +243,62 @@ class CurvedImage @JvmOverloads constructor(
         }
 
         canvas.save {
+            paintLine.color = Color.GREEN
+            drawRect(rectBitmap2, paintLine)
+            paintLine.color = Color.GRAY
+            drawLine(
+                rectBitmap2.left,
+                rectBitmap2.centerY(),
+                rectBitmap2.right,
+                rectBitmap2.centerY(),
+                paintLine
+            )
+            drawLine(
+                rectBitmap2.centerX(),
+                rectBitmap2.top,
+                rectBitmap2.centerX(),
+                rectBitmap2.bottom,
+                paintLine
+            )
+
+            camera.save()
+            camera.translate(0f, 0f, depthZ2)
+            camera.rotateY(rotateY)
+            translate(rectBitmap2.centerX(), rectBitmap2.centerY())
+            camera.applyToCanvas(this)
+            camera.restore()
+            drawBitmap(bitmap70, -bitmap70.width / 2f, -bitmap70.height / 2f, null)
+        }
+
+        canvas.save {
+            paintLine.color = Color.CYAN
+            drawRect(rectBitmap3, paintLine)
+            paintLine.color = Color.RED
+            drawLine(
+                rectBitmap3.left,
+                rectBitmap3.centerY(),
+                rectBitmap3.right,
+                rectBitmap3.centerY(),
+                paintLine
+            )
+            drawLine(
+                rectBitmap3.centerX(),
+                rectBitmap3.top,
+                rectBitmap3.centerX(),
+                rectBitmap3.bottom,
+                paintLine
+            )
+
+            camera.save()
+            camera.rotateY(rotateY)
+            camera.translate(0f, 0f, depthZ2)
+            translate(rectBitmap3.centerX(), rectBitmap3.centerY())
+            camera.applyToCanvas(this)
+            camera.restore()
+            drawBitmap(bitmap70, -bitmap70.width / 2f, -bitmap70.height / 2f, null)
+        }
+
+        canvas.save {
             paintLine.color = Color.RED
             drawLine(0f, centerY, width.toFloat(), centerY, paintLine)
             drawLine(centerX, 0f, centerX, height.toFloat(), paintLine)
@@ -219,8 +308,10 @@ class CurvedImage @JvmOverloads constructor(
     fun startAnimation() {
         if (animator.isRunning) {
             animator.reverse()
+            animator2.reverse()
         } else {
             animator.start()
+            animator2.start()
         }
     }
 
