@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.suheng.structure.wallpaperpicker">
-    <!--普通app变系统app步骤：1.手机已root的前提下，把apk push到system的app或priv-app目录；2.重启手机-->
+    <!--普通app变系统app步骤：1.手机已root的前提下，把apk push到system的app或priv-app目录（本例演示的是push到/system/priv-app目录）；2.重启手机--><!---->
     <!--变成系统app后，app即可获取部分权限。若apk使用的是系统签名且再加上sharedUserId后，则可以让app获取大部分权限。-->
     <!--android:sharedUserId="android.uid.system"-->
 
+    <!--SET_WALLPAPER_COMPONENT：设置动态壁纸权限-->
     <uses-permission android:name="android.permission.SET_WALLPAPER_COMPONENT" />
+    <!--SET_WALLPAPER：设置静态壁纸权限-->
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <!--变成系统app以后，若添加BIND_WALLPAPER权限导致开机出现以下报错，则把com.suheng.structure.wallpaperpicker.xml文件（没有的话新建一个，
+    按格式填写权限特权豁免规则）push到/system_ext/etc/permissions或/system/etc/permissions目录（本例演示的是push到/system/etc/permissions目录）-->
+    <!--*** FATAL EXCEPTION IN SYSTEM PROCESS: main
+        java.lang.IllegalStateException: Signature|privileged permissions not in privapp-permissions whitelist: {com.suheng.structure.wallpaperpicker (/system/priv-app/Wbj_WallpaperPicker.apk): android.permission.BIND_WALLPAPER}-->
+    <uses-permission android:name="android.permission.BIND_WALLPAPER" />
     <!--<uses-permission android:name="android.permission.DELETE_PACKAGES" />-->
 
     <!--<uses-feature android:name="android.hardware.type.watch" />-->

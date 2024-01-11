@@ -1,5 +1,4 @@
 //include ':apidemos'
-include ':wallpaperpicker:watchhome'
 include ':contentprovider'
 include ':database'
 include ':wallpaper:roamimg'
