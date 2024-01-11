@@ -11,7 +11,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.view.WindowInsets;
 
 import com.suheng.wallpaper.basic.manager.BitmapManager;
 import com.suheng.wallpaper.basic.utils.DateUtil;
@@ -136,11 +138,29 @@ public abstract class CanvasWallpaperService extends WallpaperService {
             Log.d(mTAG, "onDesiredSizeChanged, desiredWidth = " + desiredWidth + ", desiredHeight = " + desiredHeight);
         }
 
-        /*@Override
+        @Override
         public void onTouchEvent(MotionEvent event) {
             super.onTouchEvent(event);
             Log.d(mTAG, "onTouchEvent, action = " + event.getAction());
-        }*/
+        }
+
+        @Override
+        public void onApplyWindowInsets(WindowInsets insets) {
+            super.onApplyWindowInsets(insets);
+            Log.d(mTAG, "onApplyWindowInsets: " + insets);
+        }
+
+        @Override
+        public void onSurfaceRedrawNeeded(SurfaceHolder holder) {
+            super.onSurfaceRedrawNeeded(holder);
+            Log.d(mTAG, "onSurfaceRedrawNeeded: " + holder);
+        }
+
+        @Override
+        public void onZoomChanged(float zoom) {
+            super.onZoomChanged(zoom);
+            Log.d(mTAG, "onZoomChanged: " + zoom);
+        }
 
         public void updateTime() {
             Calendar calendar = Calendar.getInstance();
@@ -240,7 +260,7 @@ public abstract class CanvasWallpaperService extends WallpaperService {
 
             long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
             mHandler.postDelayed(mRunnableSecondTicker, delayMillis);
-            Log.d(mTAG, "onSecondTick, hour = " + mHour + ", minute = " + mMinute + ", second = " + mSecond + ", holder: " + getSurfaceHolder());
+            //Log.d(mTAG, "onSecondTick, hour = " + mHour + ", minute = " + mMinute + ", second = " + mSecond + ", holder: " + getSurfaceHolder());
         }
 
         /**

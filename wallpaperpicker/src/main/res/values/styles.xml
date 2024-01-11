@@ -12,4 +12,14 @@
         <item name="android:windowSwipeToDismiss">true</item>
     </style>
 
+    <style name="WallpaperStyle1" parent="@android:style/Theme.Wallpaper"/>
+
+    <style name="WallpaperStyle2" parent="@android:style/Theme.Wallpaper.NoTitleBar.Fullscreen"/>
+
+    <style name="WallpaperStyle" parent="@android:style/Theme.NoTitleBar.Fullscreen">
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowShowWallpaper">true</item>
+    </style>
+
 </resources>

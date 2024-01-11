@@ -23,7 +23,7 @@ public class WallpaperPickService extends Service {
     private static final String TAG = "Wbj";
     private static final String ACTION_PICK_WALLPAPER = "com.wiz.watch.action.PICK_WALLPAPER";
 
-    private BroadcastReceiver mWallpaperPickReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mWallpaperPickReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (ACTION_PICK_WALLPAPER.equals(intent.getAction())) {

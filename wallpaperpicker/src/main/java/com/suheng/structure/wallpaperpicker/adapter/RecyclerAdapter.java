@@ -3,16 +3,17 @@ package com.suheng.structure.wallpaperpicker.adapter;
 import android.content.Context;
 import android.view.View;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public abstract class RecyclerAdapter<T> extends RecyclerView.Adapter {
+public abstract class RecyclerAdapter<T, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
     private OnItemClickListener<T> mOnItemClickListener;
     private OnItemLongClickListener<T> mOnItemLongClickListener;
-    private List<T> mDataList;
+    private final List<T> mDataList;
 
     public RecyclerAdapter(List<T> dataList) {
         mDataList = dataList;
@@ -33,8 +34,9 @@ public abstract class RecyclerAdapter<T> extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
-        final T data = this.getItem(position);
+    public void onBindViewHolder(@NonNull VH holder, int position) {
+        final int pst = holder.getAdapterPosition();
+        final T data = this.getItem(pst);
         if (data == null) {
             return;
         }
@@ -43,7 +45,7 @@ public abstract class RecyclerAdapter<T> extends RecyclerView.Adapter {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mOnItemClickListener.onItemClick(holder.itemView, data, position);
+                    mOnItemClickListener.onItemClick(holder.itemView, data, pst);
                 }
             });
         }
@@ -61,7 +63,7 @@ public abstract class RecyclerAdapter<T> extends RecyclerView.Adapter {
         this.bindView(holder, position, data);
     }
 
-    protected View getItemLayout(Context context, int layoutId) {
+    protected View getItemLayout(Context context, @LayoutRes int layoutId) {
         try {
             return View.inflate(context, layoutId, null);
         } catch (Exception e) {

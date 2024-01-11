@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "com.suheng.structure.wallpaperpicker"
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 10000000
         versionName "1.0.0.a"
 
@@ -43,6 +43,9 @@ android {
         }
     }
 
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
 }
 
 dependencies {

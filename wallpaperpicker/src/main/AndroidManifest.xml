@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.suheng.structure.wallpaperpicker"
-    android:sharedUserId="android.uid.system">
-    <!--普通app变系统app条件：1.apk使用系统签名；2.push到system的app或priv-app目录，再加上sharedUserId可以让系统app获取大部分权限-->
-
-    <!--<uses-feature android:name="android.hardware.type.watch" />-->
+    package="com.suheng.structure.wallpaperpicker">
+    <!--普通app变系统app步骤：1.手机已root的前提下，把apk push到system的app或priv-app目录；2.重启手机-->
+    <!--变成系统app后，app即可获取部分权限。若apk使用的是系统签名且再加上sharedUserId后，则可以让app获取大部分权限。-->
+    <!--android:sharedUserId="android.uid.system"-->
 
     <uses-permission android:name="android.permission.SET_WALLPAPER_COMPONENT" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <!--<uses-permission android:name="android.permission.DELETE_PACKAGES" />-->
 
+    <!--<uses-feature android:name="android.hardware.type.watch" />-->
     <uses-feature
         android:name="android.software.live_wallpaper"
         android:required="true" />
-
-    <!--<uses-permission android:name="android.permission.DELETE_PACKAGES" />-->
 
     <application
         android:allowBackup="true"
@@ -27,7 +26,8 @@
             android:name=".WallpaperPickActivity"
             android:icon="@drawable/icon_app_alarm_clock"
             android:label="@string/app_theme_one"
-            android:theme="@style/WallpaperPickActivityTheme">
+            android:theme="@style/WallpaperPickActivityTheme"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="com.wiz.watch.WallpaperPicker" />
@@ -44,7 +44,8 @@
             android:name=".WallpaperPick2Activity"
             android:icon="@drawable/icon_app_blood_oxygen"
             android:label="@string/app_theme_two"
-            android:theme="@style/WallpaperPickActivityTheme">
+            android:theme="@style/WallpaperStyle2"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <!--<action android:name="com.wiz.watch.WallpaperPicker" />-->

@@ -7,8 +7,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.graphics.drawable.Drawable;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
@@ -40,24 +38,6 @@ public class WallpaperPickActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wallpaperpick_activity_wallpaper_pick);
-
-        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        if (sensorManager == null) {
-            Log.w(mTag, "SensorManager is null !");
-        } else {
-            List<Sensor> list = sensorManager.getSensorList(Sensor.TYPE_ALL);
-            for (Sensor sensor : list) {
-                Log.d(mTag, "sensor: " + sensor + ", name: " + sensor.getName());
-            }
-
-            Sensor stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-            if (stepCounterSensor == null) {
-                Log.w(mTag, "StepCounterSensor is null !");
-            } else {
-                sensorManager.registerListener(null, stepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL);
-            }
-        }
-
         WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
         /*try {
             wallpaperManager.setBitmap(BitmapFactory.decodeResource(getResources(), android.R.drawable.menu_frame));
@@ -248,7 +228,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
         }
     };
 
-    private final class LivePaperAdapter extends RecyclerAdapter<WallpaperInfo> {
+    private final class LivePaperAdapter extends RecyclerAdapter<WallpaperInfo, RecyclerView.ViewHolder> {
 
         LivePaperAdapter(List<WallpaperInfo> dataList) {
             super(dataList);
