@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.suheng.wallpaper.myhealth"
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 31
         versionCode 10000000
         versionName "1.0.0.aa"
