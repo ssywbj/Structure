@@ -141,7 +141,7 @@ public abstract class CanvasWallpaperService extends WallpaperService {
         @Override
         public void onTouchEvent(MotionEvent event) {
             super.onTouchEvent(event);
-            Log.d(mTAG, "onTouchEvent, action = " + event.getAction());
+            //Log.i(mTAG, "onTouchEvent, action = " + event.getAction());
         }
 
         @Override

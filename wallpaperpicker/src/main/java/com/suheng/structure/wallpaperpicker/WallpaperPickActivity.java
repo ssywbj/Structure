@@ -117,6 +117,20 @@ public class WallpaperPickActivity extends AppCompatActivity {
         this.initRecyclerView();
 
         startService(new Intent(this, WallpaperPickService.class));
+
+        final View.OnClickListener onClickListener = v -> {
+            final String pkg = "com.suheng.wallpaper.myhealth";
+            String cls;
+            if (v.getId() == R.id.btn_set_one) {
+                cls = pkg + ".MyHealthWatchFace";
+            } else {
+                cls = pkg + ".VapWallpaper";
+            }
+            WallpaperPickService.setLiveWallPaper(v.getContext(), pkg, cls, true);
+            finish();
+        };
+        findViewById(R.id.btn_set_one).setOnClickListener(onClickListener);
+        findViewById(R.id.btn_set_two).setOnClickListener(onClickListener);
     }
 
     private void initRecyclerView() {
