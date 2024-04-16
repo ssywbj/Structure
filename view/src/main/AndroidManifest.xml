@@ -80,7 +80,21 @@
         <activity
             android:name=".activity.GraphicsCameraActivity"
             android:label="Graphics Camera" />
-
+        <activity
+            android:name=".activity.vap.VapMainActivity"
+            android:label="Vap Demo" />
+        <activity
+            android:name=".activity.vap.AnimActiveDemoActivity"
+            android:label="Active Demo(可变动画)" />
+        <activity
+            android:name=".activity.vap.AnimSimpleDemoActivity"
+            android:label="Simple Demo" />
+        <activity
+            android:name=".activity.vap.AnimSpecialSizeDemoActivity"
+            android:label="Special Size Demo" />
+        <activity
+            android:name=".activity.vap.AnimVapxDemoActivity"
+            android:label="VAPX Demo(融合动画)" />
     </application>
 
     <supports-gl-texture android:name="GL_OES_compressed_paletted_texture" />

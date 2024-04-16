@@ -92,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "Paging3Activity");
         mStringList.add("Graphics Camera");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "GraphicsCameraActivity");
+        mStringList.add("Vap Demo");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "vap.VapMainActivity");
 
         startActivity(new Intent(this, ScrollTrackerActivity.class));
 
