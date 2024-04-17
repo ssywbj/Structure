@@ -15,11 +15,14 @@
  */
 package com.tencent.qgame.animplayer
 
-import android.graphics.SurfaceTexture
 import android.opengl.EGL14
 import android.view.Surface
 import com.tencent.qgame.animplayer.util.ALog
-import javax.microedition.khronos.egl.*
+import javax.microedition.khronos.egl.EGL10
+import javax.microedition.khronos.egl.EGLConfig
+import javax.microedition.khronos.egl.EGLContext
+import javax.microedition.khronos.egl.EGLDisplay
+import javax.microedition.khronos.egl.EGLSurface
 
 class EGLUtil {
 
@@ -40,14 +43,16 @@ class EGLUtil {
         eglContext = EGL10.EGL_NO_CONTEXT
     }
 
-    fun start(surfaceTexture: SurfaceTexture) {
+    //fun start(surfaceTexture: SurfaceTexture) {
+    fun start(surface: Surface) {
         try {
             egl = EGLContext.getEGL() as EGL10
             eglDisplay = egl?.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
             val version = IntArray(2)
             egl?.eglInitialize(eglDisplay, version)
             eglConfig = chooseConfig()
-            surface = Surface(surfaceTexture)
+            //surface = Surface(surfaceTexture)
+            this.surface = surface
             eglSurface = egl?.eglCreateWindowSurface(eglDisplay, eglConfig, surface, null)
             eglContext = createContext(egl, eglDisplay, eglConfig)
             if (eglSurface == null || eglSurface == EGL10.EGL_NO_SURFACE) {

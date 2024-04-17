@@ -15,8 +15,8 @@
  */
 package com.tencent.qgame.animplayer
 
-import android.graphics.SurfaceTexture
 import android.opengl.GLES20
+import android.view.Surface
 import com.tencent.qgame.animplayer.util.GlFloatArray
 import com.tencent.qgame.animplayer.util.ShaderUtil.createProgram
 import com.tencent.qgame.animplayer.util.TexCoordsUtil
@@ -24,7 +24,8 @@ import com.tencent.qgame.animplayer.util.VertexUtil
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
-class YUVRender (surfaceTexture: SurfaceTexture): IRenderListener {
+//class YUVRender (surfaceTexture: SurfaceTexture): IRenderListener {
+class YUVRender (surface: Surface): IRenderListener {
 
     companion object {
         private const val TAG = "${Constant.TAG}.YUVRender"
@@ -78,7 +79,7 @@ class YUVRender (surfaceTexture: SurfaceTexture): IRenderListener {
     )
 
     init {
-        eglUtil.start(surfaceTexture)
+        eglUtil.start(surface)
         initRender()
     }
 

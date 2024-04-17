@@ -15,18 +15,16 @@
  */
 package com.tencent.qgame.animplayer
 
-import android.graphics.SurfaceTexture
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
+import android.view.Surface
 import com.tencent.qgame.animplayer.util.GlFloatArray
 import com.tencent.qgame.animplayer.util.ShaderUtil
 import com.tencent.qgame.animplayer.util.TexCoordsUtil
 import com.tencent.qgame.animplayer.util.VertexUtil
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.ShortBuffer
 
-class Render(surfaceTexture: SurfaceTexture): IRenderListener {
+//class Render(surfaceTexture: SurfaceTexture): IRenderListener {
+class Render(surface: Surface): IRenderListener {
 
     companion object {
         private const val TAG = "${Constant.TAG}.Render"
@@ -47,7 +45,7 @@ class Render(surfaceTexture: SurfaceTexture): IRenderListener {
     private var aTextureRgbLocation: Int = 0
 
     init {
-        eglUtil.start(surfaceTexture)
+        eglUtil.start(surface)
         initRender()
     }
 

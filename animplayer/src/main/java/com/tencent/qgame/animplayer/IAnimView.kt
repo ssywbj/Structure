@@ -16,7 +16,7 @@
 package com.tencent.qgame.animplayer
 
 import android.content.res.AssetManager
-import android.graphics.SurfaceTexture
+import android.view.Surface
 import com.tencent.qgame.animplayer.file.IFileContainer
 import com.tencent.qgame.animplayer.inter.IAnimListener
 import com.tencent.qgame.animplayer.inter.IFetchResource
@@ -30,7 +30,8 @@ interface IAnimView {
 
     fun prepareTextureView()
 
-    fun getSurfaceTexture(): SurfaceTexture?
+    //fun getSurfaceTexture(): SurfaceTexture?
+    fun getSurface(): Surface?
 
     fun setAnimListener(animListener: IAnimListener?)
 

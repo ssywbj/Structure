@@ -16,8 +16,8 @@
 package com.tencent.qgame.animplayer
 
 import android.os.Build
-import android.os.HandlerThread
 import android.os.Handler
+import android.os.HandlerThread
 import com.tencent.qgame.animplayer.file.IFileContainer
 import com.tencent.qgame.animplayer.inter.IAnimListener
 import com.tencent.qgame.animplayer.util.ALog
@@ -86,7 +86,8 @@ abstract class Decoder(val player: AnimPlayer) : IAnimListener {
     fun prepareRender(needYUV: Boolean): Boolean {
         if (render == null) {
             ALog.i(TAG, "prepareRender")
-            player.animView.getSurfaceTexture()?.apply {
+            //player.animView.getSurfaceTexture()?.apply {
+            player.animView.getSurface()?.apply {
                 if (needYUV) {
                     ALog.i(TAG, "use yuv render")
                     render = YUVRender(this)

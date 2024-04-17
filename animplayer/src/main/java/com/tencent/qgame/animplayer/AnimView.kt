@@ -18,10 +18,10 @@ package com.tencent.qgame.animplayer
 import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.SurfaceTexture
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.view.Surface
 import android.view.TextureView
 import android.view.View
 import android.widget.FrameLayout
@@ -121,8 +121,10 @@ open class AnimView @JvmOverloads constructor(context: Context, attrs: Attribute
         }
     }
 
-    override fun getSurfaceTexture(): SurfaceTexture? {
-        return innerTextureView?.surfaceTexture ?: surface
+    //override fun getSurfaceTexture(): SurfaceTexture? {
+    override fun getSurface(): Surface? {
+        //return innerTextureView?.surfaceTexture ?: surface
+        return Surface(innerTextureView?.surfaceTexture ?: surface)
     }
 
     override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
