@@ -374,6 +374,14 @@ public class AlgorithmTest {
                 System.out.println("s: " + s + ", " + s.length() + ", " + split.length);
             }
         }
+
+        //String path = "pet/rabbit/moch_0i";
+        //String path = "ypet/rabbit/mo-ch_0i/standby.mp4";
+        //String path = "pet/rabbit/mo-ch_0i/03/standby.mp4";
+        //String path = "pet/rabbit/mo-ch_0i/standby.mp4";
+        String path = "/data/user/0/com.transsion.cutepet-1/cache/pet/hamster/moy/screen_on.mp4";
+        boolean result = path.matches("^(/(\\w|\\.|-)*)*/?pet/((\\w|-)*/){2}\\w+\\..+$");
+        System.out.println("path matches result: " + result);
     }
 
     @Test
