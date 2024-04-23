@@ -69,7 +69,6 @@
     </application>
 
     <queries>
-        <package android:name="com.suheng.wallpaper.myhealth" />
         <intent>
             <action android:name="android.service.wallpaper.WallpaperService" />
         </intent>
