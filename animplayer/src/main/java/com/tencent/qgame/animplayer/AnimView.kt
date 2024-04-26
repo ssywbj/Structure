@@ -21,6 +21,7 @@ import android.graphics.SurfaceTexture
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.Surface
 import android.view.TextureView
 import android.view.View
@@ -33,7 +34,6 @@ import com.tencent.qgame.animplayer.inter.IFetchResource
 import com.tencent.qgame.animplayer.inter.OnResourceClickListener
 import com.tencent.qgame.animplayer.mask.MaskConfig
 import com.tencent.qgame.animplayer.textureview.InnerTextureView
-import com.tencent.qgame.animplayer.util.ALog
 import com.tencent.qgame.animplayer.util.IScaleType
 import com.tencent.qgame.animplayer.util.ScaleType
 import com.tencent.qgame.animplayer.util.ScaleTypeUtil
@@ -116,7 +116,7 @@ open class AnimView @JvmOverloads constructor(context: Context, attrs: Attribute
         if (onSizeChangedCalled) {
             uiHandler.post(prepareTextureViewRunnable)
         } else {
-            ALog.e(TAG, "onSizeChanged not called")
+            Log.e(TAG, "onSizeChanged not called")
             needPrepareTextureView = true
         }
     }
@@ -128,7 +128,7 @@ open class AnimView @JvmOverloads constructor(context: Context, attrs: Attribute
     }
 
     override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
-        ALog.i(TAG, "onSurfaceTextureSizeChanged $width x $height")
+        Log.i(TAG, "onSurfaceTextureSizeChanged $width x $height")
         player.onSurfaceTextureSizeChanged(width, height)
     }
 
@@ -136,7 +136,7 @@ open class AnimView @JvmOverloads constructor(context: Context, attrs: Attribute
     }
 
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-        ALog.i(TAG, "onSurfaceTextureDestroyed")
+        Log.i(TAG, "onSurfaceTextureDestroyed")
         this.surface = null
         player.onSurfaceTextureDestroyed()
         uiHandler.post {
@@ -148,14 +148,14 @@ open class AnimView @JvmOverloads constructor(context: Context, attrs: Attribute
     }
 
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-        ALog.i(TAG, "onSurfaceTextureAvailable width=$width height=$height")
+        Log.i(TAG, "onSurfaceTextureAvailable width=$width height=$height")
         this.surface = surface
         player.onSurfaceTextureAvailable(width, height)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        ALog.i(TAG, "onSizeChanged w=$w, h=$h")
+        Log.i(TAG, "onSizeChanged w=$w, h=$h")
         scaleTypeUtil.setLayoutSize(w, h)
         onSizeChangedCalled = true
         // 需要保证onSizeChanged被调用
@@ -166,7 +166,7 @@ open class AnimView @JvmOverloads constructor(context: Context, attrs: Attribute
     }
 
     override fun onAttachedToWindow() {
-        ALog.i(TAG, "onAttachedToWindow")
+        Log.i(TAG, "onAttachedToWindow")
         super.onAttachedToWindow()
         player.isDetachedFromWindow = false
         // 自动恢复播放
@@ -178,7 +178,7 @@ open class AnimView @JvmOverloads constructor(context: Context, attrs: Attribute
     }
 
     override fun onDetachedFromWindow() {
-        ALog.i(TAG, "onDetachedFromWindow")
+        Log.i(TAG, "onDetachedFromWindow")
         super.onDetachedFromWindow()
         player.isDetachedFromWindow = true
         player.onSurfaceTextureDestroyed()
@@ -230,7 +230,7 @@ open class AnimView @JvmOverloads constructor(context: Context, attrs: Attribute
     }
 
     override fun setFps(fps: Int) {
-        ALog.i(TAG, "setFps=$fps")
+        Log.i(TAG, "setFps=$fps")
         player.defaultFps = fps
     }
 
@@ -246,7 +246,7 @@ open class AnimView @JvmOverloads constructor(context: Context, attrs: Attribute
      * @param isMute true 静音
      */
     override fun setMute(isMute: Boolean) {
-        ALog.e(TAG, "set mute=$isMute")
+        Log.e(TAG, "set mute=$isMute")
         player.isMute = isMute
     }
 
@@ -274,14 +274,14 @@ open class AnimView @JvmOverloads constructor(context: Context, attrs: Attribute
     override fun startPlay(fileContainer: IFileContainer) {
         ui {
             if (visibility != View.VISIBLE) {
-                ALog.e(TAG, "AnimView is GONE, can't play")
+                Log.e(TAG, "AnimView is GONE, can't play")
                 return@ui
             }
             if (!player.isRunning()) {
                 lastFile = fileContainer
                 player.startPlay(fileContainer)
             } else {
-                ALog.e(TAG, "is running can not start")
+                Log.e(TAG, "is running can not start")
             }
         }
     }

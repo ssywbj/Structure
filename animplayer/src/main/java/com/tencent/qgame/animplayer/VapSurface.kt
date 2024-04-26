@@ -3,6 +3,7 @@ package com.tencent.qgame.animplayer
 import android.content.res.AssetManager
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.Surface
 import com.tencent.qgame.animplayer.file.AssetsFileContainer
 import com.tencent.qgame.animplayer.file.FileContainer
@@ -11,7 +12,6 @@ import com.tencent.qgame.animplayer.inter.IAnimListener
 import com.tencent.qgame.animplayer.inter.IFetchResource
 import com.tencent.qgame.animplayer.inter.OnResourceClickListener
 import com.tencent.qgame.animplayer.mask.MaskConfig
-import com.tencent.qgame.animplayer.util.ALog
 import com.tencent.qgame.animplayer.util.IScaleType
 import com.tencent.qgame.animplayer.util.ScaleType
 import com.tencent.qgame.animplayer.util.ScaleTypeUtil
@@ -71,7 +71,7 @@ open class VapSurface : IAnimView{
     }
 
     override fun prepareTextureView() {
-        ALog.e(TAG, "onSizeChanged not called")
+        Log.e(TAG, "onSizeChanged not called")
         needPrepareTextureView = true
     }
 
@@ -80,24 +80,24 @@ open class VapSurface : IAnimView{
     }
 
     fun onSurfaceSizeChanged(width: Int, height: Int) {
-        ALog.i(TAG, "onSurfaceSizeChanged $width x $height")
+        Log.i(TAG, "onSurfaceSizeChanged $width x $height")
         player.onSurfaceTextureSizeChanged(width, height)
     }
     
     fun onSurfaceDestroyed() {
-        ALog.i(TAG, "onSurfaceDestroyed")
+        Log.i(TAG, "onSurfaceDestroyed")
         this.surface = null
         player.onSurfaceTextureDestroyed()
     }
 
     fun onSurfaceAvailable(surface: Surface, width: Int, height: Int) {
-        ALog.i(TAG, "onSurfaceAvailable width=$width height=$height")
+        Log.i(TAG, "onSurfaceAvailable width=$width height=$height")
         this.surface = surface
         player.onSurfaceTextureAvailable(width, height)
     }
 
     fun onSizeChanged(w: Int, h: Int) {
-        ALog.i(TAG, "onSizeChanged w=$w, h=$h")
+        Log.i(TAG, "onSizeChanged w=$w, h=$h")
         scaleTypeUtil.setLayoutSize(w, h)
         if (needPrepareTextureView) {
             needPrepareTextureView = false
@@ -106,7 +106,7 @@ open class VapSurface : IAnimView{
     }
 
     fun onAttachedToWindow() {
-        ALog.i(TAG, "onAttachedToWindow")
+        Log.i(TAG, "onAttachedToWindow")
         player.isDetachedFromWindow = false
         // 自动恢复播放
         if (player.playLoop > 0) {
@@ -117,7 +117,7 @@ open class VapSurface : IAnimView{
     }
 
     fun onDetachedFromWindow() {
-        ALog.i(TAG, "onDetachedFromWindow")
+        Log.i(TAG, "onDetachedFromWindow")
         player.isDetachedFromWindow = true
         player.onSurfaceTextureDestroyed()
     }
@@ -166,7 +166,7 @@ open class VapSurface : IAnimView{
     }
 
     override fun setFps(fps: Int) {
-        ALog.i(TAG, "setFps=$fps")
+        Log.i(TAG, "setFps=$fps")
         player.defaultFps = fps
     }
 
@@ -182,7 +182,7 @@ open class VapSurface : IAnimView{
      * @param isMute true 静音
      */
     override fun setMute(isMute: Boolean) {
-        ALog.e(TAG, "set mute=$isMute")
+        Log.e(TAG, "set mute=$isMute")
         player.isMute = isMute
     }
 
@@ -209,7 +209,7 @@ open class VapSurface : IAnimView{
     override fun startPlay(fileContainer: IFileContainer) {
         ui {
             if (player.isRunning()) {
-                ALog.e(TAG, "is running can not start")
+                Log.e(TAG, "is running can not start")
             } else {
                 lastFile = fileContainer
                 player.startPlay(fileContainer)
