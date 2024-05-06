@@ -17,7 +17,7 @@ import com.tencent.qgame.animplayer.util.ScaleType
 import com.tencent.qgame.animplayer.util.ScaleTypeUtil
 import java.io.File
 
-open class VapSurface : IAnimView{
+class VapSurface : IAnimView{
 
     companion object {
         private const val TAG = "${Constant.TAG}.VapSurface"

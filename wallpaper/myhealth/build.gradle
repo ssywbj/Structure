@@ -56,5 +56,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     implementation project(path: ':wallpaper:basic')
-    implementation "io.github.tencent:vap:2.0.28"
+    //implementation "io.github.tencent:vap:2.0.28"
+    implementation project(path: ':animplayer')
 }

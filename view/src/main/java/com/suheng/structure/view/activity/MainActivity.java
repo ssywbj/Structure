@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
 import com.suheng.structure.view.R;
+import com.suheng.structure.view.activity.vap.VapMainActivity;
 import com.suheng.structure.view.utils.XmlSaxParser;
 
 import java.lang.ref.WeakReference;
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         mStringList.add("Vap Demo");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "vap.VapMainActivity");
 
-        startActivity(new Intent(this, ScrollTrackerActivity.class));
+        startActivity(new Intent(this, VapMainActivity.class));
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();

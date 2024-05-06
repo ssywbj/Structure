@@ -54,6 +54,21 @@
         </service>
 
         <service
+            android:name=".Vap2Wallpaper"
+            android:exported="true"
+            android:label="Surface Render"
+            android:permission="android.permission.BIND_WALLPAPER">
+
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/vap_wallpaper_config" />
+        </service>
+
+        <service
             android:name=".VapService"
             android:exported="true" />
     </application>
