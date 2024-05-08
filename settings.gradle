@@ -46,3 +46,4 @@ include ':watchface:timerace'
 include ':watchface:x-sports'*/
 include ':compose'
 include ':wheelpicker'
+include ':opengl'
