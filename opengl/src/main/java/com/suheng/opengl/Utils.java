@@ -15,12 +15,13 @@ import androidx.annotation.RawRes;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public final class Utils {
 
@@ -46,7 +47,7 @@ public final class Utils {
             }
             reader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "loadShader error", e);
         }
 
         return builder.toString();
@@ -98,28 +99,28 @@ public final class Utils {
         GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE,
                 rgbaBuf);
         long end = System.nanoTime();
-        Log.d("TryOpenGL", "glReadPixels: " + (end - start));
+        Log.d(TAG, "glReadPixels: " + (end - start));
         saveRgb2Bitmap(rgbaBuf, Environment.getExternalStorageDirectory().getAbsolutePath()
-                                + "/gl_dump_" + width + "_" + height + ".png", width, height);
+                + "/gl_dump_" + width + "_" + height + ".png", width, height);
     }
 
     static void saveRgb2Bitmap(Buffer buf, String filename, int width, int height) {
-        Log.d("TryOpenGL", "Creating " + filename);
+        Log.d(TAG, "Creating " + filename);
         BufferedOutputStream bos = null;
         try {
-            bos = new BufferedOutputStream(new FileOutputStream(filename));
+            bos = new BufferedOutputStream(Files.newOutputStream(Paths.get(filename)));
             Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             bmp.copyPixelsFromBuffer(buf);
             bmp.compress(Bitmap.CompressFormat.PNG, 90, bos);
             bmp.recycle();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "saveRgb2Bitmap error", e);
         } finally {
             if (bos != null) {
                 try {
                     bos.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "close saveRgb2Bitmap error", e);
                 }
             }
         }

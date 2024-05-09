@@ -7,11 +7,12 @@ import android.opengl.Matrix;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class MyRenderer2 implements GLSurfaceView.Renderer {
+public class MyRenderer3 implements GLSurfaceView.Renderer {
 
     private static final String VERTEX_SHADER =
             "attribute vec4 vPosition;\n"
@@ -25,22 +26,32 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
                     + "  gl_FragColor = vec4(0.5, 0, 0, 1);\n"
                     + "}";
     private static final float[] VERTEX = { //in counterclockwise order:
-            0, 1, 0,  // top
-            -0.5f, -1, 0,  // bottom left
-            1, -1, 0,  // bottom right
+            1, 1, 0,  // top right
+            -1, 1, 0, // top left
+            -1, -1, 0, // bottom left
+            1, -1, 0, // bottom right
     };
 
+    private static final short[] VERTEX_INDEX = { 0, 1, 2, 0, 2, 3 };
+
     private final FloatBuffer mVertexBuffer;
+    private final ShortBuffer mVertexIndexBuffer;
 
     private int mMatrixHandle;
     private final float[] mMVPMatrix = new float[16];
 
-    public MyRenderer2() {
+    public MyRenderer3() {
         mVertexBuffer = ByteBuffer.allocateDirect(VERTEX.length * 4)
                 .order(ByteOrder.nativeOrder())
                 .asFloatBuffer()
                 .put(VERTEX);
         mVertexBuffer.position(0);
+
+        mVertexIndexBuffer = ByteBuffer.allocateDirect(VERTEX_INDEX.length * 2)
+                .order(ByteOrder.nativeOrder())
+                .asShortBuffer()
+                .put(VERTEX_INDEX);
+        mVertexIndexBuffer.position(0);
     }
 
     private int loadShader(int type, String shaderCode) {
@@ -75,7 +86,7 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, width, height);
 
         Matrix.perspectiveM(mMVPMatrix, 0, 45, (float) width / height, 0.1f, 100f);
-        Matrix.translateM(mMVPMatrix, 0, 0f, 0f, -3.0f); //z可控制大小
+        Matrix.translateM(mMVPMatrix, 0, 0f, 0f, -7f);
     }
 
     @Override
@@ -84,7 +95,9 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
 
         GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMVPMatrix, 0);
 
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
+        // 用glDrawElements来绘制，mVertexIndexBuffer指定了顶点绘制顺序
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, VERTEX_INDEX.length,
+                GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
     }
 
 }
