@@ -1,4 +1,4 @@
-package com.suheng.opengl;
+package com.suheng.opengl.renderer;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,6 +7,8 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
+
+import com.suheng.opengl.R;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

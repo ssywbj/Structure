@@ -1,4 +1,4 @@
-package com.suheng.opengl;
+package com.suheng.opengl.renderer;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;

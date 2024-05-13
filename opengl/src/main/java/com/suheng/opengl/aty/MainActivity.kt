@@ -4,10 +4,15 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.suheng.opengl.MyRenderer4
 import com.suheng.opengl.R
 import com.suheng.opengl.Utils
+import com.suheng.opengl.renderer.CubeRenderer
+import com.suheng.opengl.renderer.MyRenderer4
 
+//https://blog.piasy.com/2016/06/07/Open-gl-es-android-2-part-1/index.html
+//http://zhangtielei.com/posts/blog-opengl-transformations-1.html
+//https://learnopengl.com/Getting-started
+//http://www.learnopengles.com/tag/opengl-es-2-for-android-a-quick-start-guide/
 class MainActivity : AppCompatActivity() {
 
     private lateinit var glSurfaceView: GLSurfaceView
@@ -31,18 +36,26 @@ class MainActivity : AppCompatActivity() {
             //setRenderer(MyRenderer2())
             //setRenderer(MyRenderer3())
             setRenderer(MyRenderer4(this@MainActivity).also { renderer = it })
+            //setRenderer(CubeRenderer(this@MainActivity).also { renderer = it })
             renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        glSurfaceView.onPause()
     }
 
     override fun onResume() {
         super.onResume()
         glSurfaceView.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        glSurfaceView.queueEvent {
+            /*
+             * Generally, GL Context will be destroyed after pause.
+             * So we destroy GL-related resources before pause.
+             */
+            (renderer as? CubeRenderer)?.destroy()
+        }
+        glSurfaceView.onPause()
     }
 
     override fun onDestroy() {
