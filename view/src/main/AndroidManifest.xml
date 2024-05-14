@@ -95,6 +95,9 @@
         <activity
             android:name=".activity.vap.AnimVapxDemoActivity"
             android:label="VAPX Demo(融合动画)" />
+        <activity
+            android:name=".activity.ConstraintLayoutActivity"
+            android:label="Constraint Layout" />
     </application>
 
     <supports-gl-texture android:name="GL_OES_compressed_paletted_texture" />

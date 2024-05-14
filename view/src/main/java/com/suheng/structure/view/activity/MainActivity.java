@@ -95,8 +95,10 @@ public class MainActivity extends AppCompatActivity {
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "GraphicsCameraActivity");
         mStringList.add("Vap Demo");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "vap.VapMainActivity");
+        mStringList.add("Constraint Layout");
+        mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ConstraintLayoutActivity");
 
-        startActivity(new Intent(this, VapMainActivity.class));
+        startActivity(new Intent(this, ConstraintLayoutActivity.class));
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();

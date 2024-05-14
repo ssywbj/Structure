@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="title_layout_tv_title" type="id" />
+    <item name="title_layout_tv_subtitle" type="id" />
+    <item name="title_layout_iv_arrow_down" type="id" />
+</resources>
