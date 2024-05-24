@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
@@ -19,7 +18,7 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class CubeRenderer implements GLSurfaceView.Renderer {
+public class CubeRenderer implements BaseRenderer {
     private static final boolean LOG_ENABLE = BuildConfig.DEBUG;
     private static final String TAG = CubeRenderer.class.getSimpleName();
 
@@ -201,6 +200,7 @@ public class CubeRenderer implements GLSurfaceView.Renderer {
      * Destroy the GL resources attached with the Renderer.
      * This must be call on GL thread.
      */
+    @Override
     public void destroy() {
         destroyGLProgramIfNeeded();
         destroyTexturesIfNeeded();

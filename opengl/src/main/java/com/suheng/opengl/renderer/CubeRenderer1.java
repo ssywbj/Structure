@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
@@ -19,9 +18,9 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class CubeRenderer1 implements GLSurfaceView.Renderer {
+public class CubeRenderer1 implements BaseRenderer {
     private static final boolean LOG_ENABLE = BuildConfig.DEBUG;
-    private static final String TAG = CubeRenderer1.class.getSimpleName();
+    private static final String TAG = "Wbj";
 
     /**
      * The size of a float is 4 bytes.
@@ -114,12 +113,8 @@ public class CubeRenderer1 implements GLSurfaceView.Renderer {
     private final Bitmap face1;
     private final FloatBuffer verticesBuffer;
     private final float[] modelMatrix1 = new float[16];
-    private final float[] modelMatrix2 = new float[16];
-    private final float[] modelMatrix3 = new float[16];
     private final float[] viewMatrix = new float[16];
     private final float[] projectionMatrix = new float[16];
-
-    private long initFrameDrawingTime;
 
     public CubeRenderer1(Context context) {
         verticesBuffer = ByteBuffer.allocateDirect(CUBE.length * FLOAT_BYTES)
@@ -174,26 +169,7 @@ public class CubeRenderer1 implements GLSurfaceView.Renderer {
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture1);
         GLES20.glUniform1i(glTexture1Uniform, 0);
 
-        //Draw cube 1
         GLES20.glUniformMatrix4fv(glModelMatrixUniform, 1, false, modelMatrix1, 0);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);
-
-        float angle = getRotationAngle();
-
-        //Draw cube 2. Rotating about y axis...
-        Matrix.setIdentityM(modelMatrix2, 0);
-        Matrix.translateM(modelMatrix2, 0, 0.5f, 1.0f, -1.5f);
-        Matrix.rotateM(modelMatrix2, 0, angle, 0.0f, 1.0f, 0.0f);
-        Matrix.scaleM(modelMatrix2, 0, 1.5f, 1.5f, 1.5f);
-        GLES20.glUniformMatrix4fv(glModelMatrixUniform, 1, false, modelMatrix2, 0);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);
-
-        //Draw cube 3. Rotating about z axis...
-        Matrix.setIdentityM(modelMatrix3, 0);
-        Matrix.translateM(modelMatrix3, 0, 1.0f, -1.0f, 1.0f);
-        Matrix.rotateM(modelMatrix3, 0, angle, 0.0f, 0.0f, 1.0f);
-        Matrix.scaleM(modelMatrix3, 0, 0.5f, 0.5f, 0.5f);
-        GLES20.glUniformMatrix4fv(glModelMatrixUniform, 1, false, modelMatrix3, 0);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);
     }
 
@@ -201,27 +177,11 @@ public class CubeRenderer1 implements GLSurfaceView.Renderer {
      * Destroy the GL resources attached with the Renderer.
      * This must be call on GL thread.
      */
+    @Override
     public void destroy() {
         destroyGLProgramIfNeeded();
         destroyTexturesIfNeeded();
         destroyVertexBufferObjectIfNeeded();
-    }
-
-
-    private float getRotationAngle() {
-        float angle;
-
-        long now = System.currentTimeMillis();
-        if (initFrameDrawingTime == 0L) {
-            angle = 0.0f;
-            initFrameDrawingTime = now;
-        } else {
-            long deltaTime = now - initFrameDrawingTime;
-            float rotateSpeed = 1.0f / 10;
-            angle = deltaTime * rotateSpeed;
-        }
-
-        return angle;
     }
 
     private void initGLProgramIfNeeded() {

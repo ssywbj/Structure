@@ -1,9 +1,16 @@
-package com.suheng.opengl;
+package com.suheng.opengl.renderer;
 
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+
+import com.suheng.opengl.ColorShaderProgram;
+import com.suheng.opengl.Mallet;
+import com.suheng.opengl.R;
+import com.suheng.opengl.Table;
+import com.suheng.opengl.TextureShaderProgram;
+import com.suheng.opengl.Utils;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;

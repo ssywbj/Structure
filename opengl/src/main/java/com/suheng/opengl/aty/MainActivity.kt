@@ -15,11 +15,26 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        findViewById<View>(R.id.tv_base_1).setOnClickListener {
+            CubeActivity.openActivity(this, CubeActivity.ENTER_FLAG_DATA_2)
+        }
+        findViewById<View>(R.id.tv_base_2).setOnClickListener {
+            CubeActivity.openActivity(this, CubeActivity.ENTER_FLAG_DATA_3)
+        }
+        findViewById<View>(R.id.tv_base_3).setOnClickListener {
+            CubeActivity.openActivity(this, CubeActivity.ENTER_FLAG_DATA_4)
+        }
+        findViewById<View>(R.id.tv_base_4).setOnClickListener {
+            CubeActivity.openActivity(this, CubeActivity.ENTER_FLAG_DATA_5)
+        }
+        findViewById<View>(R.id.tv_base_5).setOnClickListener {
+            CubeActivity.openActivity(this, CubeActivity.ENTER_FLAG_DATA_6)
+        }
         findViewById<View>(R.id.tv_cube_1).setOnClickListener {
-            CubeActivity.openActivity(this, CubeActivity.ENTER_FLAG_DATA_0)
+            CubeActivity.openActivity(this, CubeActivity.ENTER_FLAG_DATA_1)
         }
         findViewById<View>(R.id.tv_cube_2).setOnClickListener {
-            CubeActivity.openActivity(this, CubeActivity.ENTER_FLAG_DATA_1)
+            CubeActivity.openActivity(this, CubeActivity.ENTER_FLAG_DATA_0)
         }
     }
 

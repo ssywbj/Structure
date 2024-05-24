@@ -6,10 +6,10 @@
     android:padding="8dp">
 
     <TextView
-        android:id="@+id/tv_cube_title"
+        android:id="@+id/tv_basic_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Cube"
+        android:text="Basic Title"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -17,11 +17,83 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/tv_base_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="Basic1"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@id/tv_basic_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_basic_title" />
+
+    <TextView
+        android:id="@+id/tv_base_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="Basic2"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/tv_base_1"
+        app:layout_constraintTop_toTopOf="@id/tv_base_1" />
+
+    <TextView
+        android:id="@+id/tv_base_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="Basic3"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/tv_base_2"
+        app:layout_constraintTop_toTopOf="@id/tv_base_2" />
+
+    <TextView
+        android:id="@+id/tv_base_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="Basic4"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/tv_base_3"
+        app:layout_constraintTop_toTopOf="@id/tv_base_3" />
+
+    <TextView
+        android:id="@+id/tv_base_5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="Basic5"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/tv_base_4"
+        app:layout_constraintTop_toTopOf="@id/tv_base_4" />
+
+    <TextView
+        android:id="@+id/tv_cube_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Cube Title"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_basic_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_base_1" />
+
+    <TextView
         android:id="@+id/tv_cube_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:padding="4dp"
+        android:padding="2dp"
         android:text="Cube1"
         android:textColor="@android:color/darker_gray"
         android:textSize="16sp"
@@ -33,7 +105,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:padding="4dp"
+        android:padding="2dp"
         android:text="Cube2"
         android:textColor="@android:color/darker_gray"
         android:textSize="16sp"
