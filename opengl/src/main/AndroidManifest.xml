@@ -24,6 +24,22 @@
         </activity>
 
         <activity android:name=".aty.CubeActivity" />
+
+        <service
+            android:name=".service.OpenGLWallpaper"
+            android:exported="true"
+            android:label="OpenGL Wallpaper"
+            android:permission="android.permission.BIND_WALLPAPER">
+
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/opengl_wallpaper_config" />
+        </service>
+
     </application>
 
 </manifest>
