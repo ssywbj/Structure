@@ -1,10 +1,12 @@
 package com.suheng.opengl.service
 
+import android.opengl.EGL14
 import android.opengl.EGL14.EGL_CONTEXT_CLIENT_VERSION
 import android.opengl.GLES10
 import android.opengl.GLES20
 import android.service.wallpaper.WallpaperService
 import android.view.SurfaceHolder
+import com.suheng.opengl.renderer.MyRendererTmp
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import javax.microedition.khronos.egl.EGL10
@@ -19,7 +21,8 @@ class OpenGLWallpaper : WallpaperService() {
 
     inner class OpenGLEngine : Engine() {
         //private lateinit var glThread: GLThread2
-        private lateinit var glThread: GLThread
+        //private lateinit var glThread: GLThread
+        private lateinit var myRendererTmp: MyRendererTmp
 
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             super.onCreate(surfaceHolder)
@@ -32,8 +35,10 @@ class OpenGLWallpaper : WallpaperService() {
         override fun onSurfaceCreated(holder: SurfaceHolder) {
             super.onSurfaceCreated(holder)
             //glThread = GLThread2(holder)
-            glThread = GLThread(holder)
-            glThread.start()
+            //glThread = GLThread(holder)
+            //glThread.start()
+            myRendererTmp = MyRendererTmp(holder.surface)
+            myRendererTmp.onSurfaceCreated()
         }
 
         override fun onSurfaceChanged(
@@ -43,16 +48,21 @@ class OpenGLWallpaper : WallpaperService() {
             height: Int
         ) {
             super.onSurfaceChanged(holder, format, width, height)
+            myRendererTmp.onSurfaceChanged(width, height)
         }
 
         override fun onSurfaceDestroyed(holder: SurfaceHolder?) {
             super.onSurfaceDestroyed(holder)
-            glThread.requestExitAndWait()
+            //glThread.requestExitAndWait()
+            myRendererTmp.onSurfaceDestroyed()
         }
 
         override fun onVisibilityChanged(visible: Boolean) {
             super.onVisibilityChanged(visible)
-            glThread.setPaused(!visible)
+            //glThread.setPaused(!visible)
+            if (visible) {
+                myRendererTmp.onDrawFrame()
+            }
         }
     }
 
@@ -155,7 +165,6 @@ class OpenGLWallpaper : WallpaperService() {
 
     internal class GLThread2(private val surfaceHolder: SurfaceHolder) : Thread() {
 
-        // 添加着色器源码的字符串（实际项目中可能是从文件加载）
         private val vertexShaderCode =
             "attribute vec4 a_Position;" +
             "void main() {" +
@@ -177,9 +186,8 @@ class OpenGLWallpaper : WallpaperService() {
 
         override fun run() {
             val egl = EGLContext.getEGL() as EGL10
-            val display: EGLDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
+            val display = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
             val version = IntArray(2)
-            //egl.eglInitialize(display, null)
             egl.eglInitialize(display, version)
 
             val configs = arrayOfNulls<EGLConfig>(1)
@@ -190,7 +198,7 @@ class OpenGLWallpaper : WallpaperService() {
                 EGL10.EGL_BLUE_SIZE, 8,
                 EGL10.EGL_ALPHA_SIZE, 8,
                 EGL10.EGL_DEPTH_SIZE, 16,
-                EGL10.EGL_RENDERABLE_TYPE, 4, // EGL_OPENGL_ES2_BIT 的值，表示支持 OpenGL ES 2.0
+                EGL10.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT, //EGL_OPENGL_ES2_BIT表示支持OpenGL ES 2.0
                 EGL10.EGL_NONE
             )
 
