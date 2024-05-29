@@ -6,7 +6,7 @@ import android.opengl.GLES10
 import android.opengl.GLES20
 import android.service.wallpaper.WallpaperService
 import android.view.SurfaceHolder
-import com.suheng.opengl.renderer.MyRendererTmp
+import com.suheng.opengl.renderer.MySurfaceRenderer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import javax.microedition.khronos.egl.EGL10
@@ -22,7 +22,7 @@ class OpenGLWallpaper : WallpaperService() {
     inner class OpenGLEngine : Engine() {
         //private lateinit var glThread: GLThread2
         //private lateinit var glThread: GLThread
-        private lateinit var myRendererTmp: MyRendererTmp
+        private lateinit var surfaceRenderer: MySurfaceRenderer
 
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             super.onCreate(surfaceHolder)
@@ -37,8 +37,8 @@ class OpenGLWallpaper : WallpaperService() {
             //glThread = GLThread2(holder)
             //glThread = GLThread(holder)
             //glThread.start()
-            myRendererTmp = MyRendererTmp(holder.surface)
-            myRendererTmp.onSurfaceCreated()
+            surfaceRenderer = MySurfaceRenderer(holder.surface)
+            surfaceRenderer.onSurfaceCreated()
         }
 
         override fun onSurfaceChanged(
@@ -48,20 +48,20 @@ class OpenGLWallpaper : WallpaperService() {
             height: Int
         ) {
             super.onSurfaceChanged(holder, format, width, height)
-            myRendererTmp.onSurfaceChanged(width, height)
+            surfaceRenderer.onSurfaceChanged(width, height)
         }
 
         override fun onSurfaceDestroyed(holder: SurfaceHolder?) {
             super.onSurfaceDestroyed(holder)
             //glThread.requestExitAndWait()
-            myRendererTmp.onSurfaceDestroyed()
+            surfaceRenderer.onSurfaceDestroyed()
         }
 
         override fun onVisibilityChanged(visible: Boolean) {
             super.onVisibilityChanged(visible)
             //glThread.setPaused(!visible)
             if (visible) {
-                myRendererTmp.onDrawFrame()
+                surfaceRenderer.onDrawFrame()
             }
         }
     }

@@ -29,6 +29,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.tv_base_5).setOnClickListener {
             CubeActivity.openActivity(this, CubeActivity.ENTER_FLAG_DATA_6)
         }
+        findViewById<View>(R.id.tv_base_6).setOnClickListener {
+            CubeActivity.openActivity(this, CubeActivity.ENTER_FLAG_DATA_7)
+        }
         findViewById<View>(R.id.tv_cube_1).setOnClickListener {
             CubeActivity.openActivity(this, CubeActivity.ENTER_FLAG_DATA_1)
         }

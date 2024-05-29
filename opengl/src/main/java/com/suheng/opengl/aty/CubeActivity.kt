@@ -17,6 +17,7 @@ import com.suheng.opengl.renderer.MyRenderer
 import com.suheng.opengl.renderer.MyRenderer2
 import com.suheng.opengl.renderer.MyRenderer3
 import com.suheng.opengl.renderer.MyRenderer4
+import com.suheng.opengl.renderer.MySurfaceRenderer
 
 class CubeActivity : AppCompatActivity() {
 
@@ -33,6 +34,7 @@ class CubeActivity : AppCompatActivity() {
         const val ENTER_FLAG_DATA_4 = 4
         const val ENTER_FLAG_DATA_5 = 5
         const val ENTER_FLAG_DATA_6 = 6
+        const val ENTER_FLAG_DATA_7 = 7
 
         fun openActivity(ctx: Context, enterFlag: Int, options: Bundle? = null) {
             ContextCompat.startActivity(ctx, Intent(ctx, CubeActivity::class.java).apply {
@@ -61,6 +63,7 @@ class CubeActivity : AppCompatActivity() {
                 ENTER_FLAG_DATA_3 -> MyRenderer2()
                 ENTER_FLAG_DATA_4 -> MyRenderer3()
                 ENTER_FLAG_DATA_5 -> MyRenderer4(ctx)
+                ENTER_FLAG_DATA_7 -> MySurfaceRenderer()
                 ENTER_FLAG_DATA_6 -> DemoRenderer(ctx)
 
                 ENTER_FLAG_DATA_1 -> CubeRenderer1(ctx)

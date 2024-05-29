@@ -77,6 +77,18 @@
         app:layout_constraintTop_toTopOf="@id/tv_base_4" />
 
     <TextView
+        android:id="@+id/tv_base_6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="Basic6"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/tv_base_5"
+        app:layout_constraintTop_toTopOf="@id/tv_base_5" />
+
+    <TextView
         android:id="@+id/tv_cube_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
