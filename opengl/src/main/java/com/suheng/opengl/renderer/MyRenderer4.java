@@ -9,6 +9,7 @@ import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
 import com.suheng.opengl.R;
+import com.suheng.opengl.Utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -22,20 +23,20 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
     private static final String VERTEX_SHADER =
             "uniform mat4 uMVPMatrix;" +
-                    "attribute vec4 vPosition;" +
-                    "attribute vec2 a_texCoord;" +
-                    "varying vec2 v_texCoord;" +
-                    "void main() {" +
-                    "  gl_Position = uMVPMatrix * vPosition;" +
-                    "  v_texCoord = a_texCoord;" +
-                    "}";
+            "attribute vec4 vPosition;" +
+            "attribute vec2 a_texCoord;" +
+            "varying vec2 v_texCoord;" +
+            "void main() {" +
+            "  gl_Position = uMVPMatrix * vPosition;" +
+            "  v_texCoord = a_texCoord;" +
+            "}";
     private static final String FRAGMENT_SHADER =
             "precision mediump float;" +
-                    "varying vec2 v_texCoord;" +
-                    "uniform sampler2D s_texture;" +
-                    "void main() {" +
-                    "  gl_FragColor = texture2D(s_texture, v_texCoord);" +
-                    "}";
+            "varying vec2 v_texCoord;" +
+            "uniform sampler2D s_texture;" +
+            "void main() {" +
+            "  gl_FragColor = texture2D(s_texture, v_texCoord);" +
+            "}";
     private static final float[] VERTEX = { //in counterclockwise order:
             1, 1, 0,  // top right
             -1, 1, 0, // top left
@@ -94,20 +95,13 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
         mTexVertexBuffer.position(0);
     }
 
-    private int loadShader(int type, String shaderCode) {
-        int shader = GLES20.glCreateShader(type);
-        GLES20.glShaderSource(shader, shaderCode);
-        GLES20.glCompileShader(shader);
-        return shader;
-    }
-
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
         int program = GLES20.glCreateProgram();
-        int vertexShader = this.loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
-        int fragmentShader = this.loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
+        int vertexShader = Utils.loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
+        int fragmentShader = Utils.loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
         GLES20.glAttachShader(program, vertexShader);
         GLES20.glAttachShader(program, fragmentShader);
         GLES20.glLinkProgram(program);
