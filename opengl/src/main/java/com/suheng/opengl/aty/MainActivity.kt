@@ -8,6 +8,7 @@ import com.suheng.opengl.R
 //https://blog.piasy.com/2016/06/07/Open-gl-es-android-2-part-1/index.html
 //http://zhangtielei.com/posts/blog-opengl-transformations-1.html
 //https://learnopengl.com/Getting-started
+//https://learnopengl-cn.github.io/
 //https://open.gl/introduction
 class MainActivity : AppCompatActivity() {
 
