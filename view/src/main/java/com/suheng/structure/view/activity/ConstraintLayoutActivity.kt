@@ -5,16 +5,21 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.suheng.structure.view.R
+import com.suheng.structure.view.wheel.CoroutineView
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class ConstraintLayoutActivity : AppCompatActivity() {
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_constraint_layout)
@@ -58,6 +63,14 @@ class ConstraintLayoutActivity : AppCompatActivity() {
                     "Title, Title, Title, Title",
                     "Subtitle, Subtitle, Subtitle",
                 )
+            )
+
+            addView(
+                CoroutineView(this@ConstraintLayoutActivity),
+                LinearLayout.LayoutParams(100, 100).apply {
+                    topMargin = 16
+                    gravity = Gravity.CENTER_HORIZONTAL
+                }
             )
         }
     }
