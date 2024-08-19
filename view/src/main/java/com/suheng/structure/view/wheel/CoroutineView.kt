@@ -12,8 +12,12 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapConcat
@@ -232,7 +236,7 @@ class CoroutineView @JvmOverloads constructor(
         defaultScope.cancel()
     }
 
-    private var validWidth: Int = 0 //异常初始化方法1：使用MutableStateFlow状态流
+    private var validWidth: Int = 0 //异步初始化方法1：使用MutableStateFlow状态流
     private val valueFlow = MutableStateFlow<Int?>(null)
     private val job = launch {
         valueFlow.filterNotNull().collect { value ->
@@ -266,27 +270,26 @@ class CoroutineView @JvmOverloads constructor(
     override fun onVisibilityAggregated(isVisible: Boolean) {
         super.onVisibilityAggregated(isVisible)
         if (isVisible) {
-            //printValidWidth()
+            printValidWidth()
             printValidWidth2()
+            printValidWidth3()
         }
     }
 
-    private var validWidth2: Int? = null //异常初始化方法2：使用suspendCancellableCoroutine挂起函数
+    private var validWidth2: Int? = null //异步初始化方法2：使用suspendCancellableCoroutine挂起函数
 
     private suspend fun getValidWidth2(): Int? = withContext(Dispatchers.IO) {
         Log.d(TAG, "withContext getValidWidth2, thread: ${Thread.currentThread().name}")
-        //模拟耗时操作
-        //delay(3000)
+        //delay(3000) //模拟耗时操作
         //return@withContext 1000
 
-        //从内部类的回调中把数值发送出来（注意看它并没有使用return语法）
         suspendCancellableCoroutine { continuation ->
             post {
                 val tmpWidth = (width - 10).run {
                     Log.d(TAG, "init getValidWidth2: $this, thread: ${Thread.currentThread().name}")
                     if (this > 0) this else null
                 }
-                continuation.resume(tmpWidth)
+                continuation.resume(tmpWidth) //在匿名内部类的回调中把数值发送出来
             }
         }
     }
@@ -302,10 +305,39 @@ class CoroutineView @JvmOverloads constructor(
         if (validWidth2 == null) {
             launch {
                 validWidth2 = getValidWidth2()
-                Log.w(TAG, "printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
+                Log.i(TAG, "printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
             }
         } else {
-            Log.i(TAG, "printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
+            Log.i(TAG, "printValidWidth2: $validWidth2")
+        }
+    }
+
+    private var validWidth3: Int? = null //异步初始化方法3：使用callbackFlow回调流
+
+    private fun getValidWidth3(): Flow<Int?> = callbackFlow {
+        //delay(3000) //模拟耗时操作
+        post {
+            val tmpWidth = (width - 10).run {
+                Log.d(TAG, "init getValidWidth3: $this, thread: ${Thread.currentThread().name}")
+                if (this > 0) this else null
+            }
+            //trySend(tmpWidth)
+            trySendBlocking(tmpWidth)
+        }
+        //awaitClose()
+        awaitClose { Log.d(TAG, "init getValidWidth3, awaitClose") }
+    }
+
+    private fun printValidWidth3() {
+        if (validWidth3 == null) {
+            launch {
+                getValidWidth3().collect {
+                    validWidth3 = it
+                    Log.i(TAG, "printValidWidth3: $validWidth3, thread: ${Thread.currentThread().name}")
+                }
+            }
+        } else {
+            Log.i(TAG, "printValidWidth3: $validWidth3")
         }
     }
 
