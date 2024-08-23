@@ -18,6 +18,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapConcat
@@ -183,6 +184,16 @@ class CoroutineView @JvmOverloads constructor(
             }
         }
 
+        //https://juejin.cn/post/7377025870629814298
+        launch {
+            Log.w(TAG, "collectLatest exec begin: ${System.currentTimeMillis()}")
+            flow.collectLatest {
+                Log.v(TAG, "collectLatest value: $it")
+                delay(4000)
+                Log.v(TAG, "collectLatest value---: $it")
+            }
+        }
+
         Log.w(TAG, "async exec begin: ${System.currentTimeMillis()}")
         val sAsync = async { getSecondValue("a") }
         val tAsync = async { getThirdValue(1) }
@@ -339,6 +350,10 @@ class CoroutineView @JvmOverloads constructor(
         } else {
             Log.i(TAG, "printValidWidth3: $validWidth3")
         }
+        //https://juejin.cn/post/6989782281191686180
+        //https://www.jetbrains.com/lp/compose-multiplatform/
+        //https://juejin.cn/post/6924609524548501517
+        //https://github.com/SaberAlpha/kotlinpractice
     }
 
 }

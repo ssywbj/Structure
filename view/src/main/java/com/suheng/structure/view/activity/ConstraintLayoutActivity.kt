@@ -1,25 +1,36 @@
 package com.suheng.structure.view.activity
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.suheng.structure.view.R
+import com.suheng.structure.view.kt.textChangedFlow
 import com.suheng.structure.view.wheel.CoroutineView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class ConstraintLayoutActivity : AppCompatActivity() {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_constraint_layout)
@@ -66,10 +77,35 @@ class ConstraintLayoutActivity : AppCompatActivity() {
             )
 
             addView(
-                CoroutineView(this@ConstraintLayoutActivity),
+                CoroutineView(this@ConstraintLayoutActivity).apply {
+                    setBackgroundColor(Color.GRAY)
+                },
                 LinearLayout.LayoutParams(100, 100).apply {
                     topMargin = 16
                     gravity = Gravity.CENTER_HORIZONTAL
+                }
+            )
+
+            addView(
+                EditText(this@ConstraintLayoutActivity).apply {
+                    setBackgroundColor(Color.BLUE)
+                    //textChangedFlow()
+                    lifecycleScope.launch {
+                        /*textChangedFlow().collect {
+                            Log.d("Wbj", "textChangedFlow: it:$it")
+                        }*/
+                    }
+
+                    textChangedFlow().onEach { Log.d("Wbj", "onEach: it:$it") }
+                        .filter { it.isNotBlank()/*it.trim().isNotEmpty()*/ }
+                        .debounce(600).onEach {
+                            Log.v("Wbj", "debounce onEach: it:$it")
+                        }.launchIn(lifecycleScope)
+                },
+                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 120).apply {
+                    topMargin = 16
+                    marginStart = 30
+                    marginEnd = marginStart
                 }
             )
         }

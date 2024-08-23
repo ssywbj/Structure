@@ -8,11 +8,54 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.suheng.structure.view.R
-import com.suheng.structure.view.kt.*
-import com.suheng.structure.view.kt.generic.*
-import kotlinx.android.synthetic.main.activity_kotlin.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import com.suheng.structure.view.kt.Derived2
+import com.suheng.structure.view.kt.MapObject
+import com.suheng.structure.view.kt.MyClass
+import com.suheng.structure.view.kt.MyOtherClass
+import com.suheng.structure.view.kt.MyOtherClass2
+import com.suheng.structure.view.kt.Person
+import com.suheng.structure.view.kt.Person6
+import com.suheng.structure.view.kt.Square
+import com.suheng.structure.view.kt.Square3
+import com.suheng.structure.view.kt.Student4
+import com.suheng.structure.view.kt.also2
+import com.suheng.structure.view.kt.apply2
+import com.suheng.structure.view.kt.generic.American
+import com.suheng.structure.view.kt.generic.Burger
+import com.suheng.structure.view.kt.generic.BurgerStore
+import com.suheng.structure.view.kt.generic.Consumer
+import com.suheng.structure.view.kt.generic.Everybody
+import com.suheng.structure.view.kt.generic.FastFoodStore
+import com.suheng.structure.view.kt.generic.Food
+import com.suheng.structure.view.kt.generic.FoodStore
+import com.suheng.structure.view.kt.generic.ModernPeople
+import com.suheng.structure.view.kt.generic.People
+import com.suheng.structure.view.kt.generic.People2
+import com.suheng.structure.view.kt.generic.People3
+import com.suheng.structure.view.kt.generic.Production
+import com.suheng.structure.view.kt.lastChar
+import com.suheng.structure.view.kt.lastChar2
+import com.suheng.structure.view.kt.lastTwoChar
+import com.suheng.structure.view.kt.let2
+import com.suheng.structure.view.kt.run2
+import com.suheng.structure.view.kt.with2
+import kotlinx.android.synthetic.main.activity_kotlin.btnAsync
+import kotlinx.android.synthetic.main.activity_kotlin.btnAsyncLazy
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEmpty
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -918,4 +961,16 @@ class KotlinActivity : AppCompatActivity() {
         Log.v("Wbj", "getCompanyLogo thread: ${Thread.currentThread().name}")
         return@withContext 2
     }
+
+    inline fun lineInNoCross(block: () -> Unit) {
+        block()
+    }
+
+    inline fun lineInNoCross(noinline block: () -> Unit, block2: () -> Unit): () -> Unit {
+        block()
+        block2()
+        //return block2 //compile wrong
+        return block
+    }
+
 }
