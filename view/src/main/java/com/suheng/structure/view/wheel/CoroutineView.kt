@@ -23,8 +23,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -194,6 +197,63 @@ class CoroutineView @JvmOverloads constructor(
             }
         }
 
+        launch {
+            flow.collect {
+                Log.i(TAG, "compare collectLatest value: $it")
+                delay(4000)
+                Log.i(TAG, "compare collectLatest value---: $it")
+            }
+        }
+
+        launch {
+            Log.w(TAG, "transform exec begin: ${System.currentTimeMillis()}")
+            flow {
+                emit(getFirstValue())
+                emit(getSecondValue("transform"))
+                emit(getThirdValue())
+            }.transform {
+                Log.v(TAG, "transform origin value: $it")
+                when (it) {
+                    is String -> {
+                        emit(it.substring(2))
+                        flow.collect { value ->
+                            Log.v(TAG, "inner transform: $value")
+                        }
+                    }
+                    is Int -> {
+                        emit(it * it)
+                        emit(it + it)
+                    }
+
+                    else -> emit("$it, $it")
+                }
+            }.collect {
+                Log.d(TAG, "transform new value: $it")
+            }
+        }
+
+        launch {
+            Log.w(TAG, "map operator exec begin: ${System.currentTimeMillis()}")
+            flow {
+                emit(getFirstValue())
+                emit(getSecondValue("map operator"))
+                emit(getThirdValue())
+            }.map {
+                Log.v(TAG, "map operator origin value: $it")
+                when (it) {
+                    is String -> it.substring(2)
+                    is Int -> {
+                        it * it
+                        it + it
+                    }
+
+                    else -> "$it, $it"
+                }
+            }.collect {
+                Log.d(TAG, "map operator new value: $it")
+            }
+        }
+
         Log.w(TAG, "async exec begin: ${System.currentTimeMillis()}")
         val sAsync = async { getSecondValue("a") }
         val tAsync = async { getThirdValue(1) }
@@ -220,6 +280,24 @@ class CoroutineView @JvmOverloads constructor(
                     Log.w(TAG, "lazy async exec take time: $it")
                 }
             }
+        }
+
+        //https://juejin.cn/post/7089808716135923742
+        val fAsync = async { getFirstValue() }
+        launch {
+            Log.w(TAG, "select async exec begin: ${System.currentTimeMillis()}")
+            val result = select {
+                sAsync.onAwait {
+                    Log.v(TAG, "select sAsync result: $it")
+                    "$it,$it"
+                } //{}里最后一行为返回值
+                tAsync.onAwait { it }
+                fAsync.onAwait {
+                    Log.v(TAG, "select fAsync result: $it")
+                    it * it
+                }
+            }
+            Log.v(TAG, "select async result: $result")
         }
     }
 
