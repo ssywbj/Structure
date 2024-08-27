@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,7 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -24,6 +26,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
@@ -193,15 +196,26 @@ class CoroutineView @JvmOverloads constructor(
             flow.collectLatest {
                 Log.v(TAG, "collectLatest value: $it")
                 delay(4000)
-                Log.v(TAG, "collectLatest value---: $it")
+                Log.d(TAG, "collectLatest value---: $it")
             }
-        }
 
-        launch {
             flow.collect {
-                Log.i(TAG, "compare collectLatest value: $it")
+                Log.i(TAG, "compared collectLatest value: $it")
                 delay(4000)
-                Log.i(TAG, "compare collectLatest value---: $it")
+                Log.i(TAG, "compared collectLatest value---: $it")
+            }
+
+            val flow2 = (1..5).asFlow().onEach { delay(300) }
+            flow2.collectLatest { value ->
+                Log.v(TAG, "collectLatest Processing $value")
+                try {
+                    // 模拟异步操作：消费时长大于生产时长，新生产值到达时都会取消当前的操作去处理新值。
+                    // 又因为每一个消费时长都大于生产时长，所以最终能处理完成的是最后一个发送的值。
+                    delay(500)
+                    Log.d(TAG, "collectLatest Processed $value")
+                } catch (e: CancellationException) {
+                    Log.e(TAG, "collectLatest Process cancel $value")
+                }
             }
         }
 
