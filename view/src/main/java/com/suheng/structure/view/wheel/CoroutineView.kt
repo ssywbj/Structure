@@ -211,6 +211,7 @@ class CoroutineView @JvmOverloads constructor(
                 try {
                     // 模拟异步操作：消费时长大于生产时长，新生产值到达时都会取消当前的操作去处理新值。
                     // 又因为每一个消费时长都大于生产时长，所以最终能处理完成的是最后一个发送的值。
+                    // 如果生产时长都大于消费时长，那么还是和collect一样，都能正常处理完成。
                     delay(500)
                     Log.d(TAG, "collectLatest Processed $value")
                 } catch (e: CancellationException) {
