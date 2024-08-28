@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -210,13 +211,28 @@ class CoroutineView @JvmOverloads constructor(
                 Log.v(TAG, "collectLatest Processing $value")
                 try {
                     // 模拟异步操作：消费时长大于生产时长，新生产值到达时都会取消当前的操作去处理新值。
-                    // 又因为每一个消费时长都大于生产时长，所以最终能处理完成的是最后一个发送的值。
+                    // 又因为每一个消费时长都大于生产时长，所以最终能处理完成的只有最后一个发送的值。
                     // 如果生产时长都大于消费时长，那么还是和collect一样，都能正常处理完成。
                     delay(500)
                     Log.d(TAG, "collectLatest Processed $value")
                 } catch (e: CancellationException) {
                     Log.e(TAG, "collectLatest Process cancel $value")
                 }
+            }
+        }
+
+        launch {
+            Log.w(TAG, "flatMapLatest exec begin: ${System.currentTimeMillis()}")
+            val flow2 = (1..5).asFlow().onEach { delay(300) }
+            //flatMapLatest是中间转换符，collectLatest是终端操作符。两者使用场景和作用位置不一样，功能一样。
+            flow2.flatMapLatest { value ->
+                flow {
+                    emit("Processing $value")
+                    delay(500)
+                    emit("Processed $value") //转换成String后再发射
+                }
+            }.collect { result ->
+                Log.i(TAG, "flatMapLatest result: $result")
             }
         }
 
