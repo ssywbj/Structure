@@ -20,10 +20,16 @@ import androidx.lifecycle.lifecycleScope
 import com.suheng.structure.view.R
 import com.suheng.structure.view.kt.textChangedFlow
 import com.suheng.structure.view.wheel.CoroutineView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -96,11 +102,16 @@ class ConstraintLayoutActivity : AppCompatActivity() {
                         }*/
                     }
 
-                    textChangedFlow().onEach { Log.d("Wbj", "onEach: it:$it") }
+                    textChangedFlow().onEach { Log.d("Wbj", "onEach, it: $it") }
                         .filter { it.isNotBlank()/*it.trim().isNotEmpty()*/ }
                         .debounce(600).onEach {
-                            Log.v("Wbj", "debounce onEach: it:$it")
-                        }.launchIn(lifecycleScope)
+                            Log.v("Wbj", "debounce, it: $it, ${Thread.currentThread().name}")
+                        }.flatMapLatest {
+                            requestSearchResult(it)
+                        }.flowOn(Dispatchers.Default)/*以上操作均不在UI线程中*/.onEach {
+                            Log.i("Wbj", "result, it: $it, ${Thread.currentThread().name}")
+                        }.flowOn(Dispatchers.Main)/*切换到UI显示结果*/
+                        .launchIn(lifecycleScope)/*启动操作*/
                 },
                 LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 120).apply {
                     topMargin = 16
@@ -207,6 +218,11 @@ class ConstraintLayoutActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+
+    private suspend fun requestSearchResult(search: String): Flow<List<String>> {
+        delay(1000)
+        return flow { emit(listOf("$search aaa", "bbb", "ccc")) }
     }
 
 }
