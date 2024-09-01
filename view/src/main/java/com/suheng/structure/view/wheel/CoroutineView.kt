@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -27,13 +28,17 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.retry
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.system.measureTimeMillis
 
@@ -269,6 +274,47 @@ class CoroutineView @JvmOverloads constructor(
                     Log.d(TAG, "transform new value: $it")
                 }
             }
+        }
+
+        launch {
+            var retryCount = 0
+            Log.w(TAG, "retry exec begin: ${System.currentTimeMillis()}")
+            (1..3).asFlow().onEach {
+                delay(1000)
+                if (retryCount < 2/*4*/) {
+                    if (it == 2) {
+                        throw IOException("Test Error")
+                    }
+                }
+            }.retry(3) { cause ->
+                Log.w(TAG, "retry: $cause, retryCount: ${++retryCount}")
+                cause is IOException //true时执行重试
+                //return@retry false //false或次数到时重试结束，此时会走进catch代码块
+                //if (retryCount == 2) false else true
+            }.catch { //如果抛出异常，就要捕获异常，不然程序崩溃
+                Log.e(TAG, "retry error: $it")
+            }.onCompletion { Log.i(TAG, "retry onCompletion, retryCount: $retryCount") }.collect {
+                Log.d(TAG, "retry value: $it")
+            }
+
+            retryCount = 0
+            (1..3).asFlow().onEach {
+                delay(1000)
+                check(it == 1) {
+                    "Value Error $it"
+                }
+            }.retryWhen { cause, attempt ->
+                Log.w(TAG, "retryWhen: $cause, retryCount: ${++retryCount}")
+                cause is IllegalStateException //true时执行重试
+                //return@retry false //false或次数到时重试结束，此时会走进catch代码块
+                //if (retryCount == 2) false else true
+                attempt < 2 //attempt：尝试的次数，从零开始
+            }.catch { //如果抛出异常，就要捕获异常，不然程序崩溃
+                Log.e(TAG, "retryWhen error: $it")
+            }.onCompletion { Log.i(TAG, "retryWhen onCompletion, retryCount: $retryCount") }
+                .collect {
+                    Log.d(TAG, "retryWhen value: $it")
+                }
         }
 
         launch {
