@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.transform
@@ -404,6 +405,54 @@ class CoroutineView @JvmOverloads constructor(
         return if (value == 0) 1.1f else value * 1.111f
     }
 
+    private val upFlow = (1..4).asFlow() //上游流
+    private var flowInvokeOrder = false
+
+    override fun onVisibilityAggregated(isVisible: Boolean) {
+        super.onVisibilityAggregated(isVisible)
+        if (isVisible) {
+            launch {
+                //中游流
+                val midFlow = upFlow.onEach {
+                    delay(1000)
+
+                    //上游的流抛出异常后，下游的流一定要捕获，即写上catch语句，不然程序报错
+                    //check(it == 3) //检查值等于3时通过，不等于3时抛出异常
+                    check(it != 3) //检查值不等于3时通过，等于3时抛出异常
+                }.onStart {
+                    Log.i(TAG, "upMidDownFlow, onStart")
+                }
+                //下游流：注意调用的顺序不一样，返回的流对象也不一样
+                val downFlow = if (flowInvokeOrder) {
+                    //cause：完成原因。正常完成为null，异常完成则给出原因。注：若onCompletion前异常被捕获，则也算是正常完成。
+                    midFlow.onCompletion { cause ->
+                        Log.i(TAG, "upMidDownFlow, onCompletion: $cause")
+                    }.catch { //捕获异常
+                        Log.e(TAG, "upMidDownFlow catch: $it")
+                    }
+                } else {
+                    midFlow.catch {
+                        Log.e(TAG, "upMidDownFlow catch: $it")
+                    }.onCompletion { cause -> //因为onCompletion前是catch语句，当异常被捕获后，这里的cause就为null。
+                        Log.i(TAG, "upMidDownFlow, onCompletion: $cause")
+                    }
+                }
+                flowInvokeOrder = !flowInvokeOrder
+                Log.w(
+                    TAG,
+                    "upMidDownFlow, upFlow: $upFlow\nmidFlow: $midFlow\ndownFlow: $downFlow\n"
+                )
+                downFlow.collect { //消费
+                    Log.d(TAG, "upMidDownFlow collect: $it")
+                }
+            }
+
+            printValidWidth()
+            printValidWidth2()
+            printValidWidth3()
+        }
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         cancel()
@@ -441,20 +490,11 @@ class CoroutineView @JvmOverloads constructor(
         }
     }
 
-    override fun onVisibilityAggregated(isVisible: Boolean) {
-        super.onVisibilityAggregated(isVisible)
-        if (isVisible) {
-            printValidWidth()
-            printValidWidth2()
-            printValidWidth3()
-        }
-    }
-
     private var validWidth2: Int? = null //异步初始化方法2：使用suspendCancellableCoroutine挂起函数
 
     private suspend fun getValidWidth2(): Int? = withContext(Dispatchers.IO) {
         Log.d(TAG, "withContext getValidWidth2, thread: ${Thread.currentThread().name}")
-        //delay(3000) //模拟耗时操作
+        delay(2000) //模拟耗时操作
         //return@withContext 1000
 
         suspendCancellableCoroutine { continuation ->
@@ -468,22 +508,30 @@ class CoroutineView @JvmOverloads constructor(
         }
     }
 
+    private val jobValidWidth2 = launch(start = CoroutineStart.LAZY) {
+        validWidth2 = getValidWidth2()
+        Log.v(TAG, "joining, getValidWidth2: $validWidth2")
+    }
+
     private fun printValidWidth2() {
         /*launch(Dispatchers.Main) {
             if (validWidth2 == null) {
-                validWidth2 = getValidWidth2()
+                validWidth2 = getValidWidth2() //挂起函数会阻塞后面语句的执行，当函数执行完后会继续往下执行
             }
-            Log.w(TAG, "printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
+            Log.w(TAG, "suspend after, printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
         }*/
 
-        if (validWidth2 == null) {
-            launch {
-                validWidth2 = getValidWidth2()
-                Log.i(TAG, "printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
+        launch(Dispatchers.Main) {
+            if (validWidth2 == null) {
+                jobValidWidth2.join() //join函数会阻塞后面语句的执行，当job执行完后会继续往下执行
             }
-        } else {
-            Log.i(TAG, "printValidWidth2: $validWidth2")
+            Log.w(TAG, "join after, printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
         }
+
+        /*if (validWidth2 == null) {
+            jobValidWidth2.start() //job的start函数不会阻塞后面语句的执行，因为调用start后程序直接往下执行
+        }
+        Log.i(TAG, "start() printValidWidth2: $validWidth2")*/
     }
 
     private var validWidth3: Int? = null //异步初始化方法3：使用callbackFlow回调流
