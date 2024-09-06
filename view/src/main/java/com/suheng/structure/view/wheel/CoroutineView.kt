@@ -464,15 +464,23 @@ class CoroutineView @JvmOverloads constructor(
 
     private var validWidth1: Int? = null //异步初始化方法1：使用suspendCancellableCoroutine挂起函数
 
-    private suspend fun getValidWidth1(): Int? = withContext(Dispatchers.IO) {
-        Log.d(TAG, "withContext getValidWidth1, thread: ${Thread.currentThread().name}")
-        delay(2000) //模拟耗时操作
-        //return@withContext 1000
+    private val jobValidWidth1 = launch(Dispatchers.IO, start = CoroutineStart.LAZY) {
+        Log.v(TAG, "joining, validWidth1")
+        validWidth1 = getValidWidth1()
+    }
 
+    private val deferredValidWidth1 = async(Dispatchers.IO, start = CoroutineStart.LAZY) {
+        Log.v(TAG, "deferring, validWidth1")
+        getValidWidth1() //最后一句为返回值
+    }
+
+    private suspend fun getValidWidth1(): Int? = withContext(Dispatchers.IO) {
+        Log.d(TAG, "init getValidWidth1, ${Thread.currentThread().name}")
+        delay(2000) //模拟耗时操作
         suspendCancellableCoroutine { continuation ->
             post {
                 val tmpWidth = (width - 10).run {
-                    Log.v(TAG, "init getValidWidth1: $this, thread: ${Thread.currentThread().name}")
+                    Log.v(TAG, "post getValidWidth1: $this, ${Thread.currentThread().name}")
                     if (this > 0) this else null
                 }
                 continuation.resume(tmpWidth) //在匿名内部类的回调中把数值发送出来
@@ -480,71 +488,60 @@ class CoroutineView @JvmOverloads constructor(
         }
     }
 
+    /*private suspend fun getValidWidth1(): Int? = suspendCancellableCoroutine { continuation ->
+        Log.d(TAG, "CancellableContinuation validWidth1, ${Thread.currentThread().name}")
+        post {
+            val tmpWidth = (width - 10).run {
+                Log.i(TAG, "init validWidth1: $this, ${Thread.currentThread().name}")
+                if (this > 0) this else null
+            }
+            continuation.resume(tmpWidth) //在匿名内部类的回调中把数值发送出来
+        }
+    }*/
+
     private fun printValidWidth1() {
-        /*launch(Dispatchers.Main) {
+        /*launch {
             if (validWidth1 == null) {
                 validWidth1 = getValidWidth1() //挂起函数会阻塞后面语句的执行，当函数执行完后会继续往下执行
             }
-            Log.i(TAG, "suspend after, printValidWidth1: $validWidth1, thread: ${Thread.currentThread().name}")
+            Log.w(TAG, "suspend after, validWidth1: $validWidth1, ${Thread.currentThread().name}")
         }*/
 
-        /*launch(Dispatchers.Main) {
+        launch(Dispatchers.Default) {
             if (validWidth1 == null) {
                 jobValidWidth1.join() //join函数会阻塞后面语句的执行，当Job执行完后会继续往下执行
             }
-            Log.i(TAG, "suspend after, printValidWidth1: $validWidth1, thread: ${Thread.currentThread().name}")
-        }*/
+            Log.w(TAG, "join after, validWidth1: $validWidth1, ${Thread.currentThread().name}")
+        }
 
-        launch(Dispatchers.Main) {
+        if (validWidth1 == null) {
+            jobValidWidth1.start() //start函数不会阻塞后面语句的执行，直接往下执行
+        }
+        Log.e(TAG, "start after, validWidth1: $validWidth1, ${Thread.currentThread().name}")
+
+        /*launch(Dispatchers.IO) {
             if (validWidth1 == null) {
                 validWidth1 = deferredValidWidth1.await() //await函数会阻塞后面语句的执行，当Deferred执行完后会继续往下执行
             }
-            Log.i(TAG, "suspend after, printValidWidth1: $validWidth1, thread: ${Thread.currentThread().name}")
-        }
-    }
-
-    private val jobValidWidth1 = launch(Dispatchers.IO, start = CoroutineStart.LAZY) {
-        //validWidth2 = getValidWidth1()
-        Log.d(TAG, "withContext getValidWidth1, thread: ${Thread.currentThread().name}")
-        delay(2000) //模拟耗时操作
-        post {
-            validWidth1 = (width - 10).run {
-                Log.v(TAG, "init getValidWidth1: $this, thread: ${Thread.currentThread().name}")
-                if (this > 0) this else null
-            }
-        }
-        Log.v(TAG, "joining, getValidWidth1: $validWidth1")
-    }
-
-    private val deferredValidWidth1 = async(Dispatchers.IO, start = CoroutineStart.LAZY) {
-        Log.v(TAG, "deferring, getValidWidth1: $validWidth1")
-        getValidWidth1()
-        //validWidth2 = getValidWidth1()
-        /*Log.d(TAG, "withContext getValidWidth1, thread: ${Thread.currentThread().name}")
-        delay(2000) //模拟耗时操作
-        post {
-            validWidth1 = (width - 10).run {
-                Log.v(TAG, "init getValidWidth1: $this, thread: ${Thread.currentThread().name}")
-                if (this > 0) this else null
-            }
+            Log.w(TAG, "await after, validWidth1: $validWidth1, ${Thread.currentThread().name}")
         }*/
     }
 
     private var validWidth2: Int? = null //异步初始化方法2：使用callbackFlow回调流
 
     private fun getValidWidth2(): Flow<Int?> = callbackFlow {
-        Log.d(TAG, "callbackFlow getValidWidth2, thread: ${Thread.currentThread().name}")
+        Log.d(TAG, "callbackFlow getValidWidth2, ${Thread.currentThread().name}")
         delay(2000) //模拟耗时操作
         post {
             val tmpWidth = (width - 10).run {
-                Log.v(TAG, "init getValidWidth2: $this, thread: ${Thread.currentThread().name}")
+                Log.v(TAG, "init getValidWidth2: $this, ${Thread.currentThread().name}")
                 if (this > 0) this else null
             }
             //trySend(tmpWidth)
             trySendBlocking(tmpWidth)
         }
         //awaitClose()
-        awaitClose { Log.d(TAG, "getValidWidth2, awaitClose") }
+        awaitClose { Log.d(TAG, "validWidth2, awaitClose") }
     }
 
     private fun printValidWidth2() {
