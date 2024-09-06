@@ -99,7 +99,8 @@ class ConstraintLayoutActivity : AppCompatActivity() {
                     lifecycleScope.launch {
                         /*textChangedFlow().collect {
                             Log.d("Wbj", "textChangedFlow: it:$it")
-                        }*/
+                        }
+                        Log.w("Wbj", "after collect----------") //始终未打印出来，可以理解这语句不在回调流作用域内*/
                     }
 
                     textChangedFlow().onEach { Log.d("Wbj", "onEach, it: $it") }
@@ -112,6 +113,7 @@ class ConstraintLayoutActivity : AppCompatActivity() {
                             Log.i("Wbj", "result, it: $it, ${Thread.currentThread().name}")
                         }.flowOn(Dispatchers.Main)/*切换到UI显示结果*/
                         .launchIn(lifecycleScope)/*启动操作*/
+                    Log.w("Wbj", "after launchIn----------") //正常打印出来
                 },
                 LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 120).apply {
                     topMargin = 16

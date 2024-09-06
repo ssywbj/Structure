@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -480,7 +482,7 @@ class CoroutineView @JvmOverloads constructor(
         suspendCancellableCoroutine { continuation ->
             post {
                 val tmpWidth = (width - 10).run {
-                    Log.v(TAG, "post getValidWidth1: $this, ${Thread.currentThread().name}")
+                    Log.i(TAG, "post getValidWidth1: $this, ${Thread.currentThread().name}")
                     if (this > 0) this else null
                 }
                 continuation.resume(tmpWidth) //在匿名内部类的回调中把数值发送出来
@@ -489,10 +491,10 @@ class CoroutineView @JvmOverloads constructor(
     }
 
     /*private suspend fun getValidWidth1(): Int? = suspendCancellableCoroutine { continuation ->
-        Log.d(TAG, "CancellableContinuation validWidth1, ${Thread.currentThread().name}")
+        Log.d(TAG, "init validWidth1, ${Thread.currentThread().name}")
         post {
             val tmpWidth = (width - 10).run {
-                Log.i(TAG, "init validWidth1: $this, ${Thread.currentThread().name}")
+                Log.i(TAG, "post validWidth1: $this, ${Thread.currentThread().name}")
                 if (this > 0) this else null
             }
             continuation.resume(tmpWidth) //在匿名内部类的回调中把数值发送出来
@@ -530,11 +532,11 @@ class CoroutineView @JvmOverloads constructor(
     private var validWidth2: Int? = null //异步初始化方法2：使用callbackFlow回调流
 
     private fun getValidWidth2(): Flow<Int?> = callbackFlow {
-        Log.d(TAG, "callbackFlow getValidWidth2, ${Thread.currentThread().name}")
+        Log.d(TAG, "init validWidth2, ${Thread.currentThread().name}")
         delay(2000) //模拟耗时操作
         post {
             val tmpWidth = (width - 10).run {
-                Log.v(TAG, "init getValidWidth2: $this, ${Thread.currentThread().name}")
+                Log.v(TAG, "post validWidth2: $this, ${Thread.currentThread().name}")
                 if (this > 0) this else null
             }
             //trySend(tmpWidth)
@@ -544,37 +546,37 @@ class CoroutineView @JvmOverloads constructor(
         awaitClose { Log.d(TAG, "validWidth2, awaitClose") }
     }
 
-    private fun printValidWidth2() {
-        /*val deferred = CompletableDeferred<Int?>()
-         launch(Dispatchers.Main) {
-            if (validWidth2 == null) {
-                getValidWidth2().flowOn(Dispatchers.IO).collect {
-                    validWidth2 = it
-                    Log.d(TAG, "joining, printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
-                    deferred.complete(validWidth2)
-                }
-                val await = deferred.await()
-                Log.i(TAG, "join after, printValidWidth2: $await, thread: ${Thread.currentThread().name}")
+    private suspend fun getValidWidth3(): Int? {
+        Log.d(TAG, "init validWidth2, ${Thread.currentThread().name}")
+        delay(2000)
+        val deferred = CompletableDeferred<Int?>()
+        post {
+            val tmpWidth = (width - 10).run {
+                Log.v(TAG, "post validWidth2: $this, ${Thread.currentThread().name}")
+                if (this > 0) this else null
             }
-           Log.i(TAG, "join after, printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
-        }*/
-
-        defaultScope.launch(Dispatchers.Main) {
-            if (validWidth2 == null) {
-                Log.d(TAG, "callbackFlow getValidWidth2, thread: ${Thread.currentThread().name}")
-                delay(2000) //模拟耗时操作
-                post {
-                    validWidth2 = (width - 10).run {
-                        Log.v(TAG, "init getValidWidth2: $this, thread: ${Thread.currentThread().name}")
-                        if (this > 0) this else null
-                    }
-                    supervisorJob.complete()
-                }
-                supervisorJob.join() //join函数会阻塞后面语句的执行，当job执行完后会继续往下执行
-            }
-            Log.i(TAG, "join after, printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
+            deferred.complete(tmpWidth)
         }
+        return deferred.await()
+    }
 
+
+    private fun printValidWidth2() {
+        launch {
+            if (validWidth2 == null) {
+                val deferred = CompletableDeferred<Int?>()
+                getValidWidth2().onEach {
+                    deferred.complete(it)
+                }.launchIn(this)
+                validWidth2 = deferred.await()
+            }
+            Log.w(TAG, "flow after, validWidth2: $validWidth2, ${Thread.currentThread().name}")
+
+            /*if (validWidth2 == null) {
+                validWidth2 = getValidWidth3()
+            }
+            Log.w(TAG, "deferred after, validWidth2: $validWidth2, ${Thread.currentThread().name}")*/
+        }
     }
 
     //https://juejin.cn/post/6989782281191686180
