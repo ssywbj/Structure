@@ -17,19 +17,18 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onEmpty
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.retryWhen
@@ -52,8 +51,10 @@ class CoroutineView @JvmOverloads constructor(
         private const val TAG = "CoroutineView"
     }
 
+    private val supervisorJob = SupervisorJob()
+
     /*使用协程方式2*/
-    private val defaultScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val defaultScope = CoroutineScope(Dispatchers.Default + supervisorJob)
 
     init {
         //作用
@@ -406,6 +407,7 @@ class CoroutineView @JvmOverloads constructor(
     }
 
     private val upFlow = (1..4).asFlow() //上游流
+    private val emptyFlow = flow<Int> { } //空流：没有发射任何数据的流
     private var flowInvokeOrder = false
 
     override fun onVisibilityAggregated(isVisible: Boolean) {
@@ -421,6 +423,8 @@ class CoroutineView @JvmOverloads constructor(
                     check(it != 3) //检查值不等于3时通过，等于3时抛出异常
                 }.onStart {
                     Log.i(TAG, "upMidDownFlow, onStart")
+                }.onEmpty { //空流的调用会走到onEmpty方法
+                    Log.v(TAG, "upMidDownFlow, onEmpty")
                 }
                 //下游流：注意调用的顺序不一样，返回的流对象也不一样
                 val downFlow = if (flowInvokeOrder) {
@@ -447,9 +451,8 @@ class CoroutineView @JvmOverloads constructor(
                 }
             }
 
-            printValidWidth()
+            printValidWidth1()
             printValidWidth2()
-            printValidWidth3()
         }
     }
 
@@ -459,48 +462,17 @@ class CoroutineView @JvmOverloads constructor(
         defaultScope.cancel()
     }
 
-    private var validWidth: Int = 0 //异步初始化方法1：使用MutableStateFlow状态流
-    private val valueFlow = MutableStateFlow<Int?>(null)
-    private val job = launch {
-        valueFlow.filterNotNull().collect { value ->
-            validWidth = value
-            Log.i(TAG, "mutableValidWidth: $validWidth, job thread: ${Thread.currentThread().name}")
-            printValidWidth()
-        }
-    }
+    private var validWidth1: Int? = null //异步初始化方法1：使用suspendCancellableCoroutine挂起函数
 
-    private fun getValidWidth() {
-        post {
-            valueFlow.value = (width - 10).run {
-                Log.d(TAG, "getValidWidth: $this")
-                if (this > 0) this else null
-            }
-        }
-    }
-
-    private fun printValidWidth() {
-        if (validWidth == 0) {
-            launch(Dispatchers.IO) {
-                getValidWidth()
-                job.join()
-                Log.w(TAG, "printValidWidth: $validWidth, behind job.join() process")
-            }
-        } else {
-            Log.i(TAG, "printValidWidth: $validWidth, thread: ${Thread.currentThread().name}")
-        }
-    }
-
-    private var validWidth2: Int? = null //异步初始化方法2：使用suspendCancellableCoroutine挂起函数
-
-    private suspend fun getValidWidth2(): Int? = withContext(Dispatchers.IO) {
-        Log.d(TAG, "withContext getValidWidth2, thread: ${Thread.currentThread().name}")
+    private suspend fun getValidWidth1(): Int? = withContext(Dispatchers.IO) {
+        Log.d(TAG, "withContext getValidWidth1, thread: ${Thread.currentThread().name}")
         delay(2000) //模拟耗时操作
         //return@withContext 1000
 
         suspendCancellableCoroutine { continuation ->
             post {
                 val tmpWidth = (width - 10).run {
-                    Log.d(TAG, "init getValidWidth2: $this, thread: ${Thread.currentThread().name}")
+                    Log.v(TAG, "init getValidWidth1: $this, thread: ${Thread.currentThread().name}")
                     if (this > 0) this else null
                 }
                 continuation.resume(tmpWidth) //在匿名内部类的回调中把数值发送出来
@@ -508,63 +480,108 @@ class CoroutineView @JvmOverloads constructor(
         }
     }
 
-    private val jobValidWidth2 = launch(start = CoroutineStart.LAZY) {
-        validWidth2 = getValidWidth2()
-        Log.v(TAG, "joining, getValidWidth2: $validWidth2")
-    }
-
-    private fun printValidWidth2() {
+    private fun printValidWidth1() {
         /*launch(Dispatchers.Main) {
-            if (validWidth2 == null) {
-                validWidth2 = getValidWidth2() //挂起函数会阻塞后面语句的执行，当函数执行完后会继续往下执行
+            if (validWidth1 == null) {
+                validWidth1 = getValidWidth1() //挂起函数会阻塞后面语句的执行，当函数执行完后会继续往下执行
             }
-            Log.w(TAG, "suspend after, printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
+            Log.i(TAG, "suspend after, printValidWidth1: $validWidth1, thread: ${Thread.currentThread().name}")
+        }*/
+
+        /*launch(Dispatchers.Main) {
+            if (validWidth1 == null) {
+                jobValidWidth1.join() //join函数会阻塞后面语句的执行，当Job执行完后会继续往下执行
+            }
+            Log.i(TAG, "suspend after, printValidWidth1: $validWidth1, thread: ${Thread.currentThread().name}")
         }*/
 
         launch(Dispatchers.Main) {
-            if (validWidth2 == null) {
-                jobValidWidth2.join() //join函数会阻塞后面语句的执行，当job执行完后会继续往下执行
+            if (validWidth1 == null) {
+                validWidth1 = deferredValidWidth1.await() //await函数会阻塞后面语句的执行，当Deferred执行完后会继续往下执行
             }
-            Log.w(TAG, "join after, printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
+            Log.i(TAG, "suspend after, printValidWidth1: $validWidth1, thread: ${Thread.currentThread().name}")
         }
-
-        /*if (validWidth2 == null) {
-            jobValidWidth2.start() //job的start函数不会阻塞后面语句的执行，因为调用start后程序直接往下执行
-        }
-        Log.i(TAG, "start() printValidWidth2: $validWidth2")*/
     }
 
-    private var validWidth3: Int? = null //异步初始化方法3：使用callbackFlow回调流
+    private val jobValidWidth1 = launch(Dispatchers.IO, start = CoroutineStart.LAZY) {
+        //validWidth2 = getValidWidth1()
+        Log.d(TAG, "withContext getValidWidth1, thread: ${Thread.currentThread().name}")
+        delay(2000) //模拟耗时操作
+        post {
+            validWidth1 = (width - 10).run {
+                Log.v(TAG, "init getValidWidth1: $this, thread: ${Thread.currentThread().name}")
+                if (this > 0) this else null
+            }
+        }
+        Log.v(TAG, "joining, getValidWidth1: $validWidth1")
+    }
 
-    private fun getValidWidth3(): Flow<Int?> = callbackFlow {
-        //delay(3000) //模拟耗时操作
+    private val deferredValidWidth1 = async(Dispatchers.IO, start = CoroutineStart.LAZY) {
+        Log.v(TAG, "deferring, getValidWidth1: $validWidth1")
+        getValidWidth1()
+        //validWidth2 = getValidWidth1()
+        /*Log.d(TAG, "withContext getValidWidth1, thread: ${Thread.currentThread().name}")
+        delay(2000) //模拟耗时操作
+        post {
+            validWidth1 = (width - 10).run {
+                Log.v(TAG, "init getValidWidth1: $this, thread: ${Thread.currentThread().name}")
+                if (this > 0) this else null
+            }
+        }*/
+    }
+
+    private var validWidth2: Int? = null //异步初始化方法2：使用callbackFlow回调流
+
+    private fun getValidWidth2(): Flow<Int?> = callbackFlow {
+        Log.d(TAG, "callbackFlow getValidWidth2, thread: ${Thread.currentThread().name}")
+        delay(2000) //模拟耗时操作
         post {
             val tmpWidth = (width - 10).run {
-                Log.d(TAG, "init getValidWidth3: $this, thread: ${Thread.currentThread().name}")
+                Log.v(TAG, "init getValidWidth2: $this, thread: ${Thread.currentThread().name}")
                 if (this > 0) this else null
             }
             //trySend(tmpWidth)
             trySendBlocking(tmpWidth)
         }
         //awaitClose()
-        awaitClose { Log.d(TAG, "init getValidWidth3, awaitClose") }
+        awaitClose { Log.d(TAG, "getValidWidth2, awaitClose") }
     }
 
-    private fun printValidWidth3() {
-        if (validWidth3 == null) {
-            launch {
-                getValidWidth3().collect {
-                    validWidth3 = it
-                    Log.i(TAG, "printValidWidth3: $validWidth3, thread: ${Thread.currentThread().name}")
+    private fun printValidWidth2() {
+        /*val deferred = CompletableDeferred<Int?>()
+         launch(Dispatchers.Main) {
+            if (validWidth2 == null) {
+                getValidWidth2().flowOn(Dispatchers.IO).collect {
+                    validWidth2 = it
+                    Log.d(TAG, "joining, printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
+                    deferred.complete(validWidth2)
                 }
+                val await = deferred.await()
+                Log.i(TAG, "join after, printValidWidth2: $await, thread: ${Thread.currentThread().name}")
             }
-        } else {
-            Log.i(TAG, "printValidWidth3: $validWidth3")
+           Log.i(TAG, "join after, printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
+        }*/
+
+        defaultScope.launch(Dispatchers.Main) {
+            if (validWidth2 == null) {
+                Log.d(TAG, "callbackFlow getValidWidth2, thread: ${Thread.currentThread().name}")
+                delay(2000) //模拟耗时操作
+                post {
+                    validWidth2 = (width - 10).run {
+                        Log.v(TAG, "init getValidWidth2: $this, thread: ${Thread.currentThread().name}")
+                        if (this > 0) this else null
+                    }
+                    supervisorJob.complete()
+                }
+                supervisorJob.join() //join函数会阻塞后面语句的执行，当job执行完后会继续往下执行
+            }
+            Log.i(TAG, "join after, printValidWidth2: $validWidth2, thread: ${Thread.currentThread().name}")
         }
-        //https://juejin.cn/post/6989782281191686180
-        //https://www.jetbrains.com/lp/compose-multiplatform/
-        //https://juejin.cn/post/6924609524548501517
-        //https://github.com/SaberAlpha/kotlinpractice
+
     }
 
+    //https://juejin.cn/post/6989782281191686180
+    //https://www.jetbrains.com/lp/compose-multiplatform/
+    //https://juejin.cn/post/6924609524548501517
+    //https://github.com/SaberAlpha/kotlinpractice
 }
