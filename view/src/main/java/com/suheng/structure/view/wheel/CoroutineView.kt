@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -172,20 +173,69 @@ class CoroutineView @JvmOverloads constructor(
             }
         }
 
-        Log.w(TAG, "flatMapConcat flow begin: ${System.currentTimeMillis()}")
-        val flatMapConcat = flow {
-            emit(getThirdValue(5))
-            emit(getFirstValue())
-        }.flatMapConcat {
-            flow { emit(getSecondValue("concat preview flow value: $it")) }
-        }
         launch {
+            val flatMapConcat = flow {
+                emit(getThirdValue(5))
+                emit(getFirstValue())
+            }.flatMapConcat {
+                flow { emit(getSecondValue("flatMapConcat concat: $it")) }
+            }
+            Log.w(TAG, "flatMapConcat flow begin: ${System.currentTimeMillis()}")
             measureTimeMillis {
                 flatMapConcat.collect { value ->
-                    Log.v(TAG, "flatMapConcat: $value")
+                    Log.v(TAG, "flatMapConcat collect: $value")
                 }
             }.also {
                 Log.w(TAG, "flatMapConcat flow take time: $it")
+            }
+
+            val flatMapMerge = flow {
+                emit(getThirdValue(5))
+                emit(getFirstValue())
+            }.flatMapMerge {
+                flow { emit(getSecondValue("flatMapMerge merge: $it")) }
+            }
+            Log.w(TAG, "flatMapMerge flow begin: ${System.currentTimeMillis()}")
+            measureTimeMillis {
+                flatMapMerge.collect { value ->
+                    Log.v(TAG, "flatMapMerge collect: $value")
+                }
+            }.also {
+                Log.w(TAG, "flatMapMerge flow take time: $it")
+            }
+
+            val flatMapConcat2 = (1..5).asFlow().onEach { delay(100) }
+                .flatMapConcat {
+                    flow {
+                        emit("$it: First")
+                        delay(500)
+                        emit("$it: Second")
+                    }
+                }
+            Log.w(TAG, "flatMapConcat2 flow begin: ${System.currentTimeMillis()}")
+            measureTimeMillis {
+                flatMapConcat2.collect {
+                    Log.v(TAG, "flatMapConcat2 collect: $it")
+                }
+            }.also {
+                Log.w(TAG, "flatMapConcat2 flow take time: $it")
+            }
+
+            val flatMapMerge2 = (1..5).asFlow().onEach { delay(100) }
+                .flatMapMerge {
+                    flow {
+                        emit("$it: First")
+                        delay(500)
+                        emit("$it: Second")
+                    }
+                }
+            Log.w(TAG, "flatMapMerge2 flow begin: ${System.currentTimeMillis()}")
+            measureTimeMillis {
+                flatMapMerge2.collect {
+                    Log.v(TAG, "flatMapMerge2 collect: $it")
+                }
+            }.also {
+                Log.w(TAG, "flatMapMerge2 flow take time: $it")
             }
         }
 
@@ -534,7 +584,7 @@ class CoroutineView @JvmOverloads constructor(
     private fun getValidWidth2(): Flow<Int?> = callbackFlow {
         Log.d(TAG, "init validWidth2, ${Thread.currentThread().name}")
         delay(2000) //模拟耗时操作
-        post {
+        val action = Runnable {
             val tmpWidth = (width - 10).run {
                 Log.v(TAG, "post validWidth2: $this, ${Thread.currentThread().name}")
                 if (this > 0) this else null
@@ -542,8 +592,12 @@ class CoroutineView @JvmOverloads constructor(
             //trySend(tmpWidth)
             trySendBlocking(tmpWidth)
         }
+        post(action)
         //awaitClose()
-        awaitClose { Log.d(TAG, "validWidth2, awaitClose") }
+        awaitClose {
+            removeCallbacks(action)
+            Log.d(TAG, "validWidth2, awaitClose")
+        }
     }
 
     private suspend fun getValidWidth3(): Int? {
@@ -559,7 +613,6 @@ class CoroutineView @JvmOverloads constructor(
         }
         return deferred.await()
     }
-
 
     private fun printValidWidth2() {
         launch {
