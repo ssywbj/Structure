@@ -24,21 +24,6 @@
                 android:value="" />
         </activity>
 
-        <service
-            android:name=".service.ComposeWallpaper"
-            android:exported="true"
-            android:label="Compose Wallpaper"
-            android:permission="android.permission.BIND_WALLPAPER">
-
-            <intent-filter>
-                <action android:name="android.service.wallpaper.WallpaperService" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.service.wallpaper"
-                android:resource="@xml/compose_wallpaper_config" />
-        </service>
-
         <receiver
             android:name=".receiver.ComposeWidgetReceiver"
             android:exported="true">

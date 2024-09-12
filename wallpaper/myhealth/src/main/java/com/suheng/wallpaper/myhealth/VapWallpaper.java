@@ -12,6 +12,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.tencent.qgame.animplayer.AnimView;
+import com.tencent.qgame.animplayer.util.ScaleType;
 
 public class VapWallpaper extends WallpaperService {
 
@@ -72,7 +73,7 @@ public class VapWallpaper extends WallpaperService {
                 mPresentation = new Presentation(mContext, mVirtualDisplay.getDisplay());
                 mPresentation.setContentView(R.layout.vap_wallpaper);
                 mAnimView = mPresentation.findViewById(R.id.animView);
-                //mAnimView.setScaleType(ScaleType.FIT_CENTER);
+                mAnimView.setScaleType(ScaleType.FIT_CENTER);
                 mAnimView.setLoop(Integer.MAX_VALUE);
             } else {
                 Window window = mPresentation.getWindow();

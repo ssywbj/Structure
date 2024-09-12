@@ -15,7 +15,7 @@ import javax.microedition.khronos.egl.EGLContext
 import javax.microedition.khronos.egl.EGLDisplay
 import javax.microedition.khronos.opengles.GL10
 
-
+//https://github.com/arthabus/AndroidViewToGLRendering
 class OpenGLWallpaper : WallpaperService() {
     override fun onCreateEngine(): Engine = OpenGLEngine()
 
