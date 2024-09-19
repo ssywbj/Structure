@@ -10,6 +10,7 @@ import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.service.wallpaper.WallpaperService
 import android.util.Log
+import android.view.Surface
 import android.view.SurfaceHolder
 import com.suheng.wallpaper.myhealth.file.PrefsUtils
 import com.tencent.qgame.animplayer.AnimConfig
@@ -34,6 +35,7 @@ class VapWallpaper : WallpaperService() {
         if (PrefsUtils.RENDER_WAY_KEY == key) {
             val renderWay = PrefsUtils.loadRenderWay(this)
             Log.d(TAG, "prefs changed renderWay: $renderWay")
+            renderEngine.changeRenderWay(renderWay)
         }
     }
 
@@ -59,7 +61,7 @@ class VapWallpaper : WallpaperService() {
         }
     }
 
-    private inner class RenderEngine(private val renderWay: Int = PrefsUtils.RENDER_WAY_VALUE_DEF) :
+    private inner class RenderEngine(var renderWay: Int = PrefsUtils.RENDER_WAY_VALUE_DEF) :
         Engine() {
 
         private var virtualDisplay: VirtualDisplay? = null
@@ -68,9 +70,13 @@ class VapWallpaper : WallpaperService() {
         private var isVisible = false
         private val defaultScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
-        private var vapSurface: VapSurface = VapSurface().apply {
-            setLoop(Int.MAX_VALUE)
-        }
+        private var surface: Surface? = null
+        private var format: Int = 0
+        private var width: Int = 0
+        private var height: Int = 0
+        private var densityDpi: Int = 0
+
+        private var vapSurface: VapSurface? = null
 
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             super.onCreate(surfaceHolder)
@@ -92,8 +98,8 @@ class VapWallpaper : WallpaperService() {
             super.onSurfaceDestroyed(holder)
             Log.v(TAG, "onSurfaceDestroyed: $this")
             if (renderWay == PrefsUtils.RENDER_WAY_VALUE_1) {
-                vapSurface.onSurfaceDestroyed()
-            }else{
+                vapSurface?.onSurfaceDestroyed()
+            } else {
                 animView?.takeIf { it.isRunning() }?.stopPlay()
                 presentation?.dismiss()
                 virtualDisplay?.release()
@@ -102,13 +108,24 @@ class VapWallpaper : WallpaperService() {
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             super.onSurfaceChanged(holder, format, width, height)
-            val densityDpi = resources.displayMetrics.densityDpi
-            Log.i(TAG, "onSurfaceChanged: width = $width, height = $height, densityDpi = $densityDpi, $virtualDisplay")
+            surface = holder.surface
+            this.width = width
+            this.height = height
+            this.format = format
+            densityDpi = resources.displayMetrics.densityDpi
+
+            Log.i(
+                TAG,
+                "onSurfaceChanged: width = $width, height = $height, densityDpi = $densityDpi, $virtualDisplay"
+            )
             if (renderWay == PrefsUtils.RENDER_WAY_VALUE_1) {
-                if (vapSurface.getSurface() == null) {
-                    vapSurface.onSurfaceAvailable(holder.surface, width, height)
+                vapSurface = VapSurface().apply {
+                    setLoop(Int.MAX_VALUE)
+                }
+                if (vapSurface!!.getSurface() == null) {
+                    vapSurface!!.onSurfaceAvailable(surface!!, width, height)
                 } else {
-                    vapSurface.onSurfaceSizeChanged(width, height)
+                    vapSurface!!.onSurfaceSizeChanged(width, height)
                 }
             } else {
                 measureTimeMillis {
@@ -126,7 +143,7 @@ class VapWallpaper : WallpaperService() {
                     val displayManager = context.getSystemService(DISPLAY_SERVICE) as DisplayManager
                     virtualDisplay = displayManager.createVirtualDisplay(
                         TAG, width, height, densityDpi,
-                        holder.surface, 0
+                        surface, 0
                     ).also {
                         presentation = Presentation(context, it.display).apply {
                             window?.setBackgroundDrawable(ColorDrawable(Color.BLUE))
@@ -139,7 +156,10 @@ class VapWallpaper : WallpaperService() {
                                 }.launchIn(defaultScope)*/
                                 setAnimListener(object : IAnimListener {
                                     override fun onVideoStart() {
-                                        Log.d(TAG, "onVideoStart, isPreview: $isPreview, isVisible: $isVisible")
+                                        Log.d(
+                                            TAG,
+                                            "onVideoStart, isPreview: $isPreview, isVisible: $isVisible"
+                                        )
                                     }
 
                                     override fun onVideoRender(
@@ -153,11 +173,17 @@ class VapWallpaper : WallpaperService() {
                                     }
 
                                     override fun onVideoDestroy() {
-                                        Log.i(TAG, "onVideoDestroy, isPreview: $isPreview, isVisible: $isVisible")
+                                        Log.i(
+                                            TAG,
+                                            "onVideoDestroy, isPreview: $isPreview, isVisible: $isVisible"
+                                        )
                                     }
 
                                     override fun onFailed(errorType: Int, errorMsg: String?) {
-                                        Log.w(TAG, "onFailed, errorType: $errorType, errorMsg: $errorMsg")
+                                        Log.w(
+                                            TAG,
+                                            "onFailed, errorType: $errorType, errorMsg: $errorMsg"
+                                        )
                                     }
                                 })
                             }
@@ -169,14 +195,17 @@ class VapWallpaper : WallpaperService() {
 
         override fun onVisibilityChanged(visible: Boolean) {
             super.onVisibilityChanged(visible)
-            Log.i(TAG, "onVisibilityChanged, visible: $visible, isRunning: ${animView?.isRunning()}, isPreview: $isPreview")
+            Log.i(
+                TAG,
+                "onVisibilityChanged, visible: $visible, isRunning: ${animView?.isRunning()}, isPreview: $isPreview"
+            )
             isVisible = visible
             if (renderWay == PrefsUtils.RENDER_WAY_VALUE_1) {
                 if (visible) {
-                    vapSurface.startPlay(context.assets, "demo.mp4")
+                    vapSurface?.startPlay(context.assets, "demo.mp4")
                 } else {
-                    if (vapSurface.isRunning()) {
-                        vapSurface.stopPlay()
+                    if (vapSurface?.isRunning()==true) {
+                        vapSurface?.stopPlay()
                     }
                 }
             } else {
@@ -190,6 +219,11 @@ class VapWallpaper : WallpaperService() {
                     presentation?.dismiss()
                 }
             }
+        }
+
+        fun changeRenderWay(renderWay: Int) {
+            if (this.renderWay == renderWay) return
+            this.renderWay = renderWay
         }
     }
 

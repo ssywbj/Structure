@@ -30,7 +30,4 @@ class VapWallpaperConfig : AppCompatActivity() {
         }
     }
 
-    companion object {
-
-    }
 }
