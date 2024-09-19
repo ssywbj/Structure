@@ -99,7 +99,7 @@ public abstract class CanvasWallpaperService extends WallpaperService {
         @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
-            Log.d(mTAG, "onVisibilityChanged, visible = " + visible + ", holder = " + getSurfaceHolder());
+            Log.i(mTAG, "onVisibilityChanged, visible = " + visible + ", holder = " + getSurfaceHolder());
         }
 
         @Override
@@ -147,19 +147,19 @@ public abstract class CanvasWallpaperService extends WallpaperService {
         @Override
         public void onApplyWindowInsets(WindowInsets insets) {
             super.onApplyWindowInsets(insets);
-            Log.d(mTAG, "onApplyWindowInsets: " + insets);
+            Log.v(mTAG, "onApplyWindowInsets");
         }
 
         @Override
         public void onSurfaceRedrawNeeded(SurfaceHolder holder) {
             super.onSurfaceRedrawNeeded(holder);
-            Log.d(mTAG, "onSurfaceRedrawNeeded: " + holder);
+            Log.v(mTAG, "onSurfaceRedrawNeeded: " + holder);
         }
 
         @Override
         public void onZoomChanged(float zoom) {
             super.onZoomChanged(zoom);
-            Log.d(mTAG, "onZoomChanged: " + zoom);
+            Log.v(mTAG, "onZoomChanged: " + zoom);
         }
 
         public void updateTime() {

@@ -3,11 +3,14 @@ package com.suheng.wallpaper.myhealth
 import android.app.Presentation
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
+import com.suheng.wallpaper.myhealth.file.PrefsUtils
 import com.tencent.qgame.animplayer.AnimConfig
 import com.tencent.qgame.animplayer.AnimView
 import com.tencent.qgame.animplayer.VapSurface
@@ -20,8 +23,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlin.system.measureTimeMillis
 
 class VapWallpaper : WallpaperService() {
@@ -35,8 +36,10 @@ class VapWallpaper : WallpaperService() {
     }
 
     override fun onCreateEngine(): Engine {
-        //return VirtualDisplayEngine()
-        return SurfaceGLEngine()
+        return when (PrefsUtils.loadRenderWay(this)) {
+            PrefsUtils.RENDER_WAY_VALUE_1 -> OpenGLEngine().apply {  }
+            else -> VirtualDisplayEngine()
+        }
     }
 
     private inner class VirtualDisplayEngine : Engine() {
@@ -49,7 +52,6 @@ class VapWallpaper : WallpaperService() {
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             super.onCreate(surfaceHolder)
             Log.d(TAG, "Engine, onCreate: $this")
-
         }
 
         override fun onDestroy() {
@@ -66,7 +68,10 @@ class VapWallpaper : WallpaperService() {
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             super.onSurfaceChanged(holder, format, width, height)
             val densityDpi = resources.displayMetrics.densityDpi
-            Log.i(TAG, "onSurfaceChanged: width = $width, height = $height, densityDpi = $densityDpi, $virtualDisplay")
+            Log.i(
+                TAG,
+                "onSurfaceChanged: width = $width, height = $height, densityDpi = $densityDpi, $virtualDisplay"
+            )
             measureTimeMillis {
                 virtualDisplay?.resize(width, height, densityDpi)
                 presentation?.window?.let {
@@ -86,34 +91,43 @@ class VapWallpaper : WallpaperService() {
                     holder.surface, 0
                 ).also {
                     presentation = Presentation(context, it.display).apply {
+                        window?.setBackgroundDrawable(ColorDrawable(Color.BLUE))
                         setContentView(R.layout.vap_wallpaper)
                         animView = findViewById<AnimView?>(R.id.animView).apply {
                             setScaleType(ScaleType.FIT_CENTER)
                             setLoop(Int.MAX_VALUE)
-                            getAnimListenerFlow(this).onEach { value ->
+                            /*getAnimListenerFlow(this).onEach { value ->
                                 Log.w(TAG, "onEach: $value")
-                            }.launchIn(defaultScope)
-                            /*setAnimListener(object : IAnimListener {
+                            }.launchIn(defaultScope)*/
+                            setAnimListener(object : IAnimListener {
                                 override fun onVideoStart() {
+                                    Log.d(
+                                        TAG,
+                                        "onVideoStart, isPreview: $isPreview, isVisible: $isVisible"
+                                    )
                                 }
 
                                 override fun onVideoRender(frameIndex: Int, config: AnimConfig?) {
+                                    //Log.d(TAG, "onVideoRender, frameIndex: $frameIndex, config: $config")
                                 }
 
                                 override fun onVideoComplete() {
                                 }
 
                                 override fun onVideoDestroy() {
-                                    Log.e(TAG, "onVideoDestroy, isPreview: $isPreview, isVisible: $isVisible")
-                                    if (!isPreview && isVisible) {
-                                        animView?.startPlay(context.assets, "demo.mp4")
-                                    }
+                                    Log.i(
+                                        TAG,
+                                        "onVideoDestroy, isPreview: $isPreview, isVisible: $isVisible"
+                                    )
                                 }
 
                                 override fun onFailed(errorType: Int, errorMsg: String?) {
+                                    Log.w(
+                                        TAG,
+                                        "onFailed, errorType: $errorType, errorMsg: $errorMsg"
+                                    )
                                 }
-                            })*/
-
+                            })
                         }
                     }
                 }
@@ -130,7 +144,10 @@ class VapWallpaper : WallpaperService() {
 
         override fun onVisibilityChanged(visible: Boolean) {
             super.onVisibilityChanged(visible)
-            Log.i(TAG, "visible: $visible, isRunning: ${animView?.isRunning()}, isPreview: $isPreview")
+            Log.i(
+                TAG,
+                "onVisibilityChanged, visible: $visible, isRunning: ${animView?.isRunning()}, isPreview: $isPreview"
+            )
             isVisible = visible
             if (visible) {
                 presentation?.let {
@@ -172,7 +189,7 @@ class VapWallpaper : WallpaperService() {
         }
     }
 
-    private inner class SurfaceGLEngine : Engine() {
+    private inner class OpenGLEngine : Engine() {
         private var vapSurface: VapSurface = VapSurface().apply {
             //setScaleType(ScaleType.FIT_CENTER)
             setLoop(Int.MAX_VALUE)
@@ -194,7 +211,7 @@ class VapWallpaper : WallpaperService() {
         }
 
         override fun onSurfaceChanged(
-            holder: SurfaceHolder?, format: Int, width: Int, height: Int
+            holder: SurfaceHolder?, format: Int, width: Int, height: Int,
         ) {
             super.onSurfaceChanged(holder, format, width, height)
             Log.d(TAG, "onSurfaceChanged: width = $width, height = $height , $this")
@@ -217,7 +234,7 @@ class VapWallpaper : WallpaperService() {
             super.onVisibilityChanged(visible)
             Log.i(
                 TAG,
-                "visible: $visible, isRunning: ${vapSurface.isRunning()}, isPreview: $isPreview"
+                "onVisibilityChanged, visible: $visible, isRunning: ${vapSurface.isRunning()}, isPreview: $isPreview"
             )
             if (visible) {
                 vapSurface.startPlay(context.assets, "demo.mp4")

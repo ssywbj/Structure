@@ -6,7 +6,8 @@
     <com.tencent.qgame.animplayer.AnimView
         android:id="@+id/animView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/holo_blue_dark" />
+        android:layout_height="380dp"
+        android:layout_gravity="bottom"
+        android:background="@android:color/holo_orange_dark" />
 
 </merge>

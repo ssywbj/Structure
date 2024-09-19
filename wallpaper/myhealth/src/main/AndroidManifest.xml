@@ -41,5 +41,11 @@
         <service
             android:name=".VapService"
             android:exported="true" />
+
+        <activity
+            android:name=".aty.VapWallpaperConfig"
+            android:exported="true"
+            android:label="Vap Wallpaper Config"
+            android:theme="@style/Theme.AppCompat" />
     </application>
 </manifest>
