@@ -13,18 +13,13 @@ import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
 import com.suheng.wallpaper.myhealth.file.PrefsUtils
-import com.tencent.qgame.animplayer.AnimConfig
 import com.tencent.qgame.animplayer.AnimView
 import com.tencent.qgame.animplayer.VapSurface
-import com.tencent.qgame.animplayer.inter.IAnimListener
 import com.tencent.qgame.animplayer.util.ScaleType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.channels.trySendBlocking
-import kotlinx.coroutines.flow.callbackFlow
 
 class VapWallpaper : WallpaperService() {
 
@@ -117,16 +112,18 @@ class VapWallpaper : WallpaperService() {
             isVisible = visible
             if (renderWay == PrefsUtils.RENDER_WAY_VALUE_1) {
                 if (visible) {
-                    changeRenderWay(renderWay)
+                    //changeRenderWay(renderWay)
+                    changeRenderWay(PrefsUtils.loadRenderWay(context))
                     vapSurface?.startPlay(context.assets, "demo.mp4")
                 } else {
-                    if (vapSurface?.isRunning()==true) {
+                    if (vapSurface?.isRunning() == true) {
                         vapSurface?.stopPlay()
                     }
                 }
             } else {
                 if (visible) {
-                    changeRenderWay(renderWay)
+                    //changeRenderWay(renderWay)
+                    changeRenderWay(PrefsUtils.loadRenderWay(context))
                     presentation?.let {
                         it.show()
                         animView?.startPlay(context.assets, "demo.mp4")
@@ -149,7 +146,7 @@ class VapWallpaper : WallpaperService() {
                 initVapSurface()
             } else {
                 releaseVapSurface()
-                //resizeVirtualDisplay()
+                resizeVirtualDisplay()
                 initVirtualDisplay()
             }
         }
@@ -159,18 +156,23 @@ class VapWallpaper : WallpaperService() {
                 return
             }
 
-            vapSurface = VapSurface().apply {
-                setLoop(Int.MAX_VALUE)
+            surface.takeIf { width > 0 && height > 0 }?.let {
+                vapSurface = VapSurface().apply {
+                    setLoop(Int.MAX_VALUE)
+                    onSurfaceAvailable(it, width, height)
+                }
+                Log.i(TAG, "initVapSurface vapSurface: $vapSurface")
+                resizeVapSurface()
             }
-            if (vapSurface!!.getSurface() == null) {
-                vapSurface!!.onSurfaceAvailable(surface!!, width, height)
-            } else {
-                vapSurface!!.onSurfaceSizeChanged(width, height)
-            }
+        }
+
+        private fun resizeVapSurface() {
+            vapSurface?.onSurfaceSizeChanged(width, height)
         }
 
         private fun releaseVapSurface() {
             vapSurface?.let {
+                Log.i(TAG, "releaseVapSurface")
                 it.onSurfaceDestroyed()
                 vapSurface = null
             }
@@ -184,49 +186,20 @@ class VapWallpaper : WallpaperService() {
                 return
             }
 
-            (context.getSystemService(DISPLAY_SERVICE) as DisplayManager).createVirtualDisplay(
-                TAG+System.currentTimeMillis(), width, height, resources.displayMetrics.densityDpi, surface, DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESENTATION
+            virtualDisplay = (context.getSystemService(DISPLAY_SERVICE) as DisplayManager).createVirtualDisplay(
+                TAG + System.currentTimeMillis(), width, height, resources.displayMetrics.densityDpi, surface,
+                0
             ).apply {
-                virtualDisplay = this
                 presentation = Presentation(context, display).apply {
                     window?.setBackgroundDrawable(ColorDrawable(Color.BLUE))
                     setContentView(R.layout.vap_wallpaper)
                     animView = findViewById<AnimView?>(R.id.animView).apply {
                         setScaleType(ScaleType.FIT_CENTER)
-                        setLoop(Int.MAX_VALUE)/*getAnimListenerFlow(this).onEach { value ->
-                            Log.w(TAG, "onEach: $value")
-                        }.launchIn(defaultScope)*/
-                        /*setAnimListener(object : IAnimListener {
-                            override fun onVideoStart() {
-                                Log.d(
-                                    TAG,
-                                    "onVideoStart, isPreview: $isPreview, isVisible: $isVisible"
-                                )
-                            }
-
-                            override fun onVideoRender(frameIndex: Int, config: AnimConfig?) {
-                                //Log.d(TAG, "onVideoRender, frameIndex: $frameIndex, config: $config")
-                            }
-
-                            override fun onVideoComplete() {
-                            }
-
-                            override fun onVideoDestroy() {
-                                Log.i(
-                                    TAG,
-                                    "onVideoDestroy, isPreview: $isPreview, isVisible: $isVisible"
-                                )
-                            }
-
-                            override fun onFailed(errorType: Int, errorMsg: String?) {
-                                Log.w(
-                                    TAG, "onFailed, errorType: $errorType, errorMsg: $errorMsg"
-                                )
-                            }
-                        })*/
+                        setLoop(Int.MAX_VALUE)
                     }
                 }
             }
+            Log.i(TAG, "initVirtualDisplay virtualDisplay: $virtualDisplay")
         }
 
         private fun resizeVirtualDisplay() {
@@ -243,6 +216,7 @@ class VapWallpaper : WallpaperService() {
 
         private fun releaseVirtualDisplay() {
             virtualDisplay?.let {
+                Log.i(TAG, "releaseVirtualDisplay")
                 animView?.takeIf { av -> av.isRunning() }?.stopPlay()
                 presentation?.dismiss()
                 it.release()
@@ -252,34 +226,6 @@ class VapWallpaper : WallpaperService() {
             }
         }
 
-    }
-
-    private fun getAnimListenerFlow(animView: AnimView) = callbackFlow<Any> {
-        val listener = object : IAnimListener {
-            override fun onVideoStart() {
-                trySendBlocking(0)
-            }
-
-            override fun onVideoRender(frameIndex: Int, config: AnimConfig?) {
-                //trySendBlocking(frameIndex to config)
-            }
-
-            override fun onVideoComplete() {
-                trySendBlocking(1)
-            }
-
-            override fun onVideoDestroy() {
-                trySendBlocking(2)
-            }
-
-            override fun onFailed(errorType: Int, errorMsg: String?) {
-                trySendBlocking(errorType to errorMsg)
-            }
-        }
-        animView.setAnimListener(listener)
-        awaitClose {
-            animView.setAnimListener(null)
-        }
     }
 
     companion object {

@@ -24,7 +24,7 @@
         </service>
 
         <service
-            android:name=".VapWallpaper"
+            android:name=".SimpleVapWallpaper"
             android:exported="true"
             android:label="Vap Wallpaper"
             android:permission="android.permission.BIND_WALLPAPER">
