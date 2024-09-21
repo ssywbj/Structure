@@ -16,7 +16,7 @@ import com.tencent.qgame.animplayer.util.ScaleType
 class SimpleVapWallpaper : WallpaperService() {
 
     private lateinit var context: Context
-    private var renderType = RENDER_VIRTUAL_DISPLAY
+    private var renderType = RENDER_OPEN_GL
 
     override fun onCreate() {
         super.onCreate()
@@ -66,7 +66,7 @@ class SimpleVapWallpaper : WallpaperService() {
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             super.onSurfaceChanged(holder, format, width, height)
-            Log.i(TAG, "onSurfaceChanged: width = $width, height = $height")
+            Log.i(TAG, "onSurfaceChanged, width: $width, height: $height, $this")
             virtualDisplay?.resize(width, height, resources.displayMetrics.densityDpi)
             presentation?.window?.let {
                 val attributes = it.attributes
@@ -94,7 +94,7 @@ class SimpleVapWallpaper : WallpaperService() {
 
         override fun onVisibilityChanged(visible: Boolean) {
             super.onVisibilityChanged(visible)
-            Log.i(TAG, "onVisibilityChanged, visible: $visible, isPreview: $isPreview")
+            Log.i(TAG, "onVisibilityChanged, visible: $visible, isPreview: $isPreview, $this")
             if (visible) {
                 presentation?.let {
                     it.show()
@@ -135,7 +135,7 @@ class SimpleVapWallpaper : WallpaperService() {
             holder: SurfaceHolder?, format: Int, width: Int, height: Int,
         ) {
             super.onSurfaceChanged(holder, format, width, height)
-            Log.i(TAG, "onSurfaceChanged: width = $width, height = $height , $this")
+            Log.i(TAG, "onSurfaceChanged, width: $width, height: $height, $this")
             vapSurface?.onSurfaceSizeChanged(width, height)
             if (vapSurface == null) {
                 vapSurface = holder?.surface?.let {
@@ -150,7 +150,7 @@ class SimpleVapWallpaper : WallpaperService() {
 
         override fun onVisibilityChanged(visible: Boolean) {
             super.onVisibilityChanged(visible)
-            Log.i(TAG, "onVisibilityChanged, visible: $visible, isPreview: $isPreview")
+            Log.i(TAG, "onVisibilityChanged, visible: $visible, isPreview: $isPreview, $this")
             if (visible) {
                 vapSurface?.startPlay(context.assets, "demo.mp4")
             } else {
