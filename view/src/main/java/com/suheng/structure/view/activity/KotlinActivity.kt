@@ -20,6 +20,8 @@ import com.suheng.structure.view.kt.Square3
 import com.suheng.structure.view.kt.Student4
 import com.suheng.structure.view.kt.also2
 import com.suheng.structure.view.kt.apply2
+import com.suheng.structure.view.kt.delegate.BundleHandler
+import com.suheng.structure.view.kt.delegate.BundleHandlerImpl
 import com.suheng.structure.view.kt.generic.American
 import com.suheng.structure.view.kt.generic.Burger
 import com.suheng.structure.view.kt.generic.BurgerStore
@@ -55,7 +57,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.system.measureTimeMillis
 
-class KotlinActivity : AppCompatActivity() {
+class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl() {
 
     //顶层变量
     private var aa = 11
@@ -63,6 +65,8 @@ class KotlinActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        bundleHandler(this, savedInstanceState)
+        Log.d(BundleHandlerImpl.TAG, "${bundleSum(1, 2)}")
         setContentView(R.layout.activity_kotlin)
 
         this.main()
