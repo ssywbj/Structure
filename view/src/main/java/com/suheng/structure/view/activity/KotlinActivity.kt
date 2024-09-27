@@ -44,17 +44,8 @@ import kotlinx.android.synthetic.main.activity_kotlin.btnAsyncLazy
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEmpty
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -135,8 +126,6 @@ class KotlinActivity : AppCompatActivity() {
         this.testTry()
         println("arrayOfMinusOnes(10): ${this.arrayOfMinusOnes(10)}")
 
-        this.testTurtle()
-
         this.testApply()
 
         this.nullableAlso()
@@ -156,10 +145,6 @@ class KotlinActivity : AppCompatActivity() {
 
         val square = Square("Wbj Square")
         square.draw()
-
-        //this.coroutines2()
-        //this.coroutines3()
-        this.coroutines5()
 
         var operation = this.operation(2, 4, ::plus)
         Log.d("Wbj", "operation, plus: $operation")
@@ -409,27 +394,6 @@ class KotlinActivity : AppCompatActivity() {
         val people32 = People3(20)
         val people33 = people31 + people32
         Log.i("Wbj", "people33: ${people33.age}, > result: ${people31 > people32}")
-
-        val flow = flow<String> {
-            for (i in 1..3) {
-                delay(1000)
-                Log.d("Wbj", "emit thread:　${Thread.currentThread().name}")
-                emit("emit value: $i")
-            }
-            //throw IllegalStateException("IllegalStateException") //异常会回调到catch，也会回调onCompletion
-            //deferredAvatar2!!.await() //异常会回调到catch，也会回调onCompletion
-            //什么都不发送(emit)会回调onEmpty
-            //正常发送、不发送和异常情况都会回调到onStart和onCompletion
-        }.onStart { Log.i("Wbj", "onStart onStart:　${Thread.currentThread().name}") }
-            .onCompletion { Log.i("Wbj", "onCompletion onCompletion:　${Thread.currentThread().name}") }
-            .onEmpty { Log.d("Wbj", "onEmpty onEmpty:　${Thread.currentThread().name}") }
-            .catch { Log.d("Wbj", "catch catch:　${Thread.currentThread().name}") }
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            flow.collect {
-                Log.v("Wbj", "flow result: $it, collect thread: ${Thread.currentThread().name}")
-            }
-        }
 
         letterToInt("abc").also {
             if (it == null) {
@@ -782,37 +746,6 @@ class KotlinActivity : AppCompatActivity() {
     private fun theAnswer() = 3
     private fun theAnswer2() = this.maxOf2(7, 8)
 
-    class Turtle {
-        fun penDown() {
-            println("Turtle, penDown")
-        }
-
-        fun penUp() {
-            println("Turtle, penUp")
-        }
-
-        fun turn(degrees: Double) {
-            println("Turtle, turn: $degrees")
-        }
-
-        fun forward(pixels: Double) {
-            println("Turtle, forward: $pixels")
-        }
-    }
-
-    //对一个对象实例调用多个方法(with)
-    private fun testTurtle() {
-        val myTurtle = Turtle()
-        with(myTurtle) { //with
-            penDown()
-            for (i in 1..4) {
-                forward(100.0)
-                turn(90.0)
-            }
-            penUp()
-        }
-    }
-
     //配置对象的属性(apply):这对于配置未出现在对象构造函数中的属性非常有用
     private fun testApply() {
         val rect = Rect().apply { //apply
@@ -863,73 +796,6 @@ class KotlinActivity : AppCompatActivity() {
     //TODO(String)：将代码标记为不完整
     private fun calcTaxes(): BigDecimal = TODO("Waiting for feedback from accounting")
     //习惯用法：end
-
-    private fun coroutines() {
-        GlobalScope.launch {
-            delay(3000L)
-            Log.d("Wbj_", "GlobalScope, World")
-        }
-        Log.d("Wbj_", "GlobalScope, Hello")
-        //Thread.sleep(2000L)
-        runBlocking {
-            delay(1000L)
-        }
-    }
-
-    private fun coroutines2() = runBlocking {
-        GlobalScope.launch {
-            delay(3000L)
-            Log.d("Wbj_", "GlobalScope, World")
-        }
-        Log.d("Wbj_", "GlobalScope, Hello")
-        delay(2000L)
-        Log.d("Wbj_", "GlobalScope, Hello333")
-    }
-
-    private fun coroutines3() = runBlocking {
-        val job = GlobalScope.launch {
-            delay(3000L)
-            Log.d("Wbj_", "GlobalScope, World")
-        }
-        Log.d("Wbj_", "GlobalScope, Hello")
-        job.join()
-        Log.d("Wbj_", "GlobalScope, Hello222")
-    }
-
-    private fun coroutines4() = runBlocking {
-        launch {
-            delay(3000L)
-            Log.d("Wbj_", "GlobalScope, World")
-        }
-        Log.d("Wbj_", "GlobalScope, Hello")
-    }
-
-    private fun coroutines5() = runBlocking {
-        /*val job = launch {
-            delay(3000L)
-            Log.d("Wbj_", "GlobalScope, World")
-        }
-        delay(2000)
-        Log.d("Wbj_", "GlobalScope, Hello")
-        //job.cancel()
-        //job.join()
-        job.cancelAndJoin()*/
-
-        val job = launch {
-            try {
-                repeat(1000) { i ->
-                    Log.d("Wbj_", "job: I'm sleeping $i ...")
-                    delay(2000L)
-                }
-            } finally {
-                Log.d("Wbj_", "job: I'm running finally")
-            }
-        }
-        delay(1300L) // 延迟一段时间
-        Log.d("Wbj_", "main: I'm tired of waiting!")
-        job.cancelAndJoin() // 取消该作业并且等待它结束
-        Log.d("Wbj_", "main: Now I can quit.")
-    }
 
     fun plus(a: Int, b: Int): Int = a + b
 
