@@ -430,6 +430,29 @@ class KotlinActivity : AppCompatActivity() {
                 Log.v("Wbj", "flow result: $it, collect thread: ${Thread.currentThread().name}")
             }
         }
+
+        letterToInt("abc").also {
+            if (it == null) {
+                Log.e("Wbj", "runBlocking try...catch fail")
+            } else {
+                Log.d("Wbj", "runBlocking try...catch, number: $it")
+            }
+        }
+
+        letterToInt2("abc").getOrNull().also {
+            if (it == null) {
+                Log.e("Wbj", "runBlocking getOrNull fail")
+            } else {
+                Log.d("Wbj", "runBlocking getOrNull, number: $it")
+            }
+        }
+
+        letterToInt2("abcd").exceptionOrNull().also {
+            Log.e("Wbj", "runBlocking exceptionOrNull: $it")
+        }
+
+        letterToInt2("abcde").onSuccess { Log.d("Wbj", "runBlocking result: $it") }
+            .onFailure { Log.e("Wbj", "runBlocking result, fail: $it") }
     }
 
     var people3: People? = null
@@ -971,6 +994,18 @@ class KotlinActivity : AppCompatActivity() {
         block2()
         //return block2 //compile wrong
         return block
+    }
+
+    private fun letterToInt(input: String): Int? {
+        return try {
+            input.toInt()
+        } catch (e: NumberFormatException) {
+            null
+        }
+    }
+
+    private fun letterToInt2(input: String): Result<Int> {
+        return runCatching { input.toInt() }
     }
 
 }
