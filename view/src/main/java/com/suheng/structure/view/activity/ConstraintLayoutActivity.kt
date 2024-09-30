@@ -18,6 +18,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.suheng.structure.view.R
+import com.suheng.structure.view.kt.onClickFlow
 import com.suheng.structure.view.kt.textChangedFlow
 import com.suheng.structure.view.wheel.CoroutineView
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 
 class ConstraintLayoutActivity : AppCompatActivity() {
@@ -79,12 +81,19 @@ class ConstraintLayoutActivity : AppCompatActivity() {
                     this@ConstraintLayoutActivity,
                     "Title, Title, Title, Title",
                     "Subtitle, Subtitle, Subtitle",
-                )
+                ).apply {
+                    onClickFlow().sample(300).onEach {
+                        Log.d("Wbj", "onClickFlow, sample: ${System.identityHashCode(it)}")
+                    }.launchIn(lifecycleScope)
+                }
             )
 
             addView(
                 CoroutineView(this@ConstraintLayoutActivity).apply {
                     setBackgroundColor(Color.GRAY)
+                    onClickFlow().debounce(300).onEach {
+                        Log.d("Wbj", "onClickFlow debounce: ${System.identityHashCode(it)}")
+                    }.launchIn(lifecycleScope)
                 },
                 LinearLayout.LayoutParams(100, 100).apply {
                     topMargin = 16

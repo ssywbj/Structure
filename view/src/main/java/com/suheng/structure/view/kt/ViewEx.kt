@@ -2,6 +2,7 @@ package com.suheng.structure.view.kt
 
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.TextView
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -25,4 +26,9 @@ fun TextView.textChangedFlow(): Flow<String> = callbackFlow {
     }
     addTextChangedListener(textWatcher)
     awaitClose { removeTextChangedListener(textWatcher) }
+}
+
+fun View.onClickFlow(): Flow<Unit> = callbackFlow {
+    setOnClickListener { trySendBlocking(Unit) }
+    awaitClose { setOnClickListener(null) }
 }
