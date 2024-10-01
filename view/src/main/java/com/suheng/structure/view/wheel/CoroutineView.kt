@@ -19,10 +19,12 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flatMapMerge
@@ -393,6 +395,63 @@ class CoroutineView @JvmOverloads constructor(
             }
         }
 
+        launch {
+            Log.w(TAG, "buffer exec begin: not use buffer()")
+            val timeMillis = 3000L
+            val bufferFlow = flow {
+                emit(getFirstValue())
+                emit(getSecondValue("buffer operator"))
+            }
+            measureTimeMillis {
+                bufferFlow.collect {
+                    Log.d(TAG, "buffer arrive value: $it")
+                    delay(timeMillis)
+                    Log.i(TAG, "buffer handled arrive value : $it")
+                }
+            }.also {
+                Log.v(TAG, "not use buffer take time: $it")
+            }
+
+            Log.w(TAG, "buffer exec begin: use buffer()")
+            measureTimeMillis {
+                //背压原因：生产者流速大于消费者流速。buffer:消费者在处理当前生产值时，若有新生产值到达则先缓存起来，处理完后马上发射给消费者
+                bufferFlow.buffer().collect {
+                    Log.d(TAG, "buffer arrive value: $it")
+                    delay(timeMillis)
+                    Log.i(TAG, "buffer handled arrive value : $it")
+                }
+            }.also {
+                Log.v(TAG, "use buffer take time: $it")
+            }
+
+            Log.w(TAG, "buffer exec begin: not use conflate()")
+            val timeMillis2 = 500L
+            val conflateFlow = (1..3).asFlow().onEach {
+                delay(200)
+            }
+            measureTimeMillis {
+                //背压原因：生产者流速大于消费者流速。buffer:消费者在处理当前生产值时，若有新生产值到达则先缓存起来，处理完后马上发射给消费者
+                conflateFlow.buffer().collect {
+                    Log.d(TAG, "buffer conflate arrive value: $it")
+                    delay(timeMillis2)
+                    Log.i(TAG, "buffer conflate handled arrive value : $it")
+                }
+            }.also {
+                Log.v(TAG, "not use buffer conflate take time: $it")
+            }
+            Log.w(TAG, "buffer exec begin: use conflate()")
+            measureTimeMillis {
+                //conflate:buffer(CONFLATED)函数，用于添加缓冲区并且只处理最新的数据
+                conflateFlow.conflate().collect {
+                    Log.d(TAG, "buffer conflate arrive value: $it")
+                    delay(timeMillis2)
+                    Log.i(TAG, "buffer conflate handled arrive value : $it")
+                }
+            }.also {
+                Log.v(TAG, "buffer conflate take time: $it")
+            }
+        }
+
         Log.w(TAG, "async exec begin: ${System.currentTimeMillis()}")
         val sAsync = async { getSecondValue("a") }
         val tAsync = async { getThirdValue(1) }
@@ -602,7 +661,7 @@ class CoroutineView @JvmOverloads constructor(
 
     private suspend fun getValidWidth3(): Int? {
         Log.d(TAG, "init validWidth2, ${Thread.currentThread().name}")
-        delay(2000)
+        //delay(2000)
         val deferred = CompletableDeferred<Int?>()
         post {
             val tmpWidth = (width - 10).run {
