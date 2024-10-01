@@ -28,7 +28,7 @@ fun TextView.textChangedFlow(): Flow<String> = callbackFlow {
     awaitClose { removeTextChangedListener(textWatcher) }
 }
 
-fun View.onClickFlow(): Flow<Unit> = callbackFlow {
+fun View.onClickFlow() = callbackFlow {
     setOnClickListener { trySendBlocking(Unit) }
     awaitClose { setOnClickListener(null) }
 }

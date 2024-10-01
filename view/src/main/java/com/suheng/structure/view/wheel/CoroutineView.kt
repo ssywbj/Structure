@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
@@ -337,17 +338,18 @@ class CoroutineView @JvmOverloads constructor(
             Log.w(TAG, "retry exec begin: ${System.currentTimeMillis()}")
             (1..3).asFlow().onEach {
                 delay(1000)
-                if (retryCount < 2/*4*/) {
-                    if (it == 2) {
-                        throw IOException("Test Error")
-                    }
+                if (it == 2) {
+                    throw IOException("Test Error")
                 }
             }.retry(3) { cause ->
-                Log.w(TAG, "retry: $cause, retryCount: ${++retryCount}")
+                Log.w(TAG, "retry: $cause, retryCount: ${++retryCount}, ${Thread.currentThread().name}")
+                if (retryCount == 2) {
+                    delay(1000) //第二次时延迟1000再重试
+                }
                 cause is IOException //true时执行重试
                 //return@retry false //false或次数到时重试结束，此时会走进catch代码块
                 //if (retryCount == 2) false else true
-            }.catch { //如果抛出异常，就要捕获异常，不然程序崩溃
+            }.flowOn(Dispatchers.IO).catch { //如果抛出异常，就要捕获异常，不然程序崩溃
                 Log.e(TAG, "retry error: $it")
             }.onCompletion { Log.i(TAG, "retry onCompletion, retryCount: $retryCount") }.collect {
                 Log.d(TAG, "retry value: $it")
@@ -691,8 +693,6 @@ class CoroutineView @JvmOverloads constructor(
         }
     }
 
-    //https://juejin.cn/post/6989782281191686180
     //https://www.jetbrains.com/lp/compose-multiplatform/
-    //https://juejin.cn/post/6924609524548501517
     //https://github.com/SaberAlpha/kotlinpractice
 }
