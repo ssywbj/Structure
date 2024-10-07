@@ -8,6 +8,8 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import java.lang.reflect.InvocationHandler
+import java.lang.reflect.Proxy
 
 fun TextView.textChangedFlow(): Flow<String> = callbackFlow {
     val textWatcher = object : TextWatcher {
@@ -31,4 +33,12 @@ fun TextView.textChangedFlow(): Flow<String> = callbackFlow {
 fun View.onClickFlow() = callbackFlow {
     setOnClickListener { trySendBlocking(Unit) }
     awaitClose { setOnClickListener(null) }
+}
+
+inline fun <reified T : Any> noOpDelegate(): T {
+    val javaClass = T::class.java
+    return Proxy.newProxyInstance(javaClass.classLoader, arrayOf(javaClass), noOpHandler) as T
+}
+
+val noOpHandler = InvocationHandler { _, _, _ ->
 }
