@@ -3,7 +3,6 @@ package com.suheng.opengl
 import android.app.ActivityManager
 import android.content.Context
 import android.util.Log
-import com.suheng.opengl.app.OpenGLApp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import java.lang.reflect.Proxy
@@ -27,7 +26,7 @@ fun isHomeScreen(context: Context): Boolean {
     if (runningTasks != null && runningTasks.isNotEmpty()) {
         val taskInfo = runningTasks[0]
         val componentName = taskInfo.topActivity
-        Log.d(OpenGLApp.logTag, "top topActivity: $componentName")
+        Log.v("OpenGLWallpaper", "top topActivity: $componentName")
     }
     return false
 }
