@@ -13,8 +13,14 @@ import com.suheng.wallpaper.myhealth.file.FileUtil
 import com.tencent.qgame.animplayer.AnimView
 import com.tencent.qgame.animplayer.VapSurface
 import com.tencent.qgame.animplayer.util.ScaleType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.io.File
-import kotlin.system.measureTimeMillis
 
 class SimpleVapWallpaper : WallpaperService() {
 
@@ -121,6 +127,7 @@ class SimpleVapWallpaper : WallpaperService() {
         override fun onDestroy() {
             super.onDestroy()
             Log.v(TAG, "Engine, onDestroy: $this")
+            coroutineScope.cancel()
         }
 
         override fun onSurfaceCreated(holder: SurfaceHolder?) {
@@ -158,16 +165,14 @@ class SimpleVapWallpaper : WallpaperService() {
                 if (videoFile.exists()) {
                     vapSurface?.startPlay(videoFile)
                 } else {
-                    measureTimeMillis {
-                        saveFileToCache().onSuccess {
-                            Log.v(TAG, "saveFileToCache success: $it")
+                    fileToCacheFlow().onEach {
+                        it.onSuccess { result ->
+                            Log.v(TAG, "saveFileToCache success: $result, thread: ${Thread.currentThread().name}")
                             vapSurface?.startPlay(videoFile)
-                        }.onFailure {
-                            Log.e(TAG, "saveFileToCache fail: $it")
+                        }.onFailure { cause ->
+                            Log.e(TAG, "saveFileToCache fail: $cause")
                         }
-                    }.also {
-                        Log.d(TAG, "saveFileToCache time time: $it")
-                    }
+                    }.launchIn(coroutineScope)
                 }
                 //vapSurface?.startPlay(context.assets, "demo.mp4")
             } else {
@@ -177,11 +182,16 @@ class SimpleVapWallpaper : WallpaperService() {
 
         private val fileName = "demo.mp4"
         private val videoFile = File(context.cacheDir.absolutePath + File.separator + fileName)
+        private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
         private fun saveFileToCache(): Result<Unit> {
             return kotlin.runCatching {
                 FileUtil.streamInputToFile(context.assets.open(fileName), videoFile)
             }
+        }
+
+        private fun fileToCacheFlow() = flow {
+            emit(saveFileToCache())
         }
 
     }
