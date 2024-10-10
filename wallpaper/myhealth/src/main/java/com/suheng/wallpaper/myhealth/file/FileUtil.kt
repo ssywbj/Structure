@@ -1,16 +1,21 @@
 package com.suheng.wallpaper.myhealth.file
 
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import kotlin.properties.Delegates
 
 object FileUtil {
+
+    private const val TAG = "FileUtil"
 
     fun readInputStream(inputStream: InputStream): ByteArray {
         val byteArrayOutputStream = ByteArrayOutputStream()
@@ -25,50 +30,64 @@ object FileUtil {
         return data
     }
 
-    @Throws(IOException::class)
     private fun streamInputToOutput(
-        inputStream: InputStream,
-        outputStream: OutputStream,
-        outputStreamCloseBefore: (() -> Unit)? = null,
-    ) {
-        val buffer = ByteArray(2048 * 2)
-        var len: Int
-        while (inputStream.read(buffer).also { len = it } != -1) {
-            outputStream.write(buffer, 0, len)
+        input: InputStream, output: OutputStream, needClose: Boolean = true,
+    ): Result<Unit> {
+        return kotlin.runCatching {
+            Log.v(TAG, "streamInputToOutput, ${Thread.currentThread().name}")
+            val buffer = ByteArray(2048 * 2)
+            var len: Int
+            while (input.read(buffer).also { len = it } != -1) {
+                output.write(buffer, 0, len)
+            }
+            if (needClose) {
+                output.close()
+                input.close()
+            }
         }
-        outputStreamCloseBefore?.invoke()
-        outputStream.close()
-        inputStream.close()
+
     }
 
-    @Throws(IOException::class)
-    fun streamInputToByte(inputStream: InputStream): ByteArray {
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        var data by Delegates.notNull<ByteArray>()
-        streamInputToOutput(inputStream, byteArrayOutputStream) {
-            data = byteArrayOutputStream.toByteArray()
+    fun streamInputToByte(input: InputStream): ByteArray? {
+        val output = ByteArrayOutputStream()
+        var data: ByteArray? = null
+        if (streamInputToOutput(input, output, false).isSuccess) {
+            data = output.toByteArray()
+        }
+        try {
+            output.close()
+            input.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
         return data
     }
 
-    @Throws(IOException::class, FileNotFoundException::class)
-    fun streamInputToFile(inputStream: InputStream, file: File) {
-        streamInputToOutput(inputStream, FileOutputStream(file))
+    fun streamInputToFile(input: InputStream, dest: File): Result<Unit> {
+        return streamInputToOutput(input, FileOutputStream(dest))
     }
 
-    @Throws(IOException::class, FileNotFoundException::class)
-    fun streamInputToFile(inputStream: InputStream, path: String) {
-        streamInputToOutput(inputStream, FileOutputStream(path))
+    fun streamInputToFile(input: InputStream, dest: String): Result<Unit> {
+        return streamInputToOutput(input, FileOutputStream(dest))
     }
 
-    @Throws(IOException::class, FileNotFoundException::class)
-    fun copyFile(inFile: File, outfile: File) {
-        streamInputToFile(FileInputStream(inFile), outfile)
+    fun copyFile(source: File, dest: File): Result<Unit> {
+        return streamInputToFile(FileInputStream(source), dest)
     }
 
-    @Throws(IOException::class, FileNotFoundException::class)
-    fun copyFile(inPath: String, outPath: String) {
-        streamInputToFile(FileInputStream(inPath), outPath)
+    fun copyFile(source: String, dest: String): Result<Unit> {
+        return streamInputToFile(FileInputStream(source), dest)
     }
 
 }
+
+val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+inline fun runOnUiThread(crossinline block: () -> Unit) {
+    coroutineScope.launch(Dispatchers.Main) { block() }
+}
+
+inline fun runOnWorkThread(crossinline block: () -> Unit) {
+    coroutineScope.launch(Dispatchers.IO) { block() }
+}
+

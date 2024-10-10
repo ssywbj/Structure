@@ -9,12 +9,13 @@ import android.hardware.display.VirtualDisplay
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
-import com.suheng.wallpaper.myhealth.file.FileUtil
+import com.suheng.wallpaper.myhealth.file.coroutineScope
+import com.suheng.wallpaper.myhealth.repository.FileRepository
 import com.tencent.qgame.animplayer.AnimView
 import com.tencent.qgame.animplayer.VapSurface
 import com.tencent.qgame.animplayer.util.ScaleType
-import java.io.File
-import kotlin.system.measureTimeMillis
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class SimpleVapWallpaper : WallpaperService() {
 
@@ -155,35 +156,15 @@ class SimpleVapWallpaper : WallpaperService() {
             super.onVisibilityChanged(visible)
             Log.i(TAG, "onVisibilityChanged, visible: $visible, isPreview: $isPreview, $this")
             if (visible) {
-                if (videoFile.exists()) {
-                    vapSurface?.startPlay(videoFile)
-                } else {
-                    measureTimeMillis {
-                        saveFileToCache().onSuccess {
-                            Log.v(TAG, "saveFileToCache success: $it")
-                            vapSurface?.startPlay(videoFile)
-                        }.onFailure {
-                            Log.e(TAG, "saveFileToCache fail: $it")
-                        }
-                    }.also {
-                        Log.d(TAG, "saveFileToCache time time: $it")
-                    }
-                }
+                FileRepository.loadVideoFile().onEach { file ->
+                    Log.v(TAG, "loadVideoFile: $file,")
+                    vapSurface?.startPlay(file)
+                }.launchIn(coroutineScope)
                 //vapSurface?.startPlay(context.assets, "demo.mp4")
             } else {
                 vapSurface?.takeIf { it.isRunning() }?.stopPlay()
             }
         }
-
-        private val fileName = "demo.mp4"
-        private val videoFile = File(context.cacheDir.absolutePath + File.separator + fileName)
-
-        private fun saveFileToCache(): Result<Unit> {
-            return kotlin.runCatching {
-                FileUtil.streamInputToFile(context.assets.open(fileName), videoFile)
-            }
-        }
-
     }
 
     companion object {
