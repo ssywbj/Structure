@@ -16,6 +16,7 @@ import com.tencent.qgame.animplayer.VapSurface
 import com.tencent.qgame.animplayer.util.ScaleType
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onEmpty
 
 class SimpleVapWallpaper : WallpaperService() {
 
@@ -111,6 +112,9 @@ class SimpleVapWallpaper : WallpaperService() {
         }
     }
 
+    //https://github.com/bytedance/AlphaPlayer.git
+    //https://github.com/yangdong123/MediaGiftPlayer.git
+    //https://github.com/androidx/media.git
     private inner class OpenGLEngine : Engine() {
         private var vapSurface: VapSurface? = null
 
@@ -157,9 +161,9 @@ class SimpleVapWallpaper : WallpaperService() {
             Log.i(TAG, "onVisibilityChanged, visible: $visible, isPreview: $isPreview, $this")
             if (visible) {
                 FileRepository.loadVideoFile().onEach { file ->
-                    Log.v(TAG, "loadVideoFile: $file,")
+                    Log.v(TAG, "loadVideoFile success: $file")
                     vapSurface?.startPlay(file)
-                }.launchIn(coroutineScope)
+                }.onEmpty { Log.w(TAG, "loadVideoFile fail: flow empty") }.launchIn(coroutineScope)
                 //vapSurface?.startPlay(context.assets, "demo.mp4")
             } else {
                 vapSurface?.takeIf { it.isRunning() }?.stopPlay()
