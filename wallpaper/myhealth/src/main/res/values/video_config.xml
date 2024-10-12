@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="video_demo_id">0</integer>
+    <integer name="video_demo2_id">1</integer>
+
+    <string name="video_demo" translatable="false">demo.mp4</string>
+    <string name="video_demo2" translatable="false">demo2.mp4</string>
+</resources>

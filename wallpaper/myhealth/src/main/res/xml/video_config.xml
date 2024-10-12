@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<videos>
+
+    <video
+        id="@integer/video_demo_id"
+        url="video"
+        path="/1" />
+
+    <video
+        id="@integer/video_demo2_id"
+        url="video"
+        path="/2" />
+
+</videos>
