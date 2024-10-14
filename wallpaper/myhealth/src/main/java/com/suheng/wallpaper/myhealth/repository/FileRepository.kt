@@ -15,12 +15,26 @@ object FileRepository {
 
     private const val TAG = "SimpleVapWallpaper"
     private val context = App.appCtx()
-    private const val FILE_NAME = "demo.mp4"
+    private var fileName = ""
     private const val FILE_MD5 = "3132824326bb07a1143739863e1e5762"
-    private val destFile = File(context.cacheDir.absolutePath + File.separator + FILE_NAME)
     private var selectedVideo: Video? = null
 
     fun loadVideoFile() = flow {
+        val destFile = selectedVideo?.let {
+            val assetsDir = it.url + it.path
+            val videoFile = "demo.mp4"
+            fileName = assetsDir + File.separator + videoFile
+            val dir = File(context.cacheDir, assetsDir)
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+            File(dir, videoFile)
+        }
+        Log.d(TAG, "destFile: $destFile, fileName: $fileName")
+        if (destFile == null) {
+            return@flow
+        }
+
         if (destFile.exists()) {
             FileUtil.getMD5(destFile).onSuccess {
                 val isSameMd5 = (it == FILE_MD5)
@@ -29,25 +43,25 @@ object FileRepository {
                     emit(destFile)
                 } else {
                     destFile.delete()
-                    if (copyAndCheckFile()) {
+                    if (copyAndCheckFile(destFile)) {
                         emit(destFile)
                     }
                 }
             }
         } else {
-            if (copyAndCheckFile()) {
+            if (copyAndCheckFile(destFile)) {
                 emit(destFile)
             }
         }
     }
 
-    private fun copyAndCheckFile(): Boolean {
-        if (FileUtil.copyFile(context.assets.open(FILE_NAME), destFile).isSuccess) {
-            FileUtil.getMD5(destFile).onSuccess {
-                val isSameMd5 = it == FILE_MD5
-                Log.d(TAG, "copyAndCheckFile, file: $destFile, isSameMd5: $isSameMd5")
-                return isSameMd5
+    private fun copyAndCheckFile(destFile: File): Boolean {
+        FileUtil.copyAssetsFile(fileName, destFile).onSuccess {
+            return (FILE_MD5 == FileUtil.getMD5(destFile).getOrNull()).also {
+                Log.d(TAG, "copyAndCheckFile success, check md5 result: $it")
             }
+        }.onFailure {
+            Log.e(TAG, "copyAndCheckFile error: $it")
         }
         return false
     }

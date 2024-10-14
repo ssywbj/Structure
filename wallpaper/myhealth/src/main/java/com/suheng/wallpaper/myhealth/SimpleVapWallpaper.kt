@@ -121,7 +121,7 @@ class SimpleVapWallpaper : WallpaperService() {
 
         override fun onCreate(surfaceHolder: SurfaceHolder?) {
             super.onCreate(surfaceHolder)
-            Log.d(TAG, "Engine, onCreate, cacheDir: ${context.cacheDir.absolutePath}")
+            Log.d(TAG, "Engine, onCreate")
             FileRepository.parseFileConfig().forEach {
                 Log.d(TAG, "video id: ${it.first}")
                 it.second.forEach { fileInfo ->

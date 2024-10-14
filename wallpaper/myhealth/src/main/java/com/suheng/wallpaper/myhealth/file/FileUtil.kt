@@ -1,6 +1,7 @@
 package com.suheng.wallpaper.myhealth.file
 
 import android.util.Log
+import com.suheng.wallpaper.myhealth.app.App
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -18,58 +19,46 @@ object FileUtil {
 
     private const val TAG = "FileUtil"
 
-    fun readInputStream(inputStream: InputStream): ByteArray {
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        val buffer = ByteArray(2048 * 2)
-        var len: Int
-        while ((inputStream.read(buffer).also { len = it }) != -1) {
-            byteArrayOutputStream.write(buffer, 0, len)
-        }
-        val data = byteArrayOutputStream.toByteArray()
-        byteArrayOutputStream.close()
-        inputStream.close()
-        return data
-    }
-
+    @Throws(IOException::class)
     private fun streamInputToOutput(
         input: InputStream, output: OutputStream, needClose: Boolean = true,
-    ): Result<Unit> {
-        return kotlin.runCatching {
-            Log.v(TAG, "streamInputToOutput, ${Thread.currentThread().name}")
-            val buffer = ByteArray(2048 * 2)
-            var len: Int
-            while (input.read(buffer).also { len = it } != -1) {
-                output.write(buffer, 0, len)
-            }
-            if (needClose) {
-                output.close()
-                input.close()
-            }
+    ) {
+        Log.v(TAG, "streamInputToOutput, ${Thread.currentThread().name}")
+        val buffer = ByteArray(2048 * 2)
+        var len: Int
+        while (input.read(buffer).also { len = it } != -1) {
+            output.write(buffer, 0, len)
         }
-
+        if (needClose) {
+            output.close()
+            input.close()
+        }
     }
 
     fun streamInputToByte(input: InputStream): ByteArray? {
-        val output = ByteArrayOutputStream()
-        var data: ByteArray? = null
-        if (streamInputToOutput(input, output, false).isSuccess) {
-            data = output.toByteArray()
-        }
-        try {
-            output.close()
-            input.close()
+        return kotlin.runCatching {
+            val output = ByteArrayOutputStream()
+            streamInputToOutput(input, output, false)
+            output.use {
+                output.toByteArray()
+            }.also { input.close() }
+        }.getOrNull()
+    }
+
+    fun assetsStreamInputToByte(assetsPath: String): ByteArray? {
+        return try {
+            streamInputToByte(App.appCtx().assets.open(assetsPath))
         } catch (e: IOException) {
-            e.printStackTrace()
+            null
         }
-        return data
     }
 
     fun copyFile(source: InputStream, dest: File): Result<Unit> {
-        return streamInputToOutput(source, FileOutputStream(dest))
+        return kotlin.runCatching { streamInputToOutput(source, FileOutputStream(dest)) }
     }
 
     fun copyFile(source: InputStream, dest: String): Result<Unit> {
-        return streamInputToOutput(source, FileOutputStream(dest))
+        return kotlin.runCatching { streamInputToOutput(source, FileOutputStream(dest)) }
     }
 
     fun copyFile(source: File, dest: File): Result<Unit> {
@@ -78,6 +67,18 @@ object FileUtil {
 
     fun copyFile(source: String, dest: String): Result<Unit> {
         return copyFile(FileInputStream(source), dest)
+    }
+
+    fun copyAssetsFile(absPath: String, dest: String): Result<Unit> {
+        return kotlin.runCatching {
+            streamInputToOutput(App.appCtx().assets.open(absPath), FileOutputStream(dest))
+        }
+    }
+
+    fun copyAssetsFile(assetsPath: String, dest: File): Result<Unit> {
+        return kotlin.runCatching {
+            streamInputToOutput(App.appCtx().assets.open(assetsPath), FileOutputStream(dest))
+        }
     }
 
     fun getMD5(file: File): Result<String> {
