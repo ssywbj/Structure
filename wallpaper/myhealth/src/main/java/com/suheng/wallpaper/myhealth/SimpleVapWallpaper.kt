@@ -9,14 +9,16 @@ import android.hardware.display.VirtualDisplay
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
-import com.suheng.wallpaper.myhealth.file.coroutineScope
+import com.suheng.wallpaper.myhealth.file.wallpaperScope
 import com.suheng.wallpaper.myhealth.repository.FileRepository
 import com.tencent.qgame.animplayer.AnimView
 import com.tencent.qgame.animplayer.VapSurface
 import com.tencent.qgame.animplayer.util.ScaleType
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.onEmpty
+import kotlinx.coroutines.launch
+import java.io.File
 
 class SimpleVapWallpaper : WallpaperService() {
 
@@ -118,17 +120,28 @@ class SimpleVapWallpaper : WallpaperService() {
     //https://github.com/androidx/androidx
     private inner class OpenGLEngine : Engine() {
         private var vapSurface: VapSurface? = null
+        private var isVisible = false
+        private var file: File? = null
+        private val job: Job = wallpaperScope.launch(start = CoroutineStart.LAZY) {
+            FileRepository.loadVideoFile().onEmpty { Log.w(TAG, "loadVideoFile fail: flow empty") }
+                .collect { fl ->
+                    Log.v(TAG, "loadVideoFile success: $fl, isVisible: $isVisible")
+                    file = fl
+                    if (isVisible) {
+                        vapSurface?.takeUnless { it.isRunning() }?.startPlay(fl)
+                    }
+                }
+        }
 
         override fun onCreate(surfaceHolder: SurfaceHolder?) {
             super.onCreate(surfaceHolder)
-            Log.d(TAG, "Engine, onCreate")
-            FileRepository.parseFileConfig()
-            FileRepository.parseVideoConfig()
-            FileRepository.getSelectedVideo()
+            Log.d(TAG, "Engine, onCreate, job: $job")
+            job.start()
         }
 
         override fun onDestroy() {
             super.onDestroy()
+            job.cancel()
             Log.v(TAG, "Engine, onDestroy: $this")
         }
 
@@ -162,13 +175,13 @@ class SimpleVapWallpaper : WallpaperService() {
 
         override fun onVisibilityChanged(visible: Boolean) {
             super.onVisibilityChanged(visible)
-            Log.i(TAG, "onVisibilityChanged, visible: $visible, isPreview: $isPreview, $this")
+            isVisible = visible
+            val isCompleted = job.isCompleted
+            Log.i(TAG, "visible: $visible, isPreview: $isPreview, isCompleted: $isCompleted, file: $file, $this")
             if (visible) {
-                FileRepository.loadVideoFile().onEach { file ->
-                    Log.v(TAG, "loadVideoFile success: $file")
-                    vapSurface?.startPlay(file)
-                }.onEmpty { Log.w(TAG, "loadVideoFile fail: flow empty") }.launchIn(coroutineScope)
-                //vapSurface?.startPlay(context.assets, "demo.mp4")
+                file?.takeIf { isCompleted }?.let {
+                    vapSurface?.startPlay(it)
+                }
             } else {
                 vapSurface?.takeIf { it.isRunning() }?.stopPlay()
             }

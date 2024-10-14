@@ -22,6 +22,10 @@ object FileRepository {
     private val videoList = mutableListOf<Video>()
 
     fun loadVideoFile() = flow {
+        parseFileConfig()
+        parseVideoConfig()
+        getSelectedVideo()
+
         val cacheFile = selectedVideo?.let {
             val assetsDir = it.url + it.path
             val fileName = getVideoFileName()

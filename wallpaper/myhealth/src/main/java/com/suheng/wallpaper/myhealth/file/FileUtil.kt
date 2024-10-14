@@ -120,13 +120,13 @@ object FileUtil {
     }
 }
 
-val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+var wallpaperScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
-inline fun runOnUiThread(crossinline block: () -> Unit) {
-    coroutineScope.launch(Dispatchers.Main) { block() }
+inline fun runOnUiThread(scope: CoroutineScope = wallpaperScope, crossinline block: () -> Unit) {
+    scope.launch(Dispatchers.Main) { block() }
 }
 
-inline fun runOnWorkThread(crossinline block: () -> Unit) {
-    coroutineScope.launch(Dispatchers.IO) { block() }
+inline fun runOnWorkThread(scope: CoroutineScope = wallpaperScope, crossinline block: () -> Unit) {
+    scope.launch(Dispatchers.IO) { block() }
 }
 
