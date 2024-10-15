@@ -1,7 +1,6 @@
 package com.suheng.wallpaper.myhealth
 
 import android.app.Presentation
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.hardware.display.DisplayManager
@@ -9,21 +8,33 @@ import android.hardware.display.VirtualDisplay
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
-import com.suheng.wallpaper.myhealth.file.wallpaperScope
 import com.suheng.wallpaper.myhealth.repository.FileRepository
 import com.tencent.qgame.animplayer.AnimView
 import com.tencent.qgame.animplayer.VapSurface
 import com.tencent.qgame.animplayer.util.ScaleType
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.onEmpty
 import kotlinx.coroutines.launch
 import java.io.File
+import kotlin.properties.Delegates
 
 class SimpleVapWallpaper : WallpaperService() {
 
-    private lateinit var context: Context
+    companion object {
+        private val TAG = SimpleVapWallpaper::class.java.simpleName
+        private const val RENDER_VIRTUAL_DISPLAY = 0
+        private const val RENDER_OPEN_GL = 1
+        private var context: SimpleVapWallpaper by Delegates.notNull()
+        fun getInstance(): SimpleVapWallpaper = context
+    }
+
     private var renderType = RENDER_OPEN_GL
+    val wallpaperScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     override fun onCreate() {
         super.onCreate()
@@ -34,6 +45,7 @@ class SimpleVapWallpaper : WallpaperService() {
     override fun onDestroy() {
         super.onDestroy()
         Log.v(TAG, "Wallpaper, onDestroy: $this")
+        wallpaperScope.cancel()
     }
 
     override fun onCreateEngine(): Engine {
@@ -177,7 +189,10 @@ class SimpleVapWallpaper : WallpaperService() {
             super.onVisibilityChanged(visible)
             isVisible = visible
             val isCompleted = job.isCompleted
-            Log.i(TAG, "visible: $visible, isPreview: $isPreview, isCompleted: $isCompleted, file: $file, $this")
+            Log.i(
+                TAG,
+                "visible: $visible, isPreview: $isPreview, isCompleted: $isCompleted, file: $file, $this"
+            )
             if (visible) {
                 file?.takeIf { isCompleted }?.let {
                     vapSurface?.startPlay(it)
@@ -186,12 +201,6 @@ class SimpleVapWallpaper : WallpaperService() {
                 vapSurface?.takeIf { it.isRunning() }?.stopPlay()
             }
         }
-    }
-
-    companion object {
-        private val TAG = SimpleVapWallpaper::class.java.simpleName
-        private const val RENDER_VIRTUAL_DISPLAY = 0
-        private const val RENDER_OPEN_GL = 1
     }
 
 }

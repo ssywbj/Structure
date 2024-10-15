@@ -1,10 +1,10 @@
 package com.suheng.wallpaper.myhealth.file
 
 import android.util.Log
+import com.suheng.wallpaper.myhealth.SimpleVapWallpaper
 import com.suheng.wallpaper.myhealth.app.App
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -120,13 +120,17 @@ object FileUtil {
     }
 }
 
-var wallpaperScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-
-inline fun runOnUiThread(scope: CoroutineScope = wallpaperScope, crossinline block: () -> Unit) {
+inline fun runOnUiThread(
+    scope: CoroutineScope = SimpleVapWallpaper.getInstance().wallpaperScope,
+    crossinline block: () -> Unit,
+) {
     scope.launch(Dispatchers.Main) { block() }
 }
 
-inline fun runOnWorkThread(scope: CoroutineScope = wallpaperScope, crossinline block: () -> Unit) {
+inline fun runOnWorkThread(
+    scope: CoroutineScope = SimpleVapWallpaper.getInstance().wallpaperScope,
+    crossinline block: () -> Unit,
+) {
     scope.launch(Dispatchers.IO) { block() }
 }
 
