@@ -1,17 +1,14 @@
-package com.suheng.wallpaper.myhealth.repository
+package com.suheng.wallpaper.myhealth.file
 
 import android.util.Log
 import com.suheng.wallpaper.myhealth.R
 import com.suheng.wallpaper.myhealth.app.App
 import com.suheng.wallpaper.myhealth.bean.FileInfo
 import com.suheng.wallpaper.myhealth.bean.Video
-import com.suheng.wallpaper.myhealth.file.FileUtil
-import com.suheng.wallpaper.myhealth.file.PrefsUtils
-import kotlinx.coroutines.flow.flow
 import org.xmlpull.v1.XmlPullParser
 import java.io.File
 
-object FileRepository {
+object VideoLoader {
 
     private const val TAG = "SimpleVapWallpaper"
     private val context = App.appCtx()
@@ -21,43 +18,23 @@ object FileRepository {
     private val filePairList = mutableListOf<Pair<Int, MutableList<FileInfo>>>()
     private val videoList = mutableListOf<Video>()
 
-    fun loadVideoFile() = flow {
-        parseFileConfig()
-        parseVideoConfig()
-        getSelectedVideo()
-
-        val cacheFile = selectedVideo?.let {
-            val assetsDir = it.url + it.path
-            val fileName = getVideoFileName()
-            assetsPath = assetsDir + File.separator + fileName
-            md5 = getVideoFileMD5(it.id, fileName)
-            val dir = File(context.cacheDir, assetsDir)
-            if (!dir.exists()) {
-                dir.mkdirs()
-            }
-            File(dir, fileName)
-        }
-        Log.d(TAG, "cacheFile: $cacheFile, assetsPath: $assetsPath, md5: $md5")
-        if (cacheFile == null) {
-            return@flow
-        }
-
-        if (cacheFile.exists()) {
-            FileUtil.getMD5(cacheFile).onSuccess {
-                val isSameMd5 = (it == md5)
-                Log.d(TAG, "exists cacheFile, isSameMd5: $isSameMd5")
-                if (isSameMd5) {
-                    emit(cacheFile)
-                } else {
-                    cacheFile.delete()
-                    if (copyAndCheckFile(cacheFile)) {
-                        emit(cacheFile)
+    fun loadVideoFile(): File? {
+        return selectedVideo?.let {
+            buildPath(it)
+        }?.let { cacheFile ->
+            if (cacheFile.exists()) {
+                return@let FileUtil.getMD5(cacheFile).getOrNull()?.let {
+                    val isSameMd5 = (it == md5)
+                    Log.d(TAG, "exists cacheFile, isSameMd5: $isSameMd5")
+                    if (isSameMd5) {
+                        cacheFile
+                    } else {
+                        cacheFile.delete()
+                        if (copyAndCheckFile(cacheFile)) cacheFile else null
                     }
                 }
-            }
-        } else {
-            if (copyAndCheckFile(cacheFile)) {
-                emit(cacheFile)
+            } else {
+                return@let if (copyAndCheckFile(cacheFile)) cacheFile else null
             }
         }
     }
@@ -99,8 +76,6 @@ object FileRepository {
 
         parser.close()
 
-        this.videoList.clear()
-        this.videoList.addAll(videoList)
         return videoList
     }
 
@@ -150,22 +125,35 @@ object FileRepository {
 
         parser.close()
 
-        this.filePairList.clear()
-        this.filePairList.addAll(filePairList)
         return filePairList
     }
 
-    fun getSelectedVideo(): Video? {
+    fun getSelected(): Video? {
         val videoId = PrefsUtils.loadSelectedVideoId(context)
-        return videoList.find { videoId == it.id }.also { selectedVideo = it }
+        return videoList.find { videoId == it.id }
     }
 
-    private fun getVideoFileName() = when ((0..1).random()) {
+    private fun buildPath(video: Video): File {
+        val assetsDir = video.url + video.path
+        val cacheDir = File(context.cacheDir, assetsDir)
+        if (!cacheDir.exists()) {
+            cacheDir.mkdirs()
+        }
+        val fileName = getFileName()
+        assetsPath = assetsDir + File.separator + fileName
+        md5 = getMD5(video.id, fileName)
+        return File(cacheDir, fileName).also { file ->
+            Log.d(TAG, "cacheFile: $file, assetsPath: $assetsPath, md5: $md5")
+        }
+    }
+
+    private fun getFileName() = when ((0..1).random()) {
         1 -> context.getString(R.string.video_demo2)
         else -> context.getString(R.string.video_demo)
     }
 
-    private fun getVideoFileMD5(videoId: Int, fileName: String): String? {
+    private fun getMD5(videoId: Int, fileName: String): String? {
         return filePairList.find { it.first == videoId }?.second?.find { it.name == fileName }?.md5
     }
+
 }

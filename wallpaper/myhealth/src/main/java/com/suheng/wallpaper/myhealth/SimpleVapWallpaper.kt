@@ -8,7 +8,7 @@ import android.hardware.display.VirtualDisplay
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
-import com.suheng.wallpaper.myhealth.repository.FileRepository
+import com.suheng.wallpaper.myhealth.repository.VideoRepository
 import com.tencent.qgame.animplayer.AnimView
 import com.tencent.qgame.animplayer.VapSurface
 import com.tencent.qgame.animplayer.util.ScaleType
@@ -135,7 +135,7 @@ class SimpleVapWallpaper : WallpaperService() {
         private var isVisible = false
         private var file: File? = null
         private val job: Job = wallpaperScope.launch(start = CoroutineStart.LAZY) {
-            FileRepository.loadVideoFile().onEmpty { Log.w(TAG, "loadVideoFile fail: flow empty") }
+            VideoRepository.loadVideoFile().onEmpty { Log.w(TAG, "loadVideoFile fail: flow empty") }
                 .collect { fl ->
                     Log.v(TAG, "loadVideoFile success: $fl, isVisible: $isVisible")
                     file = fl
