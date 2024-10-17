@@ -8,6 +8,7 @@ import android.hardware.display.VirtualDisplay
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
+import com.suheng.wallpaper.myhealth.file.identityHashCode
 import com.suheng.wallpaper.myhealth.repository.VideoRepository
 import com.tencent.qgame.animplayer.AnimView
 import com.tencent.qgame.animplayer.VapSurface
@@ -147,24 +148,24 @@ class SimpleVapWallpaper : WallpaperService() {
 
         override fun onCreate(surfaceHolder: SurfaceHolder?) {
             super.onCreate(surfaceHolder)
-            Log.d(TAG, "Engine, onCreate, job: $job")
+            Log.d(TAG, "Engine onCreate: ${identityHashCode()}")
             job.start()
         }
 
         override fun onDestroy() {
             super.onDestroy()
             job.cancel()
-            Log.v(TAG, "Engine, onDestroy: $this")
+            Log.v(TAG, "Engine onDestroy: ${identityHashCode()}")
         }
 
         override fun onSurfaceCreated(holder: SurfaceHolder?) {
             super.onSurfaceCreated(holder)
-            Log.d(TAG, "onSurfaceCreated: $this")
+            Log.d(TAG, "onSurfaceCreated: ${identityHashCode()}")
         }
 
         override fun onSurfaceDestroyed(holder: SurfaceHolder?) {
-            Log.v(TAG, "onSurfaceDestroyed: $this")
             super.onSurfaceDestroyed(holder)
+            Log.v(TAG, "onSurfaceDestroyed: ${identityHashCode()}")
             vapSurface?.onSurfaceDestroyed()
         }
 
@@ -172,7 +173,7 @@ class SimpleVapWallpaper : WallpaperService() {
             holder: SurfaceHolder?, format: Int, width: Int, height: Int,
         ) {
             super.onSurfaceChanged(holder, format, width, height)
-            Log.i(TAG, "onSurfaceChanged, width: $width, height: $height, $this")
+            Log.i(TAG, "onSurfaceChanged width: $width, height: $height, ${identityHashCode()}")
             vapSurface?.onSurfaceSizeChanged(width, height)
             if (vapSurface == null) {
                 vapSurface = holder?.surface?.let {
@@ -191,7 +192,7 @@ class SimpleVapWallpaper : WallpaperService() {
             val isCompleted = job.isCompleted
             Log.i(
                 TAG,
-                "visible: $visible, isPreview: $isPreview, isCompleted: $isCompleted, file: $file, $this"
+                "visible: $visible, isPreview: $isPreview, isCompleted: $isCompleted, file: $file, ${identityHashCode()}"
             )
             if (visible) {
                 file?.takeIf { isCompleted }?.let {

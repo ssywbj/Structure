@@ -133,3 +133,5 @@ inline fun runOnWorkThread(
 ) {
     scope.launch(Dispatchers.IO) { block() }
 }
+
+fun Any.identityHashCode() = System.identityHashCode(this)
