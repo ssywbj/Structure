@@ -1,8 +1,8 @@
 package com.suheng.wallpaper.myhealth.file
 
+import android.content.Context
 import android.util.Log
 import com.suheng.wallpaper.myhealth.R
-import com.suheng.wallpaper.myhealth.app.App
 import com.suheng.wallpaper.myhealth.bean.FileInfo
 import com.suheng.wallpaper.myhealth.bean.Video
 import org.xmlpull.v1.XmlPullParser
@@ -11,16 +11,14 @@ import java.io.File
 object VideoLoader {
 
     private const val TAG = "SimpleVapWallpaper"
-    private val context = App.appCtx()
     private var assetsPath = ""
     private var md5: String? = null
-    private var selectedVideo: Video? = null
     private val filePairList = mutableListOf<Pair<Int, MutableList<FileInfo>>>()
     private val videoList = mutableListOf<Video>()
 
-    fun loadVideoFile(): File? {
-        return selectedVideo?.let {
-            buildPath(it)
+    fun loadVideoFile(ctx: Context): File? {
+        return getSelected(ctx)?.let {
+            buildPath(ctx, it)
         }?.let { cacheFile ->
             if (cacheFile.exists()) {
                 return@let FileUtil.getMD5(cacheFile).getOrNull()?.let {
@@ -50,9 +48,9 @@ object VideoLoader {
         return false
     }
 
-    fun parseVideoConfig(): MutableList<Video> {
+    fun parseVideoConfig(ctx: Context): MutableList<Video> {
         val videoList = mutableListOf<Video>()
-        val resources = context.resources
+        val resources = ctx.resources
         val parser = resources.getXml(R.xml.video_config)
 
         while (parser.eventType != XmlPullParser.END_DOCUMENT) {
@@ -79,9 +77,9 @@ object VideoLoader {
         return videoList
     }
 
-    fun parseFileConfig(): MutableList<Pair<Int, MutableList<FileInfo>>> {
+    fun parseFileConfig(ctx: Context): MutableList<Pair<Int, MutableList<FileInfo>>> {
         val filePairList = mutableListOf<Pair<Int, MutableList<FileInfo>>>()
-        val resources = context.resources
+        val resources = ctx.resources
         val parser = resources.getXml(R.xml.file_config)
 
         var videoId: Int? = null
@@ -128,18 +126,18 @@ object VideoLoader {
         return filePairList
     }
 
-    fun getSelected(): Video? {
-        val videoId = PrefsUtils.loadSelectedVideoId(context)
+    fun getSelected(ctx: Context): Video? {
+        val videoId = PrefsUtils.loadSelectedVideoId(ctx)
         return videoList.find { videoId == it.id }
     }
 
-    private fun buildPath(video: Video): File {
+    private fun buildPath(ctx: Context, video: Video): File {
         val assetsDir = video.url + video.path
-        val cacheDir = File(context.cacheDir, assetsDir)
+        val cacheDir = File(ctx.cacheDir, assetsDir)
         if (!cacheDir.exists()) {
             cacheDir.mkdirs()
         }
-        val fileName = getFileName()
+        val fileName = getFileName(ctx)
         assetsPath = assetsDir + File.separator + fileName
         md5 = getMD5(video.id, fileName)
         return File(cacheDir, fileName).also { file ->
@@ -147,13 +145,25 @@ object VideoLoader {
         }
     }
 
-    private fun getFileName() = when ((0..1).random()) {
-        1 -> context.getString(R.string.video_demo2)
-        else -> context.getString(R.string.video_demo)
+    private fun getFileName(ctx: Context) = when ((0..1).random()) {
+        1 -> ctx.getString(R.string.video_demo2)
+        else -> ctx.getString(R.string.video_demo)
     }
 
     private fun getMD5(videoId: Int, fileName: String): String? {
         return filePairList.find { it.first == videoId }?.second?.find { it.name == fileName }?.md5
     }
+
+    fun setFilePairList(filePairs: MutableList<Pair<Int, MutableList<FileInfo>>>) {
+        filePairList += filePairs
+    }
+
+    fun getFilePairList(): MutableList<Pair<Int, MutableList<FileInfo>>> = filePairList
+
+    fun setVideoList(videos: MutableList<Video>) {
+        this.videoList += videos
+    }
+
+    fun getVideoList(): MutableList<Video> = videoList
 
 }
