@@ -12,14 +12,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import com.suheng.wallpaper.myhealth.R
+import com.suheng.wallpaper.myhealth.bean.asAdtItem
 import com.suheng.wallpaper.myhealth.file.PrefsUtils
+import com.suheng.wallpaper.myhealth.file.VideoLoader
+import com.suheng.wallpaper.myhealth.repository.VideoRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class VapWallpaperConfig : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView()
+
+        val videoList = VideoLoader.getVideoList()
+        if (videoList.isEmpty()) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                VideoRepository.parseVideoConfig().collect {
+                    VideoLoader.setVideoList(it)
+                    it.map { video -> video.asAdtItem() }.forEach { item -> println(item) }
+                }
+            }
+        } else {
+            videoList.map { it.asAdtItem() }.forEach { println(it) }
+        }
+
         setContent {
             Text(
                 modifier = Modifier

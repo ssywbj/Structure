@@ -63,7 +63,12 @@ object VideoLoader {
                     )
                     val url = parser.getAttributeValue(null, "url")
                     val path = parser.getAttributeValue(null, "path")
-                    val video = Video(id, url, path)
+                    val name = resources.getString(
+                        parser.getAttributeResourceValue(
+                            null, "name", R.string.video1_name
+                        )
+                    )
+                    val video = Video(id, url, path, name)
                     //Log.v(TAG, "video: $video")
                     videoList.add(video)
                 }

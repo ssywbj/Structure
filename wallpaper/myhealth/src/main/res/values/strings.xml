@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">My Health</string>
+    <string name="video1_name">Win game</string>
+    <string name="video2_name">Beat heart</string>
 </resources>

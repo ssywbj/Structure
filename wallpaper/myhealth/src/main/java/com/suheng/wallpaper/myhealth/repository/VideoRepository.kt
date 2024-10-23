@@ -48,7 +48,7 @@ object VideoRepository {
         }
     }
 
-    private fun parseVideoConfig() = flow {
+    fun parseVideoConfig() = flow {
         emit(VideoLoader.parseVideoConfig(App.appCtx()))
     }
 
