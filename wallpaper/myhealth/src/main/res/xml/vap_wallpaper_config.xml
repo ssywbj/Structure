@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <wallpaper xmlns:android="http://schemas.android.com/apk/res/android"
-    android:thumbnail="@drawable/vap_wallpaper"/>
-    <!--android:settingsActivity="com.suheng.wallpaper.myhealth.aty.VapWallpaperConfig"-->
+    android:settingsActivity="com.suheng.wallpaper.myhealth.aty.VapWallpaperConfig"
+    android:thumbnail="@drawable/vap_wallpaper" />
