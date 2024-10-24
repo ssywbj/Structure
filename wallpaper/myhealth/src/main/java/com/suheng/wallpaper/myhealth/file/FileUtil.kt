@@ -3,8 +3,14 @@ package com.suheng.wallpaper.myhealth.file
 import android.util.Log
 import com.suheng.wallpaper.myhealth.SimpleVapWallpaper
 import com.suheng.wallpaper.myhealth.app.App
+import com.tencent.qgame.animplayer.AnimConfig
+import com.tencent.qgame.animplayer.IAnimView
+import com.tencent.qgame.animplayer.inter.IAnimListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -135,3 +141,44 @@ inline fun runOnWorkThread(
 }
 
 fun Any.identityHashCode() = System.identityHashCode(this)
+
+fun IAnimView.animListenerFlow(
+    onStart: Boolean = false, onRender: Boolean = false,
+    onComplete: Boolean = false, onDestroy: Boolean = false, onFailed: Boolean = false,
+) = callbackFlow<Any> {
+    val animListener = object : IAnimListener {
+        override fun onVideoStart() {
+            if (onStart) {
+                trySendBlocking(0)
+            }
+        }
+
+        override fun onVideoRender(frameIndex: Int, config: AnimConfig?) {
+            if (onRender) {
+                trySendBlocking(frameIndex to config)
+            }
+        }
+
+        override fun onVideoComplete() {
+            if (onComplete) {
+                trySendBlocking(1)
+            }
+        }
+
+        override fun onVideoDestroy() {
+            if (onDestroy) {
+                trySendBlocking(2)
+            }
+        }
+
+        override fun onFailed(errorType: Int, errorMsg: String?) {
+            if (onFailed) {
+                check(errorType != 0) {
+                    errorMsg ?: "error msg is empty"
+                }
+            }
+        }
+    }
+    setAnimListener(animListener)
+    awaitClose { setAnimListener(null) }
+}

@@ -8,6 +8,7 @@ import android.hardware.display.VirtualDisplay
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
+import com.suheng.wallpaper.myhealth.file.animListenerFlow
 import com.suheng.wallpaper.myhealth.file.identityHashCode
 import com.suheng.wallpaper.myhealth.repository.VideoRepository
 import com.tencent.qgame.animplayer.AnimView
@@ -19,7 +20,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onEmpty
+import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.properties.Delegates
@@ -181,6 +187,14 @@ class SimpleVapWallpaper : WallpaperService() {
                         setScaleType(ScaleType.FIT_CENTER)
                         setLoop(Int.MAX_VALUE)
                         onSurfaceAvailable(it, width, height)
+                        animListenerFlow(onDestroy = true, onFailed = true).onEach {
+                            if (it == 2) {
+                                delay(100)
+                                onVideoDestroy()
+                            }
+                        }.retry(3) {
+                            it is IllegalStateException
+                        }.catch { }.launchIn(wallpaperScope)
                     }
                 }
             }
@@ -201,6 +215,9 @@ class SimpleVapWallpaper : WallpaperService() {
             } else {
                 vapSurface?.takeIf { it.isRunning() }?.stopPlay()
             }
+        }
+
+        private fun onVideoDestroy() {
         }
     }
 
