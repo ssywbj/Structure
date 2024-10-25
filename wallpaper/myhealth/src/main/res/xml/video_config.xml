@@ -14,73 +14,73 @@
         name="@string/video2_name"/>
 
     <video
-        id="@integer/video_demo_id"
+        id="@integer/video_demo3_id"
         url="video"
         path="/1"
         name="@string/video1_name" />
 
     <video
-        id="@integer/video_demo2_id"
+        id="@integer/video_demo4_id"
         url="video"
         path="/2"
         name="@string/video2_name"/>
 
     <video
-        id="@integer/video_demo_id"
+        id="@integer/video_demo5_id"
         url="video"
         path="/1"
         name="@string/video1_name" />
 
     <video
-        id="@integer/video_demo2_id"
+        id="@integer/video_demo6_id"
         url="video"
         path="/2"
         name="@string/video2_name"/>
 
     <video
-        id="@integer/video_demo_id"
+        id="@integer/video_demo7_id"
         url="video"
         path="/1"
         name="@string/video1_name" />
 
     <video
-        id="@integer/video_demo2_id"
+        id="@integer/video_demo8_id"
         url="video"
         path="/2"
         name="@string/video2_name"/>
 
     <video
-        id="@integer/video_demo_id"
+        id="@integer/video_demo9_id"
         url="video"
         path="/1"
         name="@string/video1_name" />
 
     <video
-        id="@integer/video_demo2_id"
+        id="@integer/video_demo10_id"
         url="video"
         path="/2"
         name="@string/video2_name"/>
 
     <video
-        id="@integer/video_demo_id"
+        id="@integer/video_demo11_id"
         url="video"
         path="/1"
         name="@string/video1_name" />
 
     <video
-        id="@integer/video_demo2_id"
+        id="@integer/video_demo12_id"
         url="video"
         path="/2"
         name="@string/video2_name"/>
 
     <video
-        id="@integer/video_demo_id"
+        id="@integer/video_demo13_id"
         url="video"
         path="/1"
         name="@string/video1_name" />
 
     <video
-        id="@integer/video_demo2_id"
+        id="@integer/video_demo14_id"
         url="video"
         path="/2"
         name="@string/video2_name"/>

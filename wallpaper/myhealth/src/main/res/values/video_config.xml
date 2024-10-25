@@ -2,6 +2,18 @@
 <resources>
     <integer name="video_demo_id">0</integer>
     <integer name="video_demo2_id">1</integer>
+    <integer name="video_demo3_id">2</integer>
+    <integer name="video_demo4_id">3</integer>
+    <integer name="video_demo5_id">4</integer>
+    <integer name="video_demo6_id">5</integer>
+    <integer name="video_demo7_id">6</integer>
+    <integer name="video_demo8_id">7</integer>
+    <integer name="video_demo9_id">8</integer>
+    <integer name="video_demo10_id">9</integer>
+    <integer name="video_demo11_id">10</integer>
+    <integer name="video_demo12_id">11</integer>
+    <integer name="video_demo13_id">12</integer>
+    <integer name="video_demo14_id">13</integer>
 
     <string name="video_demo" translatable="false">demo.mp4</string>
     <string name="video_demo2" translatable="false">demo2.mp4</string>

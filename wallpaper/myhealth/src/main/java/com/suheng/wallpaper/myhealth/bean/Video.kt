@@ -3,13 +3,19 @@ package com.suheng.wallpaper.myhealth.bean
 import androidx.annotation.DrawableRes
 import com.suheng.wallpaper.myhealth.R
 
-data class Video(val id: Int = 0, val url: String, val path: String, val name: String)
+data class Video(val id: Int, val url: String, val path: String, val name: String)
 
-data class AdtItem(val id: Int = 0, val name: String, @DrawableRes val preview: Int)
+data class AdtItem(
+    val id: Int,
+    val name: String,
+    @DrawableRes val preview: Int,
+    var selected: Boolean = false,
+    var previewSelected: Boolean = false,
+)
 
 //inline fun <R> Video.mapItem(block: (Video) -> R): R = this.let(block)
 
-fun Video.previewResId() = when (id) {
+fun Video.previewResId() = when (id % 2) {
     1 -> R.drawable.video2_preview
     else -> R.drawable.video1_preview
 }
