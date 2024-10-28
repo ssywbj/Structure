@@ -5,18 +5,22 @@ import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -51,9 +55,9 @@ class VapWallpaperConfig : AppCompatActivity() {
                     itemList.addAll(it.map { video ->
                         video.asAdtItem().apply {
                             selected = selectedId == video.id
-                            previewSelected = selected
+                            previewSelected.value = selected
                         }
-                    }.onEach { item -> println(item) })
+                    }/*.onEach { item -> println(item) }*/)
                     Log.v(TAG, "onCreate size: ${itemList.size}")
                 }
             }
@@ -61,9 +65,9 @@ class VapWallpaperConfig : AppCompatActivity() {
             itemList.addAll(videoList.map {
                 it.asAdtItem().apply {
                     selected = selectedId == it.id
-                    previewSelected = selected
+                    previewSelected.value = selected
                 }
-            }.onEach { println(it) })
+            }/*.onEach { println(it) }*/)
         }
 
         setContent {
@@ -79,8 +83,17 @@ class VapWallpaperConfig : AppCompatActivity() {
                         modifier = Modifier
                             .fillMaxSize()
                             .clickable {
-                                PrefsUtils.saveSelectedVideoId(context, item.id)
-                            }) {
+                                itemList.forEach {
+                                    it.previewSelected.value = false
+                                }
+                                item.previewSelected.value = true
+                            }
+                            .run {
+                                if (item.previewSelected.value) {
+                                    border(2.dp, Color.Blue, RectangleShape).padding(2.dp)
+                                } else this
+                            },
+                    ) {
                         Image(
                             painter = painterResource(item.preview),
                             contentDescription = null,
@@ -92,6 +105,15 @@ class VapWallpaperConfig : AppCompatActivity() {
                                 .align(Alignment.BottomCenter),
                             Color.White, 18.sp, textAlign = TextAlign.Center
                         )
+
+                        if (item.selected) {
+                            Checkbox(
+                                true, null,
+                                Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(6.dp)
+                            )
+                        }
                     }
 
                 }

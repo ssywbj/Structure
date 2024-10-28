@@ -1,6 +1,8 @@
 package com.suheng.wallpaper.myhealth.bean
 
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.suheng.wallpaper.myhealth.R
 
 data class Video(val id: Int, val url: String, val path: String, val name: String)
@@ -10,7 +12,7 @@ data class AdtItem(
     val name: String,
     @DrawableRes val preview: Int,
     var selected: Boolean = false,
-    var previewSelected: Boolean = false,
+    var previewSelected: MutableState<Boolean> = mutableStateOf(false),
 )
 
 //inline fun <R> Video.mapItem(block: (Video) -> R): R = this.let(block)
