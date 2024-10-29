@@ -8,6 +8,7 @@ import android.hardware.display.VirtualDisplay
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
+import com.suheng.wallpaper.myhealth.file.VideoLoader
 import com.suheng.wallpaper.myhealth.file.animListenerFlow
 import com.suheng.wallpaper.myhealth.file.identityHashCode
 import com.suheng.wallpaper.myhealth.repository.VideoRepository
@@ -156,6 +157,10 @@ class SimpleVapWallpaper : WallpaperService() {
             super.onCreate(surfaceHolder)
             Log.d(TAG, "Engine onCreate: ${identityHashCode()}")
             job.start()
+
+            VideoLoader.getSelectedFlow().onEach {
+                Log.d(TAG, "selectedFlow onEach: $it")
+            }.launchIn(wallpaperScope)
         }
 
         override fun onDestroy() {
