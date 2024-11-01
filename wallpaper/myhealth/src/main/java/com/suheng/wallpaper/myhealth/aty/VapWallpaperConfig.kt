@@ -15,11 +15,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
@@ -37,9 +40,12 @@ import com.suheng.wallpaper.myhealth.bean.asAdtItem
 import com.suheng.wallpaper.myhealth.file.PrefsUtils
 import com.suheng.wallpaper.myhealth.file.VideoLoader
 import com.suheng.wallpaper.myhealth.repository.VideoRepository
+import com.tencent.qgame.animplayer.AnimConfig
 import com.tencent.qgame.animplayer.VapSurface
+import com.tencent.qgame.animplayer.inter.IAnimListener
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -82,113 +88,164 @@ class VapWallpaperConfig : AppCompatActivity() {
 
         var vapSurface: VapSurface? = null
         var videoPath: String? = null
-        VideoLoader.getSelectedFlow().onEach {
+        val previewVideo = MutableStateFlow(VideoRepository.selectedFlow.value)
+        previewVideo.filterNotNull().onEach {
             videoPath = it.url + it.path + "/demo.mp4"
-            Log.e(TAG, "selectedFlow onEach: $it, assets path: $videoPath")
+            Log.e(TAG, "previewVideo onEach: $it, assets path: $videoPath")
             vapSurface?.let { vap ->
                 if (vap.isRunning()) {
                     vap.stopPlay()
-                    delay(200)
                 }
-                vap.startPlay(context.assets, it.url + it.path + "/demo2.mp4")
             }
         }.launchIn(lifecycleScope)
 
         setContent {
             Log.d(TAG, "onCreate setContent")
-            Column {
-                AndroidView(
-                    factory = { context ->
-                        SurfaceView(context).apply {
-                            holder.addCallback(object : SurfaceHolder.Callback {
-                                override fun surfaceCreated(holder: SurfaceHolder) {
-                                    Log.d(TAG, "surfaceCreated")
-                                }
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column {
+                    AndroidView(
+                        factory = { context ->
+                            SurfaceView(context).apply {
+                                holder.addCallback(object : SurfaceHolder.Callback {
+                                    override fun surfaceCreated(holder: SurfaceHolder) {
+                                        Log.d(TAG, "surfaceCreated")
+                                    }
 
-                                override fun surfaceChanged(
-                                    holder: SurfaceHolder, format: Int, width: Int, height: Int,
-                                ) {
-                                    Log.d(TAG, "surfaceChanged")
-                                    vapSurface?.onSurfaceSizeChanged(width, height)
-                                    if (vapSurface == null) {
-                                        vapSurface = holder.surface?.let {
-                                            VapSurface().apply {
-                                                setLoop(Int.MAX_VALUE)
-                                                onSurfaceAvailable(it, width, height)
-                                                videoPath?.let {
-                                                    startPlay(context.assets, it)
+                                    override fun surfaceChanged(
+                                        holder: SurfaceHolder, format: Int, width: Int, height: Int,
+                                    ) {
+                                        Log.d(TAG, "surfaceChanged")
+                                        vapSurface?.onSurfaceSizeChanged(width, height)
+                                        if (vapSurface == null) {
+                                            vapSurface = holder.surface?.let {
+                                                VapSurface().apply {
+                                                    setLoop(Int.MAX_VALUE)
+                                                    onSurfaceAvailable(it, width, height)
+                                                    val animListener = object : IAnimListener {
+                                                        override fun onVideoStart() {
+                                                            Log.d(TAG, "onVideoStart")
+                                                        }
+
+                                                        override fun onVideoRender(
+                                                            frameIndex: Int,
+                                                            config: AnimConfig?,
+                                                        ) {
+                                                        }
+
+                                                        override fun onVideoComplete() {
+                                                            Log.d(TAG, "onVideoComplete")
+                                                            videoPath?.let {
+                                                                startPlay(context.assets, it)
+                                                            }
+                                                        }
+
+                                                        override fun onVideoDestroy() {
+                                                            Log.d(TAG, "onVideoDestroy")
+                                                        }
+
+                                                        override fun onFailed(
+                                                            errorType: Int,
+                                                            errorMsg: String?,
+                                                        ) {
+                                                        }
+                                                    }
+                                                    setAnimListener(animListener)
+                                                    videoPath?.let {
+                                                        startPlay(context.assets, it)
+                                                    }
                                                 }
                                             }
                                         }
                                     }
-                                }
 
-                                override fun surfaceDestroyed(holder: SurfaceHolder) {
-                                    Log.d(TAG, "surfaceDestroyed")
-                                    vapSurface?.onSurfaceDestroyed()
+                                    override fun surfaceDestroyed(holder: SurfaceHolder) {
+                                        Log.d(TAG, "surfaceDestroyed")
+                                        vapSurface?.onSurfaceDestroyed()
+                                    }
+                                })
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(220.dp)
+                    )
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(2.dp),
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    ) {
+                        itemsIndexed(itemList) { _, item ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable {
+                                        itemList.forEach {
+                                            it.previewSelected.value = false
+                                        }
+                                        item.previewSelected.value = true
+                                        VideoLoader
+                                            .getVideoList()
+                                            .find { it.id == item.id }
+                                            ?.let {
+                                                previewVideo.value = it
+                                                //VideoLoader.setSelected(context, it)
+                                                //Log.d(TAG, "SelectedVideo: $it")
+                                            }
+                                    }
+                                    .run {
+                                        if (item.previewSelected.value) {
+                                            border(2.dp, Color.Blue, RectangleShape).padding(2.dp)
+                                        } else this
+                                    },
+                            ) {
+                                Image(
+                                    painter = painterResource(item.preview),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                                Text(
+                                    item.name, modifier = Modifier
+                                        .wrapContentSize()
+                                        .align(Alignment.BottomCenter),
+                                    Color.White, 18.sp, textAlign = TextAlign.Center
+                                )
+
+                                if (item.selected) {
+                                    Checkbox(
+                                        true, null,
+                                        Modifier
+                                            .align(Alignment.BottomEnd)
+                                            .padding(6.dp)
+                                    )
                                 }
-                            })
+                            }
+
                         }
+                    }
+                }
+
+                Button(
+                    {
+                        /*previewVideo.value?.let {
+                            VideoRepository.setSelected(it)
+                        }*/
                     },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(220.dp)
-                )
-
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(2.dp),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        .height(50.dp)
+                        .width(110.dp)
+                        .align(Alignment.BottomCenter)
+                        .offset(y = (-12).dp),
                 ) {
-                    itemsIndexed(itemList) { _, item ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clickable {
-                                    itemList.forEach {
-                                        it.previewSelected.value = false
-                                    }
-                                    item.previewSelected.value = true
-                                    VideoLoader
-                                        .getVideoList()
-                                        .find { it.id == item.id }
-                                        ?.let {
-                                            VideoLoader.setSelected(context, it)
-                                            //Log.d(TAG, "SelectedVideo: $it")
-                                        }
-                                }
-                                .run {
-                                    if (item.previewSelected.value) {
-                                        border(2.dp, Color.Blue, RectangleShape).padding(2.dp)
-                                    } else this
-                                },
-                        ) {
-                            Image(
-                                painter = painterResource(item.preview),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                            Text(
-                                item.name, modifier = Modifier
-                                    .wrapContentSize()
-                                    .align(Alignment.BottomCenter),
-                                Color.White, 18.sp, textAlign = TextAlign.Center
-                            )
-
-                            if (item.selected) {
-                                Checkbox(
-                                    true, null,
-                                    Modifier
-                                        .align(Alignment.BottomEnd)
-                                        .padding(6.dp)
-                                )
-                            }
-                        }
-
-                    }
+                    Text(
+                        "Play",
+                        modifier = Modifier.wrapContentSize(),
+                        color = Color.White,
+                        fontSize = 20.sp,
+                    )
                 }
             }
         }

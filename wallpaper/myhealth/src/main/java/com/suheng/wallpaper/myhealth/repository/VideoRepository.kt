@@ -6,6 +6,7 @@ import com.suheng.wallpaper.myhealth.bean.Video
 import com.suheng.wallpaper.myhealth.file.VideoLoader
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
@@ -14,6 +15,8 @@ import java.io.File
 object VideoRepository {
 
     private const val TAG = "SimpleVapWallpaper"
+    private val ctx = App.appCtx()
+    val selectedFlow = MutableStateFlow<Video?>(null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getVideoFile(): Flow<File> {
@@ -43,17 +46,23 @@ object VideoRepository {
     }
 
     private fun loadVideoFile() = flow {
-        VideoLoader.loadVideoFile(App.appCtx())?.let {
+        VideoLoader.loadVideoFile(ctx)?.let {
+            selectedFlow.value = VideoLoader.getSelected(ctx)
             emit(it)
         }
     }
 
     fun parseVideoConfig() = flow {
-        emit(VideoLoader.parseVideoConfig(App.appCtx()))
+        emit(VideoLoader.parseVideoConfig(ctx))
     }
 
     private fun parseFileConfig() = flow {
-        emit(VideoLoader.parseFileConfig(App.appCtx()))
+        emit(VideoLoader.parseFileConfig(ctx))
+    }
+
+    fun setSelected(video: Video) {
+        selectedFlow.value = video
+        VideoLoader.setSelected(ctx, video)
     }
 
 }

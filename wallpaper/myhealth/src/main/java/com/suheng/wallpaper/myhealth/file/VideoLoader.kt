@@ -5,8 +5,6 @@ import android.util.Log
 import com.suheng.wallpaper.myhealth.R
 import com.suheng.wallpaper.myhealth.bean.FileInfo
 import com.suheng.wallpaper.myhealth.bean.Video
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import org.xmlpull.v1.XmlPullParser
 import java.io.File
 
@@ -138,13 +136,8 @@ object VideoLoader {
         return videoList.find { videoId == it.id }
     }
 
-    private val selectedFlow = MutableStateFlow<Video?>(null)
-
-    fun getSelectedFlow() = selectedFlow.filterNotNull()
-
     fun setSelected(ctx: Context, video: Video) {
         PrefsUtils.saveSelectedVideoId(ctx, video.id)
-        selectedFlow.value = video
     }
 
     private fun buildPath(ctx: Context, video: Video): File {

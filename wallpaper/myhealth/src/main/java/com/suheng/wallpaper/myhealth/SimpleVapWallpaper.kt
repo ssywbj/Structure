@@ -8,7 +8,6 @@ import android.hardware.display.VirtualDisplay
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
-import com.suheng.wallpaper.myhealth.file.VideoLoader
 import com.suheng.wallpaper.myhealth.file.animListenerFlow
 import com.suheng.wallpaper.myhealth.file.identityHashCode
 import com.suheng.wallpaper.myhealth.repository.VideoRepository
@@ -23,6 +22,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onEmpty
@@ -158,9 +158,11 @@ class SimpleVapWallpaper : WallpaperService() {
             Log.d(TAG, "Engine onCreate: ${identityHashCode()}")
             job.start()
 
-            VideoLoader.getSelectedFlow().onEach {
-                Log.d(TAG, "selectedFlow onEach: $it")
-            }.launchIn(wallpaperScope)
+            wallpaperScope.launch {
+                VideoRepository.selectedFlow.filterNotNull().collect {
+                    Log.i(TAG, "selectedFlow onEach: $it")
+                }
+            }
         }
 
         override fun onDestroy() {
