@@ -5,7 +5,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.suheng.wallpaper.myhealth.R
 
-data class Video(val id: Int, val url: String, val path: String, val name: String)
+data class Video(val id: Int, val url: String, val path: String, val name: String) {
+    val assetsDir = url + path
+}
 
 data class AdtItem(
     val id: Int,

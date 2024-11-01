@@ -23,7 +23,7 @@ object VideoLoader {
             if (cacheFile.exists()) {
                 return@let FileUtil.getMD5(cacheFile).getOrNull()?.let {
                     val isSameMd5 = (it == md5)
-                    Log.d(TAG, "exists cacheFile, isSameMd5: $isSameMd5")
+                    Log.d(TAG, "exists $cacheFile, isSameMd5: $isSameMd5")
                     if (isSameMd5) {
                         cacheFile
                     } else {
@@ -141,13 +141,12 @@ object VideoLoader {
     }
 
     private fun buildPath(ctx: Context, video: Video): File {
-        val assetsDir = video.url + video.path
-        val cacheDir = File(ctx.cacheDir, assetsDir)
+        val cacheDir = File(ctx.cacheDir, video.assetsDir)
         if (!cacheDir.exists()) {
             cacheDir.mkdirs()
         }
         val fileName = getFileName(ctx)
-        assetsPath = assetsDir + File.separator + fileName
+        assetsPath = video.assetsDir + File.separator + fileName
         md5 = getMD5(video.id, fileName)
         return File(cacheDir, fileName).also { file ->
             Log.d(TAG, "cacheFile: $file, assetsPath: $assetsPath, md5: $md5")

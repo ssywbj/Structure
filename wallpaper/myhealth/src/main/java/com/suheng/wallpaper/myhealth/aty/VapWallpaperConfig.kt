@@ -54,7 +54,7 @@ class VapWallpaperConfig : AppCompatActivity() {
 
     companion object {
         //private val TAG = VapWallpaperConfig::class.java.simpleName
-        private const val TAG = "SimpleVapWallpaper"
+        private const val TAG = "VapWallpaperConfig"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +90,7 @@ class VapWallpaperConfig : AppCompatActivity() {
         var videoPath: String? = null
         val previewVideo = MutableStateFlow(VideoRepository.selectedFlow.value)
         previewVideo.filterNotNull().onEach {
-            videoPath = it.url + it.path + "/demo.mp4"
+            videoPath = it.assetsDir + "/demo.mp4"
             Log.e(TAG, "previewVideo onEach: $it, assets path: $videoPath")
             vapSurface?.let { vap ->
                 if (vap.isRunning()) {
@@ -230,9 +230,10 @@ class VapWallpaperConfig : AppCompatActivity() {
 
                 Button(
                     {
-                        /*previewVideo.value?.let {
+                        previewVideo.value?.let {
                             VideoRepository.setSelected(it)
-                        }*/
+                        }
+                        finish()
                     },
                     modifier = Modifier
                         .height(50.dp)

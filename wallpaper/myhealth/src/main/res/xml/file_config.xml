@@ -7,7 +7,7 @@
     </item>
 
     <item video_id="@integer/video_demo2_id">
-        <file name="@string/video_demo" md5="3132824326bb07a1143739863e1e5762" />
-        <file name="@string/video_demo2" md5="d993c3e9ecde8a1e73e7db01f36e2c0e" />
+        <file name="@string/video_demo" md5="d993c3e9ecde8a1e73e7db01f36e2c0e" />
+        <file name="@string/video_demo2" md5="3132824326bb07a1143739863e1e5762" />
     </item>
 </files>

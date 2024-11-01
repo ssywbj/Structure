@@ -8,11 +8,12 @@ import android.hardware.display.VirtualDisplay
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
-import com.suheng.wallpaper.myhealth.file.animListenerFlow
 import com.suheng.wallpaper.myhealth.file.identityHashCode
 import com.suheng.wallpaper.myhealth.repository.VideoRepository
+import com.tencent.qgame.animplayer.AnimConfig
 import com.tencent.qgame.animplayer.AnimView
 import com.tencent.qgame.animplayer.VapSurface
+import com.tencent.qgame.animplayer.inter.IAnimListener
 import com.tencent.qgame.animplayer.util.ScaleType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -20,13 +21,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onEmpty
-import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.properties.Delegates
@@ -142,14 +138,15 @@ class SimpleVapWallpaper : WallpaperService() {
         private var vapSurface: VapSurface? = null
         private var isVisible = false
         private var file: File? = null
+        private var path: String? = null
         private val job: Job = wallpaperScope.launch(start = CoroutineStart.LAZY) {
             VideoRepository.getVideoFile().onEmpty { Log.w(TAG, "loadVideoFile fail: flow empty") }
                 .collect { fl ->
                     Log.v(TAG, "loadVideoFile success: $fl, isVisible: $isVisible")
-                    file = fl
+                    /*file = fl
                     if (isVisible) {
                         vapSurface?.takeUnless { it.isRunning() }?.startPlay(fl)
-                    }
+                    }*/
                 }
         }
 
@@ -160,7 +157,13 @@ class SimpleVapWallpaper : WallpaperService() {
 
             wallpaperScope.launch {
                 VideoRepository.selectedFlow.filterNotNull().collect {
-                    Log.i(TAG, "selectedFlow onEach: $it")
+                    (it.assetsDir + "/demo.mp4").run {
+                        path = this
+                        Log.i(TAG, "selectedFlow: $it, path: $path, isVisible: $isVisible")
+                        if (isVisible) {
+                            vapSurface?.takeUnless { vs -> vs.isRunning() }?.startPlay(context.assets, this)
+                        }
+                    }
                 }
             }
         }
@@ -194,14 +197,34 @@ class SimpleVapWallpaper : WallpaperService() {
                         setScaleType(ScaleType.FIT_CENTER)
                         setLoop(Int.MAX_VALUE)
                         onSurfaceAvailable(it, width, height)
-                        animListenerFlow(onDestroy = true, onFailed = true).onEach {
+                        /*animListenerFlow(onDestroy = true, onFailed = true).onEach {
                             if (it == 2) {
                                 delay(100)
                                 onVideoDestroy()
                             }
                         }.retry(3) {
                             it is IllegalStateException
-                        }.catch { }.launchIn(wallpaperScope)
+                        }.catch { }.launchIn(wallpaperScope)*/
+                        setAnimListener(object :IAnimListener{
+                            override fun onVideoStart() {
+                                Log.d(TAG, "onVideoStart")
+                            }
+
+                            override fun onVideoRender(frameIndex: Int, config: AnimConfig?) {
+                            }
+
+                            override fun onVideoComplete() {
+                                Log.i(TAG, "onVideoComplete")
+                            }
+
+                            override fun onVideoDestroy() {
+                                Log.i(TAG, "onVideoDestroy")
+                            }
+
+                            override fun onFailed(errorType: Int, errorMsg: String?) {
+                            }
+
+                        })
                     }
                 }
             }
@@ -216,8 +239,11 @@ class SimpleVapWallpaper : WallpaperService() {
                 "visible: $visible, isPreview: $isPreview, isCompleted: $isCompleted, file: $file, ${identityHashCode()}"
             )
             if (visible) {
-                file?.takeIf { isCompleted }?.let {
+                /*file?.takeIf { isCompleted }?.let {
                     vapSurface?.startPlay(it)
+                }*/
+                path?.let {
+                    vapSurface?.startPlay(context.assets, it)
                 }
             } else {
                 vapSurface?.takeIf { it.isRunning() }?.stopPlay()
