@@ -59,7 +59,7 @@ class CubeActivity : AppCompatActivity() {
             setEGLConfigChooser(8, 8, 8, 8, 16, 0)
 
             renderer = when (intent.getIntExtra(ENTER_FLAG_EXTRA, ENTER_FLAG_DATA_0)) {
-                ENTER_FLAG_DATA_2 -> MyRenderer()
+                ENTER_FLAG_DATA_2 -> MyRenderer(true)
                 ENTER_FLAG_DATA_3 -> MyRenderer2()
                 ENTER_FLAG_DATA_4 -> MyRenderer3()
                 ENTER_FLAG_DATA_5 -> MyRenderer4(ctx)
@@ -71,7 +71,8 @@ class CubeActivity : AppCompatActivity() {
             }
             setRenderer(renderer)
 
-            renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
+            renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY //continuously rendering
+            //renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY //Lazy rendering, updates only occur when GLSurfaceView.requestRender() is called.
         }
     }
 
