@@ -1,8 +1,11 @@
 package com.suheng.opengl.renderer;
 
+import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
+
+import androidx.annotation.ColorInt;
 
 import com.suheng.opengl.Utils;
 
@@ -23,7 +26,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
     private static final String FRAGMENT_SHADER =
             "precision mediump float;\n" +
             "void main() {\n" +
-            "  gl_FragColor = vec4(0.5, 0, 0, 1);\n" +
+            "  gl_FragColor = vec4(1, 0, 0, 1);\n" +
             "}";
 
     //Coordinate(x, y, z): x,y,z∈[-1,1], x=-1 is the farthest left，x=1 is the farthest right，
@@ -42,14 +45,24 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
     private final FloatBuffer mVertexBuffer;
 
-    private final boolean isCenter;
+    private final boolean mIsCenter;
+
+    private static final String FRAGMENT_SHADER_COL =
+            "precision mediump float;\n" +
+            "uniform vec4 vColor;\n" +
+            "void main() {\n" +
+            "  gl_FragColor = vColor;\n" +
+            "}";
+    private static final Float FULL_COLOR_COMPONENT = 255f;
+    private final @ColorInt int mColor;
 
     public MyRenderer() {
-        this(false);
+        this(false, Color.RED);
     }
 
-    public MyRenderer(boolean isCenter) {
-        this.isCenter = isCenter;
+    public MyRenderer(boolean isCenter, @ColorInt int color) {
+        mIsCenter = isCenter;
+        mColor = color;
         mVertexBuffer = ByteBuffer.allocateDirect(VERTEX.length * 4)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
     }
@@ -58,25 +71,45 @@ public class MyRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-        int program = GLES20.glCreateProgram();
-        int vertexShader = Utils.loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
-        int fragmentShader = Utils.loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
+        final int program = GLES20.glCreateProgram();
+        final int vertexShader = Utils.loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
+        final int fragmentShader = (mColor == Color.RED) ? Utils.loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER)
+                : Utils.loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER_COL);
         GLES20.glAttachShader(program, vertexShader);
         GLES20.glAttachShader(program, fragmentShader);
         GLES20.glLinkProgram(program);
 
         GLES20.glUseProgram(program);
 
-        int position = GLES20.glGetAttribLocation(program, "vPosition");
-        GLES20.glEnableVertexAttribArray(position);
-        if (isCenter) {
+        final int positionHandle = GLES20.glGetAttribLocation(program, "vPosition");
+        Log.i("Wbj", "positionHandle: " + positionHandle);
+        GLES20.glEnableVertexAttribArray(positionHandle);
+        if (mIsCenter) {
             mVertexBuffer.put(VERTEX_CENTER);
         } else {
             mVertexBuffer.put(VERTEX);
         }
         mVertexBuffer.position(0);
-        GLES20.glVertexAttribPointer(position, 3, GLES20.GL_FLOAT, false,
+        GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false,
                 12, mVertexBuffer);
+
+        final int colorHandle = GLES20.glGetUniformLocation(program, "vColor");
+        Log.i("Wbj", "colorHandle: " + colorHandle + ", test: " + GLES20.glGetUniformLocation(program, "vColorTest"));
+        if (colorHandle != -1) {
+            //color with red, green, blue and alpha (opacity) values, all values are between 0 and 1, 1.0f is 100% of 255
+            final float redRatio = Color.red(mColor) / FULL_COLOR_COMPONENT;
+            final float greenRatio = Color.green(mColor) / FULL_COLOR_COMPONENT;
+            final float blueRatio = Color.blue(mColor) / FULL_COLOR_COMPONENT;
+            final float alphaRatio = Color.alpha(mColor) / FULL_COLOR_COMPONENT;
+            //float[] rgbaV = {1f, 1f, 1f, 1.0f}; //White
+            final float[] rgbaV = {redRatio, greenRatio, blueRatio, alphaRatio};
+            Log.i("Wbj", "colorHandle, redRatio: " + redRatio + ", greenRatio: " + greenRatio
+                    + ", blueRatio: " + blueRatio + ", alphaRatio: " + alphaRatio);
+            GLES20.glUniform4fv(colorHandle, 1, rgbaV, 0);
+        } else {
+            Log.w("Wbj", "colorHandle, invalid color handle");
+        }
+
     }
 
     @Override
