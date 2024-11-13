@@ -31,21 +31,19 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
     //Coordinate(x, y, z): x,y,z∈[-1,1], x=-1 is the farthest left，x=1 is the farthest right，
     //y=-1 is the lowest，y=1 is the highest
-    private static final float[] VERTEX = { //draw a triangle, in counterclockwise order:
+    private static final float[] VERTEX_TRIANGLE = { //draw a triangle, in counterclockwise order:
             0, 1, 0,  //top: the center of the top of the screen
             -0.5f, -1, 0,  //bottom left: a quarter from the bottom of the screen
             1, -1, 0,  //bottom right: the right side of the bottom of the screen
     };
 
-    private static final float[] VERTEX_CENTER = { //draw a triangle, in counterclockwise order:
+    private static final float[] VERTEX_TRIANGLE_CENTER = { //draw a triangle, in counterclockwise order:
             0, 0.5f, 0,  //top
             -0.5f, -0.5f, 0,  //bottom left
             0.5f, -0.5f, 0,  //bottom right
     };
 
     private final FloatBuffer mVertexBuffer;
-
-    private final boolean mIsCenter;
 
     private static final String FRAGMENT_SHADER_COL =
             "precision mediump float;\n" +
@@ -56,15 +54,43 @@ public class MyRenderer implements GLSurfaceView.Renderer {
     private static final Float FULL_COLOR_COMPONENT = 255f;
     private final @ColorInt int mColor;
 
+    private static final float RECTANGLE_SIDE_LEN = 0.7f;
+    private static final float[] VERTEX_RECTANGLE = { //draw a rectangle, in counterclockwise order:
+            RECTANGLE_SIDE_LEN, RECTANGLE_SIDE_LEN, 0,
+            -RECTANGLE_SIDE_LEN, RECTANGLE_SIDE_LEN, 0,
+            -RECTANGLE_SIDE_LEN, -RECTANGLE_SIDE_LEN, 0,
+            RECTANGLE_SIDE_LEN, RECTANGLE_SIDE_LEN, 0,
+            -RECTANGLE_SIDE_LEN, -RECTANGLE_SIDE_LEN, 0,
+            RECTANGLE_SIDE_LEN, -RECTANGLE_SIDE_LEN, 0,
+    };
+    private final boolean mIsRect;
+
     public MyRenderer() {
-        this(false, Color.RED);
+        this(false, false, Color.RED);
     }
 
-    public MyRenderer(boolean isCenter, @ColorInt int color) {
-        mIsCenter = isCenter;
+    public MyRenderer(boolean isRect, boolean isCenter, @ColorInt int color) {
+        mIsRect = isRect;
         mColor = color;
-        mVertexBuffer = ByteBuffer.allocateDirect(VERTEX.length * 4)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        ByteBuffer byteBuffer;
+        if (isRect) {
+            byteBuffer = ByteBuffer.allocateDirect(VERTEX_RECTANGLE.length * 4);
+        } else {
+            byteBuffer = ByteBuffer.allocateDirect(VERTEX_TRIANGLE.length * 4);
+        }
+        mVertexBuffer = byteBuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
+
+        isCenter = isRect || isCenter;
+        if (isRect) {
+            mVertexBuffer.put(VERTEX_RECTANGLE);
+        } else {
+            if (isCenter) {
+                mVertexBuffer.put(VERTEX_TRIANGLE_CENTER);
+            } else {
+                mVertexBuffer.put(VERTEX_TRIANGLE);
+            }
+        }
+        mVertexBuffer.position(0);
     }
 
     @Override
@@ -84,12 +110,6 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         final int positionHandle = GLES20.glGetAttribLocation(program, "vPosition");
         Log.i("Wbj", "positionHandle: " + positionHandle);
         GLES20.glEnableVertexAttribArray(positionHandle);
-        if (mIsCenter) {
-            mVertexBuffer.put(VERTEX_CENTER);
-        } else {
-            mVertexBuffer.put(VERTEX);
-        }
-        mVertexBuffer.position(0);
         GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false,
                 12, mVertexBuffer);
 
@@ -114,6 +134,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        Log.d("Wbj", "onSurfaceChanged, width: " + width + ", height: " + height);
         GLES20.glViewport(0, 0, width, height);
     }
 
@@ -125,7 +146,15 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         //GLES20.glDrawArrays(GLES20.GL_LINES, 0, 3); //draw a line, the second point connects to the first point
         //GLES20.glDrawArrays(GLES20.GL_LINE_STRIP, 0, 3);//draw lines, the last point doesn't connects to the first point
         //GLES20.glDrawArrays(GLES20.GL_LINE_LOOP, 0, 3);//draw lines, the last point connects to the first point
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);//draw lines, the last point connects to the first point, and then fill area with color
+        //GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);//draw lines, the last point connects to the first point, and then fill area with color
+
+        if (mIsRect) {
+            //first: The index of the first plotted coordinate point
+            //count: The number of plotted coordinate points, divided by 3 because one point consists of three values: (x, y, z).
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, VERTEX_RECTANGLE.length / 3); //Plot all the coordinate points (or optionally, plot only a part of them)
+        } else {
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, VERTEX_TRIANGLE.length / 3);
+        }
     }
 
 }

@@ -60,7 +60,7 @@ class CubeActivity : AppCompatActivity() {
             setEGLConfigChooser(8, 8, 8, 8, 16, 0)
 
             renderer = when (intent.getIntExtra(ENTER_FLAG_EXTRA, ENTER_FLAG_DATA_0)) {
-                ENTER_FLAG_DATA_2 -> MyRenderer(true, Color.parseColor("#08E08C"))
+                ENTER_FLAG_DATA_2 -> MyRenderer(true, false, Color.parseColor("#08E08C"))
                 //ENTER_FLAG_DATA_2 -> MyRenderer()
                 ENTER_FLAG_DATA_3 -> MyRenderer2()
                 ENTER_FLAG_DATA_4 -> MyRenderer3()
