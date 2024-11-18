@@ -12,6 +12,7 @@ import com.suheng.opengl.Utils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -55,7 +56,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
     private final @ColorInt int mColor;
 
     private static final float RECTANGLE_SIDE_LEN = 0.7f;
-    private static final float[] VERTEX_RECTANGLE = { //draw a rectangle, in counterclockwise order:
+    private static final float[] VERTEX_RECTANGLE_STANDARD_POINTS = { //draw a rectangle, in counterclockwise order:
             RECTANGLE_SIDE_LEN, RECTANGLE_SIDE_LEN, 0,
             -RECTANGLE_SIDE_LEN, RECTANGLE_SIDE_LEN, 0,
             -RECTANGLE_SIDE_LEN, -RECTANGLE_SIDE_LEN, 0,
@@ -64,6 +65,19 @@ public class MyRenderer implements GLSurfaceView.Renderer {
             RECTANGLE_SIDE_LEN, -RECTANGLE_SIDE_LEN, 0,
     };
     private final boolean mIsRect;
+
+    private static final float[] VERTEX_RECTANGLE_LESS_POINTS = { //draw a rectangle, in counterclockwise order:
+            RECTANGLE_SIDE_LEN, RECTANGLE_SIDE_LEN, 0,
+            -RECTANGLE_SIDE_LEN, RECTANGLE_SIDE_LEN, 0,
+            -RECTANGLE_SIDE_LEN, -RECTANGLE_SIDE_LEN, 0,
+            RECTANGLE_SIDE_LEN, -RECTANGLE_SIDE_LEN, 0,
+    };
+    private static final short[] VERTEX_RECTANGLE_LESS_POINTS_INDEX = {0, 1, 2, 0, 2, 3};
+    private ShortBuffer mBufferRectangleIndex;
+    //int array applies to the IntBuffer, short array applies to the ShortBuffer
+    //private static final int[] VERTEX_RECTANGLE_LESS_POINTS_INDEX = {0, 1, 2, 0, 2, 3};
+    //private IntBuffer mBufferRectangleIndex;
+    private final boolean mIsPlotRectByIndex = true;
 
     public MyRenderer() {
         this(false, false, Color.RED);
@@ -74,7 +88,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         mColor = color;
         ByteBuffer byteBuffer;
         if (isRect) {
-            byteBuffer = ByteBuffer.allocateDirect(VERTEX_RECTANGLE.length * 4);
+            if (mIsPlotRectByIndex) {
+                byteBuffer = ByteBuffer.allocateDirect(VERTEX_RECTANGLE_LESS_POINTS.length * 4);
+            } else {
+                byteBuffer = ByteBuffer.allocateDirect(VERTEX_RECTANGLE_STANDARD_POINTS.length * 4);
+            }
         } else {
             byteBuffer = ByteBuffer.allocateDirect(VERTEX_TRIANGLE.length * 4);
         }
@@ -82,7 +100,16 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
         isCenter = isRect || isCenter;
         if (isRect) {
-            mVertexBuffer.put(VERTEX_RECTANGLE);
+            if (mIsPlotRectByIndex) {
+                mVertexBuffer.put(VERTEX_RECTANGLE_LESS_POINTS);
+
+                mBufferRectangleIndex = ByteBuffer.allocateDirect(VERTEX_RECTANGLE_LESS_POINTS_INDEX.length * 2).order(ByteOrder.nativeOrder()).asShortBuffer(); //ShortBuffer multiply 2 times
+                //mBufferRectangleIndex = ByteBuffer.allocateDirect(VERTEX_RECTANGLE_LESS_POINTS_INDEX.length * 4).order(ByteOrder.nativeOrder()).asIntBuffer(); //IntBuffer multiply 4 times
+                mBufferRectangleIndex.put(VERTEX_RECTANGLE_LESS_POINTS_INDEX);
+                mBufferRectangleIndex.position(0);
+            } else {
+                mVertexBuffer.put(VERTEX_RECTANGLE_STANDARD_POINTS);
+            }
         } else {
             if (isCenter) {
                 mVertexBuffer.put(VERTEX_TRIANGLE_CENTER);
@@ -149,9 +176,15 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         //GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);//draw lines, the last point connects to the first point, and then fill area with color
 
         if (mIsRect) {
-            //first: The index of the first plotted coordinate point
-            //count: The number of plotted coordinate points, divided by 3 because one point consists of three values: (x, y, z).
-            GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, VERTEX_RECTANGLE.length / 3); //Plot all the coordinate points (or optionally, plot only a part of them)
+            if (mIsPlotRectByIndex) {
+                Log.d("Wbj", "onDrawFrame, capacity: " + mBufferRectangleIndex.capacity());
+                GLES20.glDrawElements(GLES20.GL_TRIANGLES, VERTEX_RECTANGLE_LESS_POINTS_INDEX.length, GLES20.GL_UNSIGNED_SHORT, mBufferRectangleIndex);
+                //GLES20.glDrawElements(GLES20.GL_TRIANGLES, VERTEX_RECTANGLE_LESS_POINTS_INDEX.length, GLES20.GL_UNSIGNED_INT, mBufferRectangleIndex);
+            } else {
+                //first: The index of the first plotted coordinate point
+                //count: The number of plotted coordinate points, divided by 3 because one point consists of three values: (x, y, z).
+                GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, VERTEX_RECTANGLE_STANDARD_POINTS.length / 3); //Plot all the coordinate points (or optionally, plot only a part of them)
+            }
         } else {
             GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, VERTEX_TRIANGLE.length / 3);
         }
