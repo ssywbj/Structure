@@ -29,11 +29,6 @@ class BackgroundRenderer {
     """
 
     private var program: Int
-    private var positionHandle: Int = 0
-    private var textureCoordHandle: Int = 0
-    private var mvpMatrixHandle: Int = 0
-    private var textureHandle: Int = 0
-
     private val vertexBuffer: FloatBuffer
     private val textureBuffer: FloatBuffer
 
@@ -93,7 +88,7 @@ class BackgroundRenderer {
         GLES20.glUseProgram(program)
 
         // get handle to vertex shader's vPosition member
-        positionHandle = GLES20.glGetAttribLocation(program, "aPosition")
+        val positionHandle = GLES20.glGetAttribLocation(program, "aPosition")
 
         // Enable a handle to the triangle vertices
         GLES20.glEnableVertexAttribArray(positionHandle)
@@ -106,7 +101,7 @@ class BackgroundRenderer {
         )
 
         // get handle to fragment shader's vColor member
-        textureCoordHandle = GLES20.glGetAttribLocation(program, "aTextureCoord")
+        val textureCoordHandle = GLES20.glGetAttribLocation(program, "aTextureCoord")
         GLES20.glEnableVertexAttribArray(textureCoordHandle)
         GLES20.glVertexAttribPointer(
             textureCoordHandle, 2,
@@ -115,12 +110,12 @@ class BackgroundRenderer {
         )
 
         // get handle to shape's transformation matrix
-        mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix")
+        val mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix")
         Matrix.setIdentityM(mvpMatrix, 0)
         GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mvpMatrix, 0)
 
         // get handle to textures
-        textureHandle = GLES20.glGetUniformLocation(program, "uTexture")
+        val textureHandle = GLES20.glGetUniformLocation(program, "uTexture")
 
         // Set the active texture unit to texture unit 0.
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
@@ -148,7 +143,6 @@ class BackgroundRenderer {
             GLES20.glCompileShader(shader)
         }
     }
-
 }
 
 class RectangleRenderer {
@@ -159,7 +153,6 @@ class RectangleRenderer {
             gl_Position = uMVPMatrix * aPosition;
         }
     """
-
     private val fragmentShaderCode = """
         precision mediump float;
         uniform vec4 uColor;
@@ -167,12 +160,7 @@ class RectangleRenderer {
             gl_FragColor = uColor;
         }
     """
-
     private var program: Int
-    private var positionHandle: Int = 0
-    private var mvpMatrixHandle: Int = 0
-    private var colorHandle: Int = 0
-
     private val vertexBuffer: FloatBuffer
 
     // Define the rectangle's coordinates in Normalized Device Coordinates (centered at the origin)
@@ -218,7 +206,7 @@ class RectangleRenderer {
         GLES20.glUseProgram(program)
 
         // get handle to vertex shader's vPosition member
-        positionHandle = GLES20.glGetAttribLocation(program, "aPosition")
+        val positionHandle = GLES20.glGetAttribLocation(program, "aPosition")
 
         // Enable a handle to the rectangle vertices
         GLES20.glEnableVertexAttribArray(positionHandle)
@@ -231,7 +219,7 @@ class RectangleRenderer {
         )
 
         // get handle to fragment shader's uColor member
-        colorHandle = GLES20.glGetUniformLocation(program, "uColor")
+        val colorHandle = GLES20.glGetUniformLocation(program, "uColor")
         GLES20.glUniform4fv(colorHandle, 1, color, 0)
 
         // Create a new projection and view matrix for the rectangle
@@ -244,7 +232,7 @@ class RectangleRenderer {
         Matrix.scaleM(mvpMatrix, 0, rectangleWidth, rectangleHeight, 1f)
 
         // get handle to shape's transformation matrix
-        mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix")
+        val mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix")
         GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mvpMatrix, 0)
 
         // Draw the rectangle
