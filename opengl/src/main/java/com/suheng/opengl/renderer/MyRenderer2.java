@@ -231,9 +231,9 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
                 "}";
         private static final String FRAGMENT_SHADER2 =
                 "precision mediump float;\n" +
-                        "void main() {\n" +
-                        "  gl_FragColor = vec4(0, 1, 1, 1);\n" +
-                        "}";
+                "void main() {\n" +
+                "  gl_FragColor = vec4(0, 1, 1, 1);\n" +
+                "}";
         private final FloatBuffer mVertexBuffer;
         private final ShortBuffer mVertexIndexBuffer;
         private final int mProgram;
@@ -289,23 +289,35 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
             //final int rectWidth = width; //full view width
             final int rectHeight = rectWidth * 2 / 3;
             //final int rectHeight = rectWidth; //square
-            final float screenWHRatio = 1f * width / height; //view width/height ratio
             Log.d("Wbj", "onDrawFrame, width: " + width + ", height: " + height
-                    + ", rectWidth: " + rectWidth + ", rectHeight: " + rectHeight + ", screenWHRatio: " + screenWHRatio
+                    + ", rectWidth: " + rectWidth + ", rectHeight: " + rectHeight
                     + ", rect w/h: " + (1f * rectWidth / rectHeight));
+            final float ortho = 1f;
+            final float scaleX = 2f * rectWidth / width;
+            final float scaleY = 2f * rectHeight / height;
+            final float translateX = ortho - scaleX / 2;
+            final float translateY = ortho - scaleY / 2;
+            Log.v("Wbj", "onDrawFrame, ortho: " + ortho + ", scaleX: " + scaleX + ", scaleY: " + scaleY
+                    + ", translateX: " + translateX + ", translateY: " + translateY);
 
             final int matrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
             Matrix.setIdentityM(mMatrixProjection, 0);
             Log.v("Wbj", "onDrawFrame, setIdentityM: " + Arrays.toString(mMatrixProjection));
-            Matrix.orthoM(mMatrixProjection, 0, -screenWHRatio, screenWHRatio, -1f, 1f, -1f, 1f);
+            Matrix.orthoM(mMatrixProjection, 0, -ortho, ortho, -ortho, ortho, -1f, 1f);
             Log.v("Wbj", "onDrawFrame, orthoM: " + Arrays.toString(mMatrixProjection));
-            Matrix.translateM(mMatrixProjection, 0, 0f, -0.38f, 0f);
+            //center:(0f, 0f)
+            //bottom center:(0f, -translateY)
+            //bottom right:(translateX, -translateY)
+            //bottom left:(-translateX, -translateY)
+            //top center:(0f, translateY)
+            //top right:(translateX, translateY)
+            //top left:(-translateX, translateY)
+            //left center:(-translateX, 0f)
+            //right center:(translateX, 0f)
+            Matrix.translateM(mMatrixProjection, 0, -translateX, -translateY, 0f);
             Log.v("Wbj", "onDrawFrame, translateM: " + Arrays.toString(mMatrixProjection));
-            Matrix.scaleM(mMatrixProjection, 0, 1f * rectWidth / width, 2f * rectHeight / height, 1f);
+            Matrix.scaleM(mMatrixProjection, 0, scaleX, scaleY, 1f);
             Log.v("Wbj", "onDrawFrame, scaleM: " + Arrays.toString(mMatrixProjection));
-            /*Matrix.orthoM(mMatrixProjection, 0, -screenWHRatio, screenWHRatio, -screenWHRatio, screenWHRatio, -1f, 1f);
-            Matrix.translateM(mMatrixProjection, 0, 0f, -0.19f, 0f);
-            Matrix.scaleM(mMatrixProjection, 0, 1f * rectWidth / width, 1f * rectHeight / height, 1f);*/
             GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mMatrixProjection, 0);
 
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
@@ -322,32 +334,23 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
             GLES20.glEnableVertexAttribArray(positionHandle);
             GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false,12, mVertexBuffer);
 
-            final int rectWidth = (int) (width / 1.5f);
-            final int rectHeight = rectWidth / 3;
-            final float screenWHRatio = 1f * width / height;
-            final float scaleX = 1f * rectWidth / width;
-            final float scaleY = 1f * rectHeight / height;
+            final int rectWidth = width / 2;
+            final int rectHeight = rectWidth * 2 / 3;
             Log.d("Wbj", "onDraw, width: " + width + ", height: " + height + ", rectWidth: " + rectWidth
-                    + ", rectHeight: " + rectHeight + ", screenWHRatio: " + screenWHRatio);
+                    + ", rectHeight: " + rectHeight);
+            final float ortho = 1.2f; //"Greater than 1, reduce; less than 1, enlarge; equal to 1, original size.
+            //final float ortho = 0.8f;
+            final float scaleX = 2f * rectWidth / width;
+            final float scaleY = 2f * rectHeight / height;
+            final float translateX = ortho - scaleX / 2;
+            final float translateY = ortho - scaleY / 2;
+            Log.v("Wbj", "onDraw, ortho: " + ortho + ", scaleX: " + scaleX + ", scaleY: " + scaleY
+                    + ", translateX: " + translateX + ", translateY: " + translateY);
 
             final int matrixHandle = GLES20.glGetUniformLocation(mProgram2, "uMVPMatrix");
             Matrix.setIdentityM(mMatrixProjection, 0);
             Log.v("Wbj", "onDraw, setIdentityM: " + Arrays.toString(mMatrixProjection));
-            Matrix.orthoM(mMatrixProjection, 0, -screenWHRatio, screenWHRatio, -screenWHRatio, screenWHRatio, -1f, 1f);
-            //center:(0f, 0f)
-            //bottom center:(0f, -translateY)
-            //bottom right:(translateX, -translateY)
-            //bottom left:(-translateX, -translateY)
-            //top center:(0f, translateY)
-            //top right:(translateX, translateY)
-            //top left:(-translateX, translateY)
-            //left center:(-translateX, 0f)
-            //right center:(translateX, 0f)
-            final float translateX = screenWHRatio - scaleX / 2;
-            final float translateY = screenWHRatio - scaleY / 2;
-
-            Log.v("Wbj", "onDraw, translateX: " + translateX + ", translateY: " + translateY
-                    + ", scaleX: " + scaleX + ", scaleY: " + scaleY);
+            Matrix.orthoM(mMatrixProjection, 0, -ortho, ortho, -ortho, ortho, -1f, 1f);
             Matrix.translateM(mMatrixProjection, 0, translateX, -translateY, 0f);
             Matrix.scaleM(mMatrixProjection, 0, scaleX, scaleY, 1f);
             Log.v("Wbj", "onDraw, orthoM, translateM, scaleM: " + Arrays.toString(mMatrixProjection));
