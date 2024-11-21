@@ -20,6 +20,7 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
 
     private static final int POINT_TOTAL = 4;
     private static final int VERTEX_ANCHOR = POINT_TOTAL * 3;
+    private static final float COORD_UNIT_LEN = 1f;
 
     private static final short[] VERTEX_INDEX = {0, 1, 2, 0, 2, 3};
 
@@ -237,8 +238,11 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
         private final FloatBuffer mVertexBuffer;
         private final ShortBuffer mVertexIndexBuffer;
         private final int mProgram;
-        private final int mProgram2;
         private final float[] mMatrixProjection = new float[16];
+
+        private final int mProgram2;
+        private final FloatBuffer mVertexBuffer2;
+        private final float mCoordUnitRatio;
 
         public RectRenderer3() {
             mVertexBuffer = ByteBuffer.allocateDirect(VERTEX_ANCHOR * 4)
@@ -264,6 +268,18 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
             GLES20.glAttachShader(mProgram, fragmentShader);
             GLES20.glLinkProgram(mProgram);
 
+            mVertexBuffer2 = ByteBuffer.allocateDirect(VERTEX_ANCHOR * 4)
+                    .order(ByteOrder.nativeOrder()).asFloatBuffer();
+            final float anchor = 1f;
+            mCoordUnitRatio = COORD_UNIT_LEN / anchor;
+            final float[] coordinates2 = {
+                    anchor, anchor, 0,
+                    -anchor, anchor, 0,
+                    -anchor, -anchor, 0,
+                    anchor, -anchor, 0
+            };
+            mVertexBuffer2.put(coordinates2);
+            mVertexBuffer2.position(0);
             final int fragmentShader2 = Utils.loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER2);
             mProgram2 = GLES20.glCreateProgram();
             GLES20.glAttachShader(mProgram2, vertexShader);
@@ -332,7 +348,7 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
 
             final int positionHandle = GLES20.glGetAttribLocation(mProgram2, "vPosition");
             GLES20.glEnableVertexAttribArray(positionHandle);
-            GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false,12, mVertexBuffer);
+            GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false,12, mVertexBuffer2);
 
             final int rectWidth = width / 2;
             final int rectHeight = rectWidth * 2 / 3;
@@ -340,10 +356,10 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
                     + ", rectHeight: " + rectHeight);
             final float ortho = 1.2f; //"Greater than 1, reduce; less than 1, enlarge; equal to 1, original size.
             //final float ortho = 0.8f;
-            final float scaleX = 2f * rectWidth / width;
-            final float scaleY = 2f * rectHeight / height;
-            final float translateX = ortho - scaleX / 2;
-            final float translateY = ortho - scaleY / 2;
+            final float scaleX = mCoordUnitRatio * rectWidth / width;
+            final float scaleY = mCoordUnitRatio * rectHeight / height;
+            final float translateX = ortho - scaleX / mCoordUnitRatio;
+            final float translateY = ortho - scaleY / mCoordUnitRatio;
             Log.v("Wbj", "onDraw, ortho: " + ortho + ", scaleX: " + scaleX + ", scaleY: " + scaleY
                     + ", translateX: " + translateX + ", translateY: " + translateY);
 

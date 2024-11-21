@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.RawRes;
 
 import java.io.BufferedOutputStream;
@@ -55,7 +56,7 @@ public final class Utils {
     }
 
     public static int loadTexture(Context context, @DrawableRes int resId) {
-        int[] textureObjectIds = new int[1];
+        /*int[] textureObjectIds = new int[1];
         GLES20.glGenTextures(1, textureObjectIds, 0);
         if (textureObjectIds[0] == 0) {
             Log.e(TAG, "Could not generate a new OpenGL texture object.");
@@ -84,7 +85,41 @@ public final class Utils {
         // unbind
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
 
-        return textureObjectIds[0];
+        return textureObjectIds[0];*/
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resId, options);
+        if (bitmap == null) {
+            Log.e(TAG, "Resource ID " + resId + " could not be decoded.");
+            return 0;
+        }
+        return loadTexture(bitmap, true);
+    }
+
+    public static int loadTexture(@NonNull Bitmap bitmap, boolean isRecycle) {
+        final int[] textures = new int[1];
+        GLES20.glGenTextures(1, textures, 0);
+        if (textures[0] == 0) {
+            Log.e(TAG, "Could not generate a new OpenGL texture object.");
+            return 0;
+        }
+
+        //bind
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
+                GLES20.GL_LINEAR_MIPMAP_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+        if (isRecycle) {
+            bitmap.recycle();
+        }
+
+        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
+        //unbind
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+
+        return textures[0];
     }
 
     public static boolean supportGlEs20(Activity activity) {

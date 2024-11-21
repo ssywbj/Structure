@@ -5,6 +5,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.util.Log
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -75,6 +77,14 @@ class CubeActivity : AppCompatActivity() {
 
             //renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY //continuously rendering
             renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY //Lazy rendering, updates only occur when GLSurfaceView.requestRender() is called.
+        }
+
+        val imageGirl = findViewById<ImageView>(R.id.image_girl)
+        imageGirl.post {
+            Log.i(
+                "Wbj",
+                "imageGirl, width: ${imageGirl.width}, height: ${imageGirl.height}"
+            )
         }
     }
 

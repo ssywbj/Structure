@@ -7,6 +7,8 @@ import com.suheng.opengl.R
 
 //https://blog.piasy.com/2016/06/07/Open-gl-es-android-2-part-1/index.html
 //http://zhangtielei.com/posts/blog-opengl-transformations-1.html
+//http://light3moon.com/2019/12/30/OpenGLES%20%E5%85%A5%E9%97%A8%E5%AD%A6%E4%B9%A0/
+//https://cloud.tencent.com/developer/article/1472455
 //https://learnopengl.com/Getting-started
 //https://learnopengl-cn.github.io/
 //https://open.gl/introduction

@@ -14,28 +14,7 @@ import javax.microedition.khronos.opengles.GL10
 class MySurfaceRenderer(surface: Surface? = null) : GLSurfaceView.Renderer {
     companion object {
         private const val TAG = "Wbj"
-
-        private const val VERTEX_SHADER = (
-                "attribute vec4 vPosition;\n" +
-                "void main() {\n" +
-                "  gl_Position = vPosition;\n" +
-                "}")
-        private const val FRAGMENT_SHADER = (
-                "precision mediump float;\n" +
-                "void main() {\n" +
-                "  gl_FragColor = vec4(0.5, 0, 0, 1);\n" +
-                "}")
-        private val VERTEX = floatArrayOf(
-            //in counterclockwise order:
-            0f, 1f, 0f,  // top
-            -0.5f, -1f, 0f,  // bottom left
-            1f, -1f, 0f,  // bottom right
-        )
     }
-
-    /*private val mVertexBuffer: FloatBuffer =
-        ByteBuffer.allocateDirect(VERTEX.size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer()
-            .put(VERTEX)*/
 
     private var gles20Helper: GLES20Helper? = null
 
@@ -76,21 +55,6 @@ class MySurfaceRenderer(surface: Surface? = null) : GLSurfaceView.Renderer {
         backgroundRenderer = BackgroundRenderer()
         textureId = Utils.loadTexture(OpenGLApp.getInstance(), R.drawable.air_hockey_surface)
         rectangleRenderer = RectangleRenderer()
-
-        /*val program = GLES20.glCreateProgram()
-        val vertexShader = Utils.loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER)
-        val fragmentShader = Utils.loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER)
-        GLES20.glAttachShader(program, vertexShader)
-        GLES20.glAttachShader(program, fragmentShader)
-        GLES20.glLinkProgram(program)
-
-        GLES20.glUseProgram(program)
-
-        val position = GLES20.glGetAttribLocation(program, "vPosition")
-        GLES20.glEnableVertexAttribArray(position)
-        GLES20.glVertexAttribPointer(
-            position, 3, GLES20.GL_FLOAT, false, 12, mVertexBuffer
-        )*/
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -109,8 +73,6 @@ class MySurfaceRenderer(surface: Surface? = null) : GLSurfaceView.Renderer {
 
         //绘制背景
         backgroundRenderer.draw(textureId)
-
-        //GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3)
 
         val color = floatArrayOf(1f, 0f, 0f, 1f)
         rectangleRenderer.draw(color, 200, 300, screenWidth, screenHeight)
