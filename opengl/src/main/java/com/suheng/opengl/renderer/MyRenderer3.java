@@ -94,6 +94,9 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
         private final int[] mTextures = new int[1];
         private int mTextureId2;
 
+        private final FloatBuffer mTexVertexBuffer3;
+        private int mTextureId3;
+
         public ImageRenderer() {
             mVertexBuffer = ByteBuffer.allocateDirect(VERTEX_ANCHOR * 4)
                     .order(ByteOrder.nativeOrder()).asFloatBuffer();
@@ -108,16 +111,43 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
 
             //截取纹理全部区域
             final float[] texVertex = { // in clockwise order:
-                    1, 0,  // bottom right
-                    0, 0,  // bottom left
-                    0, 1,  // top left
-                    1, 1,  // top right
+                    1f, 0f,  //bottom right
+                    0f, 0f,  //bottom left
+                    0f, 1f,  //top left
+                    1f, 1f,  //top right
             };
             mTexVertexBuffer = ByteBuffer.allocateDirect(texVertex.length * 4)
                     .order(ByteOrder.nativeOrder())
                     .asFloatBuffer()
                     .put(texVertex);
             mTexVertexBuffer.position(0);
+
+            //截取纹理部分区域 图片左上
+            /*final float[] texVertex3 = { // in clockwise order:
+                    0.5f, 0, //bottom right
+                    0, 0, //bottom left
+                    0, 0.5f, //top left
+                    0.5f, 0.5f, //top right
+            };*/
+            //截取纹理部分区域 图片左下
+            /*final float[] texVertex3 = { // in clockwise order:
+                    0.5f, 0.5f,
+                    0f, 0.5f,
+                    0f, 1f,
+                    0.5f, 1f,
+            };*/
+            //截取纹理部分区域
+            final float[] texVertex3 = { // in clockwise order:
+                    0.9f, 0f,
+                    0.1f, 0f,
+                    0.1f, 0.856f,
+                    0.9f, 0.856f,
+            };
+            mTexVertexBuffer3 = ByteBuffer.allocateDirect(texVertex3.length * 4)
+                    .order(ByteOrder.nativeOrder())
+                    .asFloatBuffer()
+                    .put(texVertex3);
+            mTexVertexBuffer3.position(0);
 
             mVertexShader = Utils.loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
             mFragmentShader = Utils.loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
@@ -184,8 +214,9 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
             GLES20.glDisableVertexAttribArray(positionHandle);
             GLES20.glDisableVertexAttribArray(textureCoordHandle);
 
-            this.onDraw(width, height);
+            //this.onDraw(width, height);
             this.onDraw2(width, height);
+            this.onDraw3(width, height);
         }
 
         public void onDraw(int width, int height) {
@@ -311,6 +342,62 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
             GLES20.glDisableVertexAttribArray(textureCoordHandle);
         }
 
+        public void onDraw3(int width, int height) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            //options.inScaled = false; //The original picture: Return the original width and height of the image.
+            options.inScaled = true; //default is true
+            final int resId = R.drawable.girl_gaitubao;
+            final Bitmap bitmap = BitmapFactory.decodeResource(OpenGLApp.Companion.getInstance().getResources(), resId, options);
+            if (bitmap == null) {
+                Log.e("Wbj", "Resource ID " + resId + " could not be decoded.");
+                return;
+            }
+
+            GLES20.glUseProgram(mProgram);
+
+            final int positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
+            GLES20.glEnableVertexAttribArray(positionHandle);
+            GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 12, mVertexBuffer);
+
+            final int rectWidth = width;
+            final int rectHeight = (int) (bitmap.getHeight() * 1f * width / bitmap.getWidth());
+            Log.d("Wbj", "onDraw, width: " + width + ", height: " + height
+                    + ", rectWidth: " + rectWidth + ", rectHeight: " + rectHeight
+                    + ", rect w/h: " + (1f * rectWidth / rectHeight));
+            final float ortho = 1f;
+            final float scaleX = ((float) rectWidth) / width;
+            final float scaleY = ((float) rectHeight) / height;
+            final float translateX = ortho - scaleX;
+            final float translateY = ortho - scaleY + (1 - ortho) / 2f;
+            Log.v("Wbj", "onDraw, ortho: " + ortho + ", scaleX: " + scaleX + ", scaleY: " + scaleY
+                    + ", translateX: " + translateX + ", translateY: " + translateY);
+            final int matrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
+            Matrix.setIdentityM(mMatrixProjection, 0);
+            Matrix.orthoM(mMatrixProjection, 0, -ortho, ortho, -ortho, ortho, -1f, 1f);
+            Matrix.translateM(mMatrixProjection, 0, 0f, 0.33f, 0f);
+            Matrix.scaleM(mMatrixProjection, 0, scaleX, scaleY, 1f);
+            GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mMatrixProjection, 0);
+
+            mTextureId3 = Utils.loadTexture(bitmap, true);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId3);
+
+            final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
+            GLES20.glEnableVertexAttribArray(textureCoordHandle);
+            GLES20.glVertexAttribPointer(textureCoordHandle, 2, GLES20.GL_FLOAT, false, 8, mTexVertexBuffer3);
+
+            final int textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
+            GLES20.glUniform1i(textureHandle, 0);
+
+            Log.v("Wbj", "onDraw, textureId3: " + mTextureId3 + ", textureCoordHandle: " + textureCoordHandle
+                    + ", textureHandle: " + textureHandle);
+
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
+
+            GLES20.glDisableVertexAttribArray(positionHandle);
+            GLES20.glDisableVertexAttribArray(textureCoordHandle);
+        }
+
         public void onDestroy() {
             Log.i("Wbj", "ImageRenderer onDestroy");
             GLES20.glDeleteProgram(mProgram);
@@ -320,6 +407,7 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
 
             GLES20.glDeleteTextures(1, mTextures, 0);
             GLES20.glDeleteTextures(1, new int[]{mTextureId2}, 0);
+            GLES20.glDeleteTextures(1, new int[]{mTextureId3}, 0);
         }
     }
 

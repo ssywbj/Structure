@@ -27,32 +27,61 @@ import java.util.Locale;
 
 public final class Utils {
 
+    public static final int TEXTURE_NONE = -1;
     public static final int BYTES_PER_FLOAT = 4;
-
     private static final String TAG = "Utils";
 
-    private Utils() {
-        // util
-    }
-
+    //https://blog.51cto.com/u_16213413/12183539
+    //https://juejin.cn/post/6943395747245064206
     public static String loadShader(Context context, @RawRes int resId) {
         StringBuilder builder = new StringBuilder();
 
+        InputStream inputStream = null;
+        BufferedReader reader = null;
         try {
-            InputStream inputStream = context.getResources().openRawResource(resId);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
+            inputStream = context.getResources().openRawResource(resId);
+            reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = reader.readLine()) != null) {
-                builder.append(line)
-                        .append('\n');
+                builder.append(line).append('\n');
             }
-            reader.close();
         } catch (IOException e) {
             Log.e(TAG, "loadShader error", e);
+        } finally {
+            try {
+                if (reader != null) reader.close();
+            } catch (IOException e) {
+                Log.e(TAG, "close reader error: " + e);
+            }
+            try {
+                if (inputStream != null) inputStream.close();
+            } catch (IOException e) {
+                Log.e(TAG, "close inputStream error: " + e);
+            }
         }
 
         return builder.toString();
+    }
+
+    public static int glCreateProgram(String vertexShaderCode, String fragmentShaderCode) {
+        final int program = GLES20.glCreateProgram();
+        final int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
+        final int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+        GLES20.glAttachShader(program, vertexShader);
+        GLES20.glAttachShader(program, fragmentShader);
+        GLES20.glLinkProgram(program);
+        //shaders can be deleted after the program is linked.
+        GLES20.glDeleteShader(vertexShader);
+        GLES20.glDeleteShader(fragmentShader);
+
+        return program;
+    }
+
+    public static int loadShader(int type, String shaderCode) {
+        int shader = GLES20.glCreateShader(type);
+        GLES20.glShaderSource(shader, shaderCode);
+        GLES20.glCompileShader(shader);
+        return shader;
     }
 
     public static int loadTexture(Context context, @DrawableRes int resId) {
@@ -160,29 +189,6 @@ public final class Utils {
                 }
             }
         }
-    }
-
-    public static final int TEXTURE_NONE = -1;
-
-    public static int createGLProgram(String vertexShaderSourceCode, String fragmentShaderSourceCode) {
-        int glProgram = GLES20.glCreateProgram();
-        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderSourceCode);
-        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderSourceCode);
-        GLES20.glAttachShader(glProgram, vertexShader);
-        GLES20.glAttachShader(glProgram, fragmentShader);
-        GLES20.glLinkProgram(glProgram);
-        //shaders can be deleted after the program is linked.
-        GLES20.glDeleteShader(vertexShader);
-        GLES20.glDeleteShader(fragmentShader);
-
-        return glProgram;
-    }
-
-    public static int loadShader(int type, String shaderCode) {
-        int shader = GLES20.glCreateShader(type);
-        GLES20.glShaderSource(shader, shaderCode);
-        GLES20.glCompileShader(shader);
-        return shader;
     }
 
     public static int loadTextureFromBitmap(Bitmap bitmap) {

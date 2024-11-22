@@ -226,7 +226,7 @@ public class CubeRenderer implements BaseRenderer {
 
     private void initGLProgramIfNeeded() {
         if (glProgram == 0) {
-            glProgram = Utils.createGLProgram(VERTEX_SHADER, FRAGMENT_SHADER);
+            glProgram = Utils.glCreateProgram(VERTEX_SHADER, FRAGMENT_SHADER);
 
             glPositionAttr = GLES20.glGetAttribLocation(glProgram, "position");
             glTexCoordAttr = GLES20.glGetAttribLocation(glProgram, "inputTextureCoordinate");

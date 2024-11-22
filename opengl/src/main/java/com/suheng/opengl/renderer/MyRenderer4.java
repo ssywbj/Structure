@@ -47,20 +47,20 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
     private static final short[] VERTEX_INDEX = {0, 1, 2, 0, 2, 3};
 
     //截取纹理全部区域
-    private static final float[] TEX_VERTEX = { // in clockwise order:
+    /*private static final float[] TEX_VERTEX = { // in clockwise order:
             1, 0,  // bottom right
             0, 0,  // bottom left
             0, 1,  // top left
             1, 1,  // top right
-    };
+    };*/
 
     //截取纹理部分区域
-    /*private static final float[] TEX_VERTEX = { // in clockwise order:
+    private static final float[] TEX_VERTEX = { // in clockwise order:
             0.5f, 0,  // bottom right
             0, 0,  // bottom left
             0, 0.5f,  // top left
             0.5f, 0.5f,  // top right
-    };*/
+    };
 
     private final FloatBuffer mVertexBuffer;
     private final ShortBuffer mVertexIndexBuffer;
@@ -147,7 +147,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, width, height);
 
         Matrix.perspectiveM(mMVPMatrix, 0, 45, (float) width / height, 0.1f, 100f);
-        Matrix.translateM(mMVPMatrix, 0, 0f, 0f, -7f);
+        Matrix.translateM(mMVPMatrix, 0, 0f, 0f, -8f);
     }
 
     @Override
