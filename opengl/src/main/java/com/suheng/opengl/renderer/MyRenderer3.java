@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
 
@@ -58,6 +59,12 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
         mImageRenderer.onDrawFrame(mWidth, mHeight);
     }
 
+    public void onDestroy() {
+        if (mImageRenderer != null) {
+            mImageRenderer.onDestroy();
+        }
+    }
+
     private final class ImageRenderer {
         private static final String VERTEX_SHADER =
                 "attribute vec4 vPosition;\n" +
@@ -77,11 +84,15 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
                 "}";
         private final FloatBuffer mVertexBuffer;
         private final int mProgram;
+        private final int mVertexShader;
+        private final int mFragmentShader;
         private final float[] mMatrixProjection = new float[16];
 
         private final FloatBuffer mTexVertexBuffer;
 
-        private final int mProgram2;
+        private int mTextureId;
+        private final int[] mTextures = new int[1];
+        private int mTextureId2;
 
         public ImageRenderer() {
             mVertexBuffer = ByteBuffer.allocateDirect(VERTEX_ANCHOR * 4)
@@ -108,17 +119,12 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
                     .put(texVertex);
             mTexVertexBuffer.position(0);
 
-            final int vertexShader = Utils.loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
-            final int fragmentShader = Utils.loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
+            mVertexShader = Utils.loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
+            mFragmentShader = Utils.loadShader(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
             mProgram = GLES20.glCreateProgram();
-            GLES20.glAttachShader(mProgram, vertexShader);
-            GLES20.glAttachShader(mProgram, fragmentShader);
+            GLES20.glAttachShader(mProgram, mVertexShader);
+            GLES20.glAttachShader(mProgram, mFragmentShader);
             GLES20.glLinkProgram(mProgram);
-
-            mProgram2 = GLES20.glCreateProgram();
-            GLES20.glAttachShader(mProgram2, vertexShader);
-            GLES20.glAttachShader(mProgram2, fragmentShader);
-            GLES20.glLinkProgram(mProgram2);
         }
 
         public void onDrawFrame(int width, int height) {
@@ -158,18 +164,19 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
             Matrix.scaleM(mMatrixProjection, 0, scaleX, scaleY, 1f);
             GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mMatrixProjection, 0);
 
-            //final int textureId = Utils.loadTexture(OpenGLApp.Companion.getInstance(), R.drawable.girl_gaitubao);
-            final int textureId = Utils.loadTexture(bitmap, !bitmap.isRecycled());
+            //mTextureId = Utils.loadTexture(OpenGLApp.Companion.getInstance(), R.drawable.girl_gaitubao);
+            mTextureId = Utils.loadTexture(bitmap, true);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
+
             final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
             GLES20.glEnableVertexAttribArray(textureCoordHandle);
             GLES20.glVertexAttribPointer(textureCoordHandle, 2, GLES20.GL_FLOAT, false, 8, mTexVertexBuffer);
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
 
-            final int  textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
+            final int textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
             GLES20.glUniform1i(textureHandle, 0);
 
-            Log.v("Wbj", "onDrawFrame, textureId: " + textureId + ", textureCoordHandle: " + textureCoordHandle
+            Log.v("Wbj", "onDrawFrame, textureId: " + mTextureId + ", textureCoordHandle: " + textureCoordHandle
                     + ", textureHandle: " + textureHandle);
 
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
@@ -192,9 +199,9 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
                 return;
             }
 
-            GLES20.glUseProgram(mProgram2);
+            GLES20.glUseProgram(mProgram);
 
-            final int positionHandle = GLES20.glGetAttribLocation(mProgram2, "vPosition");
+            final int positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
             GLES20.glEnableVertexAttribArray(positionHandle);
             GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 12, mVertexBuffer);
 
@@ -217,14 +224,26 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
             Matrix.scaleM(mMatrixProjection, 0, scaleX, scaleY, 1f);
             GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mMatrixProjection, 0);
 
-            final int textureId = Utils.loadTexture(bitmap, !bitmap.isRecycled());
-            final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram2, "aTextureCoord");
+            GLES20.glGenTextures(1, mTextures, 0);
+            final int textureId = mTextures[0];
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextures[0]);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
+                    GLES20.GL_LINEAR);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER,
+                    GLES20.GL_LINEAR);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
+                    GLES20.GL_REPEAT);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
+                    GLES20.GL_REPEAT);
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+            bitmap.recycle();
+
+            final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
             GLES20.glEnableVertexAttribArray(textureCoordHandle);
             GLES20.glVertexAttribPointer(textureCoordHandle, 2, GLES20.GL_FLOAT, false, 8, mTexVertexBuffer);
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
 
-            final int  textureHandle = GLES20.glGetUniformLocation(mProgram2, "uTexture");
+            final int  textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
             GLES20.glUniform1i(textureHandle, 0);
 
             Log.v("Wbj", "onDraw, textureId: " + textureId + ", textureCoordHandle: " + textureCoordHandle
@@ -247,9 +266,9 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
                 return;
             }
 
-            GLES20.glUseProgram(mProgram2);
+            GLES20.glUseProgram(mProgram);
 
-            final int positionHandle = GLES20.glGetAttribLocation(mProgram2, "vPosition");
+            final int positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
             GLES20.glEnableVertexAttribArray(positionHandle);
             GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 12, mVertexBuffer);
 
@@ -272,23 +291,35 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
             Matrix.scaleM(mMatrixProjection, 0, scaleX, scaleY, 1f);
             GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mMatrixProjection, 0);
 
-            final int textureId = Utils.loadTexture(bitmap, !bitmap.isRecycled());
-            final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram2, "aTextureCoord");
+            mTextureId2 = Utils.loadTexture(bitmap, true);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId2);
+
+            final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
             GLES20.glEnableVertexAttribArray(textureCoordHandle);
             GLES20.glVertexAttribPointer(textureCoordHandle, 2, GLES20.GL_FLOAT, false, 8, mTexVertexBuffer);
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
 
-            final int  textureHandle = GLES20.glGetUniformLocation(mProgram2, "uTexture");
+            final int textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
             GLES20.glUniform1i(textureHandle, 0);
 
-            Log.v("Wbj", "onDraw, textureId: " + textureId + ", textureCoordHandle: " + textureCoordHandle
+            Log.v("Wbj", "onDraw, textureId2: " + mTextureId2 + ", textureCoordHandle: " + textureCoordHandle
                     + ", textureHandle: " + textureHandle);
 
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
 
             GLES20.glDisableVertexAttribArray(positionHandle);
             GLES20.glDisableVertexAttribArray(textureCoordHandle);
+        }
+
+        public void onDestroy() {
+            Log.i("Wbj", "ImageRenderer onDestroy");
+            GLES20.glDeleteProgram(mProgram);
+            GLES20.glDeleteShader(mVertexShader);
+            GLES20.glDeleteShader(mFragmentShader);
+            GLES20.glDeleteTextures(1, new int[]{mTextureId}, 0);
+
+            GLES20.glDeleteTextures(1, mTextures, 0);
+            GLES20.glDeleteTextures(1, new int[]{mTextureId2}, 0);
         }
     }
 

@@ -80,11 +80,16 @@ class CubeActivity : AppCompatActivity() {
         }
 
         val imageGirl = findViewById<ImageView>(R.id.image_girl)
-        imageGirl.post {
-            Log.i(
-                "Wbj",
-                "imageGirl, width: ${imageGirl.width}, height: ${imageGirl.height}"
-            )
+        if (renderer is MyRenderer3) {
+            imageGirl.visibility = ImageView.VISIBLE
+            imageGirl.post {
+                Log.i(
+                    "Wbj",
+                    "imageGirl, width: ${imageGirl.width}, height: ${imageGirl.height}"
+                )
+            }
+        } else {
+            imageGirl.visibility = ImageView.GONE
         }
     }
 
@@ -110,6 +115,7 @@ class CubeActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         if (this::renderer.isInitialized) {
+            (renderer as? MyRenderer3)?.onDestroy()
             (renderer as? MyRenderer4)?.destroy()
         }
     }
