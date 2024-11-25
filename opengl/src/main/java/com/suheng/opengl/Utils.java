@@ -12,6 +12,7 @@ import android.util.Log;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RawRes;
 
 import java.io.BufferedOutputStream;
@@ -61,6 +62,10 @@ public final class Utils {
         }
 
         return builder.toString();
+    }
+
+    public static int glCreateProgram(Context context, @RawRes int vertexShader, @RawRes int fragmentShader) {
+        return glCreateProgram(loadShader(context, vertexShader), loadShader(context, fragmentShader));
     }
 
     public static int glCreateProgram(String vertexShaderCode, String fragmentShaderCode) {
@@ -149,6 +154,30 @@ public final class Utils {
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
 
         return textures[0];
+    }
+
+    public static @Nullable int[] glGenTextures(final int len) {
+        final int[] textures = new int[len];
+        GLES20.glGenTextures(len, textures, 0);
+        if (textures[0] == 0) {
+            Log.e(TAG, "Could not generate a new OpenGL texture object.");
+            return null;
+        }
+        return textures;
+    }
+
+    public static void texImage2D(@NonNull Bitmap bitmap, int texture, boolean isRecycle) {
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
+                GLES20.GL_LINEAR_MIPMAP_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+        if (isRecycle) {
+            bitmap.recycle();
+        }
+
+        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
     }
 
     public static boolean supportGlEs20(Activity activity) {

@@ -67,8 +67,8 @@ class CubeActivity : AppCompatActivity() {
                 ENTER_FLAG_DATA_3 -> MyRenderer2()
                 ENTER_FLAG_DATA_4 -> MyRenderer3()
                 ENTER_FLAG_DATA_5 -> MyRenderer4(ctx)
-                ENTER_FLAG_DATA_7 -> MySurfaceRenderer()
                 ENTER_FLAG_DATA_6 -> DemoRenderer(ctx)
+                ENTER_FLAG_DATA_7 -> MySurfaceRenderer()
 
                 ENTER_FLAG_DATA_1 -> CubeRenderer1(ctx)
                 else -> CubeRenderer(ctx)
@@ -116,7 +116,7 @@ class CubeActivity : AppCompatActivity() {
         super.onDestroy()
         if (this::renderer.isInitialized) {
             (renderer as? MyRenderer3)?.onDestroy()
-            (renderer as? MyRenderer4)?.destroy()
+            (renderer as? MyRenderer4)?.onDestroy()
         }
     }
 }

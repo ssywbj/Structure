@@ -73,7 +73,7 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
                 "varying vec2 vTextureCoord;\n"+
                 "void main() {\n" +
                 "  gl_Position = uMVPMatrix * vPosition;\n" +
-                "  vTextureCoord = aTextureCoord;;\n" +
+                "  vTextureCoord = aTextureCoord;\n" +
                 "}";
         private static final String FRAGMENT_SHADER =
                 "precision mediump float;\n" +
@@ -109,7 +109,7 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
             mVertexBuffer.put(coordinates);
             mVertexBuffer.position(0);
 
-            //截取纹理全部区域
+            //Crop texture all area: full image.
             final float[] texVertex = { // in clockwise order:
                     1f, 0f,  //bottom right
                     0f, 0f,  //bottom left
@@ -122,21 +122,21 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
                     .put(texVertex);
             mTexVertexBuffer.position(0);
 
-            //截取纹理部分区域 图片左上
+            //Crop texture partial area: top left of the image.
             /*final float[] texVertex3 = { // in clockwise order:
                     0.5f, 0, //bottom right
                     0, 0, //bottom left
                     0, 0.5f, //top left
                     0.5f, 0.5f, //top right
             };*/
-            //截取纹理部分区域 图片左下
+            //Crop texture partial area: bottom left of the image.
             /*final float[] texVertex3 = { // in clockwise order:
                     0.5f, 0.5f,
                     0f, 0.5f,
                     0f, 1f,
                     0.5f, 1f,
             };*/
-            //截取纹理部分区域
+            //Crop texture partial area
             final float[] texVertex3 = { // in clockwise order:
                     0.9f, 0f,
                     0.1f, 0f,
