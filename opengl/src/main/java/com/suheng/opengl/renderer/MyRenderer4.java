@@ -65,12 +65,14 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
         private int[] mTextures;
 
-        private final float mOrtho = 1f;
+        private float mOrtho;
         private float mTranslateX;
         private float mTranslateY;
         private float mScaleX;
         private float mScaleY;
-        private int matrixHandle;
+
+        private int mMatrixHandle;
+        private int mAlphaHandle;
 
         public ImageRenderer() {
             mVertexBuffer = ByteBuffer.allocateDirect(VERTEX_ANCHOR * 4)
@@ -124,6 +126,10 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             }
             Log.d("Wbj", "textures: " + Arrays.toString(mTextures));
 
+            //support alpha blending
+            GLES20.glEnable(GLES20.GL_BLEND);
+            GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
             GLES20.glUseProgram(mProgram);
 
             final int positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
@@ -135,25 +141,27 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             Log.d("Wbj", "onDrawFrame, width: " + width + ", height: " + height
                     + ", rectWidth: " + rectWidth + ", rectHeight: " + rectHeight
                     + ", rect w/h: " + (1f * rectWidth / rectHeight));
+            mOrtho = 1f;
             mScaleX = ((float) rectWidth) / width;
             mScaleY = ((float) rectHeight) / height;
-            mTranslateX = mOrtho - mScaleX;
-            mTranslateY = mOrtho - mScaleY;
             Log.v("Wbj", "onDrawFrame, ortho: " + mOrtho + ", scaleX: " + mScaleX + ", scaleY: " + mScaleY
                     + ", translateX: " + mTranslateX + ", translateY: " + mTranslateY);
 
-            matrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
+            mMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
             Matrix.setIdentityM(mMatrixProjection, 0);
             Matrix.orthoM(mMatrixProjection, 0, -mOrtho, mOrtho, -mOrtho, mOrtho, -1f, 1f);
             Matrix.translateM(mMatrixProjection, 0, 0, 0, 0f);
             Matrix.scaleM(mMatrixProjection, 0, mScaleX, mScaleY, 1f);
-            GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mMatrixProjection, 0);
-
+            GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrixProjection, 0);
             Utils.texImage2D(bitmap, mTextures[0], false);
 
             final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
             GLES20.glEnableVertexAttribArray(textureCoordHandle);
             GLES20.glVertexAttribPointer(textureCoordHandle, 2, GLES20.GL_FLOAT, false, 8, mTexVertexBuffer);
+
+            mAlphaHandle = GLES20.glGetUniformLocation(mProgram, "uAlpha");
+            final float alpha = 1f;
+            GLES20.glUniform1f(mAlphaHandle, alpha);
 
             final int textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
             GLES20.glUniform1i(textureHandle, 0);
@@ -167,18 +175,27 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
             GLES20.glDisableVertexAttribArray(positionHandle);
             GLES20.glDisableVertexAttribArray(textureCoordHandle);
+
+            GLES20.glDisable(GLES20.GL_BLEND); //disable alpha blending
         }
 
         public void onDrawFrame2(Bitmap bitmap) {
+            mOrtho = 1.2f;
+            mTranslateX = mOrtho - mScaleX;
+            mTranslateY = mOrtho - mScaleY;
+
             Matrix.setIdentityM(mMatrixProjection, 0);
             Matrix.orthoM(mMatrixProjection, 0, -mOrtho, mOrtho, -mOrtho, mOrtho, -1f, 1f);
             Matrix.translateM(mMatrixProjection, 0, -mTranslateX, -mTranslateY, 0f);
             Matrix.scaleM(mMatrixProjection, 0, mScaleX, mScaleY, 1f);
-            GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mMatrixProjection, 0);
+            GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrixProjection, 0);
             Utils.texImage2D(bitmap, mTextures[1], true);
 
-            /*final int textureHandle2 = GLES20.glGetUniformLocation(mProgram, "uTexture");
-            GLES20.glUniform1i(textureHandle2, 0);*/
+            final float alpha = 0.6f;
+            GLES20.glUniform1f(mAlphaHandle, alpha);
+
+            final int textureHandle2 = GLES20.glGetUniformLocation(mProgram, "uTexture");
+            GLES20.glUniform1i(textureHandle2, 0);
 
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
         }

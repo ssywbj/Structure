@@ -1,6 +1,5 @@
 package com.suheng.opengl;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -180,8 +179,8 @@ public final class Utils {
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
     }
 
-    public static boolean supportGlEs20(Activity activity) {
-        ActivityManager activityManager = (ActivityManager) activity.getSystemService(
+    public static boolean supportGlEs20(Context context) {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(
                 Context.ACTIVITY_SERVICE);
         return activityManager.getDeviceConfigurationInfo().reqGlEsVersion >= 0x20000;
     }
