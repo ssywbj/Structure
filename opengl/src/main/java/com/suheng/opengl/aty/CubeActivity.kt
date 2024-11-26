@@ -2,10 +2,12 @@ package com.suheng.opengl.aty
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -91,6 +93,50 @@ class CubeActivity : AppCompatActivity() {
         } else {
             imageGirl.visibility = ImageView.GONE
         }
+
+        val imageGirl2 = findViewById<ImageView>(R.id.image_girl2)
+        val imageGirl3 = findViewById<ImageView>(R.id.image_girl3)
+        if (renderer is MyRenderer4) {
+            val options = BitmapFactory.Options()
+            options.inScaled = false;
+            BitmapFactory.decodeResource(resources, R.drawable.iz0rltfp, options).let { bm ->
+                with(imageGirl2) {
+                    post {
+                        layoutParams?.let {
+                            it.width = bm.width
+                            it.height = bm.height
+                            layoutParams = it
+                        }
+
+                        scaleX = MyRenderer4.SCALE_RATIO
+                        scaleY = scaleX
+                        alpha = MyRenderer4.SCALE_ALPHA2
+                    }
+                }
+
+                with(imageGirl3) {
+                    setImageBitmap(bm)
+                    post {
+                        layoutParams?.let {
+                            it.width = bm.width
+                            it.height = bm.height
+                            layoutParams = it
+
+                            pivotX = it.width.toFloat()
+                            pivotY = it.height.toFloat()
+                        }
+
+                        scaleX = MyRenderer4.SCALE_RATIO2
+                        scaleY = scaleX
+                        alpha = MyRenderer4.SCALE_ALPHA2
+                    }
+                }
+            }
+        } else {
+            imageGirl2.visibility = View.GONE
+            imageGirl3.visibility = View.GONE
+        }
+
     }
 
     override fun onResume() {

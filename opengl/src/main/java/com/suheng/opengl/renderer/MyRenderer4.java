@@ -21,6 +21,10 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class MyRenderer4 implements GLSurfaceView.Renderer {
+    public static final float SCALE_RATIO = 1.2f;
+    public static final float SCALE_RATIO2 = 0.72f;
+    public static final float SCALE_ALPHA2 = 0.6f;
+
     private final Context mContext;
     private int mWidth, mHeight;
     private ImageRenderer mImageRenderer;
@@ -45,7 +49,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        mImageRenderer.onDrawFrame(mWidth, mHeight);
+        mImageRenderer.onDrawFrame();
     }
 
     public void onDestroy() {
@@ -53,6 +57,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
     }
 
     private final class ImageRenderer {
+        private static final float ORTHO = 1f;
         private static final int POINT_TOTAL = 4;
         private static final int VERTEX_ANCHOR = POINT_TOTAL * 3;
         private final FloatBuffer mVertexBuffer;
@@ -65,7 +70,6 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
         private int[] mTextures;
 
-        private float mOrtho;
         private float mTranslateX;
         private float mTranslateY;
         private float mScaleX;
@@ -109,7 +113,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
                     , R.raw.image_renderer_fragment);
         }
 
-        public void onDrawFrame(int width, int height) {
+        public void onDrawFrame() {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
             BitmapFactory.Options options = new BitmapFactory.Options();
@@ -136,20 +140,16 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             GLES20.glEnableVertexAttribArray(positionHandle);
             GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 12, mVertexBuffer);
 
-            final int rectWidth = bitmap.getWidth();
-            final int rectHeight = bitmap.getHeight();
-            Log.d("Wbj", "onDrawFrame, width: " + width + ", height: " + height
-                    + ", rectWidth: " + rectWidth + ", rectHeight: " + rectHeight
-                    + ", rect w/h: " + (1f * rectWidth / rectHeight));
-            mOrtho = 1f;
-            mScaleX = ((float) rectWidth) / width;
-            mScaleY = ((float) rectHeight) / height;
-            Log.v("Wbj", "onDrawFrame, ortho: " + mOrtho + ", scaleX: " + mScaleX + ", scaleY: " + mScaleY
+            Log.d("Wbj", "onDrawFrame, width: " + mWidth + ", height: " + mHeight
+                    + ", rectWidth: " + bitmap.getWidth() + ", rectHeight: " + bitmap.getWidth());
+            mScaleX = bitmap.getWidth() * SCALE_RATIO / mWidth;
+            mScaleY = bitmap.getHeight() * SCALE_RATIO / mHeight;
+            Log.v("Wbj", "onDrawFrame, scaleX: " + mScaleX + ", scaleY: " + mScaleY
                     + ", translateX: " + mTranslateX + ", translateY: " + mTranslateY);
 
             mMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
             Matrix.setIdentityM(mMatrixProjection, 0);
-            Matrix.orthoM(mMatrixProjection, 0, -mOrtho, mOrtho, -mOrtho, mOrtho, -1f, 1f);
+            Matrix.orthoM(mMatrixProjection, 0, -ORTHO, ORTHO, -ORTHO, ORTHO, -1f, 1f);
             Matrix.translateM(mMatrixProjection, 0, 0, 0, 0f);
             Matrix.scaleM(mMatrixProjection, 0, mScaleX, mScaleY, 1f);
             GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrixProjection, 0);
@@ -180,19 +180,19 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
         }
 
         public void onDrawFrame2(Bitmap bitmap) {
-            mOrtho = 1.2f;
-            mTranslateX = mOrtho - mScaleX;
-            mTranslateY = mOrtho - mScaleY;
+            mScaleX = bitmap.getWidth() * SCALE_RATIO2 / mWidth;
+            mScaleY = bitmap.getHeight() * SCALE_RATIO2 / mHeight;
+            mTranslateX = ORTHO - mScaleX;
+            mTranslateY = ORTHO - mScaleY;
 
             Matrix.setIdentityM(mMatrixProjection, 0);
-            Matrix.orthoM(mMatrixProjection, 0, -mOrtho, mOrtho, -mOrtho, mOrtho, -1f, 1f);
+            Matrix.orthoM(mMatrixProjection, 0, -ORTHO, ORTHO, -ORTHO, ORTHO, -1f, 1f);
             Matrix.translateM(mMatrixProjection, 0, -mTranslateX, -mTranslateY, 0f);
             Matrix.scaleM(mMatrixProjection, 0, mScaleX, mScaleY, 1f);
             GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrixProjection, 0);
             Utils.texImage2D(bitmap, mTextures[1], true);
 
-            final float alpha = 0.6f;
-            GLES20.glUniform1f(mAlphaHandle, alpha);
+            GLES20.glUniform1f(mAlphaHandle, SCALE_ALPHA2);
 
             final int textureHandle2 = GLES20.glGetUniformLocation(mProgram, "uTexture");
             GLES20.glUniform1i(textureHandle2, 0);

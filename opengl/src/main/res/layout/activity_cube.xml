@@ -14,4 +14,18 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
         android:src="@drawable/girl_gaitubao" />
+
+    <ImageView
+        android:id="@+id/image_girl2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:color/holo_red_dark" />
+
+    <ImageView
+        android:id="@+id/image_girl3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:background="@android:color/holo_red_dark" />
 </FrameLayout>
