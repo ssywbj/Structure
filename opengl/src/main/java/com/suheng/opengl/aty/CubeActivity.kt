@@ -101,6 +101,7 @@ class CubeActivity : AppCompatActivity() {
             options.inScaled = false;
             BitmapFactory.decodeResource(resources, R.drawable.iz0rltfp, options).let { bm ->
                 with(imageGirl2) {
+                    //visibility = View.VISIBLE
                     post {
                         layoutParams?.let {
                             it.width = bm.width
@@ -110,7 +111,7 @@ class CubeActivity : AppCompatActivity() {
 
                         scaleX = MyRenderer4.SCALE_RATIO
                         scaleY = scaleX
-                        alpha = MyRenderer4.SCALE_ALPHA2
+                        alpha = 0.5f
                     }
                 }
 

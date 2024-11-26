@@ -21,9 +21,9 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class MyRenderer4 implements GLSurfaceView.Renderer {
-    public static final float SCALE_RATIO = 1.2f;
+    public static final float SCALE_RATIO = 1.28f;
     public static final float SCALE_RATIO2 = 0.72f;
-    public static final float SCALE_ALPHA2 = 0.6f;
+    public static final float SCALE_ALPHA2 = 0.4f;
 
     private final Context mContext;
     private int mWidth, mHeight;
@@ -133,6 +133,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             //support alpha blending
             GLES20.glEnable(GLES20.GL_BLEND);
             GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+            //GLES20.glBlendFuncSeparate(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA, GLES20.GL_ONE, GLES20.GL_ZERO);
 
             GLES20.glUseProgram(mProgram);
 
@@ -166,7 +167,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             final int textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
             GLES20.glUniform1i(textureHandle, 0);
 
-            Log.v("Wbj", "onDrawFrame, textureCoordHandle: " + textureCoordHandle + ", textureHandle: " + textureHandle);
+            Log.v("Wbj", "onDrawFrame, textureCoordHandle: " + textureCoordHandle + ", textureHandle: " + textureHandle + ", textureHandle: " + ", alphaHandle: " + mAlphaHandle);
 
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
 
