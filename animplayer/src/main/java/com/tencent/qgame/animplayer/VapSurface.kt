@@ -1,8 +1,6 @@
 package com.tencent.qgame.animplayer
 
 import android.content.res.AssetManager
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.Surface
 import com.tencent.qgame.animplayer.file.AssetsFileContainer
@@ -24,7 +22,6 @@ class VapSurface : IAnimView{
     }
 
     private var player: AnimPlayer
-    private val uiHandler by lazy { Handler(Looper.getMainLooper()) }
     private var surface: Surface? = null
     private var animListener: IAnimListener? = null
     private var lastFile: IFileContainer? = null
@@ -103,23 +100,6 @@ class VapSurface : IAnimView{
             needPrepareTextureView = false
             prepareTextureView()
         }
-    }
-
-    fun onAttachedToWindow() {
-        Log.i(TAG, "onAttachedToWindow")
-        player.isDetachedFromWindow = false
-        // 自动恢复播放
-        if (player.playLoop > 0) {
-            lastFile?.apply {
-                startPlay(this)
-            }
-        }
-    }
-
-    fun onDetachedFromWindow() {
-        Log.i(TAG, "onDetachedFromWindow")
-        player.isDetachedFromWindow = true
-        player.onSurfaceTextureDestroyed()
     }
 
     override fun setAnimListener(animListener: IAnimListener?) {
@@ -207,13 +187,11 @@ class VapSurface : IAnimView{
     }
 
     override fun startPlay(fileContainer: IFileContainer) {
-        ui {
-            if (player.isRunning()) {
-                Log.e(TAG, "is running can not start")
-            } else {
-                lastFile = fileContainer
-                player.startPlay(fileContainer)
-            }
+        if (player.isRunning()) {
+            Log.e(TAG, "is running can not start")
+        } else {
+            lastFile = fileContainer
+            player.startPlay(fileContainer)
         }
     }
 
@@ -231,10 +209,6 @@ class VapSurface : IAnimView{
 
     private fun hide() {
         lastFile?.close()
-    }
-
-    private fun ui(f: () -> Unit) {
-        if (Looper.myLooper() == Looper.getMainLooper()) f() else uiHandler.post { f() }
     }
 
 }

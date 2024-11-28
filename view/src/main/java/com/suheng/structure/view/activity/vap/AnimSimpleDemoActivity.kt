@@ -73,6 +73,7 @@ class AnimSimpleDemoActivity : Activity(), IAnimListener {
         initTestView()
         // 获取动画view
         animView = findViewById(R.id.playerView)
+        animView.setLoop(1)
         // 居中（根据父布局按比例居中并全部显示，默认fitXY）
         animView.setScaleType(ScaleType.FIT_CENTER)
         // 注册动画监听
@@ -84,8 +85,17 @@ class AnimSimpleDemoActivity : Activity(), IAnimListener {
         play(videoInfo)
     }
 
+    private var currentVideoInfo: VideoInfo? = null
 
     private fun play(videoInfo: VideoInfo) {
+        val running = animView.isRunning()
+        if (running) {
+            Log.w(TAG, "play, but is running, cache info: ${videoInfo.fileName}")
+            currentVideoInfo = videoInfo
+            animView.stopPlay()
+            return
+        }
+
         // 播放前强烈建议检查文件的md5是否有改变
         // 因为下载或文件存储过程中会出现文件损坏，导致无法播放
         Thread {
@@ -134,7 +144,11 @@ class AnimSimpleDemoActivity : Activity(), IAnimListener {
      * 播放器被销毁情况下会调用onVideoDestroy
      */
     override fun onVideoDestroy() {
-        Log.i(TAG, "onVideoDestroy")
+        Log.i(TAG, "onVideoDestroy, currentVideoInfo=$currentVideoInfo"/*, Exception()*/)
+        currentVideoInfo?.let {
+            currentVideoInfo = null
+            play(it)
+        }
     }
 
     /**

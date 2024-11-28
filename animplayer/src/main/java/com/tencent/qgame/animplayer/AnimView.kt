@@ -96,6 +96,7 @@ open class AnimView @JvmOverloads constructor(context: Context, attrs: Attribute
     private val prepareTextureViewRunnable = Runnable {
         removeAllViews()
         innerTextureView = InnerTextureView(context).apply {
+            Log.i(TAG, "addInnerTextureView: ${System.identityHashCode(this)}")
             player = this@AnimView.player
             isOpaque = false
             surfaceTextureListener = this@AnimView
@@ -113,6 +114,7 @@ open class AnimView @JvmOverloads constructor(context: Context, attrs: Attribute
 
 
     override fun prepareTextureView() {
+        Log.i(TAG, "prepareTextureView, onSizeChangedCalled: $onSizeChangedCalled")
         if (onSizeChangedCalled) {
             uiHandler.post(prepareTextureViewRunnable)
         } else {

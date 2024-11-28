@@ -39,6 +39,7 @@ import com.suheng.wallpaper.myhealth.bean.AdtItem
 import com.suheng.wallpaper.myhealth.bean.asAdtItem
 import com.suheng.wallpaper.myhealth.file.PrefsUtils
 import com.suheng.wallpaper.myhealth.file.VideoLoader
+import com.suheng.wallpaper.myhealth.file.identityHashCode
 import com.suheng.wallpaper.myhealth.repository.VideoRepository
 import com.tencent.qgame.animplayer.AnimConfig
 import com.tencent.qgame.animplayer.VapSurface
@@ -91,7 +92,7 @@ class VapWallpaperConfig : AppCompatActivity() {
         val previewVideo = MutableStateFlow(VideoRepository.selectedFlow.value)
         previewVideo.filterNotNull().onEach {
             videoPath = it.assetsDir + "/demo.mp4"
-            Log.e(TAG, "previewVideo onEach: $it, assets path: $videoPath")
+            Log.e(TAG, "previewVideo onEach: $it, assets path: $videoPath, vapSurface: ${vapSurface?.identityHashCode()}")
             vapSurface?.let { vap ->
                 if (vap.isRunning()) {
                     vap.stopPlay()
@@ -133,8 +134,9 @@ class VapWallpaperConfig : AppCompatActivity() {
                                                         }
 
                                                         override fun onVideoComplete() {
-                                                            Log.d(TAG, "onVideoComplete")
+                                                            Log.d(TAG, "onVideoComplete, videoPath: $videoPath, ${this@VapWallpaperConfig.isDestroyed}, ${this@VapWallpaperConfig.isFinishing}")
                                                             videoPath?.let {
+                                                                videoPath = null
                                                                 startPlay(context.assets, it)
                                                             }
                                                         }
@@ -147,10 +149,12 @@ class VapWallpaperConfig : AppCompatActivity() {
                                                             errorType: Int,
                                                             errorMsg: String?,
                                                         ) {
+                                                            Log.e(TAG, "onFailed, errorType: $errorType, errorMsg: $errorMsg")
                                                         }
                                                     }
                                                     setAnimListener(animListener)
                                                     videoPath?.let {
+                                                        videoPath = null
                                                         startPlay(context.assets, it)
                                                     }
                                                 }
