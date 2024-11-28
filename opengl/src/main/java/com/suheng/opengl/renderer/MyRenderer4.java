@@ -77,6 +77,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
         private int mMatrixHandle;
         private int mAlphaHandle;
+        private int mRendererTypeHandle;
 
         public ImageRenderer() {
             mVertexBuffer = ByteBuffer.allocateDirect(VERTEX_ANCHOR * 4)
@@ -124,7 +125,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
                 Log.e("Wbj", "Resource ID " + resId + " could not be decoded.");
                 return;
             }
-            mTextures = Utils.glGenTextures(2);
+            mTextures = Utils.glGenTextures(1);
             if (mTextures == null) {
                 return;
             }
@@ -137,7 +138,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
             GLES20.glUseProgram(mProgram);
 
-            final int positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
+            final int positionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
             GLES20.glEnableVertexAttribArray(positionHandle);
             GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 12, mVertexBuffer);
 
@@ -148,13 +149,14 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             Log.v("Wbj", "onDrawFrame, scaleX: " + mScaleX + ", scaleY: " + mScaleY
                     + ", translateX: " + mTranslateX + ", translateY: " + mTranslateY);
 
+            Utils.texImage2D(bitmap, mTextures[0], true); //texture only loaded once, not every frame
+
             mMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
             Matrix.setIdentityM(mMatrixProjection, 0);
             Matrix.orthoM(mMatrixProjection, 0, -ORTHO, ORTHO, -ORTHO, ORTHO, -1f, 1f);
             Matrix.translateM(mMatrixProjection, 0, 0, 0, 0f);
             Matrix.scaleM(mMatrixProjection, 0, mScaleX, mScaleY, 1f);
             GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrixProjection, 0);
-            Utils.texImage2D(bitmap, mTextures[0], false);
 
             final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
             GLES20.glEnableVertexAttribArray(textureCoordHandle);
@@ -164,15 +166,22 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             final float alpha = 1f;
             GLES20.glUniform1f(mAlphaHandle, alpha);
 
+            mRendererTypeHandle = GLES20.glGetUniformLocation(mProgram, "uRendererType");
+            GLES20.glUniform1i(mRendererTypeHandle, 0);
+
             final int textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
             GLES20.glUniform1i(textureHandle, 0);
 
-            Log.v("Wbj", "onDrawFrame, textureCoordHandle: " + textureCoordHandle + ", textureHandle: " + textureHandle + ", textureHandle: " + ", alphaHandle: " + mAlphaHandle);
+            Log.d("Wbj", "onDrawFrame, positionHandle: " + positionHandle + ", textureCoordHandle: " + textureCoordHandle);
+            Log.v("Wbj", "onDrawFrame, textureHandle: " + textureHandle + ", alphaHandle: " + mAlphaHandle
+                    + ", rendererTypeHandle: " + mRendererTypeHandle + ", matrixHandle: " + mMatrixHandle);
 
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
 
             //pint the second texture
             this.onDrawFrame2(bitmap);
+
+            this.onDrawFrame3(bitmap);
 
             GLES20.glDisableVertexAttribArray(positionHandle);
             GLES20.glDisableVertexAttribArray(textureCoordHandle);
@@ -191,12 +200,34 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             Matrix.translateM(mMatrixProjection, 0, -mTranslateX, -mTranslateY, 0f);
             Matrix.scaleM(mMatrixProjection, 0, mScaleX, mScaleY, 1f);
             GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrixProjection, 0);
-            Utils.texImage2D(bitmap, mTextures[1], true);
+
+            GLES20.glUniform1i(mRendererTypeHandle, 0);
 
             GLES20.glUniform1f(mAlphaHandle, SCALE_ALPHA2);
 
-            final int textureHandle2 = GLES20.glGetUniformLocation(mProgram, "uTexture");
-            GLES20.glUniform1i(textureHandle2, 0);
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
+        }
+
+        public void onDrawFrame3(Bitmap bitmap) {
+            Matrix.setIdentityM(mMatrixProjection, 0);
+            Matrix.orthoM(mMatrixProjection, 0, -ORTHO, ORTHO, -ORTHO, ORTHO, -1f, 1f);
+            Matrix.translateM(mMatrixProjection, 0, -mTranslateX, mTranslateY, 0f);
+            Matrix.scaleM(mMatrixProjection, 0, mScaleX, mScaleY, 1f);
+            GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrixProjection, 0);
+
+            GLES20.glUniform1i(mRendererTypeHandle, 1);
+
+            //blur parameters
+            final int radiusHandle = GLES20.glGetUniformLocation(mProgram, "uRadius");
+            final int stepsHandle = GLES20.glGetUniformLocation(mProgram, "uSteps");
+            final int texWidthHandle = GLES20.glGetUniformLocation(mProgram, "uTexWidth");
+            final int texHeightHandle = GLES20.glGetUniformLocation(mProgram, "uTexHeight");
+            GLES20.glUniform1f(stepsHandle, 2.5f);
+            GLES20.glUniform1i(radiusHandle, 10);
+            GLES20.glUniform1f(texWidthHandle, bitmap.getWidth());
+            GLES20.glUniform1f(texHeightHandle, bitmap.getHeight());
+            Log.v("Wbj", "onDrawFrame3, radiusHandle: " + radiusHandle + ", stepsHandle: " + stepsHandle
+                    + ", texWidthHandle: " + texWidthHandle + ", texHeightHandle: " + texHeightHandle);
 
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
         }
