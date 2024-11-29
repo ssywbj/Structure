@@ -405,6 +405,7 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
             GLES20.glDeleteShader(mFragmentShader);
             GLES20.glDeleteTextures(1, new int[]{mTextureId}, 0);
 
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0); //Unbind textures
             GLES20.glDeleteTextures(1, mTextures, 0);
             GLES20.glDeleteTextures(1, new int[]{mTextureId2}, 0);
             GLES20.glDeleteTextures(1, new int[]{mTextureId3}, 0);

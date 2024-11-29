@@ -12,6 +12,8 @@ import com.suheng.opengl.R
 //https://learnopengl.com/Getting-started
 //https://learnopengl-cn.github.io/
 //https://open.gl/introduction
+//https://github.com/JYangkai/MediaDemo
+//https://juejin.cn/post/6975806731473387528
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

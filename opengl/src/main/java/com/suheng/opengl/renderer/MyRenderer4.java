@@ -158,9 +158,9 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             Matrix.scaleM(mMatrixProjection, 0, mScaleX, mScaleY, 1f);
             GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrixProjection, 0);
 
-            final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
-            GLES20.glEnableVertexAttribArray(textureCoordHandle);
-            GLES20.glVertexAttribPointer(textureCoordHandle, 2, GLES20.GL_FLOAT, false, 8, mTexVertexBuffer);
+            final int coordinateHandle = GLES20.glGetAttribLocation(mProgram, "aCoordinate");
+            GLES20.glEnableVertexAttribArray(coordinateHandle);
+            GLES20.glVertexAttribPointer(coordinateHandle, 2, GLES20.GL_FLOAT, false, 8, mTexVertexBuffer);
 
             mAlphaHandle = GLES20.glGetUniformLocation(mProgram, "uAlpha");
             final float alpha = 1f;
@@ -172,7 +172,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             final int textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
             GLES20.glUniform1i(textureHandle, 0);
 
-            Log.d("Wbj", "onDrawFrame, positionHandle: " + positionHandle + ", textureCoordHandle: " + textureCoordHandle);
+            Log.d("Wbj", "onDrawFrame, positionHandle: " + positionHandle + ", coordinateHandle: " + coordinateHandle);
             Log.v("Wbj", "onDrawFrame, textureHandle: " + textureHandle + ", alphaHandle: " + mAlphaHandle
                     + ", rendererTypeHandle: " + mRendererTypeHandle + ", matrixHandle: " + mMatrixHandle);
 
@@ -180,11 +180,11 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
             //pint the second texture
             this.onDrawFrame2(bitmap);
-
             this.onDrawFrame3(bitmap);
+            this.onDrawFrame4(bitmap);
 
             GLES20.glDisableVertexAttribArray(positionHandle);
-            GLES20.glDisableVertexAttribArray(textureCoordHandle);
+            GLES20.glDisableVertexAttribArray(coordinateHandle);
 
             GLES20.glDisable(GLES20.GL_BLEND); //disable alpha blending
         }
@@ -232,10 +232,86 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
         }
 
+        public void onDrawFrame4(Bitmap bitmap) {
+            Matrix.setIdentityM(mMatrixProjection, 0);
+            Matrix.orthoM(mMatrixProjection, 0, -ORTHO, ORTHO, -ORTHO, ORTHO, -1f, 1f);
+            Matrix.translateM(mMatrixProjection, 0, mTranslateX, mTranslateY, 0f);
+            Matrix.scaleM(mMatrixProjection, 0, mScaleX, mScaleY, 1f);
+            GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrixProjection, 0);
+
+            GLES20.glUniform1i(mRendererTypeHandle, 2);
+
+            final int blurRadiusLocation = GLES20.glGetUniformLocation(mProgram, "uBlurRadius");
+            final int blurOffsetLocation = GLES20.glGetUniformLocation(mProgram, "uBlurOffset");
+            final int sumWeightLocation = GLES20.glGetUniformLocation(mProgram, "uSumWeight");
+            this.setBlurOffset(1, 0);
+            this.calculateSumWeight();
+
+            GLES20.glUniform1i(blurRadiusLocation, blurRadius);
+            int width = bitmap.getWidth();
+            float var1 = blurOffsetW / width;
+            int height = bitmap.getHeight();
+            float var2 = blurOffsetH / height;
+            GLES20.glUniform2f(blurOffsetLocation, var1, var2);
+            GLES20.glUniform1f(sumWeightLocation, sumWeight);
+
+            //blurRadius: 30, (0.0018518518, 0.0), sumWeight: 0.99683464, width: 540, height: 1113
+            //blurRadius: 30, (0.0, 8.984726E-4), sumWeight: 0.99683464, width: 540, height: 1113
+
+            //blurRadius: 30, (0.0014641288, 0.0), sumWeight: 0.99683464, width: 683, height: 993
+            //blurRadius: 30, (0.0014641288, 0.0), sumWeight: 0.99683464, width: 683, height: 993
+            Log.d("Wbj", "blurRadius: " + blurRadius + ", (" + var1 + ", " + var2 + ")" + ", sumWeight: " + sumWeight
+                    + ", width: " + width + ", height: " + height);
+            /*GLES20.glUniform1i(blurRadiusLocation, 30);
+            GLES20.glUniform2f(blurOffsetLocation, 0.0018518518f, 0.0f);
+            GLES20.glUniform1f(sumWeightLocation, 0.99683464f);*/
+
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
+        }
+
+        private final int blurRadius = 100;
+        private float sumWeight;
+        private float blurOffsetW;
+        private float blurOffsetH;
+
+        /**
+         * 计算总权重
+         */
+        private void calculateSumWeight() {
+            if (blurRadius < 1) {
+                Log.d("Wbj", "calculateSumWeight: blurRadius:" + blurRadius + " w:" + blurOffsetW + " h:" + blurOffsetH);
+                setSumWeight(0);
+                return;
+            }
+
+            float sumWeight = 0;
+            float sigma = blurRadius / 3f;
+            for (int i = 0; i < blurRadius; i++) {
+                float weight = (float) ((1 / Math.sqrt(2 * Math.PI * sigma * sigma)) * Math.exp(-(i * i) / (2 * sigma * sigma)));
+                sumWeight += weight;
+                if (i != 0) {
+                    sumWeight += weight;
+                }
+            }
+
+            setSumWeight(sumWeight);
+        }
+
+        private void setBlurOffset(float width, float height) {
+            this.blurOffsetW = width;
+            this.blurOffsetH = height;
+        }
+
+        private void setSumWeight(float sumWeight) {
+            Log.d("Wbj", "setSumWeight: " + sumWeight);
+            this.sumWeight = sumWeight;
+        }
+
         public void onDestroy() {
             Log.i("Wbj", "ImageRenderer onDestroy");
             GLES20.glDeleteProgram(mProgram);
             if (mTextures != null) {
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0); //Unbind texture
                 GLES20.glDeleteTextures(mTextures.length, mTextures, 0);
             }
         }
