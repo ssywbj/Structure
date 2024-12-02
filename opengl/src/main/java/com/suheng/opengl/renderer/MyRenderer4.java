@@ -58,8 +58,9 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
     private final class ImageRenderer {
         private static final float ORTHO = 1f;
+        private static final int VERTEX_COMPONENTS = 2;
         private static final int POINT_TOTAL = 4;
-        private static final int VERTEX_ANCHOR = POINT_TOTAL * 3;
+        private static final int VERTEX_ANCHOR = POINT_TOTAL * VERTEX_COMPONENTS;
         private final FloatBuffer mVertexBuffer;
         private final int mProgram;
         private final float[] mMatrixProjection = new float[16];
@@ -83,10 +84,10 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             mVertexBuffer = ByteBuffer.allocateDirect(VERTEX_ANCHOR * 4)
                     .order(ByteOrder.nativeOrder()).asFloatBuffer();
             final float[] coordinates = {
-                    1f, 1f, 0,
-                    -1f, 1f, 0,
-                    -1f, -1f, 0,
-                    1f, -1f, 0
+                    1f, 1f,
+                    -1f, 1f,
+                    -1f, -1f,
+                    1f, -1f
             };
             mVertexBuffer.put(coordinates);
             mVertexBuffer.position(0);
@@ -140,7 +141,8 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
             final int positionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
             GLES20.glEnableVertexAttribArray(positionHandle);
-            GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 12, mVertexBuffer);
+            GLES20.glVertexAttribPointer(positionHandle, VERTEX_COMPONENTS, GLES20.GL_FLOAT, false
+                    , VERTEX_ANCHOR, mVertexBuffer);
 
             Log.d("Wbj", "onDrawFrame, width: " + mWidth + ", height: " + mHeight
                     + ", rectWidth: " + bitmap.getWidth() + ", rectHeight: " + bitmap.getWidth());

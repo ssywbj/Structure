@@ -89,7 +89,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         ByteBuffer byteBuffer;
         if (isRect) {
             if (mIsPlotRectByIndex) {
-                byteBuffer = ByteBuffer.allocateDirect(VERTEX_RECTANGLE_LESS_POINTS.length * 4);
+                //char and short is 2 bytes, int and float is 4 bytes, long and double is 8 bytes, byte is 8 bits.
+                byteBuffer = ByteBuffer.allocateDirect(VERTEX_RECTANGLE_LESS_POINTS.length * 4); //multiply 4 times, because float is 4 bytes
             } else {
                 byteBuffer = ByteBuffer.allocateDirect(VERTEX_RECTANGLE_STANDARD_POINTS.length * 4);
             }
@@ -103,8 +104,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
             if (mIsPlotRectByIndex) {
                 mVertexBuffer.put(VERTEX_RECTANGLE_LESS_POINTS);
 
-                mBufferRectangleIndex = ByteBuffer.allocateDirect(VERTEX_RECTANGLE_LESS_POINTS_INDEX.length * 2).order(ByteOrder.nativeOrder()).asShortBuffer(); //ShortBuffer multiply 2 times
-                //mBufferRectangleIndex = ByteBuffer.allocateDirect(VERTEX_RECTANGLE_LESS_POINTS_INDEX.length * 4).order(ByteOrder.nativeOrder()).asIntBuffer(); //IntBuffer multiply 4 times
+                mBufferRectangleIndex = ByteBuffer.allocateDirect(VERTEX_RECTANGLE_LESS_POINTS_INDEX.length * 2) //multiply 2 times, because short is 2 bytes
+                        .order(ByteOrder.nativeOrder()).asShortBuffer();
                 mBufferRectangleIndex.put(VERTEX_RECTANGLE_LESS_POINTS_INDEX);
                 mBufferRectangleIndex.position(0);
             } else {
