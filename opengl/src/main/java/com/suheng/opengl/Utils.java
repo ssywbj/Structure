@@ -6,7 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
-import android.os.Environment;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.DrawableRes;
@@ -16,9 +16,12 @@ import androidx.annotation.RawRes;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
@@ -185,38 +188,59 @@ public final class Utils {
         return activityManager.getDeviceConfigurationInfo().reqGlEsVersion >= 0x20000;
     }
 
-    static void sendImage(int width, int height) {
-        ByteBuffer rgbaBuf = ByteBuffer.allocateDirect(width * height * 4);
-        rgbaBuf.position(0);
-        long start = System.nanoTime();
-        GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE,
-                rgbaBuf);
-        long end = System.nanoTime();
-        Log.d(TAG, "glReadPixels: " + (end - start));
-        saveRgb2Bitmap(rgbaBuf, Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/gl_dump_" + width + "_" + height + ".png", width, height);
+    @NonNull
+    public static ByteBuffer glCreateReadPixels(int width, int height) {
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(width * height * 4);
+        byteBuffer.position(0);
+        GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, byteBuffer);
+        return byteBuffer;
     }
 
-    static void saveRgb2Bitmap(Buffer buf, String filename, int width, int height) {
-        Log.d(TAG, "Creating " + filename);
+    public static void bufferToOutStream(@NonNull Buffer buffer, @NonNull OutputStream outStream, int width, int height) {
         BufferedOutputStream bos = null;
         try {
-            bos = new BufferedOutputStream(Files.newOutputStream(Paths.get(filename)));
-            Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            bmp.copyPixelsFromBuffer(buf);
-            bmp.compress(Bitmap.CompressFormat.PNG, 90, bos);
-            bmp.recycle();
-        } catch (IOException e) {
-            Log.e(TAG, "saveRgb2Bitmap error", e);
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bos = new BufferedOutputStream(outStream);
+            bitmap.copyPixelsFromBuffer(buffer);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
+            bitmap.recycle();
+        } catch (RuntimeException e) {
+            Log.e(TAG, "bufferToOutStream error", e);
         } finally {
             if (bos != null) {
                 try {
                     bos.close();
                 } catch (IOException e) {
-                    Log.e(TAG, "close saveRgb2Bitmap error", e);
+                    Log.e(TAG, "close error", e);
                 }
             }
         }
+    }
+
+    public static void bufferToFile(@NonNull Buffer buffer, @NonNull String path, int width, int height) {
+        OutputStream outStream = null;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                outStream = Files.newOutputStream(Paths.get(path));
+            } else {
+                outStream = new FileOutputStream(path);
+            }
+            bufferToOutStream(buffer, outStream, width, height);
+        } catch (IOException e) {
+            Log.e(TAG, "bufferToBitmap error", e);
+        } finally {
+            if (outStream != null) {
+                try {
+                    outStream.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "close OutputStream error", e);
+                }
+            }
+        }
+    }
+
+    public static void bufferToFile(@NonNull Buffer buffer, @NonNull File file, int width, int height) {
+        bufferToFile(buffer, file.getPath(), width, height);
     }
 
     public static int loadTextureFromBitmap(Bitmap bitmap) {

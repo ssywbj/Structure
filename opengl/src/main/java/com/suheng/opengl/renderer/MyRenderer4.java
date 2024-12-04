@@ -6,11 +6,16 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.suheng.opengl.R;
 import com.suheng.opengl.Utils;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -85,6 +90,10 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
         private int mAlphaHandle;
         private int mRendererTypeHandle;
 
+        private final Handler mMainThread = new Handler(Looper.getMainLooper());
+        private final Handler mWorkThread;
+        private boolean mIsDestroyed;
+
         public ImageRenderer() {
             mVertexBuffer = ByteBuffer.allocateDirect(VERTEX_ANCHOR * 4)
                     .order(ByteOrder.nativeOrder()).asFloatBuffer();
@@ -118,6 +127,10 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
             mProgram = Utils.glCreateProgram(mContext, R.raw.image_renderer_vertex
                     , R.raw.image_renderer_fragment);
+
+            HandlerThread workerThread = new HandlerThread("WorkerThread");
+            workerThread.start();
+            mWorkThread = new Handler(workerThread.getLooper());
         }
 
         public void onDrawFrame() {
@@ -186,6 +199,23 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
 
+            final long startTime = System.currentTimeMillis();
+            final ByteBuffer byteBuffer = Utils.glCreateReadPixels(mWidth, mHeight);
+            Log.i("Wbj", "onDrawFrame, glCreateReadPixels take time: " + (System.currentTimeMillis() - startTime) / 1000f + "s");
+            mWorkThread.post(() -> {
+                final long start = System.currentTimeMillis();
+                String fileName = System.currentTimeMillis() + "_" + mWidth + "_" + mHeight + ".png";
+                String path = mContext.getCacheDir() + File.separator + fileName;
+                Utils.bufferToFile(byteBuffer, path, mWidth, mHeight);
+                Log.i("Wbj", "onDrawFrame, bufferToFile take time: " + (System.currentTimeMillis() - start) / 1000f + "s"
+                        + ", path: " + path + ", thread: " + Thread.currentThread().getName());
+
+                if (!mIsDestroyed) {
+                    mMainThread.post(() -> Toast.makeText(mContext, "save success thread: "
+                            + Thread.currentThread().getName(), Toast.LENGTH_SHORT).show());
+                }
+            });
+
             //pint the second texture
             this.onDrawFrame2(bitmap);
             this.onDrawFrame3(bitmap);
@@ -214,6 +244,13 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             GLES20.glUniform1f(mAlphaHandle, ALPHA_RATIO2);
 
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
+
+            final ByteBuffer byteBuffer = Utils.glCreateReadPixels(mWidth, mHeight);
+            mWorkThread.post(() -> {
+                String fileName = System.currentTimeMillis() + "_" + mWidth + "_" + mHeight + ".png";
+                String path = mContext.getCacheDir() + File.separator + fileName;
+                Utils.bufferToFile(byteBuffer, path, mWidth, mHeight);
+            });
         }
 
         public void onDrawFrame3(Bitmap bitmap) {
@@ -317,11 +354,13 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
         public void onDestroy() {
             Log.i("Wbj", "ImageRenderer onDestroy");
+            mIsDestroyed = true;
             GLES20.glDeleteProgram(mProgram);
             if (mTextures != null) {
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0); //Unbind texture
                 GLES20.glDeleteTextures(mTextures.length, mTextures, 0);
             }
+            mWorkThread.getLooper().quitSafely();
         }
     }
 
