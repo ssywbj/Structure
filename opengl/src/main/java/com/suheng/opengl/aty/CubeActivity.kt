@@ -129,7 +129,7 @@ class CubeActivity : AppCompatActivity() {
 
                         scaleX = MyRenderer4.SCALE_RATIO2
                         scaleY = scaleX
-                        alpha = MyRenderer4.SCALE_ALPHA2
+                        alpha = MyRenderer4.ALPHA_RATIO2
                     }
                 }
             }

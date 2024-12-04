@@ -23,7 +23,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class MyRenderer4 implements GLSurfaceView.Renderer {
     public static final float SCALE_RATIO = 1.28f;
     public static final float SCALE_RATIO2 = 0.72f;
-    public static final float SCALE_ALPHA2 = 0.4f;
+    public static final float ALPHA_RATIO2 = 0.4f;
 
     private final Context mContext;
     private int mWidth, mHeight;
@@ -61,6 +61,11 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
         private static final int VERTEX_COMPONENTS = 2;
         private static final int POINT_TOTAL = 4;
         private static final int VERTEX_ANCHOR = POINT_TOTAL * VERTEX_COMPONENTS;
+
+        private static final int TEXTURE_POINTS = 4;
+        private static final int TEXTURE_COMPONENTS = 2;
+        private static final int TEXTURE_ANCHORS = TEXTURE_POINTS * TEXTURE_COMPONENTS;
+
         private final FloatBuffer mVertexBuffer;
         private final int mProgram;
         private final float[] mMatrixProjection = new float[16];
@@ -100,12 +105,12 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             mVertexIndexBuffer.position(0);
 
             final float[] texVertex = { // in clockwise order:
-                    1f, 0f,  //bottom right
-                    0f, 0f,  //bottom left
-                    0f, 1f,  //top left
-                    1f, 1f,  //top right
+                    1f, 0f, //bottom right
+                    0f, 0f, //bottom left
+                    0f, 1f, //top left
+                    1f, 1f, //top right
             };
-            mTexVertexBuffer = ByteBuffer.allocateDirect(texVertex.length * 4)
+            mTexVertexBuffer = ByteBuffer.allocateDirect(TEXTURE_ANCHORS * 4)
                     .order(ByteOrder.nativeOrder())
                     .asFloatBuffer()
                     .put(texVertex);
@@ -162,11 +167,12 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
             final int coordinateHandle = GLES20.glGetAttribLocation(mProgram, "aCoordinate");
             GLES20.glEnableVertexAttribArray(coordinateHandle);
-            GLES20.glVertexAttribPointer(coordinateHandle, 2, GLES20.GL_FLOAT, false, 8, mTexVertexBuffer);
+            GLES20.glVertexAttribPointer(coordinateHandle, TEXTURE_COMPONENTS, GLES20.GL_FLOAT, false
+                    , TEXTURE_ANCHORS, mTexVertexBuffer);
 
             mAlphaHandle = GLES20.glGetUniformLocation(mProgram, "uAlpha");
-            final float alpha = 1f;
-            GLES20.glUniform1f(mAlphaHandle, alpha);
+            final float alphaRatio = 1f;
+            GLES20.glUniform1f(mAlphaHandle, alphaRatio);
 
             mRendererTypeHandle = GLES20.glGetUniformLocation(mProgram, "uRendererType");
             GLES20.glUniform1i(mRendererTypeHandle, 0);
@@ -205,7 +211,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
             GLES20.glUniform1i(mRendererTypeHandle, 0);
 
-            GLES20.glUniform1f(mAlphaHandle, SCALE_ALPHA2);
+            GLES20.glUniform1f(mAlphaHandle, ALPHA_RATIO2);
 
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
         }

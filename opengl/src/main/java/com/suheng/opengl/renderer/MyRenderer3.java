@@ -23,7 +23,8 @@ import javax.microedition.khronos.opengles.GL10;
 public class MyRenderer3 implements GLSurfaceView.Renderer {
 
     private static final int POINT_TOTAL = 4;
-    private static final int VERTEX_ANCHOR = POINT_TOTAL * 3;
+    private static final int VERTEX_COMPONENTS = 2;
+    private static final int VERTEX_ANCHOR = POINT_TOTAL * VERTEX_COMPONENTS;
 
     private static final short[] VERTEX_INDEX = {0, 1, 2, 0, 2, 3};
     private final ShortBuffer mVertexIndexBuffer;
@@ -66,6 +67,10 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
     }
 
     private final class ImageRenderer {
+        private static final int TEXTURE_POINTS = 4;
+        private static final int TEXTURE_COMPONENTS = 2;
+        private static final int TEXTURE_ANCHORS = TEXTURE_POINTS * TEXTURE_COMPONENTS;
+
         private static final String VERTEX_SHADER =
                 "attribute vec4 vPosition;\n" +
                 "uniform mat4 uMVPMatrix;\n" +
@@ -101,22 +106,22 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
             mVertexBuffer = ByteBuffer.allocateDirect(VERTEX_ANCHOR * 4)
                     .order(ByteOrder.nativeOrder()).asFloatBuffer();
             final float[] coordinates = {
-                    1f, 1f, 0,
-                    -1f, 1f, 0,
-                    -1f, -1f, 0,
-                    1f, -1f, 0
+                    1f, 1f,
+                    -1f, 1f,
+                    -1f, -1f,
+                    1f, -1f,
             };
             mVertexBuffer.put(coordinates);
             mVertexBuffer.position(0);
 
             //Crop texture all area: full image.
             final float[] texVertex = { // in clockwise order:
-                    1f, 0f,  //bottom right
-                    0f, 0f,  //bottom left
-                    0f, 1f,  //top left
-                    1f, 1f,  //top right
+                    1f, 0f, //bottom right
+                    0f, 0f, //bottom left
+                    0f, 1f, //top left
+                    1f, 1f, //top right
             };
-            mTexVertexBuffer = ByteBuffer.allocateDirect(texVertex.length * 4)
+            mTexVertexBuffer = ByteBuffer.allocateDirect(TEXTURE_ANCHORS * 4)
                     .order(ByteOrder.nativeOrder())
                     .asFloatBuffer()
                     .put(texVertex);
@@ -143,7 +148,7 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
                     0.1f, 0.856f,
                     0.9f, 0.856f,
             };
-            mTexVertexBuffer3 = ByteBuffer.allocateDirect(texVertex3.length * 4)
+            mTexVertexBuffer3 = ByteBuffer.allocateDirect(TEXTURE_ANCHORS * 4)
                     .order(ByteOrder.nativeOrder())
                     .asFloatBuffer()
                     .put(texVertex3);
@@ -172,7 +177,8 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
 
             final int positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
             GLES20.glEnableVertexAttribArray(positionHandle);
-            GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 12, mVertexBuffer);
+            GLES20.glVertexAttribPointer(positionHandle, VERTEX_COMPONENTS, GLES20.GL_FLOAT, false
+                    , VERTEX_ANCHOR, mVertexBuffer);
 
              final int rectWidth = bitmap.getWidth();
             final int rectHeight = bitmap.getHeight();
@@ -201,7 +207,8 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
 
             final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
             GLES20.glEnableVertexAttribArray(textureCoordHandle);
-            GLES20.glVertexAttribPointer(textureCoordHandle, 2, GLES20.GL_FLOAT, false, 8, mTexVertexBuffer);
+            GLES20.glVertexAttribPointer(textureCoordHandle, TEXTURE_COMPONENTS, GLES20.GL_FLOAT, false
+                    , TEXTURE_ANCHORS, mTexVertexBuffer);
 
             final int textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
             GLES20.glUniform1i(textureHandle, 0);
@@ -234,7 +241,8 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
 
             final int positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
             GLES20.glEnableVertexAttribArray(positionHandle);
-            GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 12, mVertexBuffer);
+            GLES20.glVertexAttribPointer(positionHandle, VERTEX_COMPONENTS, GLES20.GL_FLOAT, false
+                    , VERTEX_ANCHOR, mVertexBuffer);
 
             final int rectWidth = width;
             final int rectHeight = (int) (bitmap.getHeight() * 1f * width / bitmap.getWidth());
@@ -272,7 +280,8 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
 
             final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
             GLES20.glEnableVertexAttribArray(textureCoordHandle);
-            GLES20.glVertexAttribPointer(textureCoordHandle, 2, GLES20.GL_FLOAT, false, 8, mTexVertexBuffer);
+            GLES20.glVertexAttribPointer(textureCoordHandle, TEXTURE_COMPONENTS, GLES20.GL_FLOAT, false
+                    , TEXTURE_ANCHORS, mTexVertexBuffer);
 
             final int  textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
             GLES20.glUniform1i(textureHandle, 0);
@@ -301,7 +310,8 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
 
             final int positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
             GLES20.glEnableVertexAttribArray(positionHandle);
-            GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 12, mVertexBuffer);
+            GLES20.glVertexAttribPointer(positionHandle, VERTEX_COMPONENTS, GLES20.GL_FLOAT, false
+                    , VERTEX_ANCHOR, mVertexBuffer);
 
             final int rectWidth = width;
             final int rectHeight = (int) (bitmap.getHeight() * 1f * width / bitmap.getWidth());
@@ -328,7 +338,8 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
 
             final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
             GLES20.glEnableVertexAttribArray(textureCoordHandle);
-            GLES20.glVertexAttribPointer(textureCoordHandle, 2, GLES20.GL_FLOAT, false, 8, mTexVertexBuffer);
+            GLES20.glVertexAttribPointer(textureCoordHandle, TEXTURE_COMPONENTS, GLES20.GL_FLOAT, false
+                    , TEXTURE_ANCHORS, mTexVertexBuffer);
 
             final int textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
             GLES20.glUniform1i(textureHandle, 0);
@@ -357,7 +368,8 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
 
             final int positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
             GLES20.glEnableVertexAttribArray(positionHandle);
-            GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 12, mVertexBuffer);
+            GLES20.glVertexAttribPointer(positionHandle, VERTEX_COMPONENTS, GLES20.GL_FLOAT, false,
+                    VERTEX_ANCHOR, mVertexBuffer);
 
             final int rectWidth = width;
             final int rectHeight = (int) (bitmap.getHeight() * 1f * width / bitmap.getWidth());
@@ -384,7 +396,8 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
 
             final int textureCoordHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
             GLES20.glEnableVertexAttribArray(textureCoordHandle);
-            GLES20.glVertexAttribPointer(textureCoordHandle, 2, GLES20.GL_FLOAT, false, 8, mTexVertexBuffer3);
+            GLES20.glVertexAttribPointer(textureCoordHandle, TEXTURE_COMPONENTS, GLES20.GL_FLOAT, false
+                    , TEXTURE_ANCHORS, mTexVertexBuffer3);
 
             final int textureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
             GLES20.glUniform1i(textureHandle, 0);
