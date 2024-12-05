@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.os.Build;
@@ -199,7 +200,16 @@ public final class Utils {
             , int width, int height) throws RuntimeException {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         bitmap.copyPixelsFromBuffer(buffer);
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+        //bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+        //bitmap.recycle();
+
+        Matrix matrix = new Matrix();
+        matrix.setRotate(180); //flip vertically
+        matrix.postScale(-1, 1); //flip horizontally
+        Bitmap dst = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        dst.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+        dst.recycle();
+
         bitmap.recycle();
     }
 
