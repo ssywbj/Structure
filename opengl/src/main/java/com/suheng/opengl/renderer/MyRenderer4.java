@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -204,15 +205,21 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             Log.i("Wbj", "onDrawFrame, glCreateReadPixels take time: " + (System.currentTimeMillis() - startTime) / 1000f + "s");
             mWorkThread.post(() -> {
                 final long start = System.currentTimeMillis();
-                String fileName = System.currentTimeMillis() + "_" + mWidth + "_" + mHeight + ".png";
-                String path = mContext.getCacheDir() + File.separator + fileName;
-                Utils.bufferToFile(byteBuffer, path, mWidth, mHeight);
+                String fileName = start + "_" + mWidth + "_" + mHeight + ".png";
+                //String path = mContext.getCacheDir() + File.separator + fileName;
+                //String path = mContext.getExternalCacheDir() + File.separator + fileName;
+                //String path = mContext.getExternalFilesDir(null) + File.separator + fileName;
+                String path = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + fileName;
+                final boolean isSuccess = Utils.bufferToFile(byteBuffer, path, mWidth, mHeight);
                 Log.i("Wbj", "onDrawFrame, bufferToFile take time: " + (System.currentTimeMillis() - start) / 1000f + "s"
                         + ", path: " + path + ", thread: " + Thread.currentThread().getName());
 
                 if (!mIsDestroyed) {
-                    mMainThread.post(() -> Toast.makeText(mContext, "save success thread: "
-                            + Thread.currentThread().getName(), Toast.LENGTH_SHORT).show());
+                    mMainThread.post(() -> {
+                        final String tip = isSuccess ? "success" : "fail";
+                        Toast.makeText(mContext, "save " + tip + ", thread: "
+                                + Thread.currentThread().getName(), Toast.LENGTH_SHORT).show();
+                    });
                 }
             });
 
@@ -248,8 +255,9 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             final ByteBuffer byteBuffer = Utils.glCreateReadPixels(mWidth, mHeight);
             mWorkThread.post(() -> {
                 String fileName = System.currentTimeMillis() + "_" + mWidth + "_" + mHeight + ".png";
-                String path = mContext.getCacheDir() + File.separator + fileName;
-                Utils.bufferToFile(byteBuffer, path, mWidth, mHeight);
+                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), fileName);
+                Log.i("Wbj", "onDrawFrame, path: " + file.getPath());
+                Utils.bufferToFile(byteBuffer, file, mWidth, mHeight);
             });
         }
 

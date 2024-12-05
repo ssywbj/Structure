@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RawRes;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -196,28 +195,16 @@ public final class Utils {
         return byteBuffer;
     }
 
-    public static void bufferToOutStream(@NonNull Buffer buffer, @NonNull OutputStream outStream, int width, int height) {
-        BufferedOutputStream bos = null;
-        try {
-            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            bos = new BufferedOutputStream(outStream);
-            bitmap.copyPixelsFromBuffer(buffer);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
-            bitmap.recycle();
-        } catch (RuntimeException e) {
-            Log.e(TAG, "bufferToOutStream error", e);
-        } finally {
-            if (bos != null) {
-                try {
-                    bos.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "close error", e);
-                }
-            }
-        }
+    public static void bufferToOutStream(@NonNull Buffer buffer, @NonNull OutputStream outStream
+            , int width, int height) throws RuntimeException {
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bitmap.copyPixelsFromBuffer(buffer);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+        bitmap.recycle();
     }
 
-    public static void bufferToFile(@NonNull Buffer buffer, @NonNull String path, int width, int height) {
+    public static boolean bufferToFile(@NonNull Buffer buffer, @NonNull String path, int width, int height) {
+        boolean isSuccess = false;
         OutputStream outStream = null;
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -226,8 +213,9 @@ public final class Utils {
                 outStream = new FileOutputStream(path);
             }
             bufferToOutStream(buffer, outStream, width, height);
-        } catch (IOException e) {
-            Log.e(TAG, "bufferToBitmap error", e);
+            isSuccess = true;
+        } catch (IOException | RuntimeException e) {
+            Log.e(TAG, "bufferToFile error", e);
         } finally {
             if (outStream != null) {
                 try {
@@ -237,10 +225,30 @@ public final class Utils {
                 }
             }
         }
+
+        return isSuccess;
     }
 
     public static void bufferToFile(@NonNull Buffer buffer, @NonNull File file, int width, int height) {
-        bufferToFile(buffer, file.getPath(), width, height);
+        OutputStream outStream = null;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                outStream = Files.newOutputStream(file.toPath());
+            } else {
+                outStream = new FileOutputStream(file);
+            }
+            bufferToOutStream(buffer, outStream, width, height);
+        } catch (IOException | RuntimeException e) {
+            Log.e(TAG, "bufferToFile error", e);
+        } finally {
+            if (outStream != null) {
+                try {
+                    outStream.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "close OutputStream error", e);
+                }
+            }
+        }
     }
 
     public static int loadTextureFromBitmap(Bitmap bitmap) {
