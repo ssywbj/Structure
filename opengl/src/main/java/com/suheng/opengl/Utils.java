@@ -11,6 +11,7 @@ import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RawRes;
@@ -188,8 +189,12 @@ public final class Utils {
         return activityManager.getDeviceConfigurationInfo().reqGlEsVersion >= 0x20000;
     }
 
-    @NonNull
-    public static ByteBuffer glCreateReadPixels(int width, int height) {
+    @Nullable
+    public static ByteBuffer glCreateReadPixels(@IntRange(from = 1) int width, @IntRange(from = 1) int height) {
+        if (width < 1 || height < 1) {
+            return null;
+        }
+
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(width * height * 4);
         byteBuffer.position(0);
         GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, byteBuffer);
@@ -197,7 +202,7 @@ public final class Utils {
     }
 
     public static void bufferToOutStream(@NonNull Buffer buffer, @NonNull OutputStream outStream
-            , int width, int height) throws RuntimeException {
+            , @IntRange(from = 1) int width, @IntRange(from = 1) int height) throws RuntimeException {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         bitmap.copyPixelsFromBuffer(buffer);
         //bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
@@ -213,7 +218,8 @@ public final class Utils {
         bitmap.recycle();
     }
 
-    public static boolean bufferToFile(@NonNull Buffer buffer, @NonNull String path, int width, int height) {
+    public static boolean bufferToFile(@NonNull Buffer buffer, @NonNull String path
+            , @IntRange(from = 1) int width, @IntRange(from = 1) int height) {
         boolean isSuccess = false;
         OutputStream outStream = null;
         try {
@@ -239,7 +245,8 @@ public final class Utils {
         return isSuccess;
     }
 
-    public static void bufferToFile(@NonNull Buffer buffer, @NonNull File file, int width, int height) {
+    public static void bufferToFile(@NonNull Buffer buffer, @NonNull File file
+            , @IntRange(from = 1) int width, @IntRange(from = 1) int height) {
         OutputStream outStream = null;
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

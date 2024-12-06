@@ -13,12 +13,12 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.suheng.opengl.KtExKt;
 import com.suheng.opengl.R;
 import com.suheng.opengl.Utils;
 
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
@@ -96,38 +96,11 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
         private boolean mIsDestroyed;
 
         public ImageRenderer() {
-            mVertexBuffer = ByteBuffer.allocateDirect(VERTEX_ANCHOR * 4)
-                    .order(ByteOrder.nativeOrder()).asFloatBuffer();
-            final float[] coordinates = {
-                    1f, 1f,
-                    -1f, 1f,
-                    -1f, -1f,
-                    1f, -1f
-            };
-            mVertexBuffer.put(coordinates);
-            mVertexBuffer.position(0);
+            mVertexBuffer = KtExKt.asFloatBuffer(new float[]{1f, 1f, -1f, 1f, -1f, -1f, 1f, -1f});
+            mVertexIndexBuffer = KtExKt.asShortBuffer(new short[]{0, 1, 2, 0, 2, 3});
+            mTexVertexBuffer = KtExKt.asFloatBuffer(new float[]{1f, 0f, 0f, 0f, 0f, 1f, 1f, 1f,});
 
-            final short[] vertexIndex = {0, 1, 2, 0, 2, 3};
-            mVertexIndexBuffer = ByteBuffer.allocateDirect(vertexIndex.length * 2)
-                    .order(ByteOrder.nativeOrder())
-                    .asShortBuffer()
-                    .put(vertexIndex);
-            mVertexIndexBuffer.position(0);
-
-            final float[] texVertex = { // in clockwise order:
-                    1f, 0f, //bottom right
-                    0f, 0f, //bottom left
-                    0f, 1f, //top left
-                    1f, 1f, //top right
-            };
-            mTexVertexBuffer = ByteBuffer.allocateDirect(TEXTURE_ANCHORS * 4)
-                    .order(ByteOrder.nativeOrder())
-                    .asFloatBuffer()
-                    .put(texVertex);
-            mTexVertexBuffer.position(0);
-
-            mProgram = Utils.glCreateProgram(mContext, R.raw.image_renderer_vertex
-                    , R.raw.image_renderer_fragment);
+            mProgram = Utils.glCreateProgram(mContext, R.raw.image_renderer_vertex, R.raw.image_renderer_fragment);
 
             HandlerThread workerThread = new HandlerThread("WorkerThread");
             workerThread.start();
@@ -203,25 +176,27 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             final long startTime = System.currentTimeMillis();
             final ByteBuffer byteBuffer = Utils.glCreateReadPixels(mWidth, mHeight);
             Log.i("Wbj", "onDrawFrame, glCreateReadPixels take time: " + (System.currentTimeMillis() - startTime) / 1000f + "s");
-            mWorkThread.post(() -> {
-                final long start = System.currentTimeMillis();
-                String fileName = start + "_" + mWidth + "_" + mHeight + ".png";
-                //String path = mContext.getCacheDir() + File.separator + fileName;
-                //String path = mContext.getExternalCacheDir() + File.separator + fileName;
-                //String path = mContext.getExternalFilesDir(null) + File.separator + fileName;
-                String path = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + fileName;
-                final boolean isSuccess = Utils.bufferToFile(byteBuffer, path, mWidth, mHeight);
-                Log.i("Wbj", "onDrawFrame, bufferToFile take time: " + (System.currentTimeMillis() - start) / 1000f + "s"
-                        + ", path: " + path + ", thread: " + Thread.currentThread().getName());
+            if (byteBuffer != null) {
+                mWorkThread.post(() -> {
+                    final long start = System.currentTimeMillis();
+                    String fileName = start + "_" + mWidth + "_" + mHeight + ".png";
+                    //String path = mContext.getCacheDir() + File.separator + fileName;
+                    //String path = mContext.getExternalCacheDir() + File.separator + fileName;
+                    //String path = mContext.getExternalFilesDir(null) + File.separator + fileName;
+                    String path = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + fileName;
+                    final boolean isSuccess = Utils.bufferToFile(byteBuffer, path, mWidth, mHeight);
+                    Log.i("Wbj", "onDrawFrame, bufferToFile take time: " + (System.currentTimeMillis() - start) / 1000f + "s"
+                            + ", path: " + path + ", thread: " + Thread.currentThread().getName());
 
-                if (!mIsDestroyed) {
-                    mMainThread.post(() -> {
-                        final String tip = isSuccess ? "success" : "fail";
-                        Toast.makeText(mContext, "save " + tip + ", thread: "
-                                + Thread.currentThread().getName(), Toast.LENGTH_SHORT).show();
-                    });
-                }
-            });
+                    if (!mIsDestroyed) {
+                        mMainThread.post(() -> {
+                            final String tip = isSuccess ? "success" : "fail";
+                            Toast.makeText(mContext, "save " + tip + ", thread: "
+                                    + Thread.currentThread().getName(), Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                });
+            }
 
             //pint the second texture
             this.onDrawFrame2(bitmap);
@@ -253,12 +228,14 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
 
             final ByteBuffer byteBuffer = Utils.glCreateReadPixels(mWidth, mHeight);
-            mWorkThread.post(() -> {
-                String fileName = System.currentTimeMillis() + "_" + mWidth + "_" + mHeight + ".png";
-                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), fileName);
-                Log.i("Wbj", "onDrawFrame, path: " + file.getPath());
-                Utils.bufferToFile(byteBuffer, file, mWidth, mHeight);
-            });
+            if (byteBuffer != null) {
+                mWorkThread.post(() -> {
+                    String fileName = System.currentTimeMillis() + "_" + mWidth + "_" + mHeight + ".png";
+                    File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), fileName);
+                    Log.i("Wbj", "onDrawFrame, path: " + file.getPath());
+                    Utils.bufferToFile(byteBuffer, file, mWidth, mHeight);
+                });
+            }
         }
 
         public void onDrawFrame3(Bitmap bitmap) {
