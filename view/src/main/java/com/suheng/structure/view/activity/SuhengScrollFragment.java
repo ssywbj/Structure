@@ -1,4 +1,3 @@
-/*Transsion Top Secret*/
 package com.suheng.structure.view.activity;
 
 import android.graphics.Bitmap;
