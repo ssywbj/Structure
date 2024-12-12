@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -35,8 +36,6 @@ public final class Utils {
     public static final int BYTES_PER_FLOAT = 4;
     private static final String TAG = "Utils";
 
-    //https://blog.51cto.com/u_16213413/12183539
-    //https://juejin.cn/post/6943395747245064206
     public static String loadShader(Context context, @RawRes int resId) {
         StringBuilder builder = new StringBuilder();
 
@@ -93,37 +92,6 @@ public final class Utils {
     }
 
     public static int loadTexture(Context context, @DrawableRes int resId) {
-        /*int[] textureObjectIds = new int[1];
-        GLES20.glGenTextures(1, textureObjectIds, 0);
-        if (textureObjectIds[0] == 0) {
-            Log.e(TAG, "Could not generate a new OpenGL texture object.");
-            return 0;
-        }
-
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inScaled = false;
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resId, options);
-        if (bitmap == null) {
-            Log.e(TAG, "Resource ID " + resId + " could not be decoded.");
-            GLES20.glDeleteTextures(1, textureObjectIds, 0);
-            return 0;
-        }
-
-        // bind
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureObjectIds[0]);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_LINEAR_MIPMAP_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER,
-                GLES20.GL_LINEAR);
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
-        bitmap.recycle();
-
-        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
-        // unbind
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
-
-        return textureObjectIds[0];*/
-
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resId, options);
@@ -141,20 +109,20 @@ public final class Utils {
             Log.e(TAG, "Could not generate a new OpenGL texture object.");
             return 0;
         }
+        if (bitmap.isRecycled()) {
+            GLES20.glDeleteTextures(1, textures, 0);
+            return 0;
+        }
 
-        //bind
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_LINEAR_MIPMAP_LINEAR);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]); //bind
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
         if (isRecycle) {
             bitmap.recycle();
         }
-
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
-        //unbind
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0); //unbind
 
         return textures[0];
     }
@@ -163,7 +131,7 @@ public final class Utils {
         final int[] textures = new int[len];
         GLES20.glGenTextures(len, textures, 0);
         if (textures[0] == 0) {
-            Log.e(TAG, "Could not generate a new OpenGL texture object.");
+            Log.e(TAG, "Could not generate a texture object.");
             return null;
         }
         return textures;
@@ -172,14 +140,14 @@ public final class Utils {
     public static void texImage2D(@NonNull Bitmap bitmap, int texture, boolean isRecycle) {
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_LINEAR_MIPMAP_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_MIRRORED_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_MIRRORED_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
         if (isRecycle) {
             bitmap.recycle();
         }
-
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
     }
 
@@ -273,17 +241,41 @@ public final class Utils {
 
         GLES20.glGenTextures(1, texture, 0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture[0]);
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
         android.opengl.GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
 
         return texture[0];
+    }
+
+    public static int genVbo(@NonNull FloatBuffer floatBuffer) {
+        final int[] buffers = new int[1];
+        GLES20.glGenBuffers(buffers.length, buffers, 0);
+        final int vboId = buffers[0];
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboId);
+
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, floatBuffer.limit() * 4, floatBuffer, GLES20.GL_STATIC_DRAW);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+        return vboId;
+    }
+
+    public static int genVbo(@NonNull FloatBuffer fb1, @NonNull FloatBuffer fb2) {
+        final int[] buffers = new int[1];
+        GLES20.glGenBuffers(buffers.length, buffers, 0);
+        final int vboId = buffers[0];
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboId);
+
+        final int fb1Size = fb1.limit() * 4;
+        final int fb2Size = fb2.limit() * 4;
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, fb1Size + fb2Size, null, GLES20.GL_STATIC_DRAW);
+        GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, 0, fb1Size, fb1);
+        GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, fb1Size, fb2Size, fb2);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+        return vboId;
     }
 
     /**

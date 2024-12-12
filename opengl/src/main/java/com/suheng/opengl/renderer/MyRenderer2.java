@@ -128,8 +128,7 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
 
             mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
             GLES20.glEnableVertexAttribArray(mPositionHandle);
-            GLES20.glVertexAttribPointer(mPositionHandle, VERTEX_COMPONENTS_3, GLES20.GL_FLOAT
-                    , false, VERTEX_ANCHOR, mVertexBuffer);
+            //GLES20.glVertexAttribPointer(mPositionHandle, VERTEX_COMPONENTS_3, GLES20.GL_FLOAT, false, VERTEX_ANCHOR, mVertexBuffer);
 
             mColorHandle = GLES20.glGetAttribLocation(mProgram, "aColor");
             GLES20.glEnableVertexAttribArray(mColorHandle);
@@ -159,6 +158,13 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
             };
             mVertexBuffer.put(coordinates);
             mVertexBuffer.position(0);
+
+            Log.d("Wbj", "onSurfaceChanged, capacity: " + mVertexBuffer.capacity() + ", limit: "
+                    + mVertexBuffer.limit() + ", length: " + coordinates.length);
+            final int vboId = Utils.genVbo(mVertexBuffer);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboId);
+            GLES20.glVertexAttribPointer(mPositionHandle, VERTEX_COMPONENTS_3, GLES20.GL_FLOAT, false, VERTEX_ANCHOR, 0);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
         }
 
         public void onDrawFrame() {
@@ -229,13 +235,11 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
 
             mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
             GLES20.glEnableVertexAttribArray(mPositionHandle);
-            GLES20.glVertexAttribPointer(mPositionHandle, VERTEX_COMPONENTS_2, GLES20.GL_FLOAT
-                    , false, VERTEX_ANCHOR_LESS, mVertexBuffer);
+            //GLES20.glVertexAttribPointer(mPositionHandle, VERTEX_COMPONENTS_2, GLES20.GL_FLOAT, false, VERTEX_ANCHOR_LESS, mVertexBuffer);
 
             mColorHandle = GLES20.glGetAttribLocation(mProgram, "aColor");
             GLES20.glEnableVertexAttribArray(mColorHandle);
-            GLES20.glVertexAttribPointer(mColorHandle, COLOR_COMPONENTS, GLES20.GL_FLOAT, false,
-                    COLOR_ANCHOR, mColorBuffer);
+            //GLES20.glVertexAttribPointer(mColorHandle, COLOR_COMPONENTS, GLES20.GL_FLOAT, false, COLOR_ANCHOR, mColorBuffer);
 
             mMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
             Log.d("Wbj", "onSurfaceCreated, uMVPMatrix: " + mMatrixHandle  + ", positionHandle: " + mPositionHandle);
@@ -261,6 +265,14 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
             };
             mVertexBuffer.put(coordinates);
             mVertexBuffer.position(0);
+
+            Log.v("Wbj", "onSurfaceChanged2, capacity: " + mVertexBuffer.capacity() + ", limit: "
+                    + mVertexBuffer.limit() + ", length: " + coordinates.length);
+            final int vboId = Utils.genVbo(mVertexBuffer, mColorBuffer);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboId);
+            GLES20.glVertexAttribPointer(mPositionHandle, VERTEX_COMPONENTS_2, GLES20.GL_FLOAT, false, VERTEX_ANCHOR_LESS, 0);
+            GLES20.glVertexAttribPointer(mColorHandle, COLOR_COMPONENTS, GLES20.GL_FLOAT, false, COLOR_ANCHOR, VERTEX_ANCHOR_LESS * 4);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
             Matrix.perspectiveM(mMatrixProjection, 0, 45, screenWHRatio, 0.1f, 100f);
             Matrix.translateM(mMatrixProjection, 0, 0f, 0.8f, -5f); //z可控制大小
@@ -303,6 +315,8 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
 
         private final ShortBuffer mVertexIndexBuffer2;
         private static final short[] VERTEX_INDEX2 = {0, 1, 2, 0, 2, 3, 1, 4, 5, 1, 5, 2};
+
+        private final int mVboId;
 
         public RectRenderer3() {
             mVertexBuffer = ByteBuffer.allocateDirect(VERTEX_AND_COLOR_ANCHOR * 4)
@@ -351,6 +365,22 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
             GLES20.glAttachShader(mProgram2, fragmentShader2);
             GLES20.glLinkProgram(mProgram2);
             Log.i("Wbj", "RectRenderer3(), program: " + mProgram + " , mProgram2: " + mProgram2);
+
+            final FloatBuffer floatBuffer = ByteBuffer.allocateDirect(VERTEX_AND_COLOR_ANCHOR * 4)
+                    .order(ByteOrder.nativeOrder()).asFloatBuffer();
+            final float[] coordinatesAfterColors = { //[(x1, y1), ..., (xn, yn), (r1, g1, b1), ..., (rn, gn, bn)]
+                    0.5f, 0.5f,
+                    -0.5f, 0.5f,
+                    -0.5f, -0.5f,
+                    0.5f, -0.5f,
+                    1f, 1f, 1f,
+                    0f, 1f, 0f,
+                    0f, 1f, 0f,
+                    1f, 1f, 1f,
+            };
+            floatBuffer.put(coordinatesAfterColors);
+            floatBuffer.position(0);
+            mVboId = Utils.genVbo(floatBuffer);
         }
 
         public void onDrawFrame(int width, int height) {
@@ -409,6 +439,7 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
             GLES20.glDisableVertexAttribArray(colorHandle);
 
             this.onDraw(width, height);
+            this.onDraw2(width, height);
         }
 
         private void onDraw(int width, int height) {
@@ -449,6 +480,43 @@ public class MyRenderer2 implements GLSurfaceView.Renderer {
             GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mMatrixProjection, 0);
 
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer2.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer2);
+
+            GLES20.glDisableVertexAttribArray(positionHandle);
+            GLES20.glDisableVertexAttribArray(colorHandle);
+        }
+
+        public void onDraw2(int width, int height) {
+            GLES20.glUseProgram(mProgram);
+
+            final int positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
+            GLES20.glEnableVertexAttribArray(positionHandle);
+            Log.i("Wbj", "onDraw2, vboId: " + mVboId);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mVboId);
+            GLES20.glVertexAttribPointer(positionHandle, VERTEX_COMPONENTS_2, GLES20.GL_FLOAT
+                    , false, VERTEX_ANCHOR_LESS, 0);
+
+            final int colorHandle = GLES20.glGetAttribLocation(mProgram, "aColor");
+            GLES20.glEnableVertexAttribArray(colorHandle);
+            GLES20.glVertexAttribPointer(colorHandle, COLOR_COMPONENTS, GLES20.GL_FLOAT
+                    , false, COLOR_ANCHOR, VERTEX_ANCHOR_LESS * 4);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+            final int rectWidth = width / 2;
+            final int rectHeight = rectWidth * 2 / 3;
+            final float ortho = 1f;
+            final float scaleX = 2f * rectWidth / width;
+            final float scaleY = 2f * rectHeight / height;
+            final float translateX = ortho - scaleX / 2;
+            final float translateY = ortho - scaleY / 2;
+
+            final int matrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
+            Matrix.setIdentityM(mMatrixProjection, 0);
+            Matrix.orthoM(mMatrixProjection, 0, -ortho, ortho, -ortho, ortho, -1f, 1f);
+            Matrix.translateM(mMatrixProjection, 0, -translateX, translateY, 0f);
+            Matrix.scaleM(mMatrixProjection, 0, scaleX, scaleY, 1f);
+            GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mMatrixProjection, 0);
+
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
 
             GLES20.glDisableVertexAttribArray(positionHandle);
             GLES20.glDisableVertexAttribArray(colorHandle);

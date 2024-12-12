@@ -35,6 +35,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
     private int mWidth, mHeight;
     private ImageRenderer mImageRenderer;
 
+    //https://blog.csdn.net/yu540135101/article/details/102912319
     public MyRenderer4(Context context) {
         mContext = context;
     }
