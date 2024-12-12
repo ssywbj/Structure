@@ -1,12 +1,17 @@
 package com.suheng.opengl
 
+import android.opengl.GLES20
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import java.lang.reflect.Proxy
+import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.CharBuffer
+import java.nio.DoubleBuffer
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
+import java.nio.LongBuffer
 import java.nio.ShortBuffer
 
 
@@ -35,3 +40,31 @@ fun IntArray.asIntBuffer(): IntBuffer =
 fun FloatArray.asFloatBuffer(): FloatBuffer =
     ByteBuffer.allocateDirect(size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer()
         .put(this).apply { position(0) }
+
+fun Buffer.captureBytes() = when (this) {
+    is DoubleBuffer, is LongBuffer -> 8
+    is FloatBuffer, is IntBuffer -> 4
+    is ShortBuffer, is CharBuffer -> 2
+    else -> 1
+}
+
+fun Buffer.glBufferData() = GLES20.glBufferData(
+    GLES20.GL_ARRAY_BUFFER, limit() * captureBytes(), this, GLES20.GL_STATIC_DRAW
+)
+
+fun glBufferData(vararg buffers: Buffer) {
+    var offset = 0
+    val pairs = mutableListOf<Pair<Int, Int>>()
+    val totalSize = buffers.sumOf {
+        (it.limit() * it.captureBytes()).apply {
+            pairs.add(offset to this)
+            offset = this
+        }
+    }
+    GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, totalSize, null, GLES20.GL_STATIC_DRAW)
+    buffers.forEachIndexed { index, buffer ->
+        pairs[index].let { (offset, size) ->
+            GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, offset, size, buffer)
+        }
+    }
+}

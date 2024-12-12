@@ -256,7 +256,9 @@ public final class Utils {
         final int vboId = buffers[0];
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboId);
 
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, floatBuffer.limit() * 4, floatBuffer, GLES20.GL_STATIC_DRAW);
+        //GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, floatBuffer.limit() * 4, floatBuffer, GLES20.GL_STATIC_DRAW);
+        KtExKt.glBufferData(floatBuffer);
+
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
         return vboId;
@@ -268,13 +270,14 @@ public final class Utils {
         final int vboId = buffers[0];
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboId);
 
-        final int fb1Size = fb1.limit() * 4;
+        /*final int fb1Size = fb1.limit() * 4;
         final int fb2Size = fb2.limit() * 4;
         GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, fb1Size + fb2Size, null, GLES20.GL_STATIC_DRAW);
         GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, 0, fb1Size, fb1);
         GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, fb1Size, fb2Size, fb2);
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);*/
 
+        KtExKt.glBufferData(fb1, fb2);
         return vboId;
     }
 
