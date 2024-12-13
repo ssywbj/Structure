@@ -21,7 +21,6 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
-import java.util.Arrays;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -32,25 +31,24 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
     public static final float ALPHA_RATIO2 = 0.4f;
 
     private final Context mContext;
-    private int mWidth, mHeight;
-    private ImageRenderer mImageRenderer;
+    private final ImageRenderer mImageRenderer;
 
     //https://blog.csdn.net/yu540135101/article/details/102912319
     public MyRenderer4(Context context) {
         mContext = context;
+        mImageRenderer = new ImageRenderer();
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         GLES20.glClearColor(0f, 0f, 0f, 0f);
-        mImageRenderer = new ImageRenderer();
+        mImageRenderer.onSurfaceCreated();
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
-        mWidth = width;
-        mHeight = height;
+        mImageRenderer.onSurfaceChanged(width, height);
     }
 
     @Override
@@ -68,10 +66,8 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
         private static final int VERTEX_COMPONENTS = 2;
         private static final int TEXTURE_COMPONENTS = 2;
 
-        private final int mProgram;
+        private int mProgram;
         private final float[] mMatrixProjection = new float[16];
-
-        private int[] mTextures;
 
         private float mTranslateX;
         private float mTranslateY;
@@ -85,33 +81,42 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
         private final Handler mMainThread = new Handler(Looper.getMainLooper());
         private final Handler mWorkThread;
         private boolean mIsDestroyed;
-        private final int mVboId;
-        private final int mEboId;
+
+        private int mVboId;
+        private int mEboId;
+        private int mTextureId;
 
         private final int mVertexStride;
         private final int mTextureStride;
         private final int mVertexIndexCount;
 
-        public ImageRenderer() {
-            final FloatBuffer vertexBuffer = KtExKt.asFloatBuffer(new float[]{1f, 1f, -1f, 1f, -1f, -1f, 1f, -1f});
-            mVertexStride = vertexBuffer.capacity();
-            final FloatBuffer texVertexBuffer = KtExKt.asFloatBuffer(new float[]{1f, 0f, 0f, 0f, 0f, 1f, 1f, 1f,});
-            mTextureStride = texVertexBuffer.capacity();
-            ShortBuffer vertexIndexBuffer = KtExKt.asShortBuffer(new short[]{0, 1, 2, 0, 2, 3});
-            mVertexIndexCount = vertexIndexBuffer.capacity();
+        private final FloatBuffer mVertexBuffer;
+        private final FloatBuffer mTexVertexBuffer;
+        private final ShortBuffer mVertexIndexBuffer;
+        private int mRectWidth, mRectHeight;
+        private int mWidth, mHeight;
 
-            mProgram = Utils.glCreateProgram(mContext, R.raw.image_renderer_vertex, R.raw.image_renderer_fragment);
+        public ImageRenderer() {
+            mVertexBuffer = KtExKt.asFloatBuffer(new float[]{1f, 1f, -1f, 1f, -1f, -1f, 1f, -1f});
+            mVertexStride = mVertexBuffer.capacity();
+            mTexVertexBuffer = KtExKt.asFloatBuffer(new float[]{1f, 0f, 0f, 0f, 0f, 1f, 1f, 1f,});
+            mTextureStride = mTexVertexBuffer.capacity();
+            mVertexIndexBuffer = KtExKt.asShortBuffer(new short[]{0, 1, 2, 0, 2, 3});
+            mVertexIndexCount = mVertexIndexBuffer.capacity();
 
             HandlerThread workerThread = new HandlerThread("WorkerThread");
             workerThread.start();
             mWorkThread = new Handler(workerThread.getLooper());
-
-            mVboId = Utils.genVbo(vertexBuffer, texVertexBuffer);
-            mEboId = Utils.genEbo(vertexIndexBuffer);
         }
 
-        public void onDrawFrame() {
-            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        public void onSurfaceCreated() {
+            mProgram = Utils.glCreateProgram(mContext, R.raw.image_renderer_vertex, R.raw.image_renderer_fragment);
+
+            mVboId = Utils.genVbo(mVertexBuffer, mTexVertexBuffer);
+            mVertexBuffer.clear();
+            mTexVertexBuffer.clear();
+            mEboId = Utils.genEbo(mVertexIndexBuffer);
+            mVertexIndexBuffer.clear();
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false; //The original picture: Return the original width and height of the image.
@@ -119,13 +124,23 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             final Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), resId, options);
             if (bitmap == null) {
                 Log.e("Wbj", "Resource ID " + resId + " could not be decoded.");
-                return;
+            } else {
+                mTextureId = Utils.genTexture(bitmap);
+                mRectWidth = bitmap.getWidth();
+                mRectHeight = bitmap.getHeight();
+                Log.d("Wbj", "textureId: " + mTextureId);
             }
-            mTextures = Utils.glGenTextures(1);
-            if (mTextures == null) {
-                return;
-            }
-            Log.d("Wbj", "textures: " + Arrays.toString(mTextures));
+        }
+
+        public void onSurfaceChanged(int width, int height) {
+            mWidth = width;
+            mHeight = height;
+            Log.d("Wbj", "onDrawFrame, width: " + mWidth + ", height: " + mHeight
+                    + ", rectWidth: " + mRectWidth + ", rectHeight: " + mRectHeight);
+        }
+
+        public void onDrawFrame() {
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
             //support alpha blending
             GLES20.glEnable(GLES20.GL_BLEND);
@@ -136,27 +151,23 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
             final int positionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
             GLES20.glEnableVertexAttribArray(positionHandle);
-            //GLES20.glVertexAttribPointer(positionHandle, VERTEX_COMPONENTS, GLES20.GL_FLOAT, false, VERTEX_ANCHOR, mVertexBuffer);
 
-            Log.d("Wbj", "onDrawFrame, width: " + mWidth + ", height: " + mHeight
-                    + ", rectWidth: " + bitmap.getWidth() + ", rectHeight: " + bitmap.getWidth());
-            mScaleX = bitmap.getWidth() * SCALE_RATIO / mWidth;
-            mScaleY = bitmap.getHeight() * SCALE_RATIO / mHeight;
-            Log.v("Wbj", "onDrawFrame, scaleX: " + mScaleX + ", scaleY: " + mScaleY
+            mScaleX = mRectWidth * SCALE_RATIO / mWidth;
+            mScaleY = mRectHeight * SCALE_RATIO / mHeight;
+            mTranslateX = 0;
+            mTranslateY = 0;
+            Log.w("Wbj", "onDrawFrame, scaleX: " + mScaleX + ", scaleY: " + mScaleY
                     + ", translateX: " + mTranslateX + ", translateY: " + mTranslateY);
-
-            Utils.texImage2D(bitmap, mTextures[0], true); //texture only loaded once, not every frame
 
             mMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
             Matrix.setIdentityM(mMatrixProjection, 0);
             Matrix.orthoM(mMatrixProjection, 0, -ORTHO, ORTHO, -ORTHO, ORTHO, -1f, 1f);
-            Matrix.translateM(mMatrixProjection, 0, 0, 0, 0f);
+            Matrix.translateM(mMatrixProjection, 0, mTranslateX, mTranslateY, 0f);
             Matrix.scaleM(mMatrixProjection, 0, mScaleX, mScaleY, 1f);
             GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrixProjection, 0);
 
             final int coordinateHandle = GLES20.glGetAttribLocation(mProgram, "aCoordinate");
             GLES20.glEnableVertexAttribArray(coordinateHandle);
-            //GLES20.glVertexAttribPointer(coordinateHandle, TEXTURE_COMPONENTS, GLES20.GL_FLOAT, false, TEXTURE_ANCHORS, mTexVertexBuffer);
 
             mAlphaHandle = GLES20.glGetUniformLocation(mProgram, "uAlpha");
             final float alphaRatio = 1f;
@@ -177,7 +188,9 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             GLES20.glVertexAttribPointer(coordinateHandle, TEXTURE_COMPONENTS, GLES20.GL_FLOAT, false, mTextureStride, mVertexStride * 4);
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
-            //GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
+
             this.drawIndexElements();
 
             final long startTime = System.currentTimeMillis();
@@ -206,12 +219,13 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             }
 
             //pint the second texture
-            this.onDrawFrame2(bitmap);
-            this.onDrawFrame3(bitmap);
-            this.onDrawFrame4(bitmap);
+            this.onDrawFrame2();
+            this.onDrawFrame3();
+            this.onDrawFrame4();
 
             GLES20.glDisableVertexAttribArray(positionHandle);
             GLES20.glDisableVertexAttribArray(coordinateHandle);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
 
             GLES20.glDisable(GLES20.GL_BLEND); //disable alpha blending
         }
@@ -222,9 +236,9 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
         }
 
-        public void onDrawFrame2(Bitmap bitmap) {
-            mScaleX = bitmap.getWidth() * SCALE_RATIO2 / mWidth;
-            mScaleY = bitmap.getHeight() * SCALE_RATIO2 / mHeight;
+        public void onDrawFrame2() {
+            mScaleX = mRectWidth * SCALE_RATIO2 / mWidth;
+            mScaleY = mRectHeight * SCALE_RATIO2 / mHeight;
             mTranslateX = ORTHO - mScaleX;
             mTranslateY = ORTHO - mScaleY;
 
@@ -238,7 +252,6 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
 
             GLES20.glUniform1f(mAlphaHandle, ALPHA_RATIO2);
 
-            //GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
             this.drawIndexElements();
 
             final ByteBuffer byteBuffer = Utils.glCreateReadPixels(mWidth, mHeight);
@@ -252,7 +265,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             }
         }
 
-        public void onDrawFrame3(Bitmap bitmap) {
+        public void onDrawFrame3() {
             Matrix.setIdentityM(mMatrixProjection, 0);
             Matrix.orthoM(mMatrixProjection, 0, -ORTHO, ORTHO, -ORTHO, ORTHO, -1f, 1f);
             Matrix.translateM(mMatrixProjection, 0, -mTranslateX, mTranslateY, 0f);
@@ -268,16 +281,15 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             final int texHeightHandle = GLES20.glGetUniformLocation(mProgram, "uTexHeight");
             GLES20.glUniform1f(stepsHandle, 2.5f);
             GLES20.glUniform1i(radiusHandle, 10);
-            GLES20.glUniform1f(texWidthHandle, bitmap.getWidth());
-            GLES20.glUniform1f(texHeightHandle, bitmap.getHeight());
+            GLES20.glUniform1f(texWidthHandle, mRectWidth);
+            GLES20.glUniform1f(texHeightHandle, 1f * mRectHeight);
             Log.v("Wbj", "onDrawFrame3, radiusHandle: " + radiusHandle + ", stepsHandle: " + stepsHandle
                     + ", texWidthHandle: " + texWidthHandle + ", texHeightHandle: " + texHeightHandle);
 
-            //GLES20.glDrawElements(GLES20.GL_TRIANGLES, mVertexIndexBuffer.capacity(), GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
             this.drawIndexElements();
         }
 
-        public void onDrawFrame4(Bitmap bitmap) {
+        public void onDrawFrame4() {
             Matrix.setIdentityM(mMatrixProjection, 0);
             Matrix.orthoM(mMatrixProjection, 0, -ORTHO, ORTHO, -ORTHO, ORTHO, -1f, 1f);
             Matrix.translateM(mMatrixProjection, 0, mTranslateX, mTranslateY, 0f);
@@ -293,10 +305,8 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             this.calculateSumWeight();
 
             GLES20.glUniform1i(blurRadiusLocation, blurRadius);
-            int width = bitmap.getWidth();
-            float var1 = blurOffsetW / width;
-            int height = bitmap.getHeight();
-            float var2 = blurOffsetH / height;
+            final float var1 = blurOffsetW / mRectWidth;
+            final float var2 = blurOffsetH / mRectHeight;
             GLES20.glUniform2f(blurOffsetLocation, var1, var2);
             GLES20.glUniform1f(sumWeightLocation, sumWeight);
 
@@ -306,7 +316,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             //blurRadius: 30, (0.0014641288, 0.0), sumWeight: 0.99683464, width: 683, height: 993
             //blurRadius: 30, (0.0014641288, 0.0), sumWeight: 0.99683464, width: 683, height: 993
             Log.d("Wbj", "blurRadius: " + blurRadius + ", (" + var1 + ", " + var2 + ")" + ", sumWeight: " + sumWeight
-                    + ", width: " + width + ", height: " + height);
+                    + ", width: " + mRectWidth + ", height: " + mRectHeight);
             /*GLES20.glUniform1i(blurRadiusLocation, 30);
             GLES20.glUniform2f(blurOffsetLocation, 0.0018518518f, 0.0f);
             GLES20.glUniform1f(sumWeightLocation, 0.99683464f);*/
@@ -357,10 +367,11 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
             Log.i("Wbj", "ImageRenderer onDestroy");
             mIsDestroyed = true;
             GLES20.glDeleteProgram(mProgram);
-            if (mTextures != null) {
-                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0); //Unbind texture
-                GLES20.glDeleteTextures(mTextures.length, mTextures, 0);
-            }
+
+            //GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0); //Unbind texture
+            final int[] textures = {mTextureId};
+            GLES20.glDeleteTextures(textures.length, textures, 0);
+
             final int[] buffers = {mVboId, mEboId};
             GLES20.glDeleteBuffers(buffers.length, buffers, 0);
             mWorkThread.getLooper().quitSafely();

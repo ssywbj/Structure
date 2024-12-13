@@ -53,7 +53,7 @@ class MySurfaceRenderer(surface: Surface? = null) : GLSurfaceView.Renderer {
         GLES20.glClearColor(0f, 0f, 0f, 0f);
 
         backgroundRenderer = BackgroundRenderer()
-        textureId = Utils.loadTexture(OpenGLApp.getInstance(), R.drawable.air_hockey_surface)
+        textureId = Utils.genTexture(OpenGLApp.getInstance(), R.drawable.air_hockey_surface)
         rectangleRenderer = RectangleRenderer()
     }
 

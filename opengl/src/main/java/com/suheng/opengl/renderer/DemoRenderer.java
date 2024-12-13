@@ -40,7 +40,7 @@ public class DemoRenderer implements GLSurfaceView.Renderer {
         mMallet = new Mallet();
         mTextureShaderProgram = new TextureShaderProgram(mContext);
         mColorShaderProgram = new ColorShaderProgram(mContext);
-        mTexture = Utils.loadTexture(mContext, R.drawable.air_hockey_surface);
+        mTexture = Utils.genTexture(mContext, R.drawable.air_hockey_surface);
     }
 
     @Override

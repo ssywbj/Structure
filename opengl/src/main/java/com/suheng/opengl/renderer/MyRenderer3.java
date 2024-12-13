@@ -201,7 +201,7 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
             GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mMatrixProjection, 0);
 
             //mTextureId = Utils.loadTexture(OpenGLApp.Companion.getInstance(), R.drawable.girl_gaitubao);
-            mTextureId = Utils.loadTexture(bitmap, true);
+            mTextureId = Utils.genTexture(bitmap);
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
 
@@ -332,7 +332,7 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
             Matrix.scaleM(mMatrixProjection, 0, scaleX, scaleY, 1f);
             GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mMatrixProjection, 0);
 
-            mTextureId2 = Utils.loadTexture(bitmap, true);
+            mTextureId2 = Utils.genTexture(bitmap);
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId2);
 
@@ -390,7 +390,7 @@ public class MyRenderer3 implements GLSurfaceView.Renderer {
             Matrix.scaleM(mMatrixProjection, 0, scaleX, scaleY, 1f);
             GLES20.glUniformMatrix4fv(matrixHandle, 1, false, mMatrixProjection, 0);
 
-            mTextureId3 = Utils.loadTexture(bitmap, true);
+            mTextureId3 = Utils.genTexture(bitmap);
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId3);
 

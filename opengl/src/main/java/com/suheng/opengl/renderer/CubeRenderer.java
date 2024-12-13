@@ -278,7 +278,7 @@ public class CubeRenderer implements BaseRenderer {
     private void initTexturesIfNeeded() {
         if (texture1 == Utils.TEXTURE_NONE) {
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-            texture1 = Utils.loadTextureFromBitmap(face1);
+            texture1 = Utils.genTexture(face1);
             if (LOG_ENABLE) {
                 Log.d(TAG, String.format("create texture1 %d", texture1));
             }
