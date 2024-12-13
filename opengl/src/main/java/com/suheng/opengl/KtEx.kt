@@ -48,23 +48,25 @@ fun Buffer.captureBytes() = when (this) {
     else -> 1
 }
 
-fun Buffer.glBufferData() = GLES20.glBufferData(
-    GLES20.GL_ARRAY_BUFFER, limit() * captureBytes(), this, GLES20.GL_STATIC_DRAW
+fun Buffer.limitSize() = limit() * captureBytes()
+
+fun Buffer.glBufferData(target: Int, usage: Int) = GLES20.glBufferData(
+    target, limitSize(), this, usage
 )
 
-fun glBufferData(vararg buffers: Buffer) {
+fun glBufferData(target: Int, usage: Int, vararg buffers: Buffer) {
     var offset = 0
     val pairs = mutableListOf<Pair<Int, Int>>()
-    val totalSize = buffers.sumOf {
-        (it.limit() * it.captureBytes()).apply {
+    val size = buffers.sumOf {
+        it.limitSize().apply {
             pairs.add(offset to this)
             offset = this
         }
     }
-    GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, totalSize, null, GLES20.GL_STATIC_DRAW)
+    GLES20.glBufferData(target, size, null, usage)
     buffers.forEachIndexed { index, buffer ->
         pairs[index].let { (offset, size) ->
-            GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, offset, size, buffer)
+            GLES20.glBufferSubData(target, offset, size, buffer)
         }
     }
 }

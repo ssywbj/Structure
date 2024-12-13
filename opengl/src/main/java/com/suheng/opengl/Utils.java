@@ -25,7 +25,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -250,35 +249,46 @@ public final class Utils {
         return texture[0];
     }
 
-    public static int genVbo(@NonNull FloatBuffer floatBuffer) {
+    //VBO: Vertex Buffer Objects
+    public static int genVbo(@NonNull Buffer buffer) {
         final int[] buffers = new int[1];
         GLES20.glGenBuffers(buffers.length, buffers, 0);
         final int vboId = buffers[0];
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboId);
-
-        //GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, floatBuffer.limit() * 4, floatBuffer, GLES20.GL_STATIC_DRAW);
-        KtExKt.glBufferData(floatBuffer);
-
+        KtExKt.glBufferData(buffer, GLES20.GL_ARRAY_BUFFER, GLES20.GL_STATIC_DRAW);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-
         return vboId;
     }
 
-    public static int genVbo(@NonNull FloatBuffer fb1, @NonNull FloatBuffer fb2) {
+    public static int genVbo(@NonNull Buffer... buffer) {
         final int[] buffers = new int[1];
         GLES20.glGenBuffers(buffers.length, buffers, 0);
         final int vboId = buffers[0];
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboId);
-
-        /*final int fb1Size = fb1.limit() * 4;
-        final int fb2Size = fb2.limit() * 4;
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, fb1Size + fb2Size, null, GLES20.GL_STATIC_DRAW);
-        GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, 0, fb1Size, fb1);
-        GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, fb1Size, fb2Size, fb2);
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);*/
-
-        KtExKt.glBufferData(fb1, fb2);
+        KtExKt.glBufferData(GLES20.GL_ARRAY_BUFFER, GLES20.GL_STATIC_DRAW, buffer);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
         return vboId;
+    }
+
+    //EBO: Element Buffer Objects
+    public static int genEbo(@NonNull Buffer buffer) {
+        final int[] buffers = new int[1];
+        GLES20.glGenBuffers(buffers.length, buffers, 0);
+        final int eboId = buffers[0];
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, eboId);
+        KtExKt.glBufferData(buffer, GLES20.GL_ELEMENT_ARRAY_BUFFER, GLES20.GL_STATIC_DRAW);
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
+        return eboId;
+    }
+
+    public static int genEbo(@NonNull Buffer... buffer) {
+        final int[] buffers = new int[1];
+        GLES20.glGenBuffers(buffers.length, buffers, 0);
+        final int eboId = buffers[0];
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, eboId);
+        KtExKt.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, GLES20.GL_STATIC_DRAW, buffer);
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
+        return eboId;
     }
 
     /**
