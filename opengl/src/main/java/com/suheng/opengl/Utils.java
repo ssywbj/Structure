@@ -258,6 +258,48 @@ public final class Utils {
         return eboId;
     }
 
+    public static @Nullable int[] genFbo(final int width, final int height) {
+        final int[] frameBuffers = new int[1];
+        GLES20.glGenFramebuffers(frameBuffers.length, frameBuffers, 0);
+        final int fboId = frameBuffers[0];
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboId);
+        if (fboId == 0) {
+            Log.e(TAG, "Could not generate a frame buffer object.");
+            return null;
+        }
+
+        final int[] textures = new int[1];
+        GLES20.glGenTextures(textures.length, textures, 0);
+        final int texture = textures[0];
+        if (texture == 0) {
+            Log.e(TAG, "Could not generate a texture object.");
+            return null;
+        }
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_MIRRORED_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_MIRRORED_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0
+                , GLES20.GL_TEXTURE_2D, texture, 0);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0
+                , GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+
+        int[] fbo = null;
+        if (GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER) == GLES20.GL_FRAMEBUFFER_COMPLETE) {
+            fbo = new int[]{fboId, texture};
+            Log.d(TAG, "fboId: " + fboId + ", texture: " + texture);
+        } else {
+            Log.e(TAG, "check frame buffer status is not complete");
+        }
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+
+        return fbo;
+    }
+
     /**
      * Convert a 4x4 matrix that is stored in column-major order
      * to a string.

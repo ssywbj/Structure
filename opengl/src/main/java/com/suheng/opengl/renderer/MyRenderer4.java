@@ -135,7 +135,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
         public void onSurfaceChanged(int width, int height) {
             mWidth = width;
             mHeight = height;
-            Log.d("Wbj", "onDrawFrame, width: " + mWidth + ", height: " + mHeight
+            Log.d("Wbj", "onSurfaceChanged, width: " + mWidth + ", height: " + mHeight
                     + ", rectWidth: " + mRectWidth + ", rectHeight: " + mRectHeight);
         }
 
@@ -259,7 +259,7 @@ public class MyRenderer4 implements GLSurfaceView.Renderer {
                 mWorkThread.post(() -> {
                     String fileName = System.currentTimeMillis() + "_" + mWidth + "_" + mHeight + ".png";
                     File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), fileName);
-                    Log.i("Wbj", "onDrawFrame, path: " + file.getPath());
+                    Log.i("Wbj", "onDrawFrame2, path: " + file.getPath());
                     Utils.bufferToFile(byteBuffer, file, mWidth, mHeight);
                 });
             }
