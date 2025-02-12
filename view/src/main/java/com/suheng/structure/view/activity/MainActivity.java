@@ -2,8 +2,8 @@ package com.suheng.structure.view.activity;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.util.Log;
@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
 import com.suheng.structure.view.R;
-import com.suheng.structure.view.activity.vap.VapMainActivity;
+import com.suheng.structure.view.utils.NotificationTools;
 import com.suheng.structure.view.utils.XmlSaxParser;
 
 import java.lang.ref.WeakReference;
@@ -185,11 +185,29 @@ public class MainActivity extends AppCompatActivity {
             }
 
             holder.textName.setOnClickListener(v -> {
-                String className = mStringArrayMap.get(mStringList.get(position));
+                /*String className = mStringArrayMap.get(mStringList.get(position));
                 if (className != null && !className.isEmpty()) {
                     Intent intent = new Intent();
                     intent.setClassName(getPackageName(), className);
                     startActivity(intent);
+                }*/
+
+                if (position >= 0 && position < 3) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        NotificationTools.INSTANCE.groupNotification(MainActivity.this, position);
+                    }
+                }
+
+                if (position == 3) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        NotificationTools.INSTANCE.callNotification(MainActivity.this);
+                    }
+                }
+
+                if (position == 4) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        NotificationTools.INSTANCE.bubbleNotification(MainActivity.this);
+                    }
                 }
             });
         }

@@ -4,12 +4,10 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import com.suheng.structure.view.ModelView
+import androidx.lifecycle.ViewModel
 
-class CountViewModel : ModelView(), DefaultLifecycleObserver/*, LifecycleEventObserver*/ {
+class CountViewModel : ViewModel() {
 
     private val mHandler by lazy {
         Handler(Looper.getMainLooper())
@@ -21,10 +19,9 @@ class CountViewModel : ModelView(), DefaultLifecycleObserver/*, LifecycleEventOb
 
     private var mRunnable: Runnable? = null
 
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
-        Log.d("Wbj", "CountViewModel, onCreate")
+    init {
         this.create()
+        this.start()
     }
 
     fun create() {
@@ -46,22 +43,10 @@ class CountViewModel : ModelView(), DefaultLifecycleObserver/*, LifecycleEventOb
         }
     }
 
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
-        Log.d("Wbj", "CountViewModel, onStart")
-        this.start()
-    }
-
     private fun start() {
         mRunnable?.let {
             mHandler.postDelayed(it, 1000)
         }
-    }
-
-    override fun onStop(owner: LifecycleOwner) {
-        super.onStop(owner)
-        Log.d("Wbj", "CountViewModel, onStop")
-        this.stop()
     }
 
     private fun stop() {
@@ -76,18 +61,10 @@ class CountViewModel : ModelView(), DefaultLifecycleObserver/*, LifecycleEventOb
         }
     }
 
-    override fun onDestroy(owner: LifecycleOwner) {
-        super.onDestroy(owner)
-        Log.d("Wbj", "CountViewModel, onDestroy")
-        this.destroy()
-    }
-
-    private fun destroy() {
+    override fun onCleared() {
+        super.onCleared()
+        this.stop()
         mRunnable = null
     }
-
-    /*override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        Log.d("Wbj", "Event = $event, LifecycleOwner = $source")
-    }*/
 
 }

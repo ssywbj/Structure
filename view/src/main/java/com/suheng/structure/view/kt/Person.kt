@@ -65,7 +65,7 @@ class MyKtView : View { //如果派生类没有主构造函数，那么每个次
     constructor(ctx: Context) : super(ctx)
     constructor(ctx: Context, attrs: AttributeSet) : super(ctx, attrs)
 
-    override fun onDraw(canvas: Canvas?) { //覆盖方法：override
+    override fun onDraw(canvas: Canvas) { //覆盖方法：override
         super.onDraw(canvas)
     }
 }

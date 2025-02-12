@@ -10,11 +10,13 @@ import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import com.suheng.structure.view.activity.BubbleActivity
 
 object NotificationTools {
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun groupNotification(context: Context, title: String, id: Int) {
+    fun groupNotification(context: Context, id: Int) {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -26,7 +28,7 @@ object NotificationTools {
 
         val builder = Notification.Builder(context, channelId)
         builder.setSmallIcon(android.R.drawable.stat_notify_more)
-        builder.setContentTitle(title)
+        builder.setContentTitle("title_$id")
         notificationManager.notify("TEST_GROUP", id, builder.build())
     }
 
@@ -64,7 +66,7 @@ object NotificationTools {
     //https://github.com/android/socialite
     @RequiresApi(Build.VERSION_CODES.O)
     fun bubbleNotification(context: Context) {
-
+        ContextCompat.startActivity(context, Intent(context, BubbleActivity::class.java), null)
     }
 
 }
