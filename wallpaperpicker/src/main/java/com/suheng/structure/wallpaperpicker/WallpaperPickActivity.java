@@ -2,21 +2,32 @@ package com.suheng.structure.wallpaperpicker;
 
 import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.media.MediaMetadata;
+import android.media.Session2Token;
+import android.media.session.MediaController;
+import android.media.session.MediaSession;
+import android.media.session.MediaSessionManager;
+import android.media.session.PlaybackState;
+import android.os.Build;
 import android.os.Bundle;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -26,13 +37,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.suheng.structure.wallpaperpicker.adapter.RecyclerAdapter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class WallpaperPickActivity extends AppCompatActivity {
 
     private String mTag = "Wbj";
     private List<WallpaperInfo> mWallpaperInfoList = new ArrayList<>();
     private LivePaperAdapter mLivePaperAdapter;
+
+    private final Set<MediaController> mMediaControllerSet = new HashSet<>();
+    private Button mBtnState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,14 +139,180 @@ public class WallpaperPickActivity extends AppCompatActivity {
             String cls;
             if (v.getId() == R.id.btn_set_one) {
                 cls = pkg + ".MyHealthWatchFace";
-            } else {
+                WallpaperPickService.setLiveWallPaper(v.getContext(), pkg, cls, true);
+                finish();
+            } else if (v.getId() == R.id.btn_set_two) {
                 cls = pkg + ".VapWallpaper";
+                WallpaperPickService.setLiveWallPaper(v.getContext(), pkg, cls, true);
+                finish();
             }
-            WallpaperPickService.setLiveWallPaper(v.getContext(), pkg, cls, true);
-            finish();
+
+            if (v.getId() == R.id.btn_previous) {
+                for (MediaController mediaController : mMediaControllerSet) {
+                    mediaController.getTransportControls().skipToPrevious();
+                }
+            } else if (v.getId() == R.id.btn_state) {
+                for (MediaController mediaController : mMediaControllerSet) {
+                    PlaybackState playbackState = mediaController.getPlaybackState();
+                    if (playbackState != null) {
+                        MediaController.TransportControls transportControls = mediaController.getTransportControls();
+                        if (playbackState.getState() == PlaybackState.STATE_PLAYING) {
+                            transportControls.pause();
+                        } else if (playbackState.getState() == PlaybackState.STATE_PAUSED
+                                || playbackState.getState() == PlaybackState.STATE_NONE) {
+                            transportControls.play();
+                        } else {
+                            Log.w(mTag, "Neither in play state nor in pause/none state");
+                        }
+                    }
+                }
+            } else if (v.getId() == R.id.btn_next) {
+                for (MediaController mediaController : mMediaControllerSet) {
+                    mediaController.getTransportControls().skipToNext();
+                }
+            }
         };
         findViewById(R.id.btn_set_one).setOnClickListener(onClickListener);
         findViewById(R.id.btn_set_two).setOnClickListener(onClickListener);
+        mBtnState = findViewById(R.id.btn_state);
+        mBtnState.setOnClickListener(onClickListener);
+        findViewById(R.id.btn_previous).setOnClickListener(onClickListener);
+        findViewById(R.id.btn_next).setOnClickListener(onClickListener);
+
+        MediaSessionManager msManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
+        msManager.addOnActiveSessionsChangedListener(new MediaSessionManager.OnActiveSessionsChangedListener() {
+            @Override
+            public void onActiveSessionsChanged(@Nullable List<MediaController> list) {
+                Log.i(mTag, "onActiveSessionsChanged, mediaControllers: " + list);
+                if (list != null) {
+                    for (MediaController mediaController : list) {
+                        StringBuilder logStr = buildMediaController(mediaController);
+                        Log.i(mTag, "onActiveSessionsChanged, " + logStr);
+                    }
+                }
+            }
+        }, null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            msManager.addOnSession2TokensChangedListener(new MediaSessionManager.OnSession2TokensChangedListener() {
+                @Override
+                public void onSession2TokensChanged(@NonNull List<Session2Token> list) {
+                    Log.i(mTag, "onSession2TokensChanged, list: " + list);
+                }
+            });
+        }
+        List<MediaController> mediaControllers = msManager.getActiveSessions(null);
+        Log.d(mTag, "getActiveSessions, mediaControllers: " + mediaControllers.size());
+        for (MediaController mediaController : mediaControllers) {
+            StringBuilder logStr = buildMediaController(mediaController);
+            Log.d(mTag, "getActiveSessions, " + logStr);
+        }
+    }
+
+    @NonNull
+    private StringBuilder buildMediaController(@NonNull MediaController mediaController) {
+        mMediaControllerSet.add(mediaController);
+
+        String pkg = mediaController.getPackageName();
+        StringBuilder logStr = new StringBuilder("pkg: " + pkg);
+
+        final MediaMetadata metadata = mediaController.getMetadata();
+        if (metadata != null) {
+            String mediaMetadata = parseMediaMetadata(metadata);
+            logStr.append(", ").append(mediaMetadata);
+        }
+
+        final PlaybackState playbackState = mediaController.getPlaybackState();
+        if (playbackState != null) {
+            String pState = parsePlaybackState(playbackState);
+            logStr.append(", ").append(pState);
+        }
+
+        final MediaController.Callback callback = new MediaController.Callback() {
+            @Override
+            public void onSessionDestroyed() {
+                super.onSessionDestroyed();
+                Log.i(mTag, "onSessionDestroyed");
+            }
+
+            @Override
+            public void onSessionEvent(@NonNull String event, @Nullable Bundle extras) {
+                super.onSessionEvent(event, extras);
+                Log.d(mTag, "onSessionEvent, event: " + event);
+            }
+
+            @Override
+            public void onPlaybackStateChanged(@Nullable PlaybackState state) {
+                super.onPlaybackStateChanged(state);
+                Log.i(mTag, "onPlaybackStateChanged, state: " + state);
+                if (state != null) {
+                    String playbackState = parsePlaybackState(state);
+                    //Log.i(mTag, "onPlaybackStateChanged, playbackState: " + playbackState);
+                }
+            }
+
+            @Override
+            public void onMetadataChanged(@Nullable MediaMetadata metadata) {
+                super.onMetadataChanged(metadata);
+                String mediaMetadata = null;
+                if (metadata != null) {
+                    mediaMetadata = parseMediaMetadata(metadata);
+                }
+                Log.i(mTag, "onMetadataChanged, metadata: " + System.identityHashCode(metadata)
+                        + " {" + mediaMetadata + "}");
+            }
+
+            @Override
+            public void onQueueChanged(@Nullable List<MediaSession.QueueItem> queue) {
+                super.onQueueChanged(queue);
+                Log.d(mTag, "onQueueChanged, queue: " + queue);
+            }
+
+            @Override
+            public void onQueueTitleChanged(@Nullable CharSequence title) {
+                super.onQueueTitleChanged(title);
+                Log.d(mTag, "onQueueTitleChanged, title: " + title);
+            }
+
+            @Override
+            public void onExtrasChanged(@Nullable Bundle extras) {
+                super.onExtrasChanged(extras);
+                Log.d(mTag, "onExtrasChanged, extras: " + extras);
+            }
+
+            @Override
+            public void onAudioInfoChanged(MediaController.PlaybackInfo info) {
+                super.onAudioInfoChanged(info);
+                Log.d(mTag, "onAudioInfoChanged, info: " + info);
+            }
+        };
+        mediaController.registerCallback(callback);
+
+        return logStr;
+    }
+
+    @NonNull
+    private String parsePlaybackState(@NonNull PlaybackState playbackState) {
+        final String playbackStateStr = playbackState.toString();
+        final String stateFlag = "state=";
+        final int startIndex = playbackStateStr.indexOf(stateFlag);
+        final int endIndex = playbackStateStr.indexOf(")");
+        final String state = playbackStateStr.substring(startIndex + stateFlag.length(), endIndex + 1);
+        mBtnState.setText(state);
+        return stateFlag + state;
+    }
+
+    @NonNull
+    private String parseMediaMetadata(@NonNull MediaMetadata metadata) {
+        StringBuilder info = new StringBuilder();
+        CharSequence text = metadata.getText(MediaMetadata.METADATA_KEY_TITLE);
+        info.append("title: ").append(text);
+        CharSequence artist = metadata.getText(MediaMetadata.METADATA_KEY_ARTIST);
+        info.append(", artist: ").append(artist);
+        long duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
+        info.append(", duration: ").append(duration);
+        Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
+        info.append(", bitmap: ").append(System.identityHashCode(bitmap));
+        return info.toString();
     }
 
     private void initRecyclerView() {
