@@ -88,6 +88,8 @@ object NotificationTools {
         builder.setSmallIcon(android.R.drawable.sym_call_missed)
         builder.setContentTitle("Media notification")
         builder.setContentText("You have a media notification.")
+        //builder.setCategory(NotificationCompat.CATEGORY_SERVICE)
+        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         builder.setWhen(System.currentTimeMillis())
 
         val session = MediaSessionCompat(context, "Wbj")
@@ -102,10 +104,10 @@ object NotificationTools {
         playbackStateBuilder.setState(state, position, playbackSpeed)
 
         val stateActions = PlaybackStateCompat.ACTION_PLAY or
-                PlaybackStateCompat.ACTION_PLAY_PAUSE //or
-                //PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
-                //PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
-                //PlaybackStateCompat.ACTION_SEEK_TO // adding the seek action enables seeking with the seekbar
+                PlaybackStateCompat.ACTION_PLAY_PAUSE or
+                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+                PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                PlaybackStateCompat.ACTION_SEEK_TO // adding the seek action enables seeking with the seekbar
         playbackStateBuilder.setActions(stateActions)
 
         session.setExtras(Bundle().apply {
@@ -190,21 +192,23 @@ object NotificationTools {
 
         val previousAction = NotificationCompat.Action(
             R.drawable.alphabet_uppercase_b,
-            "previous",
+            "wPrevious",
             retrievePlaybackAction(context, "actionPrev", BubbleActivity::class.java)
         )
         val actionState = buildStateAction(context, isPlaying.also { isPlaying = !it })
         val actionNext = NotificationCompat.Action(
             R.drawable.alphabet_uppercase_c,
-            "Next",
+            "sNext",
             retrievePlaybackAction(context, "actionNext", ConstraintLayoutActivity::class.java)
         )
+        builder.addAction(android.R.drawable.ic_media_rew, "wRewind", null)
         builder.addAction(previousAction).addAction(actionState).addAction(actionNext)
+        builder.addAction(android.R.drawable.ic_media_ff, "wFf", null)
 
         val mediaStyle = androidx.media.app.NotificationCompat.MediaStyle()
         val session = MediaSessionCompat(context, "Wbj2")
         mediaStyle.setMediaSession(session.sessionToken)
-        mediaStyle.setShowActionsInCompactView(1)
+        mediaStyle.setShowActionsInCompactView(2) //show actionState in compact situation
         builder.setStyle(mediaStyle)
 
         notificationManager.notify("TEST_MEDIA2_NOTIFICATION", notifyId, builder.build())
@@ -227,7 +231,7 @@ object NotificationTools {
             if (isPlaying) R.drawable.alphabet_uppercase_d else R.drawable.alphabet_uppercase_e
         return NotificationCompat.Action.Builder(
             btnResId,
-            if (isPlaying) "Pause" else "Play",
+            if (isPlaying) "wPause" else "wPlay",
             retrievePlaybackAction(context, "actionPlayPause", VapMainActivity::class.java)
         ).build()
     }
