@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ContentHolder holder, int position) {
-            String item = mDataList.get(position);
+            String item = mDataList.get(position) + position;
             holder.textName.setText(item);
             if (position % 2 == 0) {
                 holder.itemView.setBackgroundColor(Color.parseColor("#CCCCCC"));
@@ -205,6 +205,18 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if (position == 4) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        NotificationTools.INSTANCE.mediaNotification(MainActivity.this);
+                    }
+                }
+
+                if (position == 5) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        NotificationTools.INSTANCE.mediaNotification2(MainActivity.this);
+                    }
+                }
+
+                if (position == 6) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         NotificationTools.INSTANCE.bubbleNotification(MainActivity.this);
                     }
