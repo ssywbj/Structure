@@ -10,6 +10,8 @@ import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadata;
+import android.media.MediaRoute2Info;
+import android.media.MediaRouter2;
 import android.media.Session2Token;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
@@ -17,12 +19,15 @@ import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,18 +42,45 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.suheng.structure.wallpaperpicker.adapter.RecyclerAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class WallpaperPickActivity extends AppCompatActivity {
 
     private String mTag = "Wbj";
+    private static final long UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
     private List<WallpaperInfo> mWallpaperInfoList = new ArrayList<>();
     private LivePaperAdapter mLivePaperAdapter;
 
     private final Set<MediaController> mMediaControllerSet = new HashSet<>();
+    private final Map<MediaController, MediaController.Callback> mMediaCallbackMap = new HashMap<>();
     private Button mBtnState;
+    private TextView mTvPst;
+    private TextView mTvDuration;
+    private SeekBar mSeekBar;
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
+    private final Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            for (Map.Entry<MediaController, MediaController.Callback> mediaControllerCallbackEntry : mMediaCallbackMap.entrySet()) {
+                MediaController.Callback callback = mediaControllerCallbackEntry.getValue();
+                if (callback instanceof MediaUpdateListener) {
+                    MediaController mediaController = mediaControllerCallbackEntry.getKey();
+                    PlaybackState playbackState = mediaController.getPlaybackState();
+                    if (playbackState != null) {
+                        long position = playbackState.getPosition();
+                        ((MediaUpdateListener) callback).onProgressUpdate(position, "", "");
+                    }
+                }
+            }
+            long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
+            mHandler.postDelayed(mRunnable, delayMillis);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,6 +210,34 @@ public class WallpaperPickActivity extends AppCompatActivity {
         mBtnState.setOnClickListener(onClickListener);
         findViewById(R.id.btn_previous).setOnClickListener(onClickListener);
         findViewById(R.id.btn_next).setOnClickListener(onClickListener);
+        mTvPst = findViewById(R.id.tv_pst);
+        mTvDuration = findViewById(R.id.tv_duration);
+        mSeekBar = findViewById(R.id.seekBar);
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Log.d(mTag, "onProgressChanged, progress: " + progress + ", fromUser: " + fromUser);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                Log.i(mTag, "onStartTrackingTouch");
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                final int progress = mSeekBar.getProgress();
+                final int max = mSeekBar.getMax();
+                long duration = Long.parseLong(mTvDuration.getText().toString());
+                final long position = (long) (1.0 * progress / max * duration);
+                for (MediaController mediaController : mMediaControllerSet) {
+                    Log.i(mTag, "onStopTrackingTouch, progress:" + progress + ", max: " + max
+                            + ", position: " + position + ", duration: " + duration);
+                    mediaController.getTransportControls().seekTo(position);
+                    //mediaController.getTransportControls().play();
+                }
+            }
+        });
 
         MediaSessionManager msManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
         msManager.addOnActiveSessionsChangedListener(new MediaSessionManager.OnActiveSessionsChangedListener() {
@@ -206,6 +266,22 @@ public class WallpaperPickActivity extends AppCompatActivity {
             StringBuilder logStr = buildMediaController(mediaController);
             Log.d(mTag, "getActiveSessions, " + logStr);
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            MediaRouter2 mediaRouter2 = MediaRouter2.getInstance(this);
+            List<MediaRoute2Info> routes = mediaRouter2.getRoutes();
+            Log.d(mTag, "routes.size(): " + routes.size());
+            for (MediaRoute2Info route : routes) {
+                String id = route.getId();
+                String name = route.getName().toString();
+                int type = -12345;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    type = route.getType();
+                }
+                Log.i(mTag, "route, id: " + id + ", name: " + name + ", type: " + type);
+            }
+        }
+
     }
 
     @NonNull
@@ -227,7 +303,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
             logStr.append(", ").append(pState);
         }
 
-        final MediaController.Callback callback = new MediaController.Callback() {
+        final MediaController.Callback callback = new MediaUpdateListener() {
             @Override
             public void onSessionDestroyed() {
                 super.onSessionDestroyed();
@@ -284,8 +360,16 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 super.onAudioInfoChanged(info);
                 Log.d(mTag, "onAudioInfoChanged, info: " + info);
             }
+
+            @Override
+            public void onProgressUpdate(long newPst, String oldPst, String duration) {
+                Log.d(mTag, "newPst: " + newPst + ", thread: " + Thread.currentThread().getName());
+                mTvPst.setText(String.valueOf(newPst));
+                mSeekBar.setProgress((int) (newPst / 1000));
+            }
         };
-        mediaController.registerCallback(callback);
+        mediaController.registerCallback(callback, mHandler);
+        mMediaCallbackMap.put(mediaController, callback);
 
         return logStr;
     }
@@ -298,6 +382,29 @@ public class WallpaperPickActivity extends AppCompatActivity {
         final int endIndex = playbackStateStr.indexOf(")");
         final String state = playbackStateStr.substring(startIndex + stateFlag.length(), endIndex + 1);
         mBtnState.setText(state);
+        long position = playbackState.getPosition();
+        mTvPst.setText(String.valueOf(position));
+        mSeekBar.setProgress((int) (position / 1000));
+
+        if (playbackState.getState() == PlaybackState.STATE_PLAYING) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (mHandler.hasCallbacks(mRunnable)) {
+                    mHandler.removeCallbacks(mRunnable);
+                }
+            } else {
+                mHandler.removeCallbacks(mRunnable);
+            }
+            long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
+            mHandler.postDelayed(mRunnable, delayMillis);
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (mHandler.hasCallbacks(mRunnable)) {
+                    mHandler.removeCallbacks(mRunnable);
+                }
+            } else {
+                mHandler.removeCallbacks(mRunnable);
+            }
+        }
         return stateFlag + state;
     }
 
@@ -310,9 +417,16 @@ public class WallpaperPickActivity extends AppCompatActivity {
         info.append(", artist: ").append(artist);
         long duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
         info.append(", duration: ").append(duration);
+        mTvDuration.setText(String.valueOf(duration));
+        mSeekBar.setMax((int) (duration / 1000));
         Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
         info.append(", bitmap: ").append(System.identityHashCode(bitmap));
         return info.toString();
+    }
+
+    private static class MediaUpdateListener extends MediaController.Callback {
+        public void onProgressUpdate(long newPst, String oldPst, String duration) {
+        }
     }
 
     private void initRecyclerView() {
