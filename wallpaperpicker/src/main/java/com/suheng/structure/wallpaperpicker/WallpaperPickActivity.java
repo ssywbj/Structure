@@ -235,6 +235,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                removeProgressMsg();
                 final int progress = mSeekBar.getProgress();
                 final int max = mSeekBar.getMax();
                 long duration = Long.parseLong(mTvDuration.getText().toString());
@@ -243,10 +244,10 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     Log.i(mTag, "onStopTrackingTouch, progress:" + progress + ", max: " + max
                             + ", position: " + position + ", duration: " + duration);
                     mediaController.getTransportControls().seekTo(position);
-                    mHandler.postDelayed(() -> {
+                    /*mHandler.postDelayed(() -> {
                         StringBuilder controller = buildMediaController(mediaController);
                         Log.i(mTag, "onStopTrackingTouch, controller: " + controller);
-                    }, 300);
+                    }, 500);*/
                 }
             }
         });
@@ -376,7 +377,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
     @NonNull
     private String parsePlaybackState(@NonNull PlaybackState playbackState) {
-        Log.d(mTag, "parsePlaybackState, playbackState: " + playbackState);
+        //Log.d(mTag, "parsePlaybackState, playbackState: " + playbackState);
         final String playbackStateStr = playbackState.toString();
         final String stateFlag = "state=";
         final int startIndex = playbackStateStr.indexOf(stateFlag);
@@ -388,25 +389,23 @@ public class WallpaperPickActivity extends AppCompatActivity {
         mSeekBar.setProgress((int) (position / 1000));
 
         if (playbackState.getState() == PlaybackState.STATE_PLAYING) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                if (mHandler.hasCallbacks(mRunnable)) {
-                    mHandler.removeCallbacks(mRunnable);
-                }
-            } else {
-                mHandler.removeCallbacks(mRunnable);
-            }
+            removeProgressMsg();
             long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
             mHandler.postDelayed(mRunnable, delayMillis);
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                if (mHandler.hasCallbacks(mRunnable)) {
-                    mHandler.removeCallbacks(mRunnable);
-                }
-            } else {
-                mHandler.removeCallbacks(mRunnable);
-            }
+            removeProgressMsg();
         }
         return stateFlag + state;
+    }
+
+    private void removeProgressMsg() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (mHandler.hasCallbacks(mRunnable)) {
+                mHandler.removeCallbacks(mRunnable);
+            }
+        } else {
+            mHandler.removeCallbacks(mRunnable);
+        }
     }
 
     @NonNull
@@ -475,7 +474,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     type = route.getType();
                 }
                 Log.d("Wbj", "selectableRoutes, controllerId: " + controllerId
-                        + ", routeId: " + routeId + ", name: " + name + "type: " + type);
+                        + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
 
             for (MediaRoute2Info route : controller.getDeselectableRoutes()) {
