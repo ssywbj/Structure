@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaMetadata;
 import android.media.MediaRoute2Info;
 import android.media.MediaRouter2;
+import android.media.RouteDiscoveryPreference;
 import android.media.Session2Token;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
@@ -33,6 +34,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -42,6 +44,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.suheng.structure.wallpaperpicker.adapter.RecyclerAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -61,6 +64,9 @@ public class WallpaperPickActivity extends AppCompatActivity {
     private Button mBtnState;
     private TextView mTvPst;
     private TextView mTvDuration;
+    private TextView mTvTitle;
+    private TextView mTvArtist;
+    private ImageView mIvAlbumArt;
     private SeekBar mSeekBar;
     private final Handler mHandler = new Handler(Looper.getMainLooper());
     private final Runnable mRunnable = new Runnable() {
@@ -212,11 +218,14 @@ public class WallpaperPickActivity extends AppCompatActivity {
         findViewById(R.id.btn_next).setOnClickListener(onClickListener);
         mTvPst = findViewById(R.id.tv_pst);
         mTvDuration = findViewById(R.id.tv_duration);
+        mTvTitle = findViewById(R.id.tv_title);
+        mTvArtist = findViewById(R.id.tv_artist);
+        mIvAlbumArt = findViewById(R.id.tv_album_art);
         mSeekBar = findViewById(R.id.seekBar);
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.d(mTag, "onProgressChanged, progress: " + progress + ", fromUser: " + fromUser);
+                //Log.d(mTag, "onProgressChanged, progress: " + progress + ", fromUser: " + fromUser);
             }
 
             @Override
@@ -234,7 +243,10 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     Log.i(mTag, "onStopTrackingTouch, progress:" + progress + ", max: " + max
                             + ", position: " + position + ", duration: " + duration);
                     mediaController.getTransportControls().seekTo(position);
-                    //mediaController.getTransportControls().play();
+                    mHandler.postDelayed(() -> {
+                        StringBuilder controller = buildMediaController(mediaController);
+                        Log.i(mTag, "onStopTrackingTouch, controller: " + controller);
+                    }, 300);
                 }
             }
         });
@@ -268,20 +280,8 @@ public class WallpaperPickActivity extends AppCompatActivity {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            MediaRouter2 mediaRouter2 = MediaRouter2.getInstance(this);
-            List<MediaRoute2Info> routes = mediaRouter2.getRoutes();
-            Log.d(mTag, "routes.size(): " + routes.size());
-            for (MediaRoute2Info route : routes) {
-                String id = route.getId();
-                String name = route.getName().toString();
-                int type = -12345;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    type = route.getType();
-                }
-                Log.i(mTag, "route, id: " + id + ", name: " + name + ", type: " + type);
-            }
+            this.getWifiList();
         }
-
     }
 
     @NonNull
@@ -376,6 +376,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
     @NonNull
     private String parsePlaybackState(@NonNull PlaybackState playbackState) {
+        Log.d(mTag, "parsePlaybackState, playbackState: " + playbackState);
         final String playbackStateStr = playbackState.toString();
         final String stateFlag = "state=";
         final int startIndex = playbackStateStr.indexOf(stateFlag);
@@ -413,20 +414,125 @@ public class WallpaperPickActivity extends AppCompatActivity {
         StringBuilder info = new StringBuilder();
         CharSequence text = metadata.getText(MediaMetadata.METADATA_KEY_TITLE);
         info.append("title: ").append(text);
+        mTvTitle.setText(text);
         CharSequence artist = metadata.getText(MediaMetadata.METADATA_KEY_ARTIST);
         info.append(", artist: ").append(artist);
+        mTvArtist.setText(artist);
         long duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
         info.append(", duration: ").append(duration);
         mTvDuration.setText(String.valueOf(duration));
         mSeekBar.setMax((int) (duration / 1000));
         Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
         info.append(", bitmap: ").append(System.identityHashCode(bitmap));
+        mIvAlbumArt.setImageBitmap(bitmap);
         return info.toString();
     }
 
     private static class MediaUpdateListener extends MediaController.Callback {
         public void onProgressUpdate(long newPst, String oldPst, String duration) {
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private void getWifiList(){
+        MediaRouter2 mediaRouter2 = MediaRouter2.getInstance(this);
+
+        // 定义希望发现的路由类型（例如音频路由）
+        List<String> preferredFeatures = Collections.singletonList(MediaRoute2Info.FEATURE_LIVE_AUDIO);
+        // 构造RouteDiscoveryPreference对象
+        RouteDiscoveryPreference discoveryPreference = new RouteDiscoveryPreference.Builder(preferredFeatures, true).build();
+
+        List<MediaRoute2Info> routes = mediaRouter2.getRoutes();
+        List<MediaRouter2.RoutingController> controllers = mediaRouter2.getControllers();
+        Log.d("Wbj", "controllers.size(): " + controllers.size() + ", routes.size(): " + routes.size());
+        for (MediaRouter2.RoutingController controller : controllers) {
+            String controllerId = controller.getId();
+            for (MediaRoute2Info route : controller.getSelectedRoutes()) {
+                String routeId = route.getId();
+                String name = route.getName().toString();
+                int type = -1;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    type = route.getType();
+                }
+                Log.i("Wbj", "selectedRoutes, controllerId: " + controllerId
+                        + ", routeId: " + routeId + ", name: " + name + "type: " + type);
+            }
+
+            /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                it.transferableRoutes.forEach {
+                    val routeId = it.id
+                    val name = it.name
+                    val type = it.type
+                    Log.i("Wbj", "transferableRoutes, controllerId:$controllerId, routeId:$routeId, name:$name, type:$type")
+                }
+            }*/
+
+            for (MediaRoute2Info route : controller.getSelectableRoutes()) {
+                String routeId = route.getId();
+                String name = route.getName().toString();
+                int type = -1;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    type = route.getType();
+                }
+                Log.d("Wbj", "selectableRoutes, controllerId: " + controllerId
+                        + ", routeId: " + routeId + ", name: " + name + "type: " + type);
+            }
+
+            for (MediaRoute2Info route : controller.getDeselectableRoutes()) {
+                String routeId = route.getId();
+                String name = route.getName().toString();
+                int type = -1;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    type = route.getType();
+                }
+                Log.d("Wbj", "deselectableRoutes, controllerId: " + controllerId
+                        + ", routeId: " + routeId + ", name: " + name + "type: " + type);
+            }
+        }
+
+        MediaRouter2.RouteCallback routeCallback = new MediaRouter2.RouteCallback() {
+            @Override
+            public void onRoutesUpdated(@NonNull List<MediaRoute2Info> routes) {
+                super.onRoutesUpdated(routes);
+                Log.i("Wbj", "onRoutesUpdated, routes.size: " + routes.size()
+                        + ", mediaRouter2.routes.size: " + mediaRouter2.getRoutes().size());
+                for (MediaRoute2Info route : routes) {
+                    String routeId = route.getId();
+                    String name = route.getName().toString();
+                    int type = -1;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        type = route.getType();
+                    }
+                    Log.d("Wbj", "onRoutesUpdated, routeId: " + routeId + ", name: " + name + "type: " + type);
+                    if (type == MediaRoute2Info.TYPE_BLUETOOTH_A2DP) {
+                        Log.i("Wbj", "onRoutesUpdated, type:TYPE_BLUETOOTH_A2DP");
+                        mediaRouter2.transferTo(route);
+                    }
+                }
+            }
+        };
+        mediaRouter2.registerRouteCallback(getMainExecutor(), routeCallback, discoveryPreference);
+
+        mediaRouter2.registerTransferCallback(getMainExecutor(), new MediaRouter2.TransferCallback() {
+            @Override
+            public void onTransfer(@NonNull MediaRouter2.RoutingController oldController
+                    , @NonNull MediaRouter2.RoutingController newController) {
+                super.onTransfer(oldController, newController);
+                Log.i("Wbj", "onTransfer, oldController: " + oldController + ", newController: " + newController);
+            }
+
+            @Override
+            public void onTransferFailure(@NonNull MediaRoute2Info requestedRoute) {
+                super.onTransferFailure(requestedRoute);
+                Log.w("Wbj", "onTransferFailure: " + requestedRoute);
+            }
+
+            @Override
+            public void onStop(@NonNull MediaRouter2.RoutingController controller) {
+                super.onStop(controller);
+                Log.i("Wbj", "onStop, controller");
+            }
+        });
     }
 
     private void initRecyclerView() {

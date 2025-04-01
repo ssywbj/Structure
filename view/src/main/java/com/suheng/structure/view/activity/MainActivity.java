@@ -2,6 +2,7 @@ package com.suheng.structure.view.activity;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -185,12 +186,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             holder.textName.setOnClickListener(v -> {
-                /*String className = mStringArrayMap.get(mStringList.get(position));
+                String className = mStringArrayMap.get(mStringList.get(position));
                 if (className != null && !className.isEmpty()) {
                     Intent intent = new Intent();
                     intent.setClassName(getPackageName(), className);
                     startActivity(intent);
-                }*/
+                }
 
                 if (position >= 0 && position < 3) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
