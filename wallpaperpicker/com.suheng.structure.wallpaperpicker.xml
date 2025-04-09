@@ -18,7 +18,10 @@
     <privapp-permissions package="com.suheng.structure.wallpaperpicker">
         <permission name="android.permission.BIND_WALLPAPER" />
         <permission name="android.permission.MEDIA_CONTENT_CONTROL" />
+
         <permission name="android.permission.QUERY_ALL_PACKAGES" />
         <permission name="android.permission.BLUETOOTH_PRIVILEGED" />
+        <permission name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" />
+        <permission name="android.permission.MANAGE_NOTIFICATIONS" />
     </privapp-permissions>
 </permissions>

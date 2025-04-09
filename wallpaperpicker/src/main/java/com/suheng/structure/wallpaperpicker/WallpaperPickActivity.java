@@ -2,6 +2,7 @@ package com.suheng.structure.wallpaperpicker;
 
 import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.service.notification.NotificationListenerService;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.View;
@@ -87,6 +89,9 @@ public class WallpaperPickActivity extends AppCompatActivity {
             mHandler.postDelayed(mRunnable, delayMillis);
         }
     };
+
+    @Nullable
+    private ComponentName mComponentNotification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -283,6 +288,12 @@ public class WallpaperPickActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             this.getWifiList();
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Log.d("NotificationListenerServiceImpl", "requestRebind NotificationListenerService");
+            mComponentNotification = new ComponentName(this, NotificationListenerServiceImpl.class);
+            NotificationListenerService.requestRebind(mComponentNotification);
+        }
     }
 
     @NonNull
@@ -433,7 +444,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    private void getWifiList(){
+    private void getWifiList() {
         MediaRouter2 mediaRouter2 = MediaRouter2.getInstance(this);
 
         // 定义希望发现的路由类型（例如音频路由）
@@ -454,7 +465,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     type = route.getType();
                 }
                 Log.i("Wbj", "selectedRoutes, controllerId: " + controllerId
-                        + ", routeId: " + routeId + ", name: " + name + "type: " + type);
+                        + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
 
             /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
@@ -485,7 +496,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     type = route.getType();
                 }
                 Log.d("Wbj", "deselectableRoutes, controllerId: " + controllerId
-                        + ", routeId: " + routeId + ", name: " + name + "type: " + type);
+                        + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
         }
 
@@ -502,7 +513,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         type = route.getType();
                     }
-                    Log.d("Wbj", "onRoutesUpdated, routeId: " + routeId + ", name: " + name + "type: " + type);
+                    Log.d("Wbj", "onRoutesUpdated, routeId: " + routeId + ", name: " + name + ", type: " + type);
                     if (type == MediaRoute2Info.TYPE_BLUETOOTH_A2DP) {
                         Log.i("Wbj", "onRoutesUpdated, type:TYPE_BLUETOOTH_A2DP");
                         mediaRouter2.transferTo(route);
@@ -568,6 +579,11 @@ public class WallpaperPickActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(mTag, "onDestroy()");
         mWallpaperInfoList.clear();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (mComponentNotification != null) {
+                NotificationListenerService.requestRebind(mComponentNotification);
+            }
+        }
     }
 
     @Override
