@@ -2,7 +2,6 @@ package com.suheng.structure.wallpaperpicker;
 
 import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -23,7 +22,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.service.notification.NotificationListenerService;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.View;
@@ -90,8 +88,8 @@ public class WallpaperPickActivity extends AppCompatActivity {
         }
     };
 
-    @Nullable
-    private ComponentName mComponentNotification;
+    /*@Nullable
+    private ComponentName mComponentNotification;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -289,11 +287,11 @@ public class WallpaperPickActivity extends AppCompatActivity {
             this.getWifiList();
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Log.d("NotificationListenerServiceImpl", "requestRebind NotificationListenerService");
             mComponentNotification = new ComponentName(this, NotificationListenerServiceImpl.class);
             NotificationListenerService.requestRebind(mComponentNotification);
-        }
+        }*/
     }
 
     @NonNull
@@ -517,6 +515,9 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     if (type == MediaRoute2Info.TYPE_BLUETOOTH_A2DP) {
                         Log.i("Wbj", "onRoutesUpdated, type:TYPE_BLUETOOTH_A2DP");
                         mediaRouter2.transferTo(route);
+                        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                            mediaRouter2.setRouteVolume(route, 10);
+                        }*/
                     }
                 }
             }
@@ -579,11 +580,11 @@ public class WallpaperPickActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(mTag, "onDestroy()");
         mWallpaperInfoList.clear();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (mComponentNotification != null) {
                 NotificationListenerService.requestRebind(mComponentNotification);
             }
-        }
+        }*/
     }
 
     @Override

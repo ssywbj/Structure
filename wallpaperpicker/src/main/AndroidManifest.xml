@@ -30,8 +30,10 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <!-- 需要在“设置-应用管理-应用列表-对应的应用-权限-”允许“附近的设备”权限，不然会探索不到连接的蓝牙设备 -->
     <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
 
+    <!-- 需要在“设置-应用管理-特殊应用权限-通知访问权限-对应的应用”开启“授予通知访问权限” -->
     <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" />
     <uses-permission android:name="android.permission.MANAGE_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
