@@ -243,9 +243,11 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 final int max = mSeekBar.getMax();
                 long duration = Long.parseLong(mTvDuration.getText().toString());
                 final long position = (long) (1.0 * progress / max * duration);
+                int mediaControllerSize = mMediaControllerSet.size();
+                Log.i(mTag, "mediaControllerSize:" + mediaControllerSize);
                 for (MediaController mediaController : mMediaControllerSet) {
                     Log.i(mTag, "onStopTrackingTouch, progress:" + progress + ", max: " + max
-                            + ", position: " + position + ", duration: " + duration);
+                            + ", position: " + position + ", duration: " + duration + ", mediaController: " + mediaController);
                     mediaController.getTransportControls().seekTo(position);
                     /*mHandler.postDelayed(() -> {
                         StringBuilder controller = buildMediaController(mediaController);
@@ -373,8 +375,10 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
             @Override
             public void onProgressUpdate(long newPst, String oldPst, String duration) {
-                Log.d(mTag, "newPst: " + newPst + ", thread: " + Thread.currentThread().getName());
-                mTvPst.setText(String.valueOf(newPst));
+                String fDuration = Utils.formatDuration(newPst);
+                String text = fDuration + "(" + newPst + ")";
+                Log.d(mTag, "newPst: " + text + ", thread: " + Thread.currentThread().getName());
+                mTvPst.setText(text);
                 mSeekBar.setProgress((int) (newPst / 1000));
             }
         };
@@ -394,7 +398,8 @@ public class WallpaperPickActivity extends AppCompatActivity {
         final String state = playbackStateStr.substring(startIndex + stateFlag.length(), endIndex + 1);
         mBtnState.setText(state);
         long position = playbackState.getPosition();
-        mTvPst.setText(String.valueOf(position));
+        String fDuration = Utils.formatDuration(position);
+        mTvPst.setText(fDuration + "(" + position + ")");
         mSeekBar.setProgress((int) (position / 1000));
 
         if (playbackState.getState() == PlaybackState.STATE_PLAYING) {
@@ -428,7 +433,8 @@ public class WallpaperPickActivity extends AppCompatActivity {
         mTvArtist.setText(artist);
         long duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
         info.append(", duration: ").append(duration);
-        mTvDuration.setText(String.valueOf(duration));
+        String fDuration = Utils.formatDuration(duration);
+        mTvDuration.setText(fDuration + "(" + duration + ")");
         mSeekBar.setMax((int) (duration / 1000));
         Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
         info.append(", bitmap: ").append(System.identityHashCode(bitmap));
