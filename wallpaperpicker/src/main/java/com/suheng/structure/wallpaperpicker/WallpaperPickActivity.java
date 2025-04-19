@@ -54,10 +54,12 @@ import java.util.concurrent.TimeUnit;
 
 public class WallpaperPickActivity extends AppCompatActivity {
 
-    private String mTag = "Wbj";
+    private String mTag = "WallpaperPickActivity";
     private static final long UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
-    private List<WallpaperInfo> mWallpaperInfoList = new ArrayList<>();
+    private final List<WallpaperInfo> mWallpaperInfoList = new ArrayList<>();
     private LivePaperAdapter mLivePaperAdapter;
+    private MediaListAdapter mMediaListAdapter;
+    private final List<MediaRoute2Info> mMediaRoute2InfoList = new ArrayList<>();
 
     private final Set<MediaController> mMediaControllerSet = new HashSet<>();
     private final Map<MediaController, MediaController.Callback> mMediaCallbackMap = new HashMap<>();
@@ -90,6 +92,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
     /*@Nullable
     private ComponentName mComponentNotification;*/
+    private @Nullable MediaRouter2 mMediaRouter2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -241,18 +244,22 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 removeProgressMsg();
                 final int progress = mSeekBar.getProgress();
                 final int max = mSeekBar.getMax();
-                long duration = Long.parseLong(mTvDuration.getText().toString());
+                Object tag = mTvDuration.getTag();
+                long duration = 0;
+                if (tag instanceof Long) {
+                    duration = (Long) tag;
+                }
+                if (duration <= 0) {
+                    Log.e(mTag, "onStopTrackingTouch, error duration");
+                    return;
+                }
                 final long position = (long) (1.0 * progress / max * duration);
                 int mediaControllerSize = mMediaControllerSet.size();
-                Log.i(mTag, "mediaControllerSize:" + mediaControllerSize);
+                Log.i(mTag, "onStopTrackingTouch, mediaControllerSize:" + mediaControllerSize);
                 for (MediaController mediaController : mMediaControllerSet) {
                     Log.i(mTag, "onStopTrackingTouch, progress:" + progress + ", max: " + max
                             + ", position: " + position + ", duration: " + duration + ", mediaController: " + mediaController);
                     mediaController.getTransportControls().seekTo(position);
-                    /*mHandler.postDelayed(() -> {
-                        StringBuilder controller = buildMediaController(mediaController);
-                        Log.i(mTag, "onStopTrackingTouch, controller: " + controller);
-                    }, 500);*/
                 }
             }
         });
@@ -287,6 +294,8 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             this.getWifiList();
+        } else {
+            Log.w(mTag, "Don't get wifi list because version is lower than R");
         }
 
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -435,6 +444,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
         info.append(", duration: ").append(duration);
         String fDuration = Utils.formatDuration(duration);
         mTvDuration.setText(fDuration + "(" + duration + ")");
+        mTvDuration.setTag(duration);
         mSeekBar.setMax((int) (duration / 1000));
         Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
         info.append(", bitmap: ").append(System.identityHashCode(bitmap));
@@ -449,16 +459,15 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
     @RequiresApi(Build.VERSION_CODES.R)
     private void getWifiList() {
-        MediaRouter2 mediaRouter2 = MediaRouter2.getInstance(this);
-
         // 定义希望发现的路由类型（例如音频路由）
+        mMediaRouter2 = MediaRouter2.getInstance(this);
         List<String> preferredFeatures = Collections.singletonList(MediaRoute2Info.FEATURE_LIVE_AUDIO);
         // 构造RouteDiscoveryPreference对象
         RouteDiscoveryPreference discoveryPreference = new RouteDiscoveryPreference.Builder(preferredFeatures, true).build();
 
-        List<MediaRoute2Info> routes = mediaRouter2.getRoutes();
-        List<MediaRouter2.RoutingController> controllers = mediaRouter2.getControllers();
-        Log.d("Wbj", "controllers.size(): " + controllers.size() + ", routes.size(): " + routes.size());
+        List<MediaRoute2Info> routes = mMediaRouter2.getRoutes();
+        List<MediaRouter2.RoutingController> controllers = mMediaRouter2.getControllers();
+        Log.d(mTag, "controllers.size(): " + controllers.size() + ", routes.size(): " + routes.size());
         for (MediaRouter2.RoutingController controller : controllers) {
             String controllerId = controller.getId();
             for (MediaRoute2Info route : controller.getSelectedRoutes()) {
@@ -468,7 +477,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     type = route.getType();
                 }
-                Log.i("Wbj", "selectedRoutes, controllerId: " + controllerId
+                Log.i(mTag, "selectedRoutes, controllerId: " + controllerId
                         + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
 
@@ -488,7 +497,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     type = route.getType();
                 }
-                Log.d("Wbj", "selectableRoutes, controllerId: " + controllerId
+                Log.d(mTag, "selectableRoutes, controllerId: " + controllerId
                         + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
 
@@ -499,7 +508,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     type = route.getType();
                 }
-                Log.d("Wbj", "deselectableRoutes, controllerId: " + controllerId
+                Log.d(mTag, "deselectableRoutes, controllerId: " + controllerId
                         + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
         }
@@ -508,29 +517,34 @@ public class WallpaperPickActivity extends AppCompatActivity {
             @Override
             public void onRoutesUpdated(@NonNull List<MediaRoute2Info> routes) {
                 super.onRoutesUpdated(routes);
-                Log.i("Wbj", "onRoutesUpdated, routes.size: " + routes.size()
-                        + ", mediaRouter2.routes.size: " + mediaRouter2.getRoutes().size());
+                Log.i(mTag, "onRoutesUpdated, routes.size: " + routes.size()
+                        + ", mediaRouter2.routes.size: " + mMediaRouter2.getRoutes().size()
+                        + ", thread: " + Thread.currentThread().getName());
+                mMediaRoute2InfoList.clear();
+                mMediaRoute2InfoList.addAll(routes);
                 for (MediaRoute2Info route : routes) {
-                    String routeId = route.getId();
-                    String name = route.getName().toString();
-                    int type = -1;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                        type = route.getType();
+                    Log.d(mTag, "onRoutesUpdated, route HashCode: " + System.identityHashCode(route)
+                            + ", id " + route.getId());
+                    /*MediaRoute2Info route2Info = null;
+                    for (MediaRoute2Info _route2Info : mMediaRoute2InfoList) {
+                        if (_route2Info.getId().equals(route.getId())) {
+                            route2Info = _route2Info;
+                            break;
+                        }
                     }
-                    Log.d("Wbj", "onRoutesUpdated, routeId: " + routeId + ", name: " + name + ", type: " + type);
-                    if (type == MediaRoute2Info.TYPE_BLUETOOTH_A2DP) {
-                        Log.i("Wbj", "onRoutesUpdated, type:TYPE_BLUETOOTH_A2DP");
-                        mediaRouter2.transferTo(route);
-                        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                            mediaRouter2.setRouteVolume(route, 10);
-                        }*/
-                    }
+                    if (route2Info == null) {
+                        mMediaRoute2InfoList.add(route);
+                    } else {
+                        route.writeToParcel(route2Info, 0);
+                    }*/
                 }
+                mMediaListAdapter.notifyItemRangeChanged(0, mMediaRoute2InfoList.size());
             }
         };
-        mediaRouter2.registerRouteCallback(getMainExecutor(), routeCallback, discoveryPreference);
+        mMediaRouter2.registerRouteCallback(getMainExecutor(), routeCallback, discoveryPreference);
+        //mMediaRouter2.unregisterRouteCallback(routeCallback);
 
-        mediaRouter2.registerTransferCallback(getMainExecutor(), new MediaRouter2.TransferCallback() {
+        mMediaRouter2.registerTransferCallback(getMainExecutor(), new MediaRouter2.TransferCallback() {
             @Override
             public void onTransfer(@NonNull MediaRouter2.RoutingController oldController
                     , @NonNull MediaRouter2.RoutingController newController) {
@@ -579,6 +593,21 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(mCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        RecyclerView rvMediaList = findViewById(R.id.recycler_media_list);
+        mMediaListAdapter = new MediaListAdapter(mMediaRoute2InfoList);
+        mMediaListAdapter.setOnItemClickListener((view, data, position) -> {
+            if (mMediaRouter2 != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    mMediaRouter2.transferTo(data);
+                }
+            }
+        });
+
+        //https://blog.csdn.net/u010687392/article/details/47950199?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
+        rvMediaList.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+        rvMediaList.setItemAnimator(new DefaultItemAnimator());
+        rvMediaList.setAdapter(mMediaListAdapter);
     }
 
     @Override
@@ -586,6 +615,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(mTag, "onDestroy()");
         mWallpaperInfoList.clear();
+        removeProgressMsg();
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (mComponentNotification != null) {
                 NotificationListenerService.requestRebind(mComponentNotification);
@@ -720,4 +750,41 @@ public class WallpaperPickActivity extends AppCompatActivity {
         }
     }
 
+    private static final class MediaListAdapter extends RecyclerAdapter<MediaRoute2Info, RecyclerView.ViewHolder> {
+
+        MediaListAdapter(List<MediaRoute2Info> dataList) {
+            super(dataList);
+        }
+
+        @Override
+        protected void bindView(RecyclerView.ViewHolder viewHolder, final int position, final MediaRoute2Info data) {
+            if (viewHolder instanceof ContentHolder) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    ((ContentHolder) viewHolder).textName.setText(data.getName());
+                    //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                        String info = "(" + data.getVolume()
+                                + ", " + data.getVolumeMax() + ")" + ", " + data.getConnectionState()
+                                + ", " + data.getVolumeHandling()/* + ", " + data.getSuitabilityStatus() + "," + data.getType()*/;
+                        ((ContentHolder) viewHolder).textInfo.setText(info);
+                    //}
+                }
+            }
+        }
+
+        @NonNull
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new ContentHolder(getItemLayout(parent.getContext(), R.layout.wallpaperpick_activity_media_adt));
+        }
+
+        static class ContentHolder extends RecyclerView.ViewHolder {
+            TextView textName, textInfo;
+
+            ContentHolder(View view) {
+                super(view);
+                textName = view.findViewById(R.id.text_media_name);
+                textInfo = view.findViewById(R.id.text_media_info);
+            }
+        }
+    }
 }
