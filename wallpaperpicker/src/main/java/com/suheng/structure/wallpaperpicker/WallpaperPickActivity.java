@@ -13,7 +13,6 @@ import android.media.MediaMetadata;
 import android.media.MediaRoute2Info;
 import android.media.MediaRouter2;
 import android.media.RouteDiscoveryPreference;
-import android.media.Session2Token;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
@@ -36,6 +35,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -90,9 +90,25 @@ public class WallpaperPickActivity extends AppCompatActivity {
         }
     };
 
+    private final MediaSessionManager.OnActiveSessionsChangedListener mSessionListener = controllers -> {
+        Log.i(mTag, "onActiveSessionsChanged, mediaControllers: " + controllers);
+        if (controllers != null) {
+            for (MediaController mediaController : controllers) {
+                StringBuilder logStr = buildMediaController(mediaController);
+                Log.i(mTag, "onActiveSessionsChanged, " + logStr);
+            }
+        }
+    };
+
+    @Nullable
+    private MediaSessionManager.OnSession2TokensChangedListener mOnTokensChangedListener;
+    @Nullable
+    private MediaSessionManager.OnMediaKeyEventSessionChangedListener mOnKeyEventChangedListener;
+
     /*@Nullable
     private ComponentName mComponentNotification;*/
     private @Nullable MediaRouter2 mMediaRouter2;
+    private MediaSessionManager mSessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -264,28 +280,21 @@ public class WallpaperPickActivity extends AppCompatActivity {
             }
         });
 
-        MediaSessionManager msManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
-        msManager.addOnActiveSessionsChangedListener(new MediaSessionManager.OnActiveSessionsChangedListener() {
-            @Override
-            public void onActiveSessionsChanged(@Nullable List<MediaController> list) {
-                Log.i(mTag, "onActiveSessionsChanged, mediaControllers: " + list);
-                if (list != null) {
-                    for (MediaController mediaController : list) {
-                        StringBuilder logStr = buildMediaController(mediaController);
-                        Log.i(mTag, "onActiveSessionsChanged, " + logStr);
-                    }
-                }
-            }
-        }, null);
+        mSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
+        mSessionManager.addOnActiveSessionsChangedListener(mSessionListener, null);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            msManager.addOnSession2TokensChangedListener(new MediaSessionManager.OnSession2TokensChangedListener() {
-                @Override
-                public void onSession2TokensChanged(@NonNull List<Session2Token> list) {
-                    Log.i(mTag, "onSession2TokensChanged, list: " + list);
-                }
-            });
+            if (mOnTokensChangedListener == null) {
+                mOnTokensChangedListener = session2Tokens -> Log.d(mTag, "onSession2TokensChanged, session2Tokens: " + session2Tokens);
+                mSessionManager.addOnSession2TokensChangedListener(mOnTokensChangedListener);
+            }
         }
-        List<MediaController> mediaControllers = msManager.getActiveSessions(null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (mOnKeyEventChangedListener == null) {
+                mOnKeyEventChangedListener = (pkg, sessionToken) -> Log.d(mTag, "onMediaKeyEventSessionChanged, pkg: " + pkg + ", sessionToken: " + sessionToken);
+                mSessionManager.addOnMediaKeyEventSessionChangedListener(ContextCompat.getMainExecutor(this), mOnKeyEventChangedListener);
+            }
+        }
+        List<MediaController> mediaControllers = mSessionManager.getActiveSessions(null);
         Log.d(mTag, "getActiveSessions, mediaControllers: " + mediaControllers.size());
         for (MediaController mediaController : mediaControllers) {
             StringBuilder logStr = buildMediaController(mediaController);
@@ -616,6 +625,17 @@ public class WallpaperPickActivity extends AppCompatActivity {
         Log.d(mTag, "onDestroy()");
         mWallpaperInfoList.clear();
         removeProgressMsg();
+        mSessionManager.removeOnActiveSessionsChangedListener(mSessionListener);
+        if (mOnTokensChangedListener != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                mSessionManager.removeOnSession2TokensChangedListener(mOnTokensChangedListener);
+            }
+        }
+        if (mOnKeyEventChangedListener != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                mSessionManager.removeOnMediaKeyEventSessionChangedListener(mOnKeyEventChangedListener);
+            }
+        }
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (mComponentNotification != null) {
                 NotificationListenerService.requestRebind(mComponentNotification);
