@@ -4,6 +4,7 @@ import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
@@ -91,8 +92,10 @@ public class WallpaperPickActivity extends AppCompatActivity {
     };
 
     private final MediaSessionManager.OnActiveSessionsChangedListener mSessionListener = controllers -> {
-        Log.i(mTag, "onActiveSessionsChanged, mediaControllers: " + controllers);
-        if (controllers != null) {
+        if (controllers == null) {
+            Log.w(mTag, "onActiveSessionsChanged, controllers object is null");
+        } else {
+            Log.i(mTag, "onActiveSessionsChanged, controllers size is " + controllers.size());
             for (MediaController mediaController : controllers) {
                 StringBuilder logStr = buildMediaController(mediaController);
                 Log.i(mTag, "onActiveSessionsChanged, " + logStr);
@@ -284,13 +287,13 @@ public class WallpaperPickActivity extends AppCompatActivity {
         mSessionManager.addOnActiveSessionsChangedListener(mSessionListener, null);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (mOnTokensChangedListener == null) {
-                mOnTokensChangedListener = session2Tokens -> Log.d(mTag, "onSession2TokensChanged, session2Tokens: " + session2Tokens);
+                mOnTokensChangedListener = session2Tokens -> Log.i(mTag, "onSession2TokensChanged, session2Tokens: " + session2Tokens);
                 mSessionManager.addOnSession2TokensChangedListener(mOnTokensChangedListener);
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (mOnKeyEventChangedListener == null) {
-                mOnKeyEventChangedListener = (pkg, sessionToken) -> Log.d(mTag, "onMediaKeyEventSessionChanged, pkg: " + pkg + ", sessionToken: " + sessionToken);
+                mOnKeyEventChangedListener = (pkg, sessionToken) -> Log.i(mTag, "onMediaKeyEventSessionChanged, pkg: " + pkg + ", sessionToken: " + sessionToken);
                 mSessionManager.addOnMediaKeyEventSessionChangedListener(ContextCompat.getMainExecutor(this), mOnKeyEventChangedListener);
             }
         }
@@ -319,18 +322,32 @@ public class WallpaperPickActivity extends AppCompatActivity {
         mMediaControllerSet.add(mediaController);
 
         String pkg = mediaController.getPackageName();
-        StringBuilder logStr = new StringBuilder("pkg: " + pkg);
+        StringBuilder logStr = new StringBuilder("AppInfo->pkg: " + pkg);
+
+        ApplicationInfo applicationInfo = null;
+        PackageManager packageManager = getPackageManager();
+        try {
+            applicationInfo = packageManager.getApplicationInfo(pkg, 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(mTag, "getApplicationInfo error", e);
+        }
+        if (applicationInfo != null) {
+            Drawable icon = applicationInfo.loadIcon(packageManager);
+            logStr.append(", icon: ").append(System.identityHashCode(icon));
+            CharSequence label = applicationInfo.loadLabel(packageManager);
+            logStr.append(", label: ").append(label);
+        }
 
         final MediaMetadata metadata = mediaController.getMetadata();
         if (metadata != null) {
             String mediaMetadata = parseMediaMetadata(metadata);
-            logStr.append(", ").append(mediaMetadata);
+            logStr.append(", Metadata->").append(mediaMetadata);
         }
 
         final PlaybackState playbackState = mediaController.getPlaybackState();
         if (playbackState != null) {
             String pState = parsePlaybackState(playbackState);
-            logStr.append(", ").append(pState);
+            logStr.append(", PlaybackState->").append(pState);
         }
 
         final MediaController.Callback callback = new MediaUpdateListener() {
