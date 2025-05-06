@@ -46,11 +46,7 @@ import com.suheng.structure.wallpaperpicker.adapter.RecyclerAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class WallpaperPickActivity extends AppCompatActivity {
@@ -59,20 +55,15 @@ public class WallpaperPickActivity extends AppCompatActivity {
     private static final long UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
     private final List<WallpaperInfo> mWallpaperInfoList = new ArrayList<>();
     private LivePaperAdapter mLivePaperAdapter;
-    private RouteListAdapter mRouteListAdapter;
+    private MediaRouteAdapter mMediaRouteAdapter;
+    private MediaControllerAdapter mMediaControllerAdapter;
     private final List<MediaRoute2Info> mMediaRoute2InfoList = new ArrayList<>();
 
-    private final Set<MediaController> mMediaControllerSet = new HashSet<>();
-    private final Map<MediaController, MediaController.Callback> mMediaCallbackMap = new HashMap<>();
-    private Button mBtnState;
-    private TextView mTvPst;
-    private TextView mTvDuration;
-    private TextView mTvTitle;
-    private TextView mTvArtist;
-    private ImageView mIvAlbumArt;
-    private SeekBar mSeekBar;
+    private final List<MediaController> mMediaControllerList = new ArrayList<>();
+    //private final Map<MediaController, MediaController.Callback> mMediaCallbackMap = new HashMap<>();
+
     private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private final Runnable mRunnable = new Runnable() {
+    /*private final Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
             for (Map.Entry<MediaController, MediaController.Callback> mediaControllerCallbackEntry : mMediaCallbackMap.entrySet()) {
@@ -89,17 +80,20 @@ public class WallpaperPickActivity extends AppCompatActivity {
             long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
             mHandler.postDelayed(mRunnable, delayMillis);
         }
-    };
+    };*/
 
     private final MediaSessionManager.OnActiveSessionsChangedListener mSessionListener = controllers -> {
         if (controllers == null) {
             Log.w(mTag, "onActiveSessionsChanged, controllers object is null");
         } else {
             Log.i(mTag, "onActiveSessionsChanged, controllers size is " + controllers.size());
-            for (MediaController mediaController : controllers) {
+            mMediaControllerList.clear();
+            mMediaControllerList.addAll(controllers);
+            mMediaControllerAdapter.notifyItemRangeChanged(0, mMediaControllerList.size());
+            /*for (MediaController mediaController : controllers) {
                 StringBuilder logStr = buildMediaController(mediaController);
                 Log.i(mTag, "onActiveSessionsChanged, " + logStr);
-            }
+            }*/
         }
     };
 
@@ -210,12 +204,12 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 finish();
             }
 
-            if (v.getId() == R.id.btn_previous) {
-                for (MediaController mediaController : mMediaControllerSet) {
+            /*if (v.getId() == R.id.btn_previous) {
+                for (MediaController mediaController : mMediaControllerList) {
                     mediaController.getTransportControls().skipToPrevious();
                 }
             } else if (v.getId() == R.id.btn_state) {
-                for (MediaController mediaController : mMediaControllerSet) {
+                for (MediaController mediaController : mMediaControllerList) {
                     PlaybackState playbackState = mediaController.getPlaybackState();
                     if (playbackState != null) {
                         MediaController.TransportControls transportControls = mediaController.getTransportControls();
@@ -230,24 +224,14 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     }
                 }
             } else if (v.getId() == R.id.btn_next) {
-                for (MediaController mediaController : mMediaControllerSet) {
+                for (MediaController mediaController : mMediaControllerList) {
                     mediaController.getTransportControls().skipToNext();
                 }
-            }
+            }*/
         };
         findViewById(R.id.btn_set_one).setOnClickListener(onClickListener);
         findViewById(R.id.btn_set_two).setOnClickListener(onClickListener);
-        mBtnState = findViewById(R.id.btn_state);
-        mBtnState.setOnClickListener(onClickListener);
-        findViewById(R.id.btn_previous).setOnClickListener(onClickListener);
-        findViewById(R.id.btn_next).setOnClickListener(onClickListener);
-        mTvPst = findViewById(R.id.tv_pst);
-        mTvDuration = findViewById(R.id.tv_duration);
-        mTvTitle = findViewById(R.id.tv_title);
-        mTvArtist = findViewById(R.id.tv_artist);
-        mIvAlbumArt = findViewById(R.id.tv_album_art);
-        mSeekBar = findViewById(R.id.seekBar);
-        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        /*mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 //Log.d(mTag, "onProgressChanged, progress: " + progress + ", fromUser: " + fromUser);
@@ -283,7 +267,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     mediaController.getTransportControls().seekTo(position);
                 }
             }
-        });
+        });*/
 
         mSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
         mSessionManager.addOnActiveSessionsChangedListener(mSessionListener, null);
@@ -301,10 +285,12 @@ public class WallpaperPickActivity extends AppCompatActivity {
         }
         List<MediaController> mediaControllers = mSessionManager.getActiveSessions(null);
         Log.d(mTag, "getActiveSessions, mediaControllers: " + mediaControllers.size());
-        for (MediaController mediaController : mediaControllers) {
+        mMediaControllerList.addAll(mediaControllers);
+        mMediaControllerAdapter.notifyItemRangeChanged(0, mMediaControllerList.size());
+        /*for (MediaController mediaController : mediaControllers) {
             StringBuilder logStr = buildMediaController(mediaController);
             Log.d(mTag, "getActiveSessions, " + logStr);
-        }
+        }*/
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             this.getWifiList();
@@ -321,8 +307,6 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
     @NonNull
     private StringBuilder buildMediaController(@NonNull MediaController mediaController) {
-        mMediaControllerSet.add(mediaController);
-
         String pkg = mediaController.getPackageName();
         StringBuilder logStr = new StringBuilder("AppInfo->pkg: " + pkg);
 
@@ -415,12 +399,12 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 String fDuration = Utils.formatDuration(newPst);
                 String text = fDuration + "(" + newPst + ")";
                 Log.d(mTag, "newPst: " + text + ", thread: " + Thread.currentThread().getName());
-                mTvPst.setText(text);
-                mSeekBar.setProgress((int) (newPst / 1000));
+                //mTvPst.setText(text);
+                //mSeekBar.setProgress((int) (newPst / 1000));
             }
         };
         mediaController.registerCallback(callback, mHandler);
-        mMediaCallbackMap.put(mediaController, callback);
+        //mMediaCallbackMap.put(mediaController, callback);
 
         return logStr;
     }
@@ -433,16 +417,16 @@ public class WallpaperPickActivity extends AppCompatActivity {
         final int startIndex = playbackStateStr.indexOf(stateFlag);
         final int endIndex = playbackStateStr.indexOf(")");
         final String state = playbackStateStr.substring(startIndex + stateFlag.length(), endIndex + 1);
-        mBtnState.setText(state);
+        //mBtnState.setText(state);
         long position = playbackState.getPosition();
         String fDuration = Utils.formatDuration(position);
-        mTvPst.setText(fDuration + "(" + position + ")");
-        mSeekBar.setProgress((int) (position / 1000));
+        //mTvPst.setText(fDuration + "(" + position + ")");
+        //mSeekBar.setProgress((int) (position / 1000));
 
         if (playbackState.getState() == PlaybackState.STATE_PLAYING) {
             removeProgressMsg();
             long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
-            mHandler.postDelayed(mRunnable, delayMillis);
+            //mHandler.postDelayed(mRunnable, delayMillis);
         } else {
             removeProgressMsg();
         }
@@ -450,13 +434,13 @@ public class WallpaperPickActivity extends AppCompatActivity {
     }
 
     private void removeProgressMsg() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (mHandler.hasCallbacks(mRunnable)) {
                 mHandler.removeCallbacks(mRunnable);
             }
         } else {
             mHandler.removeCallbacks(mRunnable);
-        }
+        }*/
     }
 
     @NonNull
@@ -464,19 +448,19 @@ public class WallpaperPickActivity extends AppCompatActivity {
         StringBuilder info = new StringBuilder();
         CharSequence text = metadata.getText(MediaMetadata.METADATA_KEY_TITLE);
         info.append("title: ").append(text);
-        mTvTitle.setText(text);
+        //mTvTitle.setText(text);
         CharSequence artist = metadata.getText(MediaMetadata.METADATA_KEY_ARTIST);
         info.append(", artist: ").append(artist);
-        mTvArtist.setText(artist);
+        //mTvArtist.setText(artist);
         long duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
         info.append(", duration: ").append(duration);
         String fDuration = Utils.formatDuration(duration);
-        mTvDuration.setText(fDuration + "(" + duration + ")");
-        mTvDuration.setTag(duration);
-        mSeekBar.setMax((int) (duration / 1000));
+        //mTvDuration.setText(fDuration + "(" + duration + ")");
+        //mTvDuration.setTag(duration);
+        //mSeekBar.setMax((int) (duration / 1000));
         Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
         info.append(", bitmap: ").append(System.identityHashCode(bitmap));
-        mIvAlbumArt.setImageBitmap(bitmap);
+        //mIvAlbumArt.setImageBitmap(bitmap);
         return info.toString();
     }
 
@@ -554,7 +538,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     Log.d(mTag, "onRoutesUpdated, route HashCode: " + System.identityHashCode(route)
                             + ", id " + route.getId());
                 }
-                mRouteListAdapter.notifyItemRangeChanged(0, mMediaRoute2InfoList.size());
+                mMediaRouteAdapter.notifyItemRangeChanged(0, mMediaRoute2InfoList.size());
             }
         };
         mMediaRouter2.registerRouteCallback(getMainExecutor(), routeCallback, discoveryPreference);
@@ -611,8 +595,8 @@ public class WallpaperPickActivity extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
         RecyclerView rvRouteList = findViewById(R.id.recycler_route_list);
-        mRouteListAdapter = new RouteListAdapter(mMediaRoute2InfoList);
-        mRouteListAdapter.setOnItemClickListener((view, data, position) -> {
+        mMediaRouteAdapter = new MediaRouteAdapter(mMediaRoute2InfoList);
+        mMediaRouteAdapter.setOnItemClickListener((view, data, position) -> {
             if (mMediaRouter2 != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     if (data.getVolumeHandling() == MediaRoute2Info.PLAYBACK_VOLUME_VARIABLE) {
@@ -627,7 +611,14 @@ public class WallpaperPickActivity extends AppCompatActivity {
         //https://blog.csdn.net/u010687392/article/details/47950199?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
         rvRouteList.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         rvRouteList.setItemAnimator(new DefaultItemAnimator());
-        rvRouteList.setAdapter(mRouteListAdapter);
+        rvRouteList.setAdapter(mMediaRouteAdapter);
+
+        RecyclerView rvMediaList = findViewById(R.id.recycler_media_list);
+        mMediaControllerAdapter = new MediaControllerAdapter(mMediaControllerList);
+        //https://blog.csdn.net/u010687392/article/details/47950199?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
+        rvMediaList.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+        rvMediaList.setItemAnimator(new DefaultItemAnimator());
+        rvMediaList.setAdapter(mMediaControllerAdapter);
     }
 
     @Override
@@ -781,9 +772,9 @@ public class WallpaperPickActivity extends AppCompatActivity {
         }
     }
 
-    private static final class RouteListAdapter extends RecyclerAdapter<MediaRoute2Info, RecyclerView.ViewHolder> {
+    private static final class MediaRouteAdapter extends RecyclerAdapter<MediaRoute2Info, RecyclerView.ViewHolder> {
 
-        RouteListAdapter(List<MediaRoute2Info> dataList) {
+        MediaRouteAdapter(List<MediaRoute2Info> dataList) {
             super(dataList);
         }
 
@@ -822,4 +813,150 @@ public class WallpaperPickActivity extends AppCompatActivity {
             }
         }
     }
+
+    final class MediaControllerAdapter extends RecyclerAdapter<MediaController, RecyclerView.ViewHolder> {
+
+        MediaControllerAdapter(List<MediaController> dataList) {
+            super(dataList);
+        }
+
+        @Override
+        protected void bindView(RecyclerView.ViewHolder viewHolder, final int position, final MediaController data) {
+            if (viewHolder instanceof ContentHolder) {
+                ContentHolder holder = (ContentHolder) viewHolder;
+                PlaybackState playbackState = data.getPlaybackState();
+                if (playbackState == null) {
+                    return;
+                }
+                final String playbackStateStr = playbackState.toString();
+                final String stateFlag = "state=";
+                final int startIndex = playbackStateStr.indexOf(stateFlag);
+                final int endIndex = playbackStateStr.indexOf(")");
+                final String state = playbackStateStr.substring(startIndex + stateFlag.length(), endIndex + 1);
+                holder.mBtnState.setText(state);
+                long pst = playbackState.getPosition();
+                String fPst = Utils.formatDuration(pst);
+                holder.mTvPst.setText(fPst + "(" + pst + ")");
+                holder.mSeekBar.setProgress((int) (pst / 1000));
+
+                MediaMetadata metadata = data.getMetadata();
+                if (metadata == null) {
+                    return;
+                }
+                CharSequence text = metadata.getText(MediaMetadata.METADATA_KEY_TITLE);
+                holder.mTvTitle.setText(text);
+                CharSequence artist = metadata.getText(MediaMetadata.METADATA_KEY_ARTIST);
+                holder.mTvArtist.setText(artist);
+                long duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
+                String fDuration = Utils.formatDuration(duration);
+                holder.mTvDuration.setText(fDuration + "(" + duration + ")");
+                holder.mTvDuration.setTag(duration);
+                holder.mSeekBar.setMax((int) (duration / 1000));
+                Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
+                holder.mIvAlbumArt.setImageBitmap(bitmap);
+
+                final MediaController.Callback callback = new MediaUpdateListener() {
+                    @Override
+                    public void onSessionDestroyed() {
+                        super.onSessionDestroyed();
+                        Log.i(mTag, "onSessionDestroyed");
+                    }
+
+                    @Override
+                    public void onSessionEvent(@NonNull String event, @Nullable Bundle extras) {
+                        super.onSessionEvent(event, extras);
+                        Log.d(mTag, "onSessionEvent, event: " + event);
+                    }
+
+                    @Override
+                    public void onPlaybackStateChanged(@Nullable PlaybackState state) {
+                        super.onPlaybackStateChanged(state);
+                        Log.i(mTag, "onPlaybackStateChanged, state: " + state);
+                        if (state != null) {
+                            notifyItemRangeChanged(0, mMediaControllerList.size());
+                            //String playbackState = parsePlaybackState(state);
+                            //Log.i(mTag, "onPlaybackStateChanged, playbackState: " + playbackState);
+                        }
+                    }
+
+                    @Override
+                    public void onMetadataChanged(@Nullable MediaMetadata metadata) {
+                        super.onMetadataChanged(metadata);
+                        /*String mediaMetadata = null;
+                        if (metadata != null) {
+                            mediaMetadata = parseMediaMetadata(metadata);
+                        }
+                        Log.i(mTag, "onMetadataChanged, metadata: " + System.identityHashCode(metadata)
+                                + " {" + mediaMetadata + "}");*/
+                        notifyItemRangeChanged(0, mMediaControllerList.size());
+                    }
+
+                    @Override
+                    public void onQueueChanged(@Nullable List<MediaSession.QueueItem> queue) {
+                        super.onQueueChanged(queue);
+                        Log.d(mTag, "onQueueChanged, queue: " + queue);
+                    }
+
+                    @Override
+                    public void onQueueTitleChanged(@Nullable CharSequence title) {
+                        super.onQueueTitleChanged(title);
+                        Log.d(mTag, "onQueueTitleChanged, title: " + title);
+                    }
+
+                    @Override
+                    public void onExtrasChanged(@Nullable Bundle extras) {
+                        super.onExtrasChanged(extras);
+                        Log.d(mTag, "onExtrasChanged, extras: " + extras);
+                    }
+
+                    @Override
+                    public void onAudioInfoChanged(MediaController.PlaybackInfo info) {
+                        super.onAudioInfoChanged(info);
+                        Log.d(mTag, "onAudioInfoChanged, info: " + info);
+                    }
+
+                    @Override
+                    public void onProgressUpdate(long newPst, String oldPst, String duration) {
+                        String fDuration = Utils.formatDuration(newPst);
+                        String text = fDuration + "(" + newPst + ")";
+                        Log.d(mTag, "newPst: " + text + ", thread: " + Thread.currentThread().getName());
+                        //mTvPst.setText(text);
+                        //mSeekBar.setProgress((int) (newPst / 1000));
+                    }
+                };
+                data.registerCallback(callback, mHandler);
+            }
+        }
+
+        @NonNull
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new ContentHolder(getItemLayout(parent.getContext(), R.layout.wallpaperpick_activity_media_controller_adt));
+        }
+
+        class ContentHolder extends RecyclerView.ViewHolder {
+            Button mBtnState;
+            TextView mTvPst;
+            TextView mTvDuration;
+            TextView mTvTitle;
+            TextView mTvArtist;
+            ImageView mIvAlbumArt;
+            SeekBar mSeekBar;
+
+            ContentHolder(View view) {
+                super(view);
+                mBtnState = view.findViewById(R.id.btn_state);
+                //mBtnState.setOnClickListener(onClickListener);
+                //findViewById(R.id.btn_previous).setOnClickListener(onClickListener);
+                //findViewById(R.id.btn_next).setOnClickListener(onClickListener);
+                mTvPst = view.findViewById(R.id.tv_pst);
+                mTvDuration = view.findViewById(R.id.tv_duration);
+                mTvTitle = view.findViewById(R.id.tv_title);
+                mTvArtist = view.findViewById(R.id.tv_artist);
+                mIvAlbumArt = view.findViewById(R.id.tv_album_art);
+                mSeekBar = view.findViewById(R.id.seekBar);
+            }
+        }
+    }
+
 }
