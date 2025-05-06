@@ -6,14 +6,14 @@
     android:padding="4dp">
 
     <TextView
-        android:id="@+id/text_media_name"
+        android:id="@+id/text_route_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#8DCC3E"
         android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/text_media_info"
+        android:id="@+id/text_route_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"

@@ -59,7 +59,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
     private static final long UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
     private final List<WallpaperInfo> mWallpaperInfoList = new ArrayList<>();
     private LivePaperAdapter mLivePaperAdapter;
-    private MediaListAdapter mMediaListAdapter;
+    private RouteListAdapter mRouteListAdapter;
     private final List<MediaRoute2Info> mMediaRoute2InfoList = new ArrayList<>();
 
     private final Set<MediaController> mMediaControllerSet = new HashSet<>();
@@ -273,11 +273,13 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     return;
                 }
                 final long position = (long) (1.0 * progress / max * duration);
+                String positionFormat = Utils.formatDuration(position);
                 int mediaControllerSize = mMediaControllerSet.size();
                 Log.i(mTag, "onStopTrackingTouch, mediaControllerSize:" + mediaControllerSize);
                 for (MediaController mediaController : mMediaControllerSet) {
                     Log.i(mTag, "onStopTrackingTouch, progress:" + progress + ", max: " + max
-                            + ", position: " + position + ", duration: " + duration + ", mediaController: " + mediaController);
+                            + ", position: " + position+ "(" + positionFormat + ")" + ", duration: " + duration
+                            + ", mediaController: " + mediaController);
                     mediaController.getTransportControls().seekTo(position);
                 }
             }
@@ -551,20 +553,8 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 for (MediaRoute2Info route : routes) {
                     Log.d(mTag, "onRoutesUpdated, route HashCode: " + System.identityHashCode(route)
                             + ", id " + route.getId());
-                    /*MediaRoute2Info route2Info = null;
-                    for (MediaRoute2Info _route2Info : mMediaRoute2InfoList) {
-                        if (_route2Info.getId().equals(route.getId())) {
-                            route2Info = _route2Info;
-                            break;
-                        }
-                    }
-                    if (route2Info == null) {
-                        mMediaRoute2InfoList.add(route);
-                    } else {
-                        route.writeToParcel(route2Info, 0);
-                    }*/
                 }
-                mMediaListAdapter.notifyItemRangeChanged(0, mMediaRoute2InfoList.size());
+                mRouteListAdapter.notifyItemRangeChanged(0, mMediaRoute2InfoList.size());
             }
         };
         mMediaRouter2.registerRouteCallback(getMainExecutor(), routeCallback, discoveryPreference);
@@ -620,20 +610,24 @@ public class WallpaperPickActivity extends AppCompatActivity {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(mCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        RecyclerView rvMediaList = findViewById(R.id.recycler_media_list);
-        mMediaListAdapter = new MediaListAdapter(mMediaRoute2InfoList);
-        mMediaListAdapter.setOnItemClickListener((view, data, position) -> {
+        RecyclerView rvRouteList = findViewById(R.id.recycler_route_list);
+        mRouteListAdapter = new RouteListAdapter(mMediaRoute2InfoList);
+        mRouteListAdapter.setOnItemClickListener((view, data, position) -> {
             if (mMediaRouter2 != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    if (data.getVolumeHandling() == MediaRoute2Info.PLAYBACK_VOLUME_VARIABLE) {
+                        return;
+                    }
+                    Log.d(mTag, "transferTo, route: " + data);
                     mMediaRouter2.transferTo(data);
                 }
             }
         });
 
         //https://blog.csdn.net/u010687392/article/details/47950199?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
-        rvMediaList.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        rvMediaList.setItemAnimator(new DefaultItemAnimator());
-        rvMediaList.setAdapter(mMediaListAdapter);
+        rvRouteList.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+        rvRouteList.setItemAnimator(new DefaultItemAnimator());
+        rvRouteList.setAdapter(mRouteListAdapter);
     }
 
     @Override
@@ -787,9 +781,9 @@ public class WallpaperPickActivity extends AppCompatActivity {
         }
     }
 
-    private static final class MediaListAdapter extends RecyclerAdapter<MediaRoute2Info, RecyclerView.ViewHolder> {
+    private static final class RouteListAdapter extends RecyclerAdapter<MediaRoute2Info, RecyclerView.ViewHolder> {
 
-        MediaListAdapter(List<MediaRoute2Info> dataList) {
+        RouteListAdapter(List<MediaRoute2Info> dataList) {
             super(dataList);
         }
 
@@ -799,9 +793,13 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     ((ContentHolder) viewHolder).textName.setText(data.getName());
                     //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                        String info = "(" + data.getVolume()
+                    String status = "Idle"; //
+                    if (data.getVolumeHandling() == MediaRoute2Info.PLAYBACK_VOLUME_VARIABLE) {
+                        status = "Using";
+                    }
+                    String info = "(" + data.getVolume()
                                 + ", " + data.getVolumeMax() + ")" + ", " + data.getConnectionState()
-                                + ", " + data.getVolumeHandling()/* + ", " + data.getSuitabilityStatus() + "," + data.getType()*/;
+                                + ", " + status/* + ", " + data.getSuitabilityStatus() + "," + data.getType()*/;
                         ((ContentHolder) viewHolder).textInfo.setText(info);
                     //}
                 }
@@ -811,7 +809,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
         @NonNull
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ContentHolder(getItemLayout(parent.getContext(), R.layout.wallpaperpick_activity_media_adt));
+            return new ContentHolder(getItemLayout(parent.getContext(), R.layout.wallpaperpick_activity_route_adt));
         }
 
         static class ContentHolder extends RecyclerView.ViewHolder {
@@ -819,8 +817,8 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
             ContentHolder(View view) {
                 super(view);
-                textName = view.findViewById(R.id.text_media_name);
-                textInfo = view.findViewById(R.id.text_media_info);
+                textName = view.findViewById(R.id.text_route_name);
+                textInfo = view.findViewById(R.id.text_route_info);
             }
         }
     }
