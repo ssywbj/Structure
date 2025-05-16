@@ -8,6 +8,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadata;
@@ -838,6 +839,15 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 String fPst = Utils.formatDuration(pst);
                 holder.mTvPst.setText(fPst + "(" + pst + ")");
                 holder.mSeekBar.setProgress((int) (pst / 1000));
+                long actions = playbackState.getActions();
+                List<PlaybackState.CustomAction> customActions = playbackState.getCustomActions();
+                for (PlaybackState.CustomAction customAction : customActions) {
+                    CharSequence name = customAction.getName();
+                    int icon = customAction.getIcon();
+                    String action = customAction.getAction();
+                    Log.d(mTag, "customAction, name: " + name + ", icon: " + icon
+                            + ", action: " + action+ ", actions: " + actions);
+                }
 
                 MediaMetadata metadata = data.getMetadata();
                 if (metadata == null) {
@@ -926,6 +936,22 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 };
                 data.registerCallback(callback, mHandler);
             }
+        }
+
+        public Drawable getIconFromPackage(Context context, String packageName, int resId) {
+            try {
+                PackageManager packageManager = context.getPackageManager();
+                ApplicationInfo appInfo = packageManager.getApplicationInfo(packageName, 0);
+                Resources resources = packageManager.getResourcesForApplication(appInfo);
+                return resources.getDrawable(resId, context.getTheme());
+            } catch (PackageManager.NameNotFoundException e) {
+                Log.e(mTag, "Package not found: " + packageName, e);
+            } catch (Resources.NotFoundException e) {
+                Log.e(mTag, "Resource ID not found: " + resId, e);
+            } catch (Exception e) {
+                Log.e(mTag, "Unexpected error occurred", e);
+            }
+            return null;
         }
 
         @NonNull
