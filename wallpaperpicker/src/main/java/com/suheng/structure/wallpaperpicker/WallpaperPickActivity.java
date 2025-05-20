@@ -16,13 +16,9 @@ import android.media.MediaRoute2Info;
 import android.media.MediaRouter2;
 import android.media.RouteDiscoveryPreference;
 import android.media.session.MediaController;
-import android.media.session.MediaSession;
-import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.View;
@@ -48,12 +44,10 @@ import com.suheng.structure.wallpaperpicker.adapter.RecyclerAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class WallpaperPickActivity extends AppCompatActivity {
 
     private String mTag = "WallpaperPickActivity";
-    private static final long UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
     private final List<WallpaperInfo> mWallpaperInfoList = new ArrayList<>();
     private LivePaperAdapter mLivePaperAdapter;
     private MediaRouteAdapter mMediaRouteAdapter;
@@ -61,52 +55,11 @@ public class WallpaperPickActivity extends AppCompatActivity {
     private final List<MediaRoute2Info> mMediaRoute2InfoList = new ArrayList<>();
 
     private final List<MediaController> mMediaControllerList = new ArrayList<>();
-    //private final Map<MediaController, MediaController.Callback> mMediaCallbackMap = new HashMap<>();
-
-    private final Handler mHandler = new Handler(Looper.getMainLooper());
-    /*private final Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            for (Map.Entry<MediaController, MediaController.Callback> mediaControllerCallbackEntry : mMediaCallbackMap.entrySet()) {
-                MediaController.Callback callback = mediaControllerCallbackEntry.getValue();
-                if (callback instanceof MediaUpdateListener) {
-                    MediaController mediaController = mediaControllerCallbackEntry.getKey();
-                    PlaybackState playbackState = mediaController.getPlaybackState();
-                    if (playbackState != null) {
-                        long position = playbackState.getPosition();
-                        ((MediaUpdateListener) callback).onProgressUpdate(position, "", "");
-                    }
-                }
-            }
-            long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
-            mHandler.postDelayed(mRunnable, delayMillis);
-        }
-    };*/
-
-    private final MediaSessionManager.OnActiveSessionsChangedListener mSessionListener = controllers -> {
-        if (controllers == null) {
-            Log.w(mTag, "onActiveSessionsChanged, controllers object is null");
-        } else {
-            Log.i(mTag, "onActiveSessionsChanged, controllers size is " + controllers.size());
-            mMediaControllerList.clear();
-            mMediaControllerList.addAll(controllers);
-            mMediaControllerAdapter.notifyItemRangeChanged(0, mMediaControllerList.size());
-            /*for (MediaController mediaController : controllers) {
-                StringBuilder logStr = buildMediaController(mediaController);
-                Log.i(mTag, "onActiveSessionsChanged, " + logStr);
-            }*/
-        }
-    };
-
-    @Nullable
-    private MediaSessionManager.OnSession2TokensChangedListener mOnTokensChangedListener;
-    @Nullable
-    private MediaSessionManager.OnMediaKeyEventSessionChangedListener mOnKeyEventChangedListener;
 
     /*@Nullable
     private ComponentName mComponentNotification;*/
     private @Nullable MediaRouter2 mMediaRouter2;
-    private MediaSessionManager mSessionManager;
+    private MediaSessionsLoader mMediaSessionsLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -270,28 +223,17 @@ public class WallpaperPickActivity extends AppCompatActivity {
             }
         });*/
 
-        mSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
-        mSessionManager.addOnActiveSessionsChangedListener(mSessionListener, null);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            if (mOnTokensChangedListener == null) {
-                mOnTokensChangedListener = session2Tokens -> Log.i(mTag, "onSession2TokensChanged, session2Tokens: " + session2Tokens);
-                mSessionManager.addOnSession2TokensChangedListener(mOnTokensChangedListener);
-            }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (mOnKeyEventChangedListener == null) {
-                mOnKeyEventChangedListener = (pkg, sessionToken) -> Log.i(mTag, "onMediaKeyEventSessionChanged, pkg: " + pkg + ", sessionToken: " + sessionToken);
-                mSessionManager.addOnMediaKeyEventSessionChangedListener(ContextCompat.getMainExecutor(this), mOnKeyEventChangedListener);
-            }
-        }
-        List<MediaController> mediaControllers = mSessionManager.getActiveSessions(null);
+        mMediaSessionsLoader = MediaSessionsLoader.getInstance(this);
+        List<MediaController> mediaControllers = mMediaSessionsLoader.getActiveSessions(null);
         Log.d(mTag, "getActiveSessions, mediaControllers: " + mediaControllers.size());
+        for (MediaController mediaController : mediaControllers) {
+            mMediaSessionsLoader.resolveMediaController(mediaController);
+        }
         mMediaControllerList.addAll(mediaControllers);
         mMediaControllerAdapter.notifyItemRangeChanged(0, mMediaControllerList.size());
-        /*for (MediaController mediaController : mediaControllers) {
-            StringBuilder logStr = buildMediaController(mediaController);
-            Log.d(mTag, "getActiveSessions, " + logStr);
-        }*/
+        mMediaSessionsLoader.addOnActiveSessionsChangedListener(null);
+        mMediaSessionsLoader.addOnSession2TokensChangedListener();
+        mMediaSessionsLoader.addOnMediaKeyEventSessionChangedListener(ContextCompat.getMainExecutor(this));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             this.getWifiList();
@@ -304,170 +246,6 @@ public class WallpaperPickActivity extends AppCompatActivity {
             mComponentNotification = new ComponentName(this, NotificationListenerServiceImpl.class);
             NotificationListenerService.requestRebind(mComponentNotification);
         }*/
-    }
-
-    @NonNull
-    private StringBuilder buildMediaController(@NonNull MediaController mediaController) {
-        String pkg = mediaController.getPackageName();
-        StringBuilder logStr = new StringBuilder("AppInfo->pkg: " + pkg);
-
-        ApplicationInfo applicationInfo = null;
-        PackageManager packageManager = getPackageManager();
-        try {
-            applicationInfo = packageManager.getApplicationInfo(pkg, 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(mTag, "getApplicationInfo error", e);
-        }
-        if (applicationInfo != null) {
-            Drawable icon = applicationInfo.loadIcon(packageManager);
-            logStr.append(", icon: ").append(System.identityHashCode(icon));
-            CharSequence label = applicationInfo.loadLabel(packageManager);
-            logStr.append(", label: ").append(label);
-        }
-
-        final MediaMetadata metadata = mediaController.getMetadata();
-        if (metadata != null) {
-            String mediaMetadata = parseMediaMetadata(metadata);
-            logStr.append(", Metadata->").append(mediaMetadata);
-        }
-
-        final PlaybackState playbackState = mediaController.getPlaybackState();
-        if (playbackState != null) {
-            String pState = parsePlaybackState(playbackState);
-            logStr.append(", PlaybackState->").append(pState);
-        }
-
-        final MediaController.Callback callback = new MediaUpdateListener() {
-            @Override
-            public void onSessionDestroyed() {
-                super.onSessionDestroyed();
-                Log.i(mTag, "onSessionDestroyed");
-            }
-
-            @Override
-            public void onSessionEvent(@NonNull String event, @Nullable Bundle extras) {
-                super.onSessionEvent(event, extras);
-                Log.d(mTag, "onSessionEvent, event: " + event);
-            }
-
-            @Override
-            public void onPlaybackStateChanged(@Nullable PlaybackState state) {
-                super.onPlaybackStateChanged(state);
-                Log.i(mTag, "onPlaybackStateChanged, state: " + state);
-                if (state != null) {
-                    String playbackState = parsePlaybackState(state);
-                    //Log.i(mTag, "onPlaybackStateChanged, playbackState: " + playbackState);
-                }
-            }
-
-            @Override
-            public void onMetadataChanged(@Nullable MediaMetadata metadata) {
-                super.onMetadataChanged(metadata);
-                String mediaMetadata = null;
-                if (metadata != null) {
-                    mediaMetadata = parseMediaMetadata(metadata);
-                }
-                Log.i(mTag, "onMetadataChanged, metadata: " + System.identityHashCode(metadata)
-                        + " {" + mediaMetadata + "}");
-            }
-
-            @Override
-            public void onQueueChanged(@Nullable List<MediaSession.QueueItem> queue) {
-                super.onQueueChanged(queue);
-                Log.d(mTag, "onQueueChanged, queue: " + queue);
-            }
-
-            @Override
-            public void onQueueTitleChanged(@Nullable CharSequence title) {
-                super.onQueueTitleChanged(title);
-                Log.d(mTag, "onQueueTitleChanged, title: " + title);
-            }
-
-            @Override
-            public void onExtrasChanged(@Nullable Bundle extras) {
-                super.onExtrasChanged(extras);
-                Log.d(mTag, "onExtrasChanged, extras: " + extras);
-            }
-
-            @Override
-            public void onAudioInfoChanged(MediaController.PlaybackInfo info) {
-                super.onAudioInfoChanged(info);
-                Log.d(mTag, "onAudioInfoChanged, info: " + info);
-            }
-
-            @Override
-            public void onProgressUpdate(long newPst, String oldPst, String duration) {
-                String fDuration = Utils.formatDuration(newPst);
-                String text = fDuration + "(" + newPst + ")";
-                Log.d(mTag, "newPst: " + text + ", thread: " + Thread.currentThread().getName());
-                //mTvPst.setText(text);
-                //mSeekBar.setProgress((int) (newPst / 1000));
-            }
-        };
-        mediaController.registerCallback(callback, mHandler);
-        //mMediaCallbackMap.put(mediaController, callback);
-
-        return logStr;
-    }
-
-    @NonNull
-    private String parsePlaybackState(@NonNull PlaybackState playbackState) {
-        //Log.d(mTag, "parsePlaybackState, playbackState: " + playbackState);
-        final String playbackStateStr = playbackState.toString();
-        final String stateFlag = "state=";
-        final int startIndex = playbackStateStr.indexOf(stateFlag);
-        final int endIndex = playbackStateStr.indexOf(")");
-        final String state = playbackStateStr.substring(startIndex + stateFlag.length(), endIndex + 1);
-        //mBtnState.setText(state);
-        long position = playbackState.getPosition();
-        String fDuration = Utils.formatDuration(position);
-        //mTvPst.setText(fDuration + "(" + position + ")");
-        //mSeekBar.setProgress((int) (position / 1000));
-
-        if (playbackState.getState() == PlaybackState.STATE_PLAYING) {
-            removeProgressMsg();
-            long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
-            //mHandler.postDelayed(mRunnable, delayMillis);
-        } else {
-            removeProgressMsg();
-        }
-        return stateFlag + state;
-    }
-
-    private void removeProgressMsg() {
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            if (mHandler.hasCallbacks(mRunnable)) {
-                mHandler.removeCallbacks(mRunnable);
-            }
-        } else {
-            mHandler.removeCallbacks(mRunnable);
-        }*/
-    }
-
-    @NonNull
-    private String parseMediaMetadata(@NonNull MediaMetadata metadata) {
-        StringBuilder info = new StringBuilder();
-        CharSequence text = metadata.getText(MediaMetadata.METADATA_KEY_TITLE);
-        info.append("title: ").append(text);
-        //mTvTitle.setText(text);
-        CharSequence artist = metadata.getText(MediaMetadata.METADATA_KEY_ARTIST);
-        info.append(", artist: ").append(artist);
-        //mTvArtist.setText(artist);
-        long duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
-        info.append(", duration: ").append(duration);
-        String fDuration = Utils.formatDuration(duration);
-        //mTvDuration.setText(fDuration + "(" + duration + ")");
-        //mTvDuration.setTag(duration);
-        //mSeekBar.setMax((int) (duration / 1000));
-        Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
-        info.append(", bitmap: ").append(System.identityHashCode(bitmap));
-        //mIvAlbumArt.setImageBitmap(bitmap);
-        return info.toString();
-    }
-
-    private static class MediaUpdateListener extends MediaController.Callback {
-        public void onProgressUpdate(long newPst, String oldPst, String duration) {
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -627,18 +405,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(mTag, "onDestroy()");
         mWallpaperInfoList.clear();
-        removeProgressMsg();
-        mSessionManager.removeOnActiveSessionsChangedListener(mSessionListener);
-        if (mOnTokensChangedListener != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                mSessionManager.removeOnSession2TokensChangedListener(mOnTokensChangedListener);
-            }
-        }
-        if (mOnKeyEventChangedListener != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                mSessionManager.removeOnMediaKeyEventSessionChangedListener(mOnKeyEventChangedListener);
-            }
-        }
+        mMediaSessionsLoader.removeChangedListeners();
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (mComponentNotification != null) {
                 NotificationListenerService.requestRebind(mComponentNotification);
@@ -864,77 +631,6 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 holder.mSeekBar.setMax((int) (duration / 1000));
                 Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
                 holder.mIvAlbumArt.setImageBitmap(bitmap);
-
-                final MediaController.Callback callback = new MediaUpdateListener() {
-                    @Override
-                    public void onSessionDestroyed() {
-                        super.onSessionDestroyed();
-                        Log.i(mTag, "onSessionDestroyed");
-                    }
-
-                    @Override
-                    public void onSessionEvent(@NonNull String event, @Nullable Bundle extras) {
-                        super.onSessionEvent(event, extras);
-                        Log.d(mTag, "onSessionEvent, event: " + event);
-                    }
-
-                    @Override
-                    public void onPlaybackStateChanged(@Nullable PlaybackState state) {
-                        super.onPlaybackStateChanged(state);
-                        Log.i(mTag, "onPlaybackStateChanged, state: " + state);
-                        if (state != null) {
-                            notifyItemRangeChanged(0, mMediaControllerList.size());
-                            //String playbackState = parsePlaybackState(state);
-                            //Log.i(mTag, "onPlaybackStateChanged, playbackState: " + playbackState);
-                        }
-                    }
-
-                    @Override
-                    public void onMetadataChanged(@Nullable MediaMetadata metadata) {
-                        super.onMetadataChanged(metadata);
-                        /*String mediaMetadata = null;
-                        if (metadata != null) {
-                            mediaMetadata = parseMediaMetadata(metadata);
-                        }
-                        Log.i(mTag, "onMetadataChanged, metadata: " + System.identityHashCode(metadata)
-                                + " {" + mediaMetadata + "}");*/
-                        notifyItemRangeChanged(0, mMediaControllerList.size());
-                    }
-
-                    @Override
-                    public void onQueueChanged(@Nullable List<MediaSession.QueueItem> queue) {
-                        super.onQueueChanged(queue);
-                        Log.d(mTag, "onQueueChanged, queue: " + queue);
-                    }
-
-                    @Override
-                    public void onQueueTitleChanged(@Nullable CharSequence title) {
-                        super.onQueueTitleChanged(title);
-                        Log.d(mTag, "onQueueTitleChanged, title: " + title);
-                    }
-
-                    @Override
-                    public void onExtrasChanged(@Nullable Bundle extras) {
-                        super.onExtrasChanged(extras);
-                        Log.d(mTag, "onExtrasChanged, extras: " + extras);
-                    }
-
-                    @Override
-                    public void onAudioInfoChanged(MediaController.PlaybackInfo info) {
-                        super.onAudioInfoChanged(info);
-                        Log.d(mTag, "onAudioInfoChanged, info: " + info);
-                    }
-
-                    @Override
-                    public void onProgressUpdate(long newPst, String oldPst, String duration) {
-                        String fDuration = Utils.formatDuration(newPst);
-                        String text = fDuration + "(" + newPst + ")";
-                        Log.d(mTag, "newPst: " + text + ", thread: " + Thread.currentThread().getName());
-                        //mTvPst.setText(text);
-                        //mSeekBar.setProgress((int) (newPst / 1000));
-                    }
-                };
-                data.registerCallback(callback, mHandler);
             }
         }
 
