@@ -2,30 +2,22 @@ package com.suheng.structure.wallpaperpicker;
 
 import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.media.MediaMetadata;
 import android.media.MediaRoute2Info;
 import android.media.MediaRouter2;
 import android.media.RouteDiscoveryPreference;
 import android.media.session.MediaController;
-import android.media.session.PlaybackState;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,12 +25,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.suheng.structure.wallpaperpicker.adapter.MediaControllerAdapter;
 import com.suheng.structure.wallpaperpicker.adapter.RecyclerAdapter;
 
 import java.util.ArrayList;
@@ -59,7 +51,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
     /*@Nullable
     private ComponentName mComponentNotification;*/
     private @Nullable MediaRouter2 mMediaRouter2;
-    private MediaSessionsLoader mMediaSessionsLoader;
+    private MediaDataRepository mMediaDataRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -223,17 +215,17 @@ public class WallpaperPickActivity extends AppCompatActivity {
             }
         });*/
 
-        mMediaSessionsLoader = MediaSessionsLoader.getInstance(this);
-        List<MediaController> mediaControllers = mMediaSessionsLoader.getActiveSessions(null);
+        mMediaDataRepository = MediaDataRepository.getInstance(this);
+        List<MediaController> mediaControllers = mMediaDataRepository.getMediaDataList();
         Log.d(mTag, "getActiveSessions, mediaControllers: " + mediaControllers.size());
-        for (MediaController mediaController : mediaControllers) {
-            mMediaSessionsLoader.resolveMediaController(mediaController);
-        }
+        /*for (MediaController mediaController : mediaControllers) {
+            mMediaSessionHelper.resolveMediaController(mediaController);
+        }*/
         mMediaControllerList.addAll(mediaControllers);
         mMediaControllerAdapter.notifyItemRangeChanged(0, mMediaControllerList.size());
-        mMediaSessionsLoader.addOnActiveSessionsChangedListener(null);
-        mMediaSessionsLoader.addOnSession2TokensChangedListener();
-        mMediaSessionsLoader.addOnMediaKeyEventSessionChangedListener(ContextCompat.getMainExecutor(this));
+        /*mMediaSessionHelper.addOnActiveSessionsChangedListener(null);
+        mMediaSessionHelper.addOnSession2TokensChangedListener();
+        mMediaSessionHelper.addOnMediaKeyEventSessionChangedListener(ContextCompat.getMainExecutor(this));*/
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             this.getWifiList();
@@ -405,7 +397,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(mTag, "onDestroy()");
         mWallpaperInfoList.clear();
-        mMediaSessionsLoader.removeChangedListeners();
+        //mMediaSessionHelper.removeChangedListeners();
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (mComponentNotification != null) {
                 NotificationListenerService.requestRebind(mComponentNotification);
@@ -578,105 +570,6 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 super(view);
                 textName = view.findViewById(R.id.text_route_name);
                 textInfo = view.findViewById(R.id.text_route_info);
-            }
-        }
-    }
-
-    final class MediaControllerAdapter extends RecyclerAdapter<MediaController, RecyclerView.ViewHolder> {
-
-        MediaControllerAdapter(List<MediaController> dataList) {
-            super(dataList);
-        }
-
-        @Override
-        protected void bindView(RecyclerView.ViewHolder viewHolder, final int position, final MediaController data) {
-            if (viewHolder instanceof ContentHolder) {
-                ContentHolder holder = (ContentHolder) viewHolder;
-                PlaybackState playbackState = data.getPlaybackState();
-                if (playbackState == null) {
-                    return;
-                }
-                final String playbackStateStr = playbackState.toString();
-                final String stateFlag = "state=";
-                final int startIndex = playbackStateStr.indexOf(stateFlag);
-                final int endIndex = playbackStateStr.indexOf(")");
-                final String state = playbackStateStr.substring(startIndex + stateFlag.length(), endIndex + 1);
-                holder.mBtnState.setText(state);
-                long pst = playbackState.getPosition();
-                String fPst = Utils.formatDuration(pst);
-                holder.mTvPst.setText(fPst + "(" + pst + ")");
-                holder.mSeekBar.setProgress((int) (pst / 1000));
-                long actions = playbackState.getActions();
-                List<PlaybackState.CustomAction> customActions = playbackState.getCustomActions();
-                for (PlaybackState.CustomAction customAction : customActions) {
-                    CharSequence name = customAction.getName();
-                    int icon = customAction.getIcon();
-                    String action = customAction.getAction();
-                    Log.d(mTag, "customAction, name: " + name + ", icon: " + icon
-                            + ", action: " + action+ ", actions: " + actions);
-                }
-
-                MediaMetadata metadata = data.getMetadata();
-                if (metadata == null) {
-                    return;
-                }
-                CharSequence text = metadata.getText(MediaMetadata.METADATA_KEY_TITLE);
-                holder.mTvTitle.setText(text);
-                CharSequence artist = metadata.getText(MediaMetadata.METADATA_KEY_ARTIST);
-                holder.mTvArtist.setText(artist);
-                long duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
-                String fDuration = Utils.formatDuration(duration);
-                holder.mTvDuration.setText(fDuration + "(" + duration + ")");
-                holder.mTvDuration.setTag(duration);
-                holder.mSeekBar.setMax((int) (duration / 1000));
-                Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
-                holder.mIvAlbumArt.setImageBitmap(bitmap);
-            }
-        }
-
-        public Drawable getIconFromPackage(Context context, String packageName, int resId) {
-            try {
-                PackageManager packageManager = context.getPackageManager();
-                ApplicationInfo appInfo = packageManager.getApplicationInfo(packageName, 0);
-                Resources resources = packageManager.getResourcesForApplication(appInfo);
-                return resources.getDrawable(resId, context.getTheme());
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.e(mTag, "Package not found: " + packageName, e);
-            } catch (Resources.NotFoundException e) {
-                Log.e(mTag, "Resource ID not found: " + resId, e);
-            } catch (Exception e) {
-                Log.e(mTag, "Unexpected error occurred", e);
-            }
-            return null;
-        }
-
-        @NonNull
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ContentHolder(getItemLayout(parent.getContext(), R.layout.wallpaperpick_activity_media_controller_adt));
-        }
-
-        class ContentHolder extends RecyclerView.ViewHolder {
-            Button mBtnState;
-            TextView mTvPst;
-            TextView mTvDuration;
-            TextView mTvTitle;
-            TextView mTvArtist;
-            ImageView mIvAlbumArt;
-            SeekBar mSeekBar;
-
-            ContentHolder(View view) {
-                super(view);
-                mBtnState = view.findViewById(R.id.btn_state);
-                //mBtnState.setOnClickListener(onClickListener);
-                //findViewById(R.id.btn_previous).setOnClickListener(onClickListener);
-                //findViewById(R.id.btn_next).setOnClickListener(onClickListener);
-                mTvPst = view.findViewById(R.id.tv_pst);
-                mTvDuration = view.findViewById(R.id.tv_duration);
-                mTvTitle = view.findViewById(R.id.tv_title);
-                mTvArtist = view.findViewById(R.id.tv_artist);
-                mIvAlbumArt = view.findViewById(R.id.tv_album_art);
-                mSeekBar = view.findViewById(R.id.seekBar);
             }
         }
     }
