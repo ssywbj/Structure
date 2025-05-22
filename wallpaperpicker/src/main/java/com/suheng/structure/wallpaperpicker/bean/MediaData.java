@@ -7,6 +7,7 @@ import android.media.session.PlaybackState;
 public class MediaData {
     public MediaController mediaController;
     public MediaController.TransportControls transportControls;
+    public String pkg;
     public String stateText;
     public int state = PlaybackState.STATE_NONE;
     public long position;

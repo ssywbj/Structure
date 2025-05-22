@@ -73,15 +73,11 @@ public class WallpaperPickActivity extends AppCompatActivity {
         if (wallpaperInfo == null) {
             Log.w(mTag, "live wallpaper isn't setting !");
         } else {//不为空说明当前系统使用的是动态壁纸
-            Log.d(mTag, "current live wallpaper, name: " + wallpaperInfo.getServiceName()
-                    + ", package: " + wallpaperInfo.getPackageName()
-                    + ", label: " + wallpaperInfo.loadLabel(getPackageManager())
-                    + ", setting activity: " + wallpaperInfo.getSettingsActivity());
+            Log.d(mTag, "current live wallpaper, name: " + wallpaperInfo.getServiceName() + ", package: " + wallpaperInfo.getPackageName() + ", label: " + wallpaperInfo.loadLabel(getPackageManager()) + ", setting activity: " + wallpaperInfo.getSettingsActivity());
         }
 
         PackageManager packageManager = getPackageManager();
-        List<ResolveInfo> resolveInfoList = packageManager.queryIntentServices(new Intent(WallpaperService.SERVICE_INTERFACE)
-                , PackageManager.GET_META_DATA);
+        List<ResolveInfo> resolveInfoList = packageManager.queryIntentServices(new Intent(WallpaperService.SERVICE_INTERFACE), PackageManager.GET_META_DATA);
         int size = resolveInfoList.size();
         Log.d(mTag, "wallpaperInfo, size: " + size);
         List<WallpaperInfo> wallpaperInfoList = new ArrayList<>();
@@ -94,12 +90,9 @@ public class WallpaperPickActivity extends AppCompatActivity {
         }
 
         try {
-            ResolveInfo resolveInfo = packageManager.resolveService(new Intent("com.wiz.watch.FaceRoamingClock")
-                    , PackageManager.GET_META_DATA);
+            ResolveInfo resolveInfo = packageManager.resolveService(new Intent("com.wiz.watch.FaceRoamingClock"), PackageManager.GET_META_DATA);
             WallpaperInfo info = new WallpaperInfo(this, resolveInfo);
-            Log.d(mTag, "custom resolveInfo: " + resolveInfo + "\nwallpaperInfo: " + info + "\n" +
-                    "pkg: " + info.getPackageName() + ", service: " + info.getServiceName()
-                    + ", recycle_life: " + info.getServiceInfo().metaData.getBoolean("recycle_life"));
+            Log.d(mTag, "custom resolveInfo: " + resolveInfo + "\nwallpaperInfo: " + info + "\n" + "pkg: " + info.getPackageName() + ", service: " + info.getServiceName() + ", recycle_life: " + info.getServiceInfo().metaData.getBoolean("recycle_life"));
         } catch (Exception e) {
             Log.e(mTag, "parse custom wallpaper info error:" + e.toString());
         }
@@ -116,11 +109,8 @@ public class WallpaperPickActivity extends AppCompatActivity {
             drawable = wallpaper.loadThumbnail(packageManager);
             serviceInfo = wallpaper.getServiceInfo();
             bundle = serviceInfo.metaData;
-            Log.d(mTag, "package: " + packageName + ", service: " + service
-                    + ", drawable = " + drawable + ", label = " + wallpaper.loadLabel(packageManager)
-                    + ", setting activity: " + wallpaper.getSettingsActivity());
-            Log.d(mTag, "service info, name: " + serviceInfo.name
-                    + ", recycle_life: " + bundle.getBoolean("recycle_life"));
+            Log.d(mTag, "package: " + packageName + ", service: " + service + ", drawable = " + drawable + ", label = " + wallpaper.loadLabel(packageManager) + ", setting activity: " + wallpaper.getSettingsActivity());
+            Log.d(mTag, "service info, name: " + serviceInfo.name + ", recycle_life: " + bundle.getBoolean("recycle_life"));
 
             /*if (drawable == null) {
                 drawable = ContextCompat.getDrawable(this, R.drawable.watch_face_preview_default);
@@ -151,13 +141,31 @@ public class WallpaperPickActivity extends AppCompatActivity {
         };
         findViewById(R.id.btn_set_one).setOnClickListener(onClickListener);
         findViewById(R.id.btn_set_two).setOnClickListener(onClickListener);
-        List<MediaData> mediaControllers = MediaDataRepository.getInstance(this).getMediaDataList(null, new OnDataChangedListener() {
+        MediaDataRepository mediaDataRepository = MediaDataRepository.getInstance(this);
+        OnDataChangedListener onDataChangedListener = new OnDataChangedListener() {
             @Override
             public void onDataChanged(MediaData data) {
                 final int position = mMediaControllerList.indexOf(data);
                 mMediaControllerAdapter.notifyItemChanged(position, data);
             }
-        });
+
+            @Override
+            public void onDataAdded(MediaData data) {
+                mMediaControllerList.add(data);
+                mMediaControllerAdapter.notifyItemRangeChanged(0, mMediaControllerList.size());
+            }
+
+            @Override
+            public void onDataRemoved(MediaData data) {
+                final int position = mMediaControllerList.indexOf(data);
+                mMediaControllerAdapter.notifyItemRemoved(position);
+                mMediaControllerList.remove(data);
+                mediaDataRepository.removePlayer(data.pkg);
+                //mMediaControllerAdapter.notifyItemRangeChanged(0, mMediaControllerList.size());
+            }
+        };
+        List<MediaData> mediaControllers = mediaDataRepository.getMediaDataList(null, onDataChangedListener);
+        mediaDataRepository.addOnActiveSessionsChangedListener(onDataChangedListener);
         mMediaControllerList.addAll(mediaControllers);
         mMediaControllerAdapter.notifyItemRangeChanged(0, mMediaControllerList.size());
         /*mMediaSessionHelper.addOnActiveSessionsChangedListener(null);
@@ -197,8 +205,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     type = route.getType();
                 }
-                Log.i(mTag, "selectedRoutes, controllerId: " + controllerId
-                        + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
+                Log.i(mTag, "selectedRoutes, controllerId: " + controllerId + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
 
             /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
@@ -217,8 +224,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     type = route.getType();
                 }
-                Log.d(mTag, "selectableRoutes, controllerId: " + controllerId
-                        + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
+                Log.d(mTag, "selectableRoutes, controllerId: " + controllerId + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
 
             for (MediaRoute2Info route : controller.getDeselectableRoutes()) {
@@ -228,8 +234,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     type = route.getType();
                 }
-                Log.d(mTag, "deselectableRoutes, controllerId: " + controllerId
-                        + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
+                Log.d(mTag, "deselectableRoutes, controllerId: " + controllerId + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
         }
 
@@ -237,14 +242,11 @@ public class WallpaperPickActivity extends AppCompatActivity {
             @Override
             public void onRoutesUpdated(@NonNull List<MediaRoute2Info> routes) {
                 super.onRoutesUpdated(routes);
-                Log.i(mTag, "onRoutesUpdated, routes.size: " + routes.size()
-                        + ", mediaRouter2.routes.size: " + mMediaRouter2.getRoutes().size()
-                        + ", thread: " + Thread.currentThread().getName());
+                Log.i(mTag, "onRoutesUpdated, routes.size: " + routes.size() + ", mediaRouter2.routes.size: " + mMediaRouter2.getRoutes().size() + ", thread: " + Thread.currentThread().getName());
                 mMediaRoute2InfoList.clear();
                 mMediaRoute2InfoList.addAll(routes);
                 for (MediaRoute2Info route : routes) {
-                    Log.d(mTag, "onRoutesUpdated, route HashCode: " + System.identityHashCode(route)
-                            + ", id " + route.getId());
+                    Log.d(mTag, "onRoutesUpdated, route HashCode: " + System.identityHashCode(route) + ", id " + route.getId());
                 }
                 mMediaRouteAdapter.notifyItemRangeChanged(0, mMediaRoute2InfoList.size());
             }
@@ -254,8 +256,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
         mMediaRouter2.registerTransferCallback(getMainExecutor(), new MediaRouter2.TransferCallback() {
             @Override
-            public void onTransfer(@NonNull MediaRouter2.RoutingController oldController
-                    , @NonNull MediaRouter2.RoutingController newController) {
+            public void onTransfer(@NonNull MediaRouter2.RoutingController oldController, @NonNull MediaRouter2.RoutingController newController) {
                 super.onTransfer(oldController, newController);
                 Log.i("Wbj", "onTransfer, oldController: " + oldController + ", newController: " + newController);
             }
@@ -350,8 +351,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
     ItemTouchHelper.Callback mCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP, ItemTouchHelper.UP) {
         @Override
-        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder
-                , @NonNull RecyclerView.ViewHolder target) {
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
             /*int fromPst = viewHolder.getAdapterPosition();//得到拖动ViewHolder的position
             int toPosition = target.getAdapterPosition();//得到目标ViewHolder的position
             if (fromPst < toPosition) {
@@ -485,9 +485,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     if (data.getVolumeHandling() == MediaRoute2Info.PLAYBACK_VOLUME_VARIABLE) {
                         status = "Using";
                     }
-                    String info = "(" + data.getVolume()
-                            + ", " + data.getVolumeMax() + ")" + ", " + data.getConnectionState()
-                            + ", " + status/* + ", " + data.getSuitabilityStatus() + "," + data.getType()*/;
+                    String info = "(" + data.getVolume() + ", " + data.getVolumeMax() + ")" + ", " + data.getConnectionState() + ", " + status/* + ", " + data.getSuitabilityStatus() + "," + data.getType()*/;
                     ((ContentHolder) viewHolder).textInfo.setText(info);
                     //}
                 }

@@ -48,9 +48,10 @@ public class MediaControllerHelper {
         MediaData mediaData = new MediaData();
         mediaData.mediaController = mediaController;
         mediaData.transportControls = mediaController.getTransportControls();
+        mediaData.pkg = mediaController.getPackageName();
         mControllerMediaDataMap.put(mediaController, mediaData);
 
-        parseAppInfo(mediaController.getPackageName(), mediaData);
+        parseAppInfo(mediaData.pkg, mediaData);
 
         final MediaMetadata metadata = mediaController.getMetadata();
         if (metadata != null) {
@@ -168,6 +169,12 @@ public class MediaControllerHelper {
             Log.d(TAG, "onSessionDestroyed");
             unregisterCallback();
             removeMsgProgressChanged();
+
+            /*MediaController mediaController = mControllerCallbackMap.get(this);
+            MediaData mediaData = mControllerMediaDataMap.get(mediaController);
+            if (mOnDataChangedListener != null) {
+                mOnDataChangedListener.onDataRemoved(mediaData);
+            }*/
         }
 
         @Override

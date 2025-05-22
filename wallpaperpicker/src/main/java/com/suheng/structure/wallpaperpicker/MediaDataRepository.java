@@ -19,6 +19,7 @@ public class MediaDataRepository {
     private static volatile MediaDataRepository sInstance;
     private final MediaSessionHelper mMediaSessionHelper;
     private final MediaControllerHelper mControllerHelper;
+    private final List<String> mPkgList = new ArrayList<>();
 
     private MediaDataRepository(@NonNull Context context) {
         mMediaSessionHelper = new MediaSessionHelper(context);
@@ -42,9 +43,37 @@ public class MediaDataRepository {
         Log.d(TAG, "getActiveSessions, mediaControllers: " + mediaControllers.size());
         for (MediaController controller : mediaControllers) {
             mediaDataList.add(mControllerHelper.resolveMediaController(controller));
-            mControllerHelper.registerCallback(controller, onDataChangedListener);
+            if (onDataChangedListener != null) {
+                mControllerHelper.registerCallback(controller, onDataChangedListener);
+            }
+            mPkgList.add(controller.getPackageName());
         }
         return mediaDataList;
+    }
+
+    public void addOnActiveSessionsChangedListener(@Nullable OnDataChangedListener onDataChangedListener) {
+        mMediaSessionHelper.addOnActiveSessionsChangedListener(controllers -> {
+            if (controllers == null) {
+                Log.w(TAG, "onActiveSessionsChanged, controllers object is null");
+            } else {
+                Log.i(TAG, "onActiveSessionsChanged, controllers size is " + controllers.size()
+                        + ", pkg size: " + mPkgList.size());
+                for (MediaController controller : controllers) {
+                    String packageName = controller.getPackageName();
+                    if (mPkgList.contains(packageName)) {
+                        continue;
+                    }
+
+                    Log.i(TAG, "onActiveSessionsChanged, add player: " + packageName);
+                    mPkgList.add(packageName);
+                    if (onDataChangedListener != null) {
+                        MediaData mediaData = mControllerHelper.resolveMediaController(controller);
+                        mControllerHelper.registerCallback(controller, onDataChangedListener);
+                        onDataChangedListener.onDataAdded(mediaData);
+                    }
+                }
+            }
+        }, null);
     }
 
     public List<MediaData> getMediaDataList() {
@@ -55,4 +84,7 @@ public class MediaDataRepository {
         mControllerHelper.seekTo(mediaController, pst);
     }
 
+    public void removePlayer(String pkg) {
+        mPkgList.remove(pkg);
+    }
 }
