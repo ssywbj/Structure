@@ -1,5 +1,6 @@
 package com.suheng.structure.wallpaperpicker;
 
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,25 +18,24 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.suheng.structure.wallpaperpicker.bean.MediaData;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class MediaControllerHelper {
     private static final String TAG = MediaControllerHelper.class.getSimpleName();
     private static final long UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
-    @NonNull
-    private final MediaController mMediaController;
-
-    MediaControllerHelper(@NonNull MediaController mediaController) {
-        mMediaController = mediaController;
-    }
-
-    @Nullable
-    private MediaController.Callback mControllerCallback;
-    @Nullable
+    private final PackageManager mPackageManager;
+    private final Map<PlayProgressListener, MediaController> mControllerCallbackMap = new HashMap<>();
+    private final Map<MediaController, MediaData> mControllerMediaDataMap = new HashMap<>();
     private Handler mHandler;
-    @Nullable
-    private Runnable mRunProgressChanged;
+
+    MediaControllerHelper(@NonNull Context context) {
+        mPackageManager = context.getPackageManager();
+    }
 
     public Handler getHandler() {
         if (mHandler == null) {
@@ -44,51 +44,33 @@ public class MediaControllerHelper {
         return mHandler;
     }
 
-    private void sendMsgProgressChanged() {
-        if (mRunProgressChanged == null) {
-            mRunProgressChanged = () -> {
-                PlaybackState playbackState = mMediaController.getPlaybackState();
-                if ((mControllerCallback instanceof PlayProgressCallback) && playbackState != null) {
-                    ((PlayProgressCallback) mControllerCallback).onProgressChanged(playbackState);
-                    sendMsgProgressChanged();
-                }
-            };
-        }
+    public MediaData resolveMediaController(@NonNull MediaController mediaController) {
+        MediaData mediaData = new MediaData();
+        mControllerMediaDataMap.put(mediaController, mediaData);
 
-        final long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
-        getHandler().postDelayed(mRunProgressChanged, delayMillis);
-    }
+        parseAppInfo(mediaController.getPackageName(), mediaData);
 
-    private void removeMsgProgressChanged() {
-        if (mRunProgressChanged == null) {
-            return;
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            if (getHandler().hasCallbacks(mRunProgressChanged)) {
-                getHandler().removeCallbacks(mRunProgressChanged);
-            }
-        } else {
-            getHandler().removeCallbacks(mRunProgressChanged);
-        }
-    }
-
-    public void resolveMediaController() {
-        parseAppInfo(mMediaController.getPackageName());
-
-        final MediaMetadata metadata = mMediaController.getMetadata();
+        final MediaMetadata metadata = mediaController.getMetadata();
         if (metadata != null) {
-            parseMediaMetadata(metadata);
+            parseMediaMetadata(metadata, mediaData);
         }
 
-        final PlaybackState playbackState = mMediaController.getPlaybackState();
+        final PlaybackState playbackState = mediaController.getPlaybackState();
         if (playbackState != null) {
-            parsePlaybackState(playbackState);
+            parsePlaybackState(playbackState, mediaData);
         }
-
-        registerCallback();
+        return mediaData;
     }
 
-    private void parseAppInfo(@NonNull String pkg) {
+    /*public List<MediaData> resolveMediaControllers(@NonNull List<MediaController> mediaControllers) {
+        List<MediaData> mediaDataList = new ArrayList<>();
+        for (MediaController mediaController : mediaControllers) {
+            mediaDataList.add(resolveMediaController(mediaController));
+        }
+        return mediaDataList;
+    }*/
+
+    private void parseAppInfo(@NonNull String pkg, @Nullable MediaData dest) {
         try {
             StringBuilder logInfo = new StringBuilder("AppInfo->pkg: " + pkg);
             ApplicationInfo applicationInfo = mPackageManager.getApplicationInfo(pkg, 0);
@@ -102,21 +84,29 @@ public class MediaControllerHelper {
         }
     }
 
-    private void parseMediaMetadata(@NonNull MediaMetadata metadata) {
+    private void parseMediaMetadata(@NonNull MediaMetadata metadata, @Nullable MediaData mediaData) {
         StringBuilder logInfo = new StringBuilder("MediaMetadata->");
-        CharSequence text = metadata.getText(MediaMetadata.METADATA_KEY_TITLE);
-        logInfo.append("title: ").append(text);
-        CharSequence artist = metadata.getText(MediaMetadata.METADATA_KEY_ARTIST);
+        String title = metadata.getText(MediaMetadata.METADATA_KEY_TITLE).toString();
+        logInfo.append("title: ").append(title);
+        String artist = metadata.getText(MediaMetadata.METADATA_KEY_ARTIST).toString();
         logInfo.append(", artist: ").append(artist);
         long duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
         String formatDuration = Utils.formatDuration(duration);
         logInfo.append(", duration: ").append(duration).append("(").append(formatDuration).append(")");
-        Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
-        logInfo.append(", bitmap: ").append(System.identityHashCode(bitmap));
+        Bitmap albumArt = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
+        logInfo.append(", albumArt: ").append(System.identityHashCode(albumArt));
         Log.i(TAG, logInfo.toString());
+
+        if (mediaData != null) {
+            mediaData.title = title;
+            mediaData.artist = artist;
+            mediaData.duration = duration;
+            mediaData.progressMax = (int) (mediaData.duration / 1000);
+            mediaData.albumArt = albumArt;
+        }
     }
 
-    private void parsePlaybackState(@NonNull PlaybackState playbackState) {
+    private void parsePlaybackState(@NonNull PlaybackState playbackState, @Nullable MediaData mediaData) {
         final String playbackStateStr = playbackState.toString();
         StringBuilder logInfo = new StringBuilder("PlaybackState->" + playbackStateStr);
         final String stateFlag = "state";
@@ -128,98 +118,162 @@ public class MediaControllerHelper {
         String formatPst = Utils.formatDuration(position);
         logInfo.append(", position: ").append(position).append("(").append(formatPst).append(")");
         Log.i(TAG, logInfo.toString());
+
+        if (mediaData != null) {
+            mediaData.state = state;
+            mediaData.position = position;
+            mediaData.progress = (int) (mediaData.position / 1000);
+        }
     }
 
-    public void registerCallback() {
-        if (mControllerCallback == null) {
-            mControllerCallback = new PlayProgressCallback() {
-                @Override
-                public void onSessionDestroyed() {
-                    super.onSessionDestroyed();
-                    Log.d(TAG, "onSessionDestroyed");
-                    unregisterCallback();
-                }
+    public void registerCallback(MediaController mediaController, @Nullable OnDataChangedListener onDataChangedListener) {
+        PlayProgressListener controllerCallback = new PlayProgressListener();
+        controllerCallback.setOnDataChangedListener(onDataChangedListener);
+        mediaController.registerCallback(controllerCallback, getHandler());
 
-                @Override
-                public void onSessionEvent(@NonNull String event, @Nullable Bundle extras) {
-                    super.onSessionEvent(event, extras);
-                    Log.d(TAG, "onSessionEvent, event: " + event);
-                }
+        mControllerCallbackMap.put(controllerCallback, mediaController);
 
-                @Override
-                public void onPlaybackStateChanged(@Nullable PlaybackState state) {
-                    super.onPlaybackStateChanged(state);
-                    Log.d(TAG, "onPlaybackStateChanged, state: " + state);
-                    if (state != null) {
-                        parsePlaybackState(state);
-
-                        removeMsgProgressChanged();
-                        if (state.getState() == PlaybackState.STATE_PLAYING) {
-                            sendMsgProgressChanged();
-                        }
-                    }
-                }
-
-                @Override
-                public void onMetadataChanged(@Nullable MediaMetadata metadata) {
-                    super.onMetadataChanged(metadata);
-                    Log.d(TAG, "onMetadataChanged, metadata: " + metadata);
-                    if (metadata != null) {
-                        parseMediaMetadata(metadata);
-                    }
-                }
-
-                @Override
-                public void onQueueChanged(@Nullable List<MediaSession.QueueItem> queue) {
-                    super.onQueueChanged(queue);
-                    Log.d(TAG, "onQueueChanged, queue: " + queue);
-                }
-
-                @Override
-                public void onQueueTitleChanged(@Nullable CharSequence title) {
-                    super.onQueueTitleChanged(title);
-                    Log.d(TAG, "onQueueTitleChanged, title: " + title);
-                }
-
-                @Override
-                public void onExtrasChanged(@Nullable Bundle extras) {
-                    super.onExtrasChanged(extras);
-                    Log.d(TAG, "onExtrasChanged, extras: " + extras);
-                }
-
-                @Override
-                public void onAudioInfoChanged(MediaController.PlaybackInfo info) {
-                    super.onAudioInfoChanged(info);
-                    Log.d(TAG, "onAudioInfoChanged, info: " + info);
-                }
-
-                @Override
-                public void onProgressChanged(@NonNull PlaybackState state) {
-                    Log.d(TAG, "onProgressChanged, state: " + state);
-                    parsePlaybackState(state);
-                }
-            };
-        }
-        mMediaController.registerCallback(mControllerCallback, getHandler());
-
-        sendMsgProgressChanged();
+        controllerCallback.sendMsgProgressChanged();
     }
 
     public void unregisterCallback() {
-        removeMsgProgressChanged();
-        if (mControllerCallback != null) {
-            mMediaController.unregisterCallback(mControllerCallback);
+        for (Map.Entry<PlayProgressListener, MediaController> entry : mControllerCallbackMap.entrySet()) {
+            PlayProgressListener progressListener = entry.getKey();
+            entry.getValue().unregisterCallback(progressListener);
+            progressListener.removeMsgProgressChanged();
         }
     }
 
-    private PackageManager mPackageManager;
+    private final class PlayProgressListener extends PlayProgressCallback {
+        @Nullable
+        private Runnable mRunProgressChanged;
+        @Nullable
+        private OnDataChangedListener mOnDataChangedListener;
 
-    public void setPackageManager(PackageManager packageManager) {
-        mPackageManager = packageManager;
+        @Override
+        public void onSessionDestroyed() {
+            super.onSessionDestroyed();
+            Log.d(TAG, "onSessionDestroyed");
+            unregisterCallback();
+            removeMsgProgressChanged();
+        }
+
+        @Override
+        public void onSessionEvent(@NonNull String event, @Nullable Bundle extras) {
+            super.onSessionEvent(event, extras);
+            Log.d(TAG, "onSessionEvent, event: " + event);
+        }
+
+        @Override
+        public void onPlaybackStateChanged(@Nullable PlaybackState state) {
+            super.onPlaybackStateChanged(state);
+            Log.d(TAG, "onPlaybackStateChanged, state: " + state);
+            if (state != null) {
+                MediaController mediaController = mControllerCallbackMap.get(this);
+                MediaData mediaData = mControllerMediaDataMap.get(mediaController);
+                parsePlaybackState(state, mediaData);
+
+                if (mOnDataChangedListener != null) {
+                    mOnDataChangedListener.onDataChanged(mediaData);
+                }
+
+                removeMsgProgressChanged();
+                if (state.getState() == PlaybackState.STATE_PLAYING) {
+                    sendMsgProgressChanged();
+                }
+            }
+        }
+
+        @Override
+        public void onMetadataChanged(@Nullable MediaMetadata metadata) {
+            super.onMetadataChanged(metadata);
+            Log.d(TAG, "onMetadataChanged, metadata: " + metadata);
+            if (metadata != null) {
+                MediaController mediaController = mControllerCallbackMap.get(this);
+                MediaData mediaData = mControllerMediaDataMap.get(mediaController);
+                parseMediaMetadata(metadata, mediaData);
+
+                if (mOnDataChangedListener != null) {
+                    mOnDataChangedListener.onDataChanged(mediaData);
+                }
+            }
+        }
+
+        @Override
+        public void onQueueChanged(@Nullable List<MediaSession.QueueItem> queue) {
+            super.onQueueChanged(queue);
+            Log.d(TAG, "onQueueChanged, queue: " + queue);
+        }
+
+        @Override
+        public void onQueueTitleChanged(@Nullable CharSequence title) {
+            super.onQueueTitleChanged(title);
+            Log.d(TAG, "onQueueTitleChanged, title: " + title);
+        }
+
+        @Override
+        public void onExtrasChanged(@Nullable Bundle extras) {
+            super.onExtrasChanged(extras);
+            Log.d(TAG, "onExtrasChanged, extras: " + extras);
+        }
+
+        @Override
+        public void onAudioInfoChanged(MediaController.PlaybackInfo info) {
+            super.onAudioInfoChanged(info);
+            Log.d(TAG, "onAudioInfoChanged, info: " + info);
+        }
+
+        @Override
+        public void onProgressChanged(@Nullable PlaybackState state) {
+            super.onProgressChanged(state);
+            Log.d(TAG, "onProgressChanged, state: " + state);
+            if (state != null) {
+                MediaController mediaController = mControllerCallbackMap.get(this);
+                MediaData mediaData = mControllerMediaDataMap.get(mediaController);
+                parsePlaybackState(state, mediaData);
+
+                if (mOnDataChangedListener != null) {
+                    mOnDataChangedListener.onDataChanged(mediaData);
+                }
+            }
+        }
+
+        public void sendMsgProgressChanged() {
+            if (mRunProgressChanged == null) {
+                mRunProgressChanged = () -> {
+                    MediaController mediaController = mControllerCallbackMap.get(this);
+                    if (mediaController == null) {
+                        return;
+                    }
+                    onProgressChanged(mediaController.getPlaybackState());
+                    sendMsgProgressChanged();
+                };
+            }
+
+            final long delayMillis = UPDATE_RATE_MS - (System.currentTimeMillis() % UPDATE_RATE_MS);
+            getHandler().postDelayed(mRunProgressChanged, delayMillis);
+        }
+
+        public void removeMsgProgressChanged() {
+            if (mRunProgressChanged == null) {
+                return;
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (getHandler().hasCallbacks(mRunProgressChanged)) {
+                    getHandler().removeCallbacks(mRunProgressChanged);
+                }
+            } else {
+                getHandler().removeCallbacks(mRunProgressChanged);
+            }
+        }
+
+        public void setOnDataChangedListener(@Nullable OnDataChangedListener onDataChangedListener) {
+            mOnDataChangedListener = onDataChangedListener;
+        }
     }
 
     public abstract static class PlayProgressCallback extends MediaController.Callback {
-        void onProgressChanged(@NonNull PlaybackState state) {
+        void onProgressChanged(@Nullable PlaybackState state) {
         }
     }
 

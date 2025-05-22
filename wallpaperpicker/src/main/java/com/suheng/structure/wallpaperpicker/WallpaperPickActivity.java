@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaRoute2Info;
 import android.media.MediaRouter2;
 import android.media.RouteDiscoveryPreference;
-import android.media.session.MediaController;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.wallpaper.WallpaperService;
@@ -32,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.suheng.structure.wallpaperpicker.adapter.MediaControllerAdapter;
 import com.suheng.structure.wallpaperpicker.adapter.RecyclerAdapter;
+import com.suheng.structure.wallpaperpicker.bean.MediaData;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +46,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
     private MediaControllerAdapter mMediaControllerAdapter;
     private final List<MediaRoute2Info> mMediaRoute2InfoList = new ArrayList<>();
 
-    private final List<MediaController> mMediaControllerList = new ArrayList<>();
+    private final List<MediaData> mMediaControllerList = new ArrayList<>();
 
     /*@Nullable
     private ComponentName mComponentNotification;*/
@@ -216,11 +216,13 @@ public class WallpaperPickActivity extends AppCompatActivity {
         });*/
 
         mMediaDataRepository = MediaDataRepository.getInstance(this);
-        List<MediaController> mediaControllers = mMediaDataRepository.getMediaDataList();
-        Log.d(mTag, "getActiveSessions, mediaControllers: " + mediaControllers.size());
-        /*for (MediaController mediaController : mediaControllers) {
-            mMediaSessionHelper.resolveMediaController(mediaController);
-        }*/
+        List<MediaData> mediaControllers = mMediaDataRepository.getMediaDataList(null, new OnDataChangedListener() {
+            @Override
+            public void onDataChanged(MediaData data) {
+                int position = mMediaControllerList.indexOf(data);
+                mMediaControllerAdapter.notifyItemChanged(position, data);
+            }
+        });
         mMediaControllerList.addAll(mediaControllers);
         mMediaControllerAdapter.notifyItemRangeChanged(0, mMediaControllerList.size());
         /*mMediaSessionHelper.addOnActiveSessionsChangedListener(null);
@@ -549,9 +551,9 @@ public class WallpaperPickActivity extends AppCompatActivity {
                         status = "Using";
                     }
                     String info = "(" + data.getVolume()
-                                + ", " + data.getVolumeMax() + ")" + ", " + data.getConnectionState()
-                                + ", " + status/* + ", " + data.getSuitabilityStatus() + "," + data.getType()*/;
-                        ((ContentHolder) viewHolder).textInfo.setText(info);
+                            + ", " + data.getVolumeMax() + ")" + ", " + data.getConnectionState()
+                            + ", " + status/* + ", " + data.getSuitabilityStatus() + "," + data.getType()*/;
+                    ((ContentHolder) viewHolder).textInfo.setText(info);
                     //}
                 }
             }

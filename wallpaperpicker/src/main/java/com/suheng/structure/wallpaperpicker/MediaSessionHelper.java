@@ -91,11 +91,4 @@ public class MediaSessionHelper {
         }
     }
 
-    public void resolveMediaController(@NonNull MediaController mediaController) {
-        MediaControllerHelper mediaControllerHelper = new MediaControllerHelper(mediaController);
-        mediaControllerHelper.setPackageManager(mPackageManager);
-        mediaControllerHelper.resolveMediaController();
-        mControllerHelpers.add(mediaControllerHelper);
-    }
-
 }
