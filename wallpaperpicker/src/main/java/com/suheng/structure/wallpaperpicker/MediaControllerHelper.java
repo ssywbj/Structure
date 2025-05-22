@@ -46,6 +46,8 @@ public class MediaControllerHelper {
 
     public MediaData resolveMediaController(@NonNull MediaController mediaController) {
         MediaData mediaData = new MediaData();
+        mediaData.mediaController = mediaController;
+        mediaData.transportControls = mediaController.getTransportControls();
         mControllerMediaDataMap.put(mediaController, mediaData);
 
         parseAppInfo(mediaController.getPackageName(), mediaData);
@@ -120,7 +122,8 @@ public class MediaControllerHelper {
         Log.i(TAG, logInfo.toString());
 
         if (mediaData != null) {
-            mediaData.state = state;
+            mediaData.stateText = state;
+            mediaData.state = playbackState.getState();
             mediaData.position = position;
             mediaData.progress = (int) (mediaData.position / 1000);
         }
@@ -141,6 +144,15 @@ public class MediaControllerHelper {
             PlayProgressListener progressListener = entry.getKey();
             entry.getValue().unregisterCallback(progressListener);
             progressListener.removeMsgProgressChanged();
+        }
+    }
+
+    public void seekTo(MediaController mediaController, long pst) {
+        for (Map.Entry<PlayProgressListener, MediaController> entry : mControllerCallbackMap.entrySet()) {
+            if (entry.getValue() == mediaController) {
+                entry.getKey().seekTo(pst);
+                break;
+            }
         }
     }
 
@@ -270,6 +282,28 @@ public class MediaControllerHelper {
         public void setOnDataChangedListener(@Nullable OnDataChangedListener onDataChangedListener) {
             mOnDataChangedListener = onDataChangedListener;
         }
+
+        public void seekTo(long pst) {
+            MediaController mediaController = mControllerCallbackMap.get(this);
+            if (mediaController == null) {
+                return;
+            }
+
+            PlaybackState remoteState = mediaController.getPlaybackState();
+            if (remoteState == null) {
+                return;
+            }
+
+            removeMsgProgressChanged();
+
+            PlaybackState.Builder builder = new PlaybackState.Builder(remoteState);
+            PlaybackState localState = builder.setState(remoteState.getState(), pst
+                    , remoteState.getPlaybackSpeed(), System.currentTimeMillis()).build();
+            onProgressChanged(localState);
+
+            sendMsgProgressChanged();
+        }
+
     }
 
     public abstract static class PlayProgressCallback extends MediaController.Callback {

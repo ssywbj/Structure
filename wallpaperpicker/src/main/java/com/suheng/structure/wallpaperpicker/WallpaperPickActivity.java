@@ -51,7 +51,6 @@ public class WallpaperPickActivity extends AppCompatActivity {
     /*@Nullable
     private ComponentName mComponentNotification;*/
     private @Nullable MediaRouter2 mMediaRouter2;
-    private MediaDataRepository mMediaDataRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,77 +148,13 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 WallpaperPickService.setLiveWallPaper(v.getContext(), pkg, cls, true);
                 finish();
             }
-
-            /*if (v.getId() == R.id.btn_previous) {
-                for (MediaController mediaController : mMediaControllerList) {
-                    mediaController.getTransportControls().skipToPrevious();
-                }
-            } else if (v.getId() == R.id.btn_state) {
-                for (MediaController mediaController : mMediaControllerList) {
-                    PlaybackState playbackState = mediaController.getPlaybackState();
-                    if (playbackState != null) {
-                        MediaController.TransportControls transportControls = mediaController.getTransportControls();
-                        if (playbackState.getState() == PlaybackState.STATE_PLAYING) {
-                            transportControls.pause();
-                        } else if (playbackState.getState() == PlaybackState.STATE_PAUSED
-                                || playbackState.getState() == PlaybackState.STATE_NONE) {
-                            transportControls.play();
-                        } else {
-                            Log.w(mTag, "Neither in play state nor in pause/none state");
-                        }
-                    }
-                }
-            } else if (v.getId() == R.id.btn_next) {
-                for (MediaController mediaController : mMediaControllerList) {
-                    mediaController.getTransportControls().skipToNext();
-                }
-            }*/
         };
         findViewById(R.id.btn_set_one).setOnClickListener(onClickListener);
         findViewById(R.id.btn_set_two).setOnClickListener(onClickListener);
-        /*mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                //Log.d(mTag, "onProgressChanged, progress: " + progress + ", fromUser: " + fromUser);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                Log.i(mTag, "onStartTrackingTouch");
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                removeProgressMsg();
-                final int progress = mSeekBar.getProgress();
-                final int max = mSeekBar.getMax();
-                Object tag = mTvDuration.getTag();
-                long duration = 0;
-                if (tag instanceof Long) {
-                    duration = (Long) tag;
-                }
-                if (duration <= 0) {
-                    Log.e(mTag, "onStopTrackingTouch, error duration");
-                    return;
-                }
-                final long position = (long) (1.0 * progress / max * duration);
-                String positionFormat = Utils.formatDuration(position);
-                int mediaControllerSize = mMediaControllerSet.size();
-                Log.i(mTag, "onStopTrackingTouch, mediaControllerSize:" + mediaControllerSize);
-                for (MediaController mediaController : mMediaControllerSet) {
-                    Log.i(mTag, "onStopTrackingTouch, progress:" + progress + ", max: " + max
-                            + ", position: " + position+ "(" + positionFormat + ")" + ", duration: " + duration
-                            + ", mediaController: " + mediaController);
-                    mediaController.getTransportControls().seekTo(position);
-                }
-            }
-        });*/
-
-        mMediaDataRepository = MediaDataRepository.getInstance(this);
-        List<MediaData> mediaControllers = mMediaDataRepository.getMediaDataList(null, new OnDataChangedListener() {
+        List<MediaData> mediaControllers = MediaDataRepository.getInstance(this).getMediaDataList(null, new OnDataChangedListener() {
             @Override
             public void onDataChanged(MediaData data) {
-                int position = mMediaControllerList.indexOf(data);
+                final int position = mMediaControllerList.indexOf(data);
                 mMediaControllerAdapter.notifyItemChanged(position, data);
             }
         });

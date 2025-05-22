@@ -51,4 +51,8 @@ public class MediaDataRepository {
         return getMediaDataList(null, null);
     }
 
+    public void seekTo(MediaController mediaController, long pst) {
+        mControllerHelper.seekTo(mediaController, pst);
+    }
+
 }
