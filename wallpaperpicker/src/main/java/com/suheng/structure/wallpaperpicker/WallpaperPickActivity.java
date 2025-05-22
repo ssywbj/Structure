@@ -161,7 +161,6 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 mMediaControllerAdapter.notifyItemRemoved(position);
                 mMediaControllerList.remove(data);
                 mediaDataRepository.removePlayer(data.pkg);
-                //mMediaControllerAdapter.notifyItemRangeChanged(0, mMediaControllerList.size());
             }
         };
         List<MediaData> mediaControllers = mediaDataRepository.getMediaDataList(null, onDataChangedListener);

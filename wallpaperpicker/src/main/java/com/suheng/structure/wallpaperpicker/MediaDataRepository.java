@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import com.suheng.structure.wallpaperpicker.bean.MediaData;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class MediaDataRepository {
@@ -56,7 +57,8 @@ public class MediaDataRepository {
             if (controllers == null) {
                 Log.w(TAG, "onActiveSessionsChanged, controllers object is null");
             } else {
-                Log.i(TAG, "onActiveSessionsChanged, controllers size is " + controllers.size()
+                final int controllerSize = controllers.size();
+                Log.i(TAG, "onActiveSessionsChanged, controllers size is " + controllerSize
                         + ", pkg size: " + mPkgList.size());
                 for (MediaController controller : controllers) {
                     String packageName = controller.getPackageName();
@@ -72,6 +74,44 @@ public class MediaDataRepository {
                         onDataChangedListener.onDataAdded(mediaData);
                     }
                 }
+
+                if (controllerSize == 0) {
+                    Log.i(TAG, "onActiveSessionsChanged, remove all players");
+                    mPkgList.clear();
+                    mControllerHelper.unregisterCallbacks();
+                    if (onDataChangedListener != null) {
+                        List<MediaData> cacheMediaData = mControllerHelper.getCacheMediaData();
+                        if (cacheMediaData != null) {
+                            for (MediaData mediaData : cacheMediaData) {
+                                onDataChangedListener.onDataRemoved(mediaData);
+                            }
+                        }
+                    }
+                } else {
+                    Iterator<String> iterator = mPkgList.iterator();
+                    while (iterator.hasNext()) {
+                        final String pkg = iterator.next(); //0,1,2
+                        MediaController mediaController = null;
+                        for (MediaController controller : controllers) { //0, 1
+                            if (pkg.equals(controller.getPackageName())) {
+                                mediaController = null;
+                                break;
+                            }
+                            mediaController = controller;
+                        }
+
+                        if (mediaController != null) {
+                            Log.i(TAG, "onActiveSessionsChanged, remove player: " + pkg);
+                            iterator.remove();
+                            mControllerHelper.unregisterCallback(mediaController);
+                            if (onDataChangedListener != null) {
+                                MediaData mediaData = mControllerHelper.getCacheMediaData(mediaController);
+                                onDataChangedListener.onDataRemoved(mediaData);
+                            }
+                        }
+                    }
+                }
+
             }
         }, null);
     }

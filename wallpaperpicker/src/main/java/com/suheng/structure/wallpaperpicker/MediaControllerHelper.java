@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 
 import com.suheng.structure.wallpaperpicker.bean.MediaData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,7 +131,7 @@ public class MediaControllerHelper {
         }
     }
 
-    public void registerCallback(MediaController mediaController, @Nullable OnDataChangedListener onDataChangedListener) {
+    public void registerCallback(@NonNull MediaController mediaController, @Nullable OnDataChangedListener onDataChangedListener) {
         PlayProgressListener controllerCallback = new PlayProgressListener();
         controllerCallback.setOnDataChangedListener(onDataChangedListener);
         mediaController.registerCallback(controllerCallback, getHandler());
@@ -140,12 +141,32 @@ public class MediaControllerHelper {
         controllerCallback.sendMsgProgressChanged();
     }
 
-    public void unregisterCallback() {
+    public void unregisterCallback(@NonNull MediaController mediaController) {
+        PlayProgressListener progressListener = null;
         for (Map.Entry<PlayProgressListener, MediaController> entry : mControllerCallbackMap.entrySet()) {
-            PlayProgressListener progressListener = entry.getKey();
-            entry.getValue().unregisterCallback(progressListener);
-            progressListener.removeMsgProgressChanged();
+            MediaController controller = entry.getValue();
+            if (mediaController == controller) {
+                progressListener = entry.getKey();
+                controller.unregisterCallback(progressListener);
+                progressListener.removeMsgProgressChanged();
+                break;
+            }
         }
+
+        if (progressListener != null) {
+            mControllerCallbackMap.remove(progressListener, mediaController);
+        }
+    }
+
+    public void unregisterCallbacks() {
+        for (Map.Entry<PlayProgressListener, MediaController> entry : mControllerCallbackMap.entrySet()) {
+            MediaController controller = entry.getValue();
+            PlayProgressListener progressListener = entry.getKey();
+            controller.unregisterCallback(progressListener);
+            progressListener.removeMsgProgressChanged();
+
+        }
+        mControllerCallbackMap.clear();
     }
 
     public void seekTo(MediaController mediaController, long pst) {
@@ -155,6 +176,21 @@ public class MediaControllerHelper {
                 break;
             }
         }
+    }
+
+    public @Nullable MediaData getCacheMediaData(MediaController mediaController) {
+        return mControllerMediaDataMap.get(mediaController);
+    }
+
+    public @Nullable List<MediaData> getCacheMediaData() {
+        if (mControllerMediaDataMap.isEmpty()) {
+            return null;
+        }
+        List<MediaData> mediaDataList = new ArrayList<>();
+        for (Map.Entry<MediaController, MediaData> mediaDataEntry : mControllerMediaDataMap.entrySet()) {
+            mediaDataList.add(mediaDataEntry.getValue());
+        }
+        return mediaDataList;
     }
 
     private final class PlayProgressListener extends PlayProgressCallback {
@@ -167,14 +203,10 @@ public class MediaControllerHelper {
         public void onSessionDestroyed() {
             super.onSessionDestroyed();
             Log.d(TAG, "onSessionDestroyed");
-            unregisterCallback();
-            removeMsgProgressChanged();
-
-            /*MediaController mediaController = mControllerCallbackMap.get(this);
-            MediaData mediaData = mControllerMediaDataMap.get(mediaController);
-            if (mOnDataChangedListener != null) {
-                mOnDataChangedListener.onDataRemoved(mediaData);
-            }*/
+            MediaController mediaController = mControllerCallbackMap.get(this);
+            if (mediaController != null) {
+                unregisterCallback(mediaController);
+            }
         }
 
         @Override
@@ -189,7 +221,7 @@ public class MediaControllerHelper {
             Log.d(TAG, "onPlaybackStateChanged, state: " + state);
             if (state != null) {
                 MediaController mediaController = mControllerCallbackMap.get(this);
-                MediaData mediaData = mControllerMediaDataMap.get(mediaController);
+                MediaData mediaData = getCacheMediaData(mediaController);
                 parsePlaybackState(state, mediaData);
 
                 if (mOnDataChangedListener != null) {
@@ -209,7 +241,7 @@ public class MediaControllerHelper {
             Log.d(TAG, "onMetadataChanged, metadata: " + metadata);
             if (metadata != null) {
                 MediaController mediaController = mControllerCallbackMap.get(this);
-                MediaData mediaData = mControllerMediaDataMap.get(mediaController);
+                MediaData mediaData = getCacheMediaData(mediaController);
                 parseMediaMetadata(metadata, mediaData);
 
                 if (mOnDataChangedListener != null) {
@@ -248,7 +280,7 @@ public class MediaControllerHelper {
             Log.d(TAG, "onProgressChanged, state: " + state);
             if (state != null) {
                 MediaController mediaController = mControllerCallbackMap.get(this);
-                MediaData mediaData = mControllerMediaDataMap.get(mediaController);
+                MediaData mediaData = getCacheMediaData(mediaController);
                 parsePlaybackState(state, mediaData);
 
                 if (mOnDataChangedListener != null) {
@@ -284,6 +316,7 @@ public class MediaControllerHelper {
             } else {
                 getHandler().removeCallbacks(mRunProgressChanged);
             }
+            mRunProgressChanged = null;
         }
 
         public void setOnDataChangedListener(@Nullable OnDataChangedListener onDataChangedListener) {
