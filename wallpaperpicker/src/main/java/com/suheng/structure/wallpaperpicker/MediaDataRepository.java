@@ -75,16 +75,14 @@ public class MediaDataRepository {
                     }
                 }
 
-                if (controllerSize == 0) {
+                if (controllerSize == 0 && !mPkgList.isEmpty()) {
                     Log.i(TAG, "onActiveSessionsChanged, remove all players");
                     mPkgList.clear();
                     mControllerHelper.unregisterCallbacks();
-                    if (onDataChangedListener != null) {
-                        List<MediaData> cacheMediaData = mControllerHelper.getCacheMediaData();
-                        if (cacheMediaData != null) {
-                            for (MediaData mediaData : cacheMediaData) {
-                                onDataChangedListener.onDataRemoved(mediaData);
-                            }
+                    List<MediaData> cacheMediaData = mControllerHelper.getCacheMediaData();
+                    if (onDataChangedListener != null && cacheMediaData != null) {
+                        for (MediaData mediaData : cacheMediaData) {
+                            onDataChangedListener.onDataRemoved(mediaData);
                         }
                     }
                 } else {
@@ -104,9 +102,9 @@ public class MediaDataRepository {
                             Log.i(TAG, "onActiveSessionsChanged, remove player: " + pkg);
                             iterator.remove();
                             mControllerHelper.unregisterCallback(mediaController);
-                            if (onDataChangedListener != null) {
-                                MediaData mediaData = mControllerHelper.getCacheMediaData(mediaController);
-                                onDataChangedListener.onDataRemoved(mediaData);
+                            MediaData cacheMediaData = mControllerHelper.getCacheMediaData(mediaController);
+                            if (onDataChangedListener != null && cacheMediaData != null) {
+                                onDataChangedListener.onDataRemoved(cacheMediaData);
                             }
                         }
                     }
@@ -122,9 +120,5 @@ public class MediaDataRepository {
 
     public void seekTo(MediaController mediaController, long pst) {
         mControllerHelper.seekTo(mediaController, pst);
-    }
-
-    public void removePlayer(String pkg) {
-        mPkgList.remove(pkg);
     }
 }

@@ -45,7 +45,7 @@ public class MediaControllerHelper {
         return mHandler;
     }
 
-    public MediaData resolveMediaController(@NonNull MediaController mediaController) {
+    public @NonNull MediaData resolveMediaController(@NonNull MediaController mediaController) {
         MediaData mediaData = new MediaData();
         mediaData.mediaController = mediaController;
         mediaData.transportControls = mediaController.getTransportControls();
@@ -121,6 +121,20 @@ public class MediaControllerHelper {
         long position = playbackState.getPosition();
         String formatPst = Utils.formatDuration(position);
         logInfo.append(", position: ").append(position).append("(").append(formatPst).append(")");
+
+        List<PlaybackState.CustomAction> customActions = playbackState.getCustomActions();
+        if (customActions != null) {
+            logInfo.append(", customActions: ").append(customActions.size()).append(" ");
+            for (PlaybackState.CustomAction customAction : customActions) {
+                String action = customAction.getAction();
+                CharSequence name = customAction.getName();
+                int icon = customAction.getIcon();
+                logInfo.append("(").append(action).append(",").append(name).append(",").append(icon).append(")");
+                logInfo.append("-");
+            }
+            logInfo.deleteCharAt(logInfo.length() - 1);
+        }
+
         Log.i(TAG, logInfo.toString());
 
         if (mediaData != null) {
@@ -224,7 +238,7 @@ public class MediaControllerHelper {
                 MediaData mediaData = getCacheMediaData(mediaController);
                 parsePlaybackState(state, mediaData);
 
-                if (mOnDataChangedListener != null) {
+                if (mOnDataChangedListener != null && mediaData != null) {
                     mOnDataChangedListener.onDataChanged(mediaData);
                 }
 
@@ -244,7 +258,7 @@ public class MediaControllerHelper {
                 MediaData mediaData = getCacheMediaData(mediaController);
                 parseMediaMetadata(metadata, mediaData);
 
-                if (mOnDataChangedListener != null) {
+                if (mOnDataChangedListener != null && mediaData != null) {
                     mOnDataChangedListener.onDataChanged(mediaData);
                 }
             }
@@ -283,21 +297,32 @@ public class MediaControllerHelper {
                 MediaData mediaData = getCacheMediaData(mediaController);
                 parsePlaybackState(state, mediaData);
 
-                if (mOnDataChangedListener != null) {
+                if (mOnDataChangedListener != null && mediaData != null) {
                     mOnDataChangedListener.onDataChanged(mediaData);
                 }
             }
         }
 
         public void sendMsgProgressChanged() {
+            final MediaController mediaController = mControllerCallbackMap.get(this);
+            if (mediaController == null) {
+                Log.w(TAG, "don't sendMsgProgressChanged, because MediaController is null");
+                return;
+            }
+            final PlaybackState playbackState = mediaController.getPlaybackState();
+            if (playbackState == null) {
+                Log.w(TAG, "don't sendMsgProgressChanged, because PlaybackState is null");
+                return;
+            }
+
             if (mRunProgressChanged == null) {
                 mRunProgressChanged = () -> {
-                    MediaController mediaController = mControllerCallbackMap.get(this);
-                    if (mediaController == null) {
-                        return;
+                    if (playbackState.getState() == PlaybackState.STATE_PLAYING) {
+                        onProgressChanged(playbackState);
+                        sendMsgProgressChanged();
+                    } else {
+                        Log.i(TAG, "don't sendMsgProgressChanged, because isn't in playing status ");
                     }
-                    onProgressChanged(mediaController.getPlaybackState());
-                    sendMsgProgressChanged();
                 };
             }
 
