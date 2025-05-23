@@ -74,7 +74,7 @@ public class MediaControllerHelper {
         return mediaDataList;
     }*/
 
-    private void parseAppInfo(@NonNull String pkg, @Nullable MediaData dest) {
+    private void parseAppInfo(@NonNull String pkg, @Nullable MediaData mediaData) {
         try {
             StringBuilder logInfo = new StringBuilder("AppInfo->pkg: " + pkg);
             ApplicationInfo applicationInfo = mPackageManager.getApplicationInfo(pkg, 0);
@@ -83,6 +83,11 @@ public class MediaControllerHelper {
             CharSequence label = applicationInfo.loadLabel(mPackageManager);
             logInfo.append(", label: ").append(label);
             Log.i(TAG, logInfo.toString());
+
+            if (mediaData != null) {
+                mediaData.icon = icon;
+                mediaData.label = label.toString();
+            }
         } catch (PackageManager.NameNotFoundException e) {
             Log.e(TAG, "getApplicationInfo error", e);
         }
@@ -121,7 +126,19 @@ public class MediaControllerHelper {
         long position = playbackState.getPosition();
         String formatPst = Utils.formatDuration(position);
         logInfo.append(", position: ").append(position).append("(").append(formatPst).append(")");
+        customActionsLog(playbackState, logInfo);
+        Log.i(TAG, logInfo.toString());
 
+        if (mediaData != null) {
+            mediaData.stateText = state;
+            mediaData.state = playbackState.getState();
+            mediaData.position = position;
+            mediaData.progress = (int) (mediaData.position / 1000);
+            mediaData.customActions = playbackState.getCustomActions();
+        }
+    }
+
+    private void customActionsLog(@NonNull PlaybackState playbackState, StringBuilder logInfo) {
         List<PlaybackState.CustomAction> customActions = playbackState.getCustomActions();
         if (customActions != null) {
             logInfo.append(", customActions: ").append(customActions.size()).append(" ");
@@ -133,15 +150,6 @@ public class MediaControllerHelper {
                 logInfo.append("-");
             }
             logInfo.deleteCharAt(logInfo.length() - 1);
-        }
-
-        Log.i(TAG, logInfo.toString());
-
-        if (mediaData != null) {
-            mediaData.stateText = state;
-            mediaData.state = playbackState.getState();
-            mediaData.position = position;
-            mediaData.progress = (int) (mediaData.position / 1000);
         }
     }
 

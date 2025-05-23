@@ -49,6 +49,17 @@
         android:paddingTop="4dp"
         android:paddingEnd="26dp">
 
+        <TextView
+            android:id="@+id/tv_player"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="Player"
+            android:drawablePadding="2dp"
+            android:gravity="center"
+            android:padding="4dp"
+            android:textColor="@android:color/holo_blue_bright"
+            android:textSize="11sp" />
+
         <ImageView
             android:id="@+id/tv_album_art"
             android:layout_width="32dp"
@@ -113,4 +124,13 @@
             android:textColor="@android:color/white"
             android:textSize="13sp" />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp" />
 </LinearLayout>

@@ -1,13 +1,20 @@
 package com.suheng.structure.wallpaperpicker.adapter;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.session.PlaybackState;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,21 +37,74 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
     protected void bindView(RecyclerView.ViewHolder viewHolder, final int position, final MediaData data) {
         if (viewHolder instanceof ContentHolder) {
             ContentHolder holder = (ContentHolder) viewHolder;
-            holder.mBtnState.setText(data.stateText);
+            Context context = holder.itemView.getContext();
+
+            holder.tvPlayer.setText(data.label);
+            Drawable icon = data.icon;
+            icon.setBounds(0, 0, (int) (icon.getIntrinsicWidth() / 2.5f), (int) (icon.getIntrinsicHeight() / 2.5f));
+            holder.tvPlayer.setCompoundDrawablesRelative(null, icon, null, null);
+
+            holder.btnState.setText(data.stateText);
             long pst = data.position;
             String fPst = Utils.formatDuration(pst);
-            holder.mTvPst.setText(fPst + "(" + pst + ")");
-            holder.mSeekBar.setProgress(data.progress);
-            holder.mTvTitle.setText(data.title);
-            holder.mTvArtist.setText(data.artist);
+            holder.tvPst.setText(fPst + "(" + pst + ")");
+            holder.seekBar.setProgress(data.progress);
+            holder.tvTitle.setText(data.title);
+            holder.tvArtist.setText(data.artist);
             String duration = Utils.formatDuration(data.duration);
-            holder.mTvDuration.setText(duration + "(" + data.duration + ")");
-            holder.mSeekBar.setMax(data.progressMax);
-            holder.mIvAlbumArt.setImageBitmap(data.albumArt);
+            holder.tvDuration.setText(duration + "(" + data.duration + ")");
+            holder.seekBar.setMax(data.progressMax);
+            holder.ivAlbumArt.setImageBitmap(data.albumArt);
 
-            holder.mBtnPre.setOnClickListener(v -> data.transportControls.skipToPrevious());
-            holder.mBtnNext.setOnClickListener(v -> data.transportControls.skipToNext());
-            holder.mBtnState.setOnClickListener(v -> {
+            List<PlaybackState.CustomAction> customActions = data.customActions;
+            if (customActions != null && !customActions.isEmpty()) {
+                holder.layoutActions.setVisibility(View.VISIBLE);
+
+                final int len = customActions.size();
+                if (holder.layoutActions.getTag() == null) {
+                    holder.layoutActions.setTag("Inflate");
+                    for (int i = 0; i < len; i++) {
+                        TextView textView = new TextView(context);
+                        textView.setGravity(Gravity.CENTER);
+                        textView.setPaddingRelative(10, 6, 10, 6);
+                        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+                        textView.setTextColor(Color.CYAN);
+                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        holder.layoutActions.addView(textView, i, layoutParams);
+                    }
+                }
+
+                final int childCount = holder.layoutActions.getChildCount();
+                for (int i = 0; i < childCount; i++) {
+                    if (i < len) {
+                        PlaybackState.CustomAction customAction = customActions.get(i);
+                        View child = holder.layoutActions.getChildAt(i);
+                        if (child instanceof TextView) {
+                            TextView textView = (TextView) child;
+                            CharSequence nameAction = customAction.getName();
+                            textView.setText(nameAction);
+                            Drawable actionIcon = Utils.getIconFromPackage(context, data.pkg, customAction.getIcon());
+                            if (actionIcon != null) {
+                                final float dimension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
+                                        , 24f, context.getResources().getDisplayMetrics());
+                                int intrinsicWidth = (int) dimension;
+                                int intrinsicHeight = (int) (dimension * actionIcon.getIntrinsicWidth() / actionIcon.getIntrinsicHeight());
+                                actionIcon.setBounds(0, 0, intrinsicWidth, intrinsicHeight);
+                                textView.setCompoundDrawables(null, actionIcon, null, null);
+                            }
+
+                            textView.setOnClickListener(v -> Toast.makeText(context, nameAction + ": " + customAction.getAction(), Toast.LENGTH_SHORT).show());
+                        }
+                    }
+                }
+            } else {
+                holder.layoutActions.setVisibility(View.GONE);
+            }
+
+            holder.btnPre.setOnClickListener(v -> data.transportControls.skipToPrevious());
+            holder.btnNext.setOnClickListener(v -> data.transportControls.skipToNext());
+            holder.btnState.setOnClickListener(v -> {
                 if (data.state == PlaybackState.STATE_PLAYING) {
                     data.transportControls.pause();
                 } else if (data.state == PlaybackState.STATE_PAUSED
@@ -54,7 +114,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                     Log.w(TAG, "Neither in play state nor in pause/none state");
                 }
             });
-            holder.mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            holder.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 }
@@ -73,7 +133,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                     data.transportControls.seekTo(pst);
                     //data.transportControls.pause();
                     //data.transportControls.play();
-                    MediaDataRepository.getInstance(holder.itemView.getContext()).seekTo(data.mediaController, pst);
+                    MediaDataRepository.getInstance(context).seekTo(data.mediaController, pst);
                 }
             });
         }
@@ -86,27 +146,31 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
     }
 
     static class ContentHolder extends RecyclerView.ViewHolder {
-        Button mBtnState;
-        Button mBtnPre;
-        Button mBtnNext;
-        TextView mTvPst;
-        TextView mTvDuration;
-        TextView mTvTitle;
-        TextView mTvArtist;
-        ImageView mIvAlbumArt;
-        SeekBar mSeekBar;
+        TextView tvPlayer;
+        Button btnState;
+        Button btnPre;
+        Button btnNext;
+        TextView tvPst;
+        TextView tvDuration;
+        TextView tvTitle;
+        TextView tvArtist;
+        ImageView ivAlbumArt;
+        SeekBar seekBar;
+        LinearLayout layoutActions;
 
         ContentHolder(View view) {
             super(view);
-            mBtnState = view.findViewById(R.id.btn_state);
-            mBtnPre = view.findViewById(R.id.btn_previous);
-            mBtnNext = view.findViewById(R.id.btn_next);
-            mTvPst = view.findViewById(R.id.tv_pst);
-            mTvDuration = view.findViewById(R.id.tv_duration);
-            mTvTitle = view.findViewById(R.id.tv_title);
-            mTvArtist = view.findViewById(R.id.tv_artist);
-            mIvAlbumArt = view.findViewById(R.id.tv_album_art);
-            mSeekBar = view.findViewById(R.id.seekBar);
+            tvPlayer = view.findViewById(R.id.tv_player);
+            btnState = view.findViewById(R.id.btn_state);
+            btnPre = view.findViewById(R.id.btn_previous);
+            btnNext = view.findViewById(R.id.btn_next);
+            tvPst = view.findViewById(R.id.tv_pst);
+            tvDuration = view.findViewById(R.id.tv_duration);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvArtist = view.findViewById(R.id.tv_artist);
+            ivAlbumArt = view.findViewById(R.id.tv_album_art);
+            seekBar = view.findViewById(R.id.seekBar);
+            layoutActions = view.findViewById(R.id.layout_actions);
         }
     }
 }
