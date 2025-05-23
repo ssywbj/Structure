@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class MediaControllerHelper {
@@ -201,7 +202,16 @@ public class MediaControllerHelper {
     }
 
     public @Nullable MediaData getCacheMediaData(MediaController mediaController) {
-        return mControllerMediaDataMap.get(mediaController);
+        if (mediaController == null) {
+            return null;
+        }
+        for (Map.Entry<MediaController, MediaData> mediaDataEntry : mControllerMediaDataMap.entrySet()) {
+            MediaController controller = mediaDataEntry.getKey();
+            if (Objects.equals(controller.getPackageName(), mediaController.getPackageName())) {
+                return mControllerMediaDataMap.get(controller);
+            }
+        }
+        return null;
     }
 
     public @Nullable List<MediaData> getCacheMediaData() {
@@ -213,6 +223,16 @@ public class MediaControllerHelper {
             mediaDataList.add(mediaDataEntry.getValue());
         }
         return mediaDataList;
+    }
+
+    public @Nullable MediaController getCacheController(String pkg) {
+        for (Map.Entry<PlayProgressListener, MediaController> mediaDataEntry : mControllerCallbackMap.entrySet()) {
+            MediaController controller = mediaDataEntry.getValue();
+            if (Objects.equals(pkg, controller.getPackageName())) {
+                return controller;
+            }
+        }
+        return null;
     }
 
     private final class PlayProgressListener extends PlayProgressCallback {

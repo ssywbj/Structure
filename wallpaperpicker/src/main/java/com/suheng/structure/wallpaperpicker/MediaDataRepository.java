@@ -13,6 +13,7 @@ import com.suheng.structure.wallpaperpicker.bean.MediaData;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 public class MediaDataRepository {
     public static final String TAG = MediaDataRepository.class.getSimpleName();
@@ -88,23 +89,26 @@ public class MediaDataRepository {
                 } else {
                     Iterator<String> iterator = mPkgList.iterator();
                     while (iterator.hasNext()) {
-                        final String pkg = iterator.next(); //0,1,2
-                        MediaController mediaController = null;
-                        for (MediaController controller : controllers) { //0, 1
-                            if (pkg.equals(controller.getPackageName())) {
-                                mediaController = null;
+                        final String pkg = iterator.next(); //0,1
+                        boolean exclude = true;
+                        for (MediaController controller : controllers) { //0
+                            if (Objects.equals(pkg, controller.getPackageName())) {
+                                exclude = false;
                                 break;
                             }
-                            mediaController = controller;
                         }
 
-                        if (mediaController != null) {
-                            Log.i(TAG, "onActiveSessionsChanged, remove player: " + pkg);
+                        if (exclude) {
                             iterator.remove();
-                            mControllerHelper.unregisterCallback(mediaController);
-                            MediaData cacheMediaData = mControllerHelper.getCacheMediaData(mediaController);
-                            if (onDataChangedListener != null && cacheMediaData != null) {
-                                onDataChangedListener.onDataRemoved(cacheMediaData);
+                            MediaController cacheController = mControllerHelper.getCacheController(pkg);
+                            if (cacheController != null) {
+                                mControllerHelper.unregisterCallback(cacheController);
+                                MediaData cacheMediaData = mControllerHelper.getCacheMediaData(cacheController);
+                                Log.i(TAG, "onActiveSessionsChanged, remove player: " + pkg + ", cache pkg: "
+                                        + cacheController.getPackageName() + ", cacheMediaData: " + cacheMediaData);
+                                if (onDataChangedListener != null && cacheMediaData != null) {
+                                    onDataChangedListener.onDataRemoved(cacheMediaData);
+                                }
                             }
                         }
                     }
