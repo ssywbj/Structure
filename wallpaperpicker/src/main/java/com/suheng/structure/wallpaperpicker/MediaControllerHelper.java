@@ -128,6 +128,12 @@ public class MediaControllerHelper {
         String formatPst = Utils.formatDuration(position);
         logInfo.append(", position: ").append(position).append("(").append(formatPst).append(")");
         customActionsLog(playbackState, logInfo);
+        final long actions = playbackState.getActions();
+        boolean existsPrevious = includesAction(actions, PlaybackState.ACTION_SKIP_TO_PREVIOUS);
+        boolean existsNext = includesAction(actions, PlaybackState.ACTION_SKIP_TO_NEXT);
+        logInfo.append(", actions: ").append(actions).append(", existsPrevious: ").append(existsPrevious)
+                .append(", existsNext: ").append(existsNext);
+
         Log.i(TAG, logInfo.toString());
 
         if (mediaData != null) {
@@ -136,6 +142,8 @@ public class MediaControllerHelper {
             mediaData.position = position;
             mediaData.progress = (int) (mediaData.position / 1000);
             mediaData.customActions = playbackState.getCustomActions();
+            mediaData.existsPrevious = existsPrevious;
+            mediaData.existsNext = existsNext;
         }
     }
 
@@ -233,6 +241,14 @@ public class MediaControllerHelper {
             }
         }
         return null;
+    }
+
+    private boolean includesAction(long stateActions, long action) {
+        if ((action == PlaybackState.ACTION_PLAY || action == PlaybackState.ACTION_PAUSE)
+                && (stateActions & PlaybackState.ACTION_PLAY_PAUSE) > 0L) {
+            return true;
+        }
+        return (stateActions & action) != 0L;
     }
 
     private final class PlayProgressListener extends PlayProgressCallback {

@@ -64,46 +64,64 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                 if (holder.layoutActions.getTag() == null) {
                     holder.layoutActions.setTag("Inflate");
                     for (int i = 0; i < len; i++) {
-                        TextView textView = new TextView(context);
-                        textView.setGravity(Gravity.CENTER);
-                        textView.setPaddingRelative(10, 6, 10, 6);
-                        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-                        textView.setTextColor(Color.CYAN);
-                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                        holder.layoutActions.addView(textView, i, layoutParams);
+                        createViewAction(context, holder, i);
+                    }
+                }
+
+                final int countCompareLen = holder.layoutActions.getChildCount();
+                if (countCompareLen < len) { //4<6
+                    for (int i = countCompareLen; i < len; i++) {
+                        createViewAction(context, holder, i);
+                    }
+                } else if (countCompareLen > len) { //4>2
+                    for (int i = len; i < countCompareLen; i++) {
+                        holder.layoutActions.removeViewAt(len);
                     }
                 }
 
                 final int childCount = holder.layoutActions.getChildCount();
                 for (int i = 0; i < childCount; i++) {
-                    if (i < len) {
-                        PlaybackState.CustomAction customAction = customActions.get(i);
-                        View child = holder.layoutActions.getChildAt(i);
-                        if (child instanceof TextView) {
-                            TextView textView = (TextView) child;
-                            CharSequence nameAction = customAction.getName();
-                            textView.setText(nameAction);
-                            Drawable actionIcon = Utils.getIconFromPackage(context, data.pkg, customAction.getIcon());
-                            if (actionIcon != null) {
-                                final float dimension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
-                                        , 24f, context.getResources().getDisplayMetrics());
-                                int intrinsicWidth = (int) dimension;
-                                int intrinsicHeight = (int) (dimension * actionIcon.getIntrinsicWidth() / actionIcon.getIntrinsicHeight());
-                                actionIcon.setBounds(0, 0, intrinsicWidth, intrinsicHeight);
-                                textView.setCompoundDrawables(null, actionIcon, null, null);
-                            }
-
-                            textView.setOnClickListener(v -> Toast.makeText(context, nameAction + ": " + customAction.getAction(), Toast.LENGTH_SHORT).show());
-                        }
+                    if (i >= len) {
+                        break;
                     }
+
+                    View child = holder.layoutActions.getChildAt(i);
+                    if (!(child instanceof TextView)) {
+                        break;
+                    }
+
+                    PlaybackState.CustomAction customAction = customActions.get(i);
+                    TextView textView = (TextView) child;
+                    CharSequence nameAction = customAction.getName();
+                    textView.setText(nameAction);
+                    Drawable actionIcon = Utils.getIconFromPackage(context, data.pkg, customAction.getIcon());
+                    if (actionIcon != null) {
+                        final float dimension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
+                                , 24f, context.getResources().getDisplayMetrics());
+                        int intrinsicWidth = (int) dimension;
+                        int intrinsicHeight = (int) (dimension * actionIcon.getIntrinsicWidth() / actionIcon.getIntrinsicHeight());
+                        actionIcon.setBounds(0, 0, intrinsicWidth, intrinsicHeight);
+                        textView.setCompoundDrawables(null, actionIcon, null, null);
+                    }
+
+                    textView.setOnClickListener(v -> Toast.makeText(context, nameAction + ": " + customAction.getAction(), Toast.LENGTH_SHORT).show());
                 }
             } else {
                 holder.layoutActions.setVisibility(View.GONE);
             }
 
-            holder.btnPre.setOnClickListener(v -> data.transportControls.skipToPrevious());
-            holder.btnNext.setOnClickListener(v -> data.transportControls.skipToNext());
+            holder.btnPrevious.setEnabled(data.existsPrevious);
+            if (data.existsPrevious) {
+                holder.btnPrevious.setOnClickListener(v -> data.transportControls.skipToPrevious());
+            } else {
+                holder.btnPrevious.setOnClickListener(null);
+            }
+            holder.btnNext.setEnabled(data.existsNext);
+            if (data.existsNext) {
+                holder.btnNext.setOnClickListener(v -> data.transportControls.skipToNext());
+            } else {
+                holder.btnNext.setOnClickListener(null);
+            }
             holder.btnState.setOnClickListener(v -> {
                 if (data.state == PlaybackState.STATE_PLAYING) {
                     data.transportControls.pause();
@@ -145,10 +163,21 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
         return new ContentHolder(getItemLayout(parent.getContext(), R.layout.wallpaperpick_activity_media_controller_adt));
     }
 
+    private void createViewAction(Context context, ContentHolder holder, int index) {
+        TextView textView = new TextView(context);
+        textView.setGravity(Gravity.CENTER);
+        textView.setPaddingRelative(10, 6, 10, 6);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        textView.setTextColor(Color.CYAN);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        holder.layoutActions.addView(textView, index, layoutParams);
+    }
+
     static class ContentHolder extends RecyclerView.ViewHolder {
         TextView tvPlayer;
         Button btnState;
-        Button btnPre;
+        Button btnPrevious;
         Button btnNext;
         TextView tvPst;
         TextView tvDuration;
@@ -162,7 +191,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
             super(view);
             tvPlayer = view.findViewById(R.id.tv_player);
             btnState = view.findViewById(R.id.btn_state);
-            btnPre = view.findViewById(R.id.btn_previous);
+            btnPrevious = view.findViewById(R.id.btn_previous);
             btnNext = view.findViewById(R.id.btn_next);
             tvPst = view.findViewById(R.id.tv_pst);
             tvDuration = view.findViewById(R.id.tv_duration);

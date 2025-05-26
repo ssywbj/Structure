@@ -20,6 +20,8 @@ public class MediaData {
     public int state = PlaybackState.STATE_NONE;
     public long position;
     public List<PlaybackState.CustomAction> customActions;
+    public boolean existsPrevious;
+    public boolean existsNext;
 
     public String title;
     public String artist;
