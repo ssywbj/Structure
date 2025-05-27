@@ -105,6 +105,8 @@ public class MediaControllerHelper {
         logInfo.append(", duration: ").append(duration).append("(").append(formatDuration).append(")");
         Bitmap albumArt = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
         logInfo.append(", albumArt: ").append(System.identityHashCode(albumArt));
+        String mediaId = metadata.getString(MediaMetadata.METADATA_KEY_MEDIA_ID);
+        logInfo.append(", mediaId: ").append(mediaId);
         Log.i(TAG, logInfo.toString());
 
         if (mediaData != null) {

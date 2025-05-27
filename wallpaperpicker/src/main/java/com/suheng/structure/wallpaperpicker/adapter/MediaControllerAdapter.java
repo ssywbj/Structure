@@ -69,11 +69,11 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                 }
 
                 final int countCompareLen = holder.layoutActions.getChildCount();
-                if (countCompareLen < len) { //4<6
+                if (countCompareLen < len) { //example: 4<6
                     for (int i = countCompareLen; i < len; i++) {
                         createViewAction(context, holder, i);
                     }
-                } else if (countCompareLen > len) { //4>2
+                } else if (countCompareLen > len) { //example: 4>2
                     for (int i = len; i < countCompareLen; i++) {
                         holder.layoutActions.removeViewAt(len);
                     }
@@ -92,8 +92,8 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
 
                     PlaybackState.CustomAction customAction = customActions.get(i);
                     TextView textView = (TextView) child;
-                    CharSequence nameAction = customAction.getName();
-                    textView.setText(nameAction);
+                    CharSequence actionName = customAction.getName();
+                    textView.setText(actionName);
                     Drawable actionIcon = Utils.getIconFromPackage(context, data.pkg, customAction.getIcon());
                     if (actionIcon != null) {
                         final float dimension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
@@ -104,7 +104,10 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                         textView.setCompoundDrawables(null, actionIcon, null, null);
                     }
 
-                    textView.setOnClickListener(v -> Toast.makeText(context, nameAction + ": " + customAction.getAction(), Toast.LENGTH_SHORT).show());
+                    textView.setOnClickListener(v -> {
+                        Toast.makeText(context, actionName, Toast.LENGTH_SHORT).show();
+                        data.transportControls.sendCustomAction(customAction.getAction(), null); //test app: Spotify
+                    });
                 }
             } else {
                 holder.layoutActions.setVisibility(View.GONE);
