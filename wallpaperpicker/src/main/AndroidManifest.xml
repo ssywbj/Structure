@@ -88,8 +88,6 @@
                 android:resource="@drawable/icon_app_calculator" />
         </activity>
 
-        <service android:name=".WallpaperPickService" />
-
         <service
             android:name=".NotificationListenerServiceImpl"
             android:exported="true"

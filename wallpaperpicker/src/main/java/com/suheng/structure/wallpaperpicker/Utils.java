@@ -1,11 +1,17 @@
 package com.suheng.structure.wallpaperpicker;
 
+import android.app.WallpaperManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import java.lang.reflect.Method;
 import java.util.Locale;
 
 public class Utils {
@@ -36,6 +42,19 @@ public class Utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void setLiveWallpaper(@NonNull Context context, @NonNull String pkg
+            , @NonNull String service) {
+        try {
+            final WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
+            final Method method = WallpaperManager.class.getMethod("setWallpaperComponent", ComponentName.class);
+            method.invoke(wallpaperManager, new ComponentName(pkg, service));
+            Toast.makeText(context, "setting success", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "setting fail", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

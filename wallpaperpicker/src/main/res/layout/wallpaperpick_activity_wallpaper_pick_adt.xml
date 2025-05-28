@@ -1,34 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/text_wallpaper_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        android:gravity="center"
-        android:padding="2dp"
-        android:textColor="#8DCC3E"
-        android:textSize="20sp" />
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="4dp">
 
     <ImageView
         android:id="@+id/image_wallpaper_thumb"
-        android:layout_width="240dp"
+        android:layout_width="match_parent"
         android:layout_height="240dp"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"/>
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp" />
+
+    <TextView
+        android:id="@+id/text_wallpaper_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        android:textColor="#8DCC3E"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/text_wallpaper_setting"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="6dp"
+        android:padding="2dp"
         android:text="设置"
         android:textColor="@android:color/white"
-        android:textSize="18sp" />
+        android:textSize="12sp" />
 
 </LinearLayout>

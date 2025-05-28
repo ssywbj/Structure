@@ -2,33 +2,25 @@ package com.suheng.structure.wallpaperpicker;
 
 import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.content.pm.ServiceInfo;
-import android.graphics.drawable.Drawable;
 import android.media.MediaRoute2Info;
 import android.media.MediaRouter2;
 import android.media.RouteDiscoveryPreference;
 import android.os.Build;
 import android.os.Bundle;
-import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.suheng.structure.wallpaperpicker.adapter.LivePaperAdapter;
 import com.suheng.structure.wallpaperpicker.adapter.MediaControllerAdapter;
 import com.suheng.structure.wallpaperpicker.adapter.RecyclerAdapter;
 import com.suheng.structure.wallpaperpicker.bean.MediaData;
@@ -39,9 +31,8 @@ import java.util.List;
 
 public class WallpaperPickActivity extends AppCompatActivity {
 
-    private String mTag = "WallpaperPickActivity";
+    private static final String TAG = "WallpaperPickActivity";
     private final List<WallpaperInfo> mWallpaperInfoList = new ArrayList<>();
-    private LivePaperAdapter mLivePaperAdapter;
     private MediaRouteAdapter mMediaRouteAdapter;
     private MediaControllerAdapter mMediaControllerAdapter;
     private final List<MediaRoute2Info> mMediaRoute2InfoList = new ArrayList<>();
@@ -69,78 +60,11 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 new ComponentName(this, ZhipuWallpaperService.class));
         startActivity(intent);*/
 
-        WallpaperInfo wallpaperInfo = wallpaperManager.getWallpaperInfo();
-        if (wallpaperInfo == null) {
-            Log.w(mTag, "live wallpaper isn't setting !");
-        } else {//不为空说明当前系统使用的是动态壁纸
-            Log.d(mTag, "current live wallpaper, name: " + wallpaperInfo.getServiceName() + ", package: " + wallpaperInfo.getPackageName() + ", label: " + wallpaperInfo.loadLabel(getPackageManager()) + ", setting activity: " + wallpaperInfo.getSettingsActivity());
-        }
-
-        PackageManager packageManager = getPackageManager();
-        List<ResolveInfo> resolveInfoList = packageManager.queryIntentServices(new Intent(WallpaperService.SERVICE_INTERFACE), PackageManager.GET_META_DATA);
-        int size = resolveInfoList.size();
-        Log.d(mTag, "wallpaperInfo, size: " + size);
-        List<WallpaperInfo> wallpaperInfoList = new ArrayList<>();
-        for (ResolveInfo resolveInfo : resolveInfoList) {
-            try {
-                wallpaperInfoList.add(new WallpaperInfo(this, resolveInfo));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            ResolveInfo resolveInfo = packageManager.resolveService(new Intent("com.wiz.watch.FaceRoamingClock"), PackageManager.GET_META_DATA);
-            WallpaperInfo info = new WallpaperInfo(this, resolveInfo);
-            Log.d(mTag, "custom resolveInfo: " + resolveInfo + "\nwallpaperInfo: " + info + "\n" + "pkg: " + info.getPackageName() + ", service: " + info.getServiceName() + ", recycle_life: " + info.getServiceInfo().metaData.getBoolean("recycle_life"));
-        } catch (Exception e) {
-            Log.e(mTag, "parse custom wallpaper info error:" + e.toString());
-        }
-
-        String packageName;
-        String service;
-        Drawable drawable;
-        ServiceInfo serviceInfo;
-        Bundle bundle;
-        List<WallpaperInfo> wallpaperInfos = new ArrayList<>();
-        for (WallpaperInfo wallpaper : wallpaperInfoList) {
-            packageName = wallpaper.getPackageName();
-            service = wallpaper.getServiceName();
-            drawable = wallpaper.loadThumbnail(packageManager);
-            serviceInfo = wallpaper.getServiceInfo();
-            bundle = serviceInfo.metaData;
-            Log.d(mTag, "package: " + packageName + ", service: " + service + ", drawable = " + drawable + ", label = " + wallpaper.loadLabel(packageManager) + ", setting activity: " + wallpaper.getSettingsActivity());
-            Log.d(mTag, "service info, name: " + serviceInfo.name + ", recycle_life: " + bundle.getBoolean("recycle_life"));
-
-            /*if (drawable == null) {
-                drawable = ContextCompat.getDrawable(this, R.drawable.watch_face_preview_default);
-            }*/
-            if (drawable != null) {
-                wallpaperInfos.add(wallpaper);
-            }
-        }
-
-        mWallpaperInfoList.addAll(wallpaperInfos);
+        WallpaperRepository wallpaperRepository = WallpaperRepository.getInstance(this);
+        mWallpaperInfoList.addAll(wallpaperRepository.getPaperList(this));
 
         this.initRecyclerView();
 
-        startService(new Intent(this, WallpaperPickService.class));
-
-        final View.OnClickListener onClickListener = v -> {
-            final String pkg = "com.suheng.wallpaper.myhealth";
-            String cls;
-            if (v.getId() == R.id.btn_set_one) {
-                cls = pkg + ".MyHealthWatchFace";
-                WallpaperPickService.setLiveWallPaper(v.getContext(), pkg, cls, true);
-                finish();
-            } else if (v.getId() == R.id.btn_set_two) {
-                cls = pkg + ".VapWallpaper";
-                WallpaperPickService.setLiveWallPaper(v.getContext(), pkg, cls, true);
-                finish();
-            }
-        };
-        findViewById(R.id.btn_set_one).setOnClickListener(onClickListener);
-        findViewById(R.id.btn_set_two).setOnClickListener(onClickListener);
         MediaDataRepository mediaDataRepository = MediaDataRepository.getInstance(this);
         OnDataChangedListener onDataChangedListener = new OnDataChangedListener() {
             @Override
@@ -173,7 +97,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             this.getWifiList();
         } else {
-            Log.w(mTag, "Don't get wifi list because version is lower than R");
+            Log.w(TAG, "Don't get wifi list because version is lower than R");
         }
 
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -193,7 +117,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
         List<MediaRoute2Info> routes = mMediaRouter2.getRoutes();
         List<MediaRouter2.RoutingController> controllers = mMediaRouter2.getControllers();
-        Log.d(mTag, "controllers.size(): " + controllers.size() + ", routes.size(): " + routes.size());
+        Log.d(TAG, "controllers.size(): " + controllers.size() + ", routes.size(): " + routes.size());
         for (MediaRouter2.RoutingController controller : controllers) {
             String controllerId = controller.getId();
             for (MediaRoute2Info route : controller.getSelectedRoutes()) {
@@ -203,7 +127,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     type = route.getType();
                 }
-                Log.i(mTag, "selectedRoutes, controllerId: " + controllerId + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
+                Log.i(TAG, "selectedRoutes, controllerId: " + controllerId + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
 
             /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
@@ -222,7 +146,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     type = route.getType();
                 }
-                Log.d(mTag, "selectableRoutes, controllerId: " + controllerId + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
+                Log.d(TAG, "selectableRoutes, controllerId: " + controllerId + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
 
             for (MediaRoute2Info route : controller.getDeselectableRoutes()) {
@@ -232,7 +156,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     type = route.getType();
                 }
-                Log.d(mTag, "deselectableRoutes, controllerId: " + controllerId + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
+                Log.d(TAG, "deselectableRoutes, controllerId: " + controllerId + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
         }
 
@@ -240,11 +164,11 @@ public class WallpaperPickActivity extends AppCompatActivity {
             @Override
             public void onRoutesUpdated(@NonNull List<MediaRoute2Info> routes) {
                 super.onRoutesUpdated(routes);
-                Log.i(mTag, "onRoutesUpdated, routes.size: " + routes.size() + ", mediaRouter2.routes.size: " + mMediaRouter2.getRoutes().size() + ", thread: " + Thread.currentThread().getName());
+                Log.i(TAG, "onRoutesUpdated, routes.size: " + routes.size() + ", mediaRouter2.routes.size: " + mMediaRouter2.getRoutes().size() + ", thread: " + Thread.currentThread().getName());
                 mMediaRoute2InfoList.clear();
                 mMediaRoute2InfoList.addAll(routes);
                 for (MediaRoute2Info route : routes) {
-                    Log.d(mTag, "onRoutesUpdated, route HashCode: " + System.identityHashCode(route) + ", id " + route.getId());
+                    Log.d(TAG, "onRoutesUpdated, route HashCode: " + System.identityHashCode(route) + ", id " + route.getId());
                 }
                 mMediaRouteAdapter.notifyItemRangeChanged(0, mMediaRoute2InfoList.size());
             }
@@ -275,31 +199,15 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
     private void initRecyclerView() {
         final RecyclerView recyclerView = findViewById(R.id.recycler_view_wallpaper);
-        mLivePaperAdapter = new LivePaperAdapter(mWallpaperInfoList);
-        mLivePaperAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener<WallpaperInfo>() {
-            @Override
-            public void onItemClick(View view, final WallpaperInfo data, int position) {
-                Intent intent = new Intent("com.wiz.watch.action.PICK_WALLPAPER");
-                intent.putExtra("wallpaper_info", data);
-                sendBroadcast(intent);
-
-                recyclerView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        finish();
-                    }
-                }, 100);
-
-            }
+        LivePaperAdapter livePaperAdapter = new LivePaperAdapter(mWallpaperInfoList);
+        livePaperAdapter.setOnItemClickListener((view, data, position) -> {
+            Utils.setLiveWallpaper(this, data.getPackageName(), data.getServiceName());
+            recyclerView.postDelayed(this::finish, 100);
         });
-
         //https://blog.csdn.net/u010687392/article/details/47950199?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mLivePaperAdapter);
-
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(mCallback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+        recyclerView.setAdapter(livePaperAdapter);
 
         RecyclerView rvRouteList = findViewById(R.id.recycler_route_list);
         mMediaRouteAdapter = new MediaRouteAdapter(mMediaRoute2InfoList);
@@ -309,12 +217,11 @@ public class WallpaperPickActivity extends AppCompatActivity {
                     if (data.getVolumeHandling() == MediaRoute2Info.PLAYBACK_VOLUME_VARIABLE) {
                         return;
                     }
-                    Log.d(mTag, "transferTo, route: " + data);
+                    Log.d(TAG, "transferTo, route: " + data);
                     mMediaRouter2.transferTo(data);
                 }
             }
         });
-
         //https://blog.csdn.net/u010687392/article/details/47950199?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
         rvRouteList.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         rvRouteList.setItemAnimator(new DefaultItemAnimator());
@@ -331,7 +238,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(mTag, "onDestroy()");
+        Log.d(TAG, "onDestroy()");
         mWallpaperInfoList.clear();
         //mMediaSessionHelper.removeChangedListeners();
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -344,127 +251,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Log.d(mTag, "onBackPressed()");
-    }
-
-    ItemTouchHelper.Callback mCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP, ItemTouchHelper.UP) {
-        @Override
-        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-            /*int fromPst = viewHolder.getAdapterPosition();//得到拖动ViewHolder的position
-            int toPosition = target.getAdapterPosition();//得到目标ViewHolder的position
-            if (fromPst < toPosition) {
-                //分别把中间所有的item的位置重新交换
-                for (int i = fromPst; i < toPosition; i++) {
-                    Collections.swap(mWallpaperInfoList, i, i + 1);
-                }
-            } else {
-                for (int i = fromPst; i > toPosition; i--) {
-                    Collections.swap(mWallpaperInfoList, i, i - 1);
-                }
-            }
-            mLivePaperAdapter.notifyItemMoved(fromPst, toPosition);*/
-
-            int fromPst = viewHolder.getAdapterPosition();
-            mWallpaperInfoList.remove(mWallpaperInfoList.get(fromPst));
-            mLivePaperAdapter.notifyDataSetChanged();
-            Log.d(mTag, "onMove, from pst: " + fromPst);
-            return true;//true表示执行拖动
-        }
-
-        @Override
-        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            int pst = viewHolder.getAdapterPosition();
-            WallpaperInfo wallpaper = mWallpaperInfoList.get(pst);
-
-            /*try {
-                deleteLiveWallPaper(wallpaper.getPackageName());
-
-                mWallpaperInfoList.remove(wallpaper);
-                mLivePaperAdapter.notifyDataSetChanged();
-                Toast.makeText(WallpaperPickActivity.this, "表盘删除成功", Toast.LENGTH_SHORT).show();
-            } catch (Exception e) {
-                Log.e(mTag, "delete live wallpaper fail", e);
-                Toast.makeText(WallpaperPickActivity.this, "表盘删除失败", Toast.LENGTH_SHORT).show();
-            }*/
-
-            /*try {
-                execCommand("pm", "uninstall", wallpaper.getPackageName());
-
-                mWallpaperInfoList.remove(wallpaper);
-                mLivePaperAdapter.notifyDataSetChanged();
-                Toast.makeText(WallpaperPickActivity.this, "表盘删除成功", Toast.LENGTH_SHORT).show();
-            } catch (Exception e) {
-                Log.e(mTag, "delete live wallpaper fail", e);
-                Toast.makeText(WallpaperPickActivity.this, "表盘删除失败", Toast.LENGTH_SHORT).show();
-            }*/
-
-            /*Uri uri = Uri.fromParts("package", wallpaper.getPackageName(), null);
-            Intent intent = new Intent(Intent.ACTION_DELETE, uri);
-            startActivity(intent);
-            mWallpaperInfoList.remove(wallpaper);
-            mLivePaperAdapter.notifyDataSetChanged();*/
-
-            mWallpaperInfoList.remove(wallpaper);
-            mLivePaperAdapter.notifyDataSetChanged();
-            Log.d(mTag, "onSwiped");
-            if (mWallpaperInfoList.size() == 0) {
-                Toast.makeText(WallpaperPickActivity.this, "表盘列表为空", Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
-
-    private final class LivePaperAdapter extends RecyclerAdapter<WallpaperInfo, RecyclerView.ViewHolder> {
-
-        LivePaperAdapter(List<WallpaperInfo> dataList) {
-            super(dataList);
-        }
-
-        @Override
-        protected void bindView(RecyclerView.ViewHolder viewHolder, final int position, final WallpaperInfo data) {
-            if (viewHolder instanceof ContentHolder) {
-                ContentHolder contentHolder = (ContentHolder) viewHolder;
-                contentHolder.textName.setText(data.loadLabel(getPackageManager()));
-                contentHolder.imageThumb.setImageDrawable(data.loadThumbnail(getPackageManager()));
-
-                final String settingsActivity = data.getSettingsActivity();
-                if (settingsActivity == null) {
-                    contentHolder.textSetting.setVisibility(View.GONE);
-                    contentHolder.textSetting.setOnClickListener(null);
-                } else {
-                    contentHolder.textSetting.setVisibility(View.VISIBLE);
-                    contentHolder.textSetting.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            try {
-                                Intent intent = new Intent();
-                                intent.setClassName(data.getPackageName(), settingsActivity);
-                                startActivity(intent);
-                            } catch (Exception e) {
-                                Log.e(mTag, "open " + settingsActivity + " fail", e);
-                            }
-                        }
-                    });
-                }
-            }
-        }
-
-        @NonNull
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ContentHolder(getItemLayout(parent.getContext(), R.layout.wallpaperpick_activity_wallpaper_pick_adt));
-        }
-
-        class ContentHolder extends RecyclerView.ViewHolder {
-            TextView textName, textSetting;
-            ImageView imageThumb;
-
-            ContentHolder(View view) {
-                super(view);
-                textName = view.findViewById(R.id.text_wallpaper_name);
-                imageThumb = view.findViewById(R.id.image_wallpaper_thumb);
-                textSetting = view.findViewById(R.id.text_wallpaper_setting);
-            }
-        }
+        Log.d(TAG, "onBackPressed()");
     }
 
     private static final class MediaRouteAdapter extends RecyclerAdapter<MediaRoute2Info, RecyclerView.ViewHolder> {
