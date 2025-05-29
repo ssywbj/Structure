@@ -9,7 +9,6 @@ import android.media.MediaMetadata;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -380,11 +379,7 @@ public class MediaControllerHelper {
             if (mRunProgressChanged == null) {
                 return;
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                if (getHandler().hasCallbacks(mRunProgressChanged)) {
-                    getHandler().removeCallbacks(mRunProgressChanged);
-                }
-            } else {
+            if (getHandler().hasCallbacks(mRunProgressChanged)) {
                 getHandler().removeCallbacks(mRunProgressChanged);
             }
             mRunProgressChanged = null;

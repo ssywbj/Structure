@@ -2,7 +2,6 @@ package com.suheng.structure.wallpaperpicker;
 
 import android.app.WallpaperInfo;
 import android.media.MediaRoute2Info;
-import android.media.MediaRouter2;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -16,6 +15,7 @@ import com.suheng.structure.wallpaperpicker.adapter.LivePaperAdapter;
 import com.suheng.structure.wallpaperpicker.adapter.MediaControllerAdapter;
 import com.suheng.structure.wallpaperpicker.adapter.MediaRouteAdapter;
 import com.suheng.structure.wallpaperpicker.bean.MediaData;
+import com.suheng.structure.wallpaperpicker.bean.RouteData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
     private static final String TAG = "WallpaperPickActivity";
     private final List<WallpaperInfo> mWallpaperInfoList = new ArrayList<>();
-    private final List<MediaRoute2Info> mMediaRoute2InfoList = new ArrayList<>();
+    private final List<RouteData> mRouteDataList = new ArrayList<>();
     private final List<MediaData> mMediaControllerList = new ArrayList<>();
 
     /*@Nullable
@@ -67,30 +67,39 @@ public class WallpaperPickActivity extends AppCompatActivity {
 
         MediaRouteRepository routeRepository = MediaRouteRepository.getInstance(this);
         RecyclerView rvRouteList = findViewById(R.id.recycler_route_list);
-        MediaRouteAdapter mediaRouteAdapter = new MediaRouteAdapter(mMediaRoute2InfoList);
+        MediaRouteAdapter mediaRouteAdapter = new MediaRouteAdapter(mRouteDataList);
         mediaRouteAdapter.setOnItemClickListener((view, data, position) -> {
             if (data.getVolumeHandling() == MediaRoute2Info.PLAYBACK_VOLUME_VARIABLE) {
                 return;
             }
-            Log.d(TAG, "transferTo, route: " + data);
             routeRepository.transferTo(data);
         });
         //https://blog.csdn.net/u010687392/article/details/47950199?utm_medium=distribute.pc_relevant.none-task-blog-baidujs-2
         rvRouteList.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         rvRouteList.setItemAnimator(new DefaultItemAnimator());
         rvRouteList.setAdapter(mediaRouteAdapter);
-        routeRepository.getWifiList(this, new MediaRouter2.RouteCallback() {
+        List<RouteData> routeList = routeRepository.getRouteList(getMainExecutor(), new MediaRouteRepository.OnDataLChangedListener() {
             @Override
-            public void onRoutesUpdated(@NonNull List<MediaRoute2Info> routes) {
-                Log.i(TAG, "onRoutesUpdated, routes.size: " + routes.size() + ", thread: " + Thread.currentThread().getName());
-                mMediaRoute2InfoList.clear();
-                mMediaRoute2InfoList.addAll(routes);
-                for (MediaRoute2Info route : routes) {
-                    Log.d(TAG, "onRoutesUpdated, route HashCode: " + System.identityHashCode(route) + ", id " + route.getId());
-                }
-                mediaRouteAdapter.notifyItemRangeChanged(0, mMediaRoute2InfoList.size());
+            public void onRouteRemoved(@NonNull RouteData routeData) {
+                final int index = mRouteDataList.indexOf(routeData);
+                mediaRouteAdapter.notifyItemRemoved(index);
+                mRouteDataList.remove(routeData);
+            }
+
+            @Override
+            public void onRouteAdded(@NonNull RouteData routeData) {
+                mRouteDataList.add(routeData);
+                mediaRouteAdapter.notifyItemInserted(mRouteDataList.indexOf(routeData));
+            }
+
+            @Override
+            public void onRouteUpdated(@NonNull RouteData routeData) {
+                final int index = mRouteDataList.indexOf(routeData);
+                mediaRouteAdapter.notifyItemChanged(index, routeData);
             }
         });
+        mRouteDataList.addAll(routeList);
+        mediaRouteAdapter.notifyItemRangeChanged(0, mRouteDataList.size());
 
         RecyclerView rvMediaList = findViewById(R.id.recycler_media_list);
         MediaControllerAdapter mediaControllerAdapter = new MediaControllerAdapter(mMediaControllerList);
@@ -109,7 +118,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
             @Override
             public void onDataAdded(@NonNull MediaData data) {
                 mMediaControllerList.add(data);
-                mediaControllerAdapter.notifyItemRangeChanged(0, mMediaControllerList.size());
+                mediaControllerAdapter.notifyItemInserted(mMediaControllerList.indexOf(data));
             }
 
             @Override
@@ -132,7 +141,7 @@ public class WallpaperPickActivity extends AppCompatActivity {
         MediaRouteRepository.getInstance(this).destroy();
         mWallpaperInfoList.clear();
         mMediaControllerList.clear();
-        mMediaRoute2InfoList.clear();
+        mRouteDataList.clear();
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (mComponentNotification != null) {
                 NotificationListenerService.requestRebind(mComponentNotification);
