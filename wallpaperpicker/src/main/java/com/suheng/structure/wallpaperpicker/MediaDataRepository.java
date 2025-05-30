@@ -118,11 +118,35 @@ public class MediaDataRepository {
         }, null);
     }
 
-    public List<MediaData> getMediaDataList() {
-        return getMediaDataList(null, null);
+    public void sendCustomAction(String pkg, @NonNull String action) {
+        mControllerHelper.sendCustomAction(pkg, action);
     }
 
-    public void seekTo(MediaController mediaController, long pst) {
-        mControllerHelper.seekTo(mediaController, pst);
+    public void seekTo(String pkg, long pos) {
+        mControllerHelper.seekTo(pkg, pos);
+    }
+
+    public void play(String pkg) {
+        mControllerHelper.play(pkg);
+    }
+
+    public void pause(String pkg) {
+        mControllerHelper.pause(pkg);
+    }
+
+    public void skipToPrevious(String pkg) {
+        mControllerHelper.skipToPrevious(pkg);
+    }
+
+    public void skipToNext(String pkg) {
+        mControllerHelper.skipToNext(pkg);
+    }
+
+    public abstract static class OnDataChangedListener {
+        abstract void onDataUpdated(@NonNull MediaData data);
+
+        abstract void onDataAdded(@NonNull MediaData data);
+
+        abstract void onDataRemoved(@NonNull MediaData data);
     }
 }

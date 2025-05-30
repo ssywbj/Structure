@@ -47,8 +47,6 @@ public class MediaControllerHelper {
 
     public @NonNull MediaData resolveMediaController(@NonNull MediaController mediaController) {
         MediaData mediaData = new MediaData();
-        mediaData.mediaController = mediaController;
-        mediaData.transportControls = mediaController.getTransportControls();
         mediaData.pkg = mediaController.getPackageName();
         mControllerMediaDataMap.put(mediaController, mediaData);
 
@@ -163,7 +161,7 @@ public class MediaControllerHelper {
         }
     }
 
-    public void registerCallback(@NonNull MediaController mediaController, @Nullable OnDataChangedListener onDataChangedListener) {
+    public void registerCallback(@NonNull MediaController mediaController, @Nullable MediaDataRepository.OnDataChangedListener onDataChangedListener) {
         PlayProgressListener controllerCallback = new PlayProgressListener();
         controllerCallback.setOnDataChangedListener(onDataChangedListener);
         mediaController.registerCallback(controllerCallback, getHandler());
@@ -252,11 +250,60 @@ public class MediaControllerHelper {
         return (stateActions & action) != 0L;
     }
 
+    public void sendCustomAction(String pkg, @NonNull String action) {
+        MediaController mediaController = getCacheController(pkg);
+        if (mediaController == null) {
+            return;
+        }
+        mediaController.getTransportControls().sendCustomAction(action, null);//test app: Spotify
+    }
+
+    public void seekTo(String pkg, long pos) {
+        MediaController mediaController = getCacheController(pkg);
+        if (mediaController == null) {
+            return;
+        }
+        mediaController.getTransportControls().seekTo(pos);
+        seekTo(mediaController, pos);
+    }
+
+    public void play(String pkg) {
+        MediaController mediaController = getCacheController(pkg);
+        if (mediaController == null) {
+            return;
+        }
+        mediaController.getTransportControls().play();
+    }
+
+    public void pause(String pkg) {
+        MediaController mediaController = getCacheController(pkg);
+        if (mediaController == null) {
+            return;
+        }
+        mediaController.getTransportControls().pause();
+    }
+
+    public void skipToPrevious(String pkg) {
+        MediaController mediaController = getCacheController(pkg);
+        if (mediaController == null) {
+            return;
+        }
+        mediaController.getTransportControls().skipToPrevious();
+    }
+
+    public void skipToNext(String pkg) {
+        MediaController mediaController = getCacheController(pkg);
+        if (mediaController == null) {
+            return;
+        }
+        mediaController.getTransportControls().skipToNext();
+    }
+
     private final class PlayProgressListener extends PlayProgressCallback {
         @Nullable
         private Runnable mRunProgressChanged;
         @Nullable
-        private OnDataChangedListener mOnDataChangedListener;
+        private MediaDataRepository.OnDataChangedListener mOnDataChangedListener;
 
         @Override
         public void onSessionDestroyed() {
@@ -284,7 +331,7 @@ public class MediaControllerHelper {
                 parsePlaybackState(state, mediaData);
 
                 if (mOnDataChangedListener != null && mediaData != null) {
-                    mOnDataChangedListener.onDataChanged(mediaData);
+                    mOnDataChangedListener.onDataUpdated(mediaData);
                 }
 
                 removeMsgProgressChanged();
@@ -304,7 +351,7 @@ public class MediaControllerHelper {
                 parseMediaMetadata(metadata, mediaData);
 
                 if (mOnDataChangedListener != null && mediaData != null) {
-                    mOnDataChangedListener.onDataChanged(mediaData);
+                    mOnDataChangedListener.onDataUpdated(mediaData);
                 }
             }
         }
@@ -343,7 +390,7 @@ public class MediaControllerHelper {
                 parsePlaybackState(state, mediaData);
 
                 if (mOnDataChangedListener != null && mediaData != null) {
-                    mOnDataChangedListener.onDataChanged(mediaData);
+                    mOnDataChangedListener.onDataUpdated(mediaData);
                 }
             }
         }
@@ -385,7 +432,7 @@ public class MediaControllerHelper {
             mRunProgressChanged = null;
         }
 
-        public void setOnDataChangedListener(@Nullable OnDataChangedListener onDataChangedListener) {
+        public void setOnDataChangedListener(@Nullable MediaDataRepository.OnDataChangedListener onDataChangedListener) {
             mOnDataChangedListener = onDataChangedListener;
         }
 

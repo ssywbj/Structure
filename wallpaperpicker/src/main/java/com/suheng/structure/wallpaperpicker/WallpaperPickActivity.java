@@ -108,9 +108,9 @@ public class WallpaperPickActivity extends AppCompatActivity {
         rvMediaList.setItemAnimator(new DefaultItemAnimator());
         rvMediaList.setAdapter(mediaControllerAdapter);
         MediaDataRepository mediaDataRepository = MediaDataRepository.getInstance(this);
-        OnDataChangedListener onDataChangedListener = new OnDataChangedListener() {
+        MediaDataRepository.OnDataChangedListener onDataChangedListener = new MediaDataRepository.OnDataChangedListener() {
             @Override
-            public void onDataChanged(@NonNull MediaData data) {
+            public void onDataUpdated(@NonNull MediaData data) {
                 final int position = mMediaControllerList.indexOf(data);
                 mediaControllerAdapter.notifyItemChanged(position, data);
             }

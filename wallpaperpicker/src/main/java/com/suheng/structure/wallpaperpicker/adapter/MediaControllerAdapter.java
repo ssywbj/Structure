@@ -38,6 +38,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
         if (viewHolder instanceof ContentHolder) {
             ContentHolder holder = (ContentHolder) viewHolder;
             Context context = holder.itemView.getContext();
+            MediaDataRepository dataRepository = MediaDataRepository.getInstance(context);
 
             holder.tvPlayer.setText(data.label);
             Drawable icon = data.icon;
@@ -106,7 +107,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
 
                     textView.setOnClickListener(v -> {
                         Toast.makeText(context, actionName, Toast.LENGTH_SHORT).show();
-                        data.transportControls.sendCustomAction(customAction.getAction(), null); //test app: Spotify
+                        dataRepository.sendCustomAction(data.pkg, customAction.getAction());
                     });
                 }
             } else {
@@ -115,22 +116,22 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
 
             holder.btnPrevious.setEnabled(data.existsPrevious);
             if (data.existsPrevious) {
-                holder.btnPrevious.setOnClickListener(v -> data.transportControls.skipToPrevious());
+                holder.btnPrevious.setOnClickListener(v -> dataRepository.skipToPrevious(data.pkg));
             } else {
                 holder.btnPrevious.setOnClickListener(null);
             }
             holder.btnNext.setEnabled(data.existsNext);
             if (data.existsNext) {
-                holder.btnNext.setOnClickListener(v -> data.transportControls.skipToNext());
+                holder.btnNext.setOnClickListener(v -> dataRepository.skipToNext(data.pkg));
             } else {
                 holder.btnNext.setOnClickListener(null);
             }
             holder.btnState.setOnClickListener(v -> {
                 if (data.state == PlaybackState.STATE_PLAYING) {
-                    data.transportControls.pause();
+                    dataRepository.pause(data.pkg);
                 } else if (data.state == PlaybackState.STATE_PAUSED
                         || data.state == PlaybackState.STATE_NONE) {
-                    data.transportControls.play();
+                    dataRepository.play(data.pkg);
                 } else {
                     Log.w(TAG, "Neither in play state nor in pause/none state");
                 }
@@ -151,10 +152,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                     final long pst = (long) (1.0 * progress / max * data.duration);
                     String pstFormat = Utils.formatDuration(pst);
                     Log.i(TAG, "onStopTrackingTouch, progress:" + progress + ", max: " + max + ", seekTo: " + pst + "(" + pstFormat + ")");
-                    data.transportControls.seekTo(pst);
-                    //data.transportControls.pause();
-                    //data.transportControls.play();
-                    MediaDataRepository.getInstance(context).seekTo(data.mediaController, pst);
+                    dataRepository.seekTo(data.pkg, pst);
                 }
             });
         }
