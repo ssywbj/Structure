@@ -3,6 +3,7 @@ package com.suheng.structure.wallpaperpicker;
 import android.content.ComponentName;
 import android.content.Context;
 import android.media.session.MediaController;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -72,7 +73,7 @@ public class MediaDataRepository {
                     if (onDataChangedListener != null) {
                         MediaData mediaData = mControllerHelper.resolveMediaController(controller);
                         mControllerHelper.registerCallback(controller, onDataChangedListener);
-                        onDataChangedListener.onDataAdded(mediaData);
+                        onDataChangedListener.onMediaAdded(mediaData);
                     }
                 }
 
@@ -83,7 +84,7 @@ public class MediaDataRepository {
                     List<MediaData> cacheMediaData = mControllerHelper.getCacheMediaData();
                     if (onDataChangedListener != null && cacheMediaData != null) {
                         for (MediaData mediaData : cacheMediaData) {
-                            onDataChangedListener.onDataRemoved(mediaData);
+                            onDataChangedListener.onMediaRemoved(mediaData);
                         }
                     }
                 } else {
@@ -107,7 +108,7 @@ public class MediaDataRepository {
                                 Log.i(TAG, "onActiveSessionsChanged, remove player: " + pkg + ", cache pkg: "
                                         + cacheController.getPackageName() + ", cacheMediaData: " + cacheMediaData);
                                 if (onDataChangedListener != null && cacheMediaData != null) {
-                                    onDataChangedListener.onDataRemoved(cacheMediaData);
+                                    onDataChangedListener.onMediaRemoved(cacheMediaData);
                                 }
                             }
                         }
@@ -118,8 +119,8 @@ public class MediaDataRepository {
         }, null);
     }
 
-    public void sendCustomAction(String pkg, @NonNull String action) {
-        mControllerHelper.sendCustomAction(pkg, action);
+    public void sendCustomAction(String pkg, @NonNull String action, @Nullable Bundle args) {
+        mControllerHelper.sendCustomAction(pkg, action, args);
     }
 
     public void seekTo(String pkg, long pos) {
@@ -143,10 +144,10 @@ public class MediaDataRepository {
     }
 
     public abstract static class OnDataChangedListener {
-        abstract void onDataUpdated(@NonNull MediaData data);
+        abstract void onMediaUpdated(@NonNull MediaData data);
 
-        abstract void onDataAdded(@NonNull MediaData data);
+        abstract void onMediaAdded(@NonNull MediaData data);
 
-        abstract void onDataRemoved(@NonNull MediaData data);
+        abstract void onMediaRemoved(@NonNull MediaData data);
     }
 }

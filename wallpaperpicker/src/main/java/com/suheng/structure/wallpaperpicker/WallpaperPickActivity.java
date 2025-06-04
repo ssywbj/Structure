@@ -110,19 +110,19 @@ public class WallpaperPickActivity extends AppCompatActivity {
         MediaDataRepository mediaDataRepository = MediaDataRepository.getInstance(this);
         MediaDataRepository.OnDataChangedListener onDataChangedListener = new MediaDataRepository.OnDataChangedListener() {
             @Override
-            public void onDataUpdated(@NonNull MediaData data) {
+            public void onMediaUpdated(@NonNull MediaData data) {
                 final int position = mMediaControllerList.indexOf(data);
                 mediaControllerAdapter.notifyItemChanged(position, data);
             }
 
             @Override
-            public void onDataAdded(@NonNull MediaData data) {
+            public void onMediaAdded(@NonNull MediaData data) {
                 mMediaControllerList.add(data);
                 mediaControllerAdapter.notifyItemInserted(mMediaControllerList.indexOf(data));
             }
 
             @Override
-            public void onDataRemoved(@NonNull MediaData data) {
+            public void onMediaRemoved(@NonNull MediaData data) {
                 final int position = mMediaControllerList.indexOf(data);
                 mediaControllerAdapter.notifyItemRemoved(position);
                 mMediaControllerList.remove(data);

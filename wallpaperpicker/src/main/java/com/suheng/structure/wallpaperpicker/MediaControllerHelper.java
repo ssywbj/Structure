@@ -250,12 +250,13 @@ public class MediaControllerHelper {
         return (stateActions & action) != 0L;
     }
 
-    public void sendCustomAction(String pkg, @NonNull String action) {
+    public void sendCustomAction(String pkg, @NonNull String action, @Nullable Bundle args) {
         MediaController mediaController = getCacheController(pkg);
         if (mediaController == null) {
             return;
         }
-        mediaController.getTransportControls().sendCustomAction(action, null);//test app: Spotify
+        //test app: Spotify、PocketFM、Music player(com.search.music.mp3.musicplayer)、YT Music
+        mediaController.getTransportControls().sendCustomAction(action, args);
     }
 
     public void seekTo(String pkg, long pos) {
@@ -331,7 +332,7 @@ public class MediaControllerHelper {
                 parsePlaybackState(state, mediaData);
 
                 if (mOnDataChangedListener != null && mediaData != null) {
-                    mOnDataChangedListener.onDataUpdated(mediaData);
+                    mOnDataChangedListener.onMediaUpdated(mediaData);
                 }
 
                 removeMsgProgressChanged();
@@ -351,7 +352,7 @@ public class MediaControllerHelper {
                 parseMediaMetadata(metadata, mediaData);
 
                 if (mOnDataChangedListener != null && mediaData != null) {
-                    mOnDataChangedListener.onDataUpdated(mediaData);
+                    mOnDataChangedListener.onMediaUpdated(mediaData);
                 }
             }
         }
@@ -390,7 +391,7 @@ public class MediaControllerHelper {
                 parsePlaybackState(state, mediaData);
 
                 if (mOnDataChangedListener != null && mediaData != null) {
-                    mOnDataChangedListener.onDataUpdated(mediaData);
+                    mOnDataChangedListener.onMediaUpdated(mediaData);
                 }
             }
         }

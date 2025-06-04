@@ -196,19 +196,10 @@ public class MediaRouteRepository {
     }
 
     public void setVolume(@NonNull RouteData routeData, int volume) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            MediaRouter2.RoutingController controller = mMediaRouter2.getController(routeData.getId());
-            Log.i(TAG, "setVolume, volume: " + volume + ", id: " + routeData.getId()
-                    + ", controller: " + controller + ", isVolumeFixed: " + mAudioManager.isVolumeFixed()
-                    + ", isMusicActive: " + mAudioManager.isMusicActive());
-            if (controller == null) {
-                mMediaRouter2.getSystemController().setVolume(volume);
-            } else {
-                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, AudioManager.FLAG_PLAY_SOUND);
-            }
-        } else {
-            mMediaRouter2.getSystemController().setVolume(volume);
-        }
+        MediaRoute2Info route2Info = mMapRoute2Info.get(routeData.getId());
+        Log.i(TAG, "setVolume, volume: " + volume + ", route2Info: " + route2Info
+                + ", " + mAudioManager.isVolumeFixed() + ", " + mAudioManager.isMusicActive());
+        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, AudioManager.FLAG_PLAY_SOUND);
     }
 
     public void destroy() {

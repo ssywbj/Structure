@@ -107,7 +107,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
 
                     textView.setOnClickListener(v -> {
                         Toast.makeText(context, actionName, Toast.LENGTH_SHORT).show();
-                        dataRepository.sendCustomAction(data.pkg, customAction.getAction());
+                        dataRepository.sendCustomAction(data.pkg, customAction.getAction(), customAction.getExtras());
                     });
                 }
             } else {
