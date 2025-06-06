@@ -3,7 +3,6 @@ if (isModule3Library.toBoolean()) {
 } else {
     apply plugin: 'com.android.application'
 }
-apply plugin: 'com.alibaba.arouter'//ARouter配置5(共5步)
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -19,12 +18,6 @@ android {
         versionName rootProject.ext.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [moduleName: project.getName()/*ARouter配置1(共5步)*/]
-            }
-        }
     }
 
     signingConfigs {
@@ -83,8 +76,5 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$rootProject.runnerVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoCoreVersion"
 
-    //ARouter配置3(共5步)：配置ARouter注解
-    annotationProcessor "com.alibaba:arouter-compiler:$rootProject.arouterCompilerVersion"
-    implementation project(path: ':ui')
-    implementation project(path: ':data')
+    implementation project(path: ':common')
 }

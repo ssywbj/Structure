@@ -8,14 +8,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.common.arouter.RouteTable;
+import com.suheng.structure.common.ui.architecture.basic.PresenterActivity;
 import com.suheng.structure.module3.mvp.LoginPresenter;
 import com.suheng.structure.module3.mvp.LoginView;
-import com.suheng.structure.ui.architecture.basic.PresenterActivity;
 
-@Route(path = RouteTable.MODULE3_ATY_MVP_LOGIN)
 public class MVPLoginActivity extends PresenterActivity<LoginPresenter> implements LoginView {
 
     private LoginPresenter mPresenter = new LoginPresenter(this);
@@ -42,7 +38,7 @@ public class MVPLoginActivity extends PresenterActivity<LoginPresenter> implemen
         findViewById(R.id.btn_switch_mode).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ARouter.getInstance().build(RouteTable.MODULE3_ATY_MVC_LOGIN).navigation();
+                //ARouter.getInstance().build(RouteTable.MODULE3_ATY_MVC_LOGIN).navigation();
             }
         });
 

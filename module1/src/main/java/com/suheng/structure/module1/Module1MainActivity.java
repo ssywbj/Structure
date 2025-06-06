@@ -6,31 +6,20 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
-import com.google.gson.Gson;
-import com.suheng.structure.common.arouter.RouteTable;
+import com.suheng.structure.common.ui.architecture.basic.BasicActivity;
 import com.suheng.structure.module1.request.DownloadTaskImpl;
 import com.suheng.structure.module1.request.DownloadTaskImpl2;
 import com.suheng.structure.module1.request.JsonTaskImpl;
 import com.suheng.structure.module1.request.JsonTaskImpl2;
 import com.suheng.structure.module1.request.StringTaskImpl;
 import com.suheng.structure.module1.request.StringTaskImpl2;
-import com.suheng.structure.module1.request.bean.JsonTaskErrorBean;
-import com.suheng.structure.module1.request.bean.StringTaskBean;
 import com.suheng.structure.module1.utils.FileUtil;
-import com.suheng.structure.net.callback.OnFailureListener;
-import com.suheng.structure.net.callback.OnFinishListener;
-import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
-import java.io.File;
-
-@Route(path = RouteTable.MODULE1_ATY_MODULE1_MAIN)
 public class Module1MainActivity extends BasicActivity {
 
     private static final int REQUEST_CODE_OPEN_FILE_MANAGER = 1;
@@ -47,7 +36,7 @@ public class Module1MainActivity extends BasicActivity {
             public void onClick(View v) {
                 showProgressDialog("");
                 StringTaskImpl stringTask = new StringTaskImpl("韦小宝", "adce1234");
-                stringTask.addOnFinishListener(new OnFinishListener<String>() {
+                /*stringTask.addOnFinishListener(new OnFinishListener<String>() {
                     @Override
                     public void onFinish(String data) {
                         dismissProgressDialog();
@@ -57,7 +46,7 @@ public class Module1MainActivity extends BasicActivity {
                     public void onFailure(int code, String errorMsg) {
                         dismissProgressDialog();
                     }
-                }).doPostRequest();
+                }).doPostRequest();*/
             }
         });
 
@@ -66,7 +55,7 @@ public class Module1MainActivity extends BasicActivity {
             public void onClick(View v) {
                 showProgressDialog("");
                 final StringTaskImpl2 stringTask = new StringTaskImpl2("韦小宝", "adce1234");
-                stringTask.addOnFinishListener(new OnFinishListener<StringTaskBean>() {
+                /*stringTask.addOnFinishListener(new OnFinishListener<StringTaskBean>() {
                     @Override
                     public void onFinish(StringTaskBean data) {
                         Log.d(stringTask.getLogTag(), "data: " + data);
@@ -77,7 +66,7 @@ public class Module1MainActivity extends BasicActivity {
                     public void onFailure(int code, String errorMsg) {
                         dismissProgressDialog();
                     }
-                }).doPostRequest();
+                }).doPostRequest();*/
             }
         });
 
@@ -86,7 +75,7 @@ public class Module1MainActivity extends BasicActivity {
             public void onClick(View v) {
                 showProgressDialog("");
                 final JsonTaskImpl jsonTask = new JsonTaskImpl("韦小宝", "adce1234");
-                jsonTask.addOnFinishListener(new OnFinishListener<StringTaskBean>() {
+                /*jsonTask.addOnFinishListener(new OnFinishListener<StringTaskBean>() {
                     @Override
                     public void onFinish(StringTaskBean data) {
                         Log.d(jsonTask.getLogTag(), "data: " + data);
@@ -97,7 +86,7 @@ public class Module1MainActivity extends BasicActivity {
                     public void onFailure(int code, String errorMsg) {
                         dismissProgressDialog();
                     }
-                }).doPostRequest();
+                }).doPostRequest();*/
             }
         });
 
@@ -106,7 +95,7 @@ public class Module1MainActivity extends BasicActivity {
             public void onClick(View v) {
                 showProgressDialog("");
                 final JsonTaskImpl2 jsonTask = new JsonTaskImpl2("满意", "adce1234");
-                jsonTask.addOnFinishListener(new OnFinishListener<StringTaskBean>() {
+                /*jsonTask.addOnFinishListener(new OnFinishListener<StringTaskBean>() {
                     @Override
                     public void onFinish(StringTaskBean data) {
                         Log.d(jsonTask.getLogTag(), "data: " + data);
@@ -124,7 +113,7 @@ public class Module1MainActivity extends BasicActivity {
                             Log.d(jsonTask.getLogTag(), "error bean: " + errorBean);
                         }
                     }
-                }).doPostRequest();
+                }).doPostRequest();*/
             }
         });
 
@@ -154,7 +143,7 @@ public class Module1MainActivity extends BasicActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (mDownloadTaskImpl2 != null) {
-            mDownloadTaskImpl2.cancelTask();
+            //mDownloadTaskImpl2.cancelTask();
         }
     }
 
@@ -165,7 +154,7 @@ public class Module1MainActivity extends BasicActivity {
             if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
                 final DownloadTaskImpl downloadTask = new DownloadTaskImpl(Environment.getExternalStoragePublicDirectory
                         (Environment.DIRECTORY_DOWNLOADS).getPath(), System.currentTimeMillis() + ".png");
-                downloadTask.addOnFailureListener(new OnFailureListener() {
+                /*downloadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(int code, String error) {
                         showToast("下载失败");
@@ -175,13 +164,13 @@ public class Module1MainActivity extends BasicActivity {
                     public void onFinish(File data) {
                         showToast("下载完成，路径：" + data.getPath());
                     }
-                }).doRequest();
+                }).doRequest();*/
             }
         } else if (businessId == R.id.text_test_download_task2) {
             if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
                 mDownloadTaskImpl2 = new DownloadTaskImpl2(Environment.getExternalStoragePublicDirectory
                         (Environment.DIRECTORY_DOWNLOADS).getPath(), System.currentTimeMillis() + ".png");
-                mDownloadTaskImpl2.addOnFailureListener(new OnFailureListener() {
+                /*mDownloadTaskImpl2.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(int code, String error) {
                         showToast("下载失败");
@@ -191,7 +180,7 @@ public class Module1MainActivity extends BasicActivity {
                     public void onFinish(File data) {
                         showToast("下载完成，路径：" + data.getPath());
                     }
-                }).doRequest();
+                }).doRequest();*/
             }
         } else if (businessId == R.id.text_test_upload_task) {//打开系统文件管理器
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);

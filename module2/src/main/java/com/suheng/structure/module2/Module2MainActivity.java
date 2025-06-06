@@ -16,41 +16,21 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import androidx.documentfile.provider.DocumentFile;
-
-import com.alibaba.android.arouter.facade.annotation.Autowired;
-import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.suheng.structure.common.arouter.RouteTable;
-import com.suheng.structure.data.DataManager;
-import com.suheng.structure.data.net.URLConstants;
-import com.suheng.structure.data.net.bean.UserInfo;
+import com.suheng.structure.common.data.DataManager;
+import com.suheng.structure.common.ui.architecture.basic.BasicActivity;
 import com.suheng.structure.module2.request.BeautyTask;
-import com.suheng.structure.module2.utils.DocumentsUtils;
 import com.suheng.structure.module2.utils.NetWorkUtil;
-import com.suheng.structure.net.callback.OnFailureListener;
-import com.suheng.structure.net.callback.OnFinishListener;
-import com.suheng.structure.net.callback.OnProgressListener;
-import com.suheng.structure.ui.architecture.basic.BasicActivity;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
-@Route(path = RouteTable.MODULE2_ATY_MODULE2_MAIN)
 public class Module2MainActivity extends BasicActivity {
 
-    @Autowired
     DataManager mDataManager;
     private Button mBtnLoginStatus;
 
@@ -58,8 +38,6 @@ public class Module2MainActivity extends BasicActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.module2_aty_module2_main);
-
-        ARouter.getInstance().inject(this);
 
         mBtnLoginStatus = findViewById(R.id.btn_login_status);
         mBtnLoginStatus.setText(mDataManager.isLoginSuccessful() ? "退出" : "登录");
@@ -84,17 +62,14 @@ public class Module2MainActivity extends BasicActivity {
                         }
                     });*/
 
-                    new Thread(new Runnable() {
+                    /*new Thread(new Runnable() {
                         @Override
                         public void run() {
-
-                            /*OkHttpClient httpClient = new OkHttpClient.Builder().connectionSpecs(Collections.singletonList(new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-                                    .allEnabledTlsVersions().build())).build();*/
                             OkHttpClient httpClient = new OkHttpClient();
                             Request request = new Request.Builder().url(URLConstants.URL_LOGIN_REQUEST).build();
                             httpClient.newCall(request).enqueue(new Callback() {
                                 @Override
-                                public void onFailure( Call call,  IOException e) {
+                                public void onFailure(Call call, IOException e) {
                                     new Handler(getMainLooper()).post(new Runnable() {
                                         @Override
                                         public void run() {
@@ -118,9 +93,9 @@ public class Module2MainActivity extends BasicActivity {
                             });
 
                         }
-                    }).start();
+                    }).start();*/
                 } else {
-                    mDataManager.doLoginRequest("Wbj韦帮杰", "wbj89").addOnFailureListener(new OnFailureListener() {
+                    /*mDataManager.doLoginRequest("Wb", "89").addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(int code, String errorMsg) {
                             dismissProgressDialog();
@@ -133,7 +108,7 @@ public class Module2MainActivity extends BasicActivity {
                             mDataManager.setLoginSuccessful(true);
                             mBtnLoginStatus.setText("退出");
                         }
-                    });
+                    });*/
 
                     /*final LoginTask2 loginTask = new LoginTask2("Wbj", "wbj89");
                     loginTask.doRequest().addOnFinishListener(new OnFinishListener<UserInfo>() {
@@ -234,7 +209,7 @@ public class Module2MainActivity extends BasicActivity {
                     (Environment.DIRECTORY_PICTURES).getPath());*/
             final BeautyTask beautyTask = new BeautyTask(Environment.getExternalStoragePublicDirectory
                     (Environment.DIRECTORY_DOWNLOADS).getPath(), System.currentTimeMillis() + ".jpg");
-            beautyTask.doPostRequest().addOnFailureListener(new OnFailureListener() {
+            /*beautyTask.doPostRequest().addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(int code, String error) {
                     showToast("下载失败");
@@ -248,11 +223,14 @@ public class Module2MainActivity extends BasicActivity {
                 public void onFinish(File data) {
                     showToast("下载完成");
                 }
-            });
+            });*/
         } else if (businessId == R.id.btn_upload) {
-            String sdcardPath = DocumentsUtils.getStoragePath(this, true);
-            String internalPath = DocumentsUtils.getStoragePath(this, false);
-            String[] sdcardExtPath = DocumentsUtils.getExtSdCardPaths(this);
+            //String sdcardPath = DocumentsUtils.getStoragePath(this, true);
+            String sdcardPath = "DocumentsUtils.getStoragePath(this, true)";
+            //String internalPath = DocumentsUtils.getStoragePath(this, false);
+            String internalPath = "DocumentsUtils.getStoragePath(this, false)";
+            //String[] sdcardExtPath = DocumentsUtils.getExtSdCardPaths(this);
+            String[] sdcardExtPath = new String[]{""};
             Log.d(mTag, "internalPath: " + internalPath + ", sdcard path: " + sdcardPath + ", " + sdcardExtPath[0]);
 
             File file = new File(sdcardFilePath);
@@ -279,7 +257,8 @@ public class Module2MainActivity extends BasicActivity {
                     //获取到指定文件夹，这里为：/storage/emulated/0/Android/data/你的包	名/files/Download
                     intent = new Intent(Intent.ACTION_GET_CONTENT);
                     //7.0以上跳转系统文件需用FileProvider，参考链接：https://blog.csdn.net/growing_tree/article/details/71190741
-                    Uri uri = DocumentsUtils.getFileUri(this, file);
+                    //Uri uri = DocumentsUtils.getFileUri(this, file);
+                    Uri uri = null;
                     intent.setData(uri);
                     //intent.setDataAndType(uri,"file/*.apk");
                     //intent.setDataAndType(uri,"application/vnd.ms-powerpoint");
@@ -296,15 +275,16 @@ public class Module2MainActivity extends BasicActivity {
                         Log.w(mTag, file + ", delete fail!");
                     }
 
-                    delete = DocumentFile.fromFile(file).delete();
+                    //delete = DocumentFile.fromFile(file).delete();
                     if (delete) {
                         Log.d(mTag, file + ", delete successful.");
                     } else {
                         Log.w(mTag, file + ", delete fail!");
                     }
 
-                    Uri uri = DocumentFile.fromFile(file).getUri();
-                    delete = DocumentsUtils.delete(this, file, uri);
+                    //Uri uri = DocumentFile.fromFile(file).getUri();
+                    Uri uri = null;
+                    //delete = DocumentsUtils.delete(this, file, uri);
                     if (delete) {
                         Log.d(mTag, file + ", delete successful.");
                     } else {
@@ -345,8 +325,8 @@ public class Module2MainActivity extends BasicActivity {
                     //stealAccountRisks1.apk URI: SDCardUri: content://com.android.externalstorage.documents/tree/14CB-D108%3A, DocumentFile.fromFile(File).getUri(): file:///storage/14CB-D108/stealAccountRisks1.apk, Uri.fromFile(file): file:///storage/14CB-D108/stealAccountRisks1.apk
                     //stealAccountRisks2.apk URI: SDCardUri: content://com.android.externalstorage.documents/tree/14CB-D108%3A, DocumentFile.fromFile(File).getUri(): file:///storage/14CB-D108/stealAccountRisks2.apk, Uri.fromFile(file): file:///storage/14CB-D108/stealAccountRisks2.apk
                     //stealAccountRisks3.apk URI: SDCardUri: content://com.android.externalstorage.documents/tree/14CB-D108%3A, DocumentFile.fromFile(File).getUri(): file:///storage/14CB-D108/stealAccountRisks3.apk, Uri.fromFile(file): file:///storage/14CB-D108/stealAccountRisks3.apk
-                    Log.d(mTag, "SDCardUri: " + mSDCardUri + ", DocumentFile.fromFile(File).getUri(): " +
-                            DocumentFile.fromFile(file).getUri() + ", Uri.fromFile(file): " + Uri.fromFile(file));
+                    /*Log.d(mTag, "SDCardUri: " + mSDCardUri + ", DocumentFile.fromFile(File).getUri(): " +
+                            DocumentFile.fromFile(file).getUri() + ", Uri.fromFile(file): " + Uri.fromFile(file));*/
 
                     /*if (file.exists()) {
                         boolean delete = file.delete();

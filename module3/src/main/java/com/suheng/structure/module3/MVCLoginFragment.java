@@ -10,9 +10,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.common.arouter.RouteTable;
-import com.suheng.structure.ui.architecture.basic.BasicFragment;
+import com.suheng.structure.common.ui.architecture.basic.BasicFragment;
 
 import java.util.Random;
 
@@ -70,7 +68,7 @@ public class MVCLoginFragment extends BasicFragment {
                 } else if (random == 1) {
                     loginFail("密码不正确！");
                 } else {
-                    ARouter.getInstance().build(RouteTable.MODULE3_ATY_MODULE3_MAIN).navigation();
+                    //ARouter.getInstance().build(RouteTable.MODULE3_ATY_MODULE3_MAIN).navigation();
                 }
             }
         }, 2000);

@@ -32,10 +32,6 @@ allprojects {
         //https://jeroenmols.com/blog/2021/02/04/migratingjcenter/，依然依赖jcenter的库
         jcenter() {
             content {
-                includeModule("com.alibaba", "arouter-compiler")
-                includeModule("com.alibaba", "arouter-api")
-                includeModule("com.alibaba", "arouter-annotation")
-
                 includeModule("com.github.hotchemi", "permissionsdispatcher")
                 includeModule("com.github.hotchemi", "permissionsdispatcher-processor")
             }

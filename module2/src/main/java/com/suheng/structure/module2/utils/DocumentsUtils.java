@@ -1,33 +1,8 @@
 package com.suheng.structure.module2.utils;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.Build;
-import android.os.storage.StorageManager;
-import android.preference.PreferenceManager;
-import android.provider.DocumentsContract;
-import android.util.Log;
-
-import androidx.core.content.FileProvider;
-import androidx.documentfile.provider.DocumentFile;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
 public class DocumentsUtils {
 
-    private static final String TAG = DocumentsUtils.class.getSimpleName();
+    /*private static final String TAG = DocumentsUtils.class.getSimpleName();
 
     public static final int OPEN_DOCUMENT_TREE_CODE = 8000;
 
@@ -41,11 +16,11 @@ public class DocumentsUtils {
         sExtSdCardPaths.clear();
     }
 
-    /**
+    *//**
      * Get a list of external SD card paths. (Kitkat or higher.)
      *
      * @return A list of external SD card paths.
-     */
+     *//*
     public static String[] getExtSdCardPaths(Context context) {
         if (sExtSdCardPaths.size() > 0) {
             return sExtSdCardPaths.toArray(new String[0]);
@@ -72,14 +47,14 @@ public class DocumentsUtils {
         return sExtSdCardPaths.toArray(new String[0]);
     }
 
-    /**
+    *//**
      * Determine the main folder of the external SD card containing the given file.
      *
      * @param file the file.
      * @return The main folder of the external SD card containing this file, if the file is on an SD
      * card. Otherwise,
      * null is returned.
-     */
+     *//*
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private static String getExtSdCardFolder(final File file, Context context) {
         String[] extSdPaths = getExtSdCardPaths(context);
@@ -95,18 +70,18 @@ public class DocumentsUtils {
         return null;
     }
 
-    /**
+    *//**
      * Determine if a file is on external sd card. (Kitkat or higher.)
      *
      * @param file The file.
      * @return true if on external sd card.
-     */
+     *//*
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public static boolean isOnExtSdCard(final File file, Context c) {
         return getExtSdCardFolder(file, c) != null;
     }
 
-    /**
+    *//**
      * Get a DocumentFile corresponding to the given file (for writing on ExtSdCard on Android 5).
      * If the file is not
      * existing, it is created.
@@ -114,7 +89,7 @@ public class DocumentsUtils {
      * @param file        The file.
      * @param isDirectory flag indicating if the file should be a directory.
      * @return The DocumentFile
-     */
+     *//*
     public static DocumentFile getDocumentFile(final File file, final boolean isDirectory,
                                                Context context) {
 
@@ -380,11 +355,11 @@ public class DocumentsUtils {
 
     }
 
-    /**
+    *//**
      * 通过反射调用获取内置存储和外置sd卡根路径(通用)
      *
      * @param isCanRemove 是否可移除，false返回内部存储路径，true返回外置SD卡路径
-     */
+     *//*
     public static String getStoragePath(Context context, boolean isCanRemove) {
         String path = "";
         try {
@@ -419,14 +394,14 @@ public class DocumentsUtils {
         return path;
     }
 
-    /**
+    *//**
      * 获取图片uri
-     */
+     *//*
     public static Uri getFileUri(Context context, File file) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             return Uri.fromFile(file);
         } else {
             return FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", file);
         }
-    }
+    }*/
 }

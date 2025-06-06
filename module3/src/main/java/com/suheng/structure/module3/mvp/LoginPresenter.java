@@ -6,23 +6,12 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.alibaba.android.arouter.facade.annotation.Autowired;
-import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.common.arouter.RouteTable;
-import com.suheng.structure.common.eventbus.LoginEvent;
-import com.suheng.structure.data.DataManager;
-import com.suheng.structure.data.net.bean.UserInfo;
-import com.suheng.structure.module3.BuildConfig;
+import com.suheng.structure.common.data.DataManager;
+import com.suheng.structure.common.ui.architecture.presenter.BasicPresenter;
 import com.suheng.structure.module3.R;
-import com.suheng.structure.net.callback.OnFailureListener;
-import com.suheng.structure.net.callback.OnFinishListener;
-import com.suheng.structure.ui.architecture.presenter.BasicPresenter;
-
-import org.greenrobot.eventbus.EventBus;
 
 public class LoginPresenter extends BasicPresenter<LoginView> {
 
-    @Autowired
     DataManager mDataManager;
 
     public LoginPresenter(LoginView loginView) {
@@ -33,7 +22,6 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
     public void onCreate() {
         super.onCreate();
         Log.d(mTag, mTag + ", onCreate");
-        ARouter.getInstance().inject(this);
     }
 
     @Override
@@ -89,10 +77,7 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
 
         getView().showProgressDialog(getContext().getString(R.string.module3_login_progress), true);
 
-        /*new Thread(new Runnable() {
-            @Override
-            public void run() {*/
-        mDataManager.doLoginRequest(name, pwd).addOnFailureListener(new OnFailureListener() {
+        /*mDataManager.doLoginRequest(name, pwd).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(int code, String errorMsg) {
                 getView().dismissProgressDialog();
@@ -110,11 +95,9 @@ public class LoginPresenter extends BasicPresenter<LoginView> {
                     EventBus.getDefault().post(new LoginEvent());
                     getActivity().finish();
                 } else {
-                    ARouter.getInstance().build(RouteTable.MODULE3_ATY_MODULE3_MAIN).navigation();
+                    //ARouter.getInstance().build(RouteTable.MODULE3_ATY_MODULE3_MAIN).navigation();
                 }
             }
-        });
-            /*}
-        }).start();*/
+        });*/
     }
 }

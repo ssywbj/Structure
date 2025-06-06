@@ -1,6 +1,6 @@
 package com.suheng.structure.module3.mvp;
 
-import com.suheng.structure.ui.architecture.view.MvpView;
+import com.suheng.structure.common.ui.architecture.view.MvpView;
 
 public interface LoginView extends MvpView<LoginPresenter> {
     /**

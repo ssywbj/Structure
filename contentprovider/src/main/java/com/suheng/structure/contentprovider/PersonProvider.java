@@ -6,15 +6,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.suheng.structure.database.manager.DBHelper;
 
 import java.util.ArrayList;
 
@@ -24,7 +21,7 @@ public class PersonProvider extends ContentProvider {
     private final static int STUDENT_URI_CODE = 0;
 
     private Context mContext;
-    private DBHelper mDBHelper;
+
     private final static UriMatcher sUriMatcher;
 
     static {
@@ -35,7 +32,6 @@ public class PersonProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         mContext = getContext();
-        mDBHelper = new DBHelper(mContext);
         return true;
     }
 
@@ -70,10 +66,10 @@ public class PersonProvider extends ContentProvider {
         Log.d("Wbj", "query uri: " + uri + ", type: " + uriType);
 
         Cursor cursor = null;
-        SQLiteDatabase database = mDBHelper.getReadableDatabase();
+        /*SQLiteDatabase database = mDBHelper.getReadableDatabase();
         if (uriType == STUDENT_URI_CODE) {//query(String table, String[] columns, String selection,String[] selectionArgs, String groupBy, String having,String orderBy, String limit)
             cursor = database.query("person", projection, selection, selectionArgs, null, null, sortOrder, null);
-        }
+        }*/
 
         return cursor;
     }
@@ -86,8 +82,9 @@ public class PersonProvider extends ContentProvider {
         Log.d("Wbj", "insert uri: " + uri + ", type: " + uriType);
 
         if (uriType == STUDENT_URI_CODE) {
-            SQLiteDatabase database = mDBHelper.getWritableDatabase();
-            row = database.insert("person", null, values);
+            //SQLiteDatabase database = mDBHelper.getWritableDatabase();
+            //row = database.insert("person", null, values);
+            row = 1;
         } else {
             return null;
         }
@@ -108,8 +105,9 @@ public class PersonProvider extends ContentProvider {
         Log.d("Wbj", "delete uri: " + uri + ", type: " + uriType);
 
         if (uriType == STUDENT_URI_CODE) {
-            SQLiteDatabase database = mDBHelper.getWritableDatabase();
-            rowDelete = database.delete("person", selection, selectionArgs);
+            //SQLiteDatabase database = mDBHelper.getWritableDatabase();
+            //rowDelete = database.delete("person", selection, selectionArgs);
+            rowDelete = 1;
         } else {
             throw new IllegalArgumentException("UnSupport Uri : " + uri);
         }
@@ -129,8 +127,9 @@ public class PersonProvider extends ContentProvider {
         Log.d("Wbj", "update uri: " + uri + ", type: " + uriType);
 
         if (uriType == STUDENT_URI_CODE) {
-            SQLiteDatabase database = mDBHelper.getWritableDatabase();
-            rowUpdate = database.update("person", values, selection, selectionArgs);
+            //SQLiteDatabase database = mDBHelper.getWritableDatabase();
+            //rowUpdate = database.update("person", values, selection, selectionArgs);
+            rowUpdate = 1;
         } else {
             throw new IllegalArgumentException("UnSupport Uri : " + uri);
         }

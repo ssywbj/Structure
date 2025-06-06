@@ -1,25 +1,24 @@
 package com.suheng.structure.module1.request;
 
-import com.suheng.structure.data.net.URLConstants;
-import com.suheng.structure.net.request.download.DownloadTask;
+import com.suheng.structure.common.data.net.URLConstants;
 
 import java.io.File;
 
-public class DownloadTaskImpl extends DownloadTask {
+public class DownloadTaskImpl /*extends DownloadTask*/ {
 
     public DownloadTaskImpl(File file) {
-        super(file);
+        //super(file);
     }
 
     public DownloadTaskImpl(String path) {
-        super(path);
+        //super(path);
     }
 
     public DownloadTaskImpl(String dirPath, String fileName) {
-        super(dirPath, fileName);
+        //super(dirPath, fileName);
     }
 
-    @Override
+    //@Override
     protected String getURL() {
         return URLConstants.URL_FILE+ "/ic_launcher_round.png";
         //return "http://ww1.sinaimg.cn/large/0065oQSqgy1ftt7g8ntdyj30j60op7dq.jpg";

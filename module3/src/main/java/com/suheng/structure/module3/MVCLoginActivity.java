@@ -6,27 +6,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.common.arouter.RouteTable;
-import com.suheng.structure.common.eventbus.LoginEvent;
-import com.suheng.structure.data.net.bean.UserInfo;
-import com.suheng.structure.data.net.request.LoginTask;
-import com.suheng.structure.net.callback.OnFailureListener;
-import com.suheng.structure.net.callback.OnFinishListener;
-import com.suheng.structure.ui.architecture.basic.BasicActivity;
+import com.suheng.structure.common.ui.architecture.basic.BasicActivity;
 
-import org.greenrobot.eventbus.EventBus;
-
-@Route(path = RouteTable.MODULE3_ATY_MVC_LOGIN)
 public class MVCLoginActivity extends BasicActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.module3_aty_login);
-
-        ARouter.getInstance().inject(this);
 
         findViewById(R.id.btn_fragment).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -38,7 +25,7 @@ public class MVCLoginActivity extends BasicActivity {
         findViewById(R.id.btn_switch_mode).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ARouter.getInstance().build(RouteTable.MODULE3_ATY_MVP_LOGIN).navigation();
+                //ARouter.getInstance().build(RouteTable.MODULE3_ATY_MVP_LOGIN).navigation();
             }
         });
 
@@ -87,7 +74,7 @@ public class MVCLoginActivity extends BasicActivity {
 
         showProgressDialog(getString(R.string.module3_login_progress), true);
 
-        new LoginTask(name, pwd).doRequest().addOnFailureListener(new OnFailureListener() {
+        /*new LoginTask(name, pwd).doRequest().addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(int code, String errorMsg) {
                 dismissProgressDialog();
@@ -104,10 +91,10 @@ public class MVCLoginActivity extends BasicActivity {
                     EventBus.getDefault().post(new LoginEvent());
                     finish();
                 } else {
-                    ARouter.getInstance().build(RouteTable.MODULE3_ATY_MODULE3_MAIN).navigation();
+                    //ARouter.getInstance().build(RouteTable.MODULE3_ATY_MODULE3_MAIN).navigation();
                 }
             }
-        });
+        });*/
     }
 
     private void loginFail(String reason) {

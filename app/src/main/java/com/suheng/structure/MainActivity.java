@@ -3,18 +3,12 @@ package com.suheng.structure;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
-import com.alibaba.android.arouter.facade.Postcard;
-import com.alibaba.android.arouter.facade.annotation.Autowired;
-import com.alibaba.android.arouter.facade.callback.NavCallback;
-import com.alibaba.android.arouter.launcher.ARouter;
-import com.suheng.structure.common.arouter.RouteTable;
+import com.suheng.structure.common.data.DataManager;
 import com.suheng.structure.common.eventbus.LoginEvent;
 import com.suheng.structure.common.receiver.InstallApkReceiver;
-import com.suheng.structure.data.DataManager;
-import com.suheng.structure.ui.architecture.basic.BasicActivity;
+import com.suheng.structure.common.ui.architecture.basic.BasicActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -22,25 +16,23 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class MainActivity extends BasicActivity {
 
-    @Autowired
-    DataManager mDataManager;
+    DataManager mDataManager = new DataManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //https://www.jianshu.com/p/1ec4ab9f53d9
-        ARouter.getInstance().inject(this);
+        mDataManager.init(this);
         EventBus.getDefault().register(this);
 
         findViewById(R.id.item_module1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mDataManager.isLoginSuccessful()) {
-                    ARouter.getInstance().build(RouteTable.MODULE1_ATY_MODULE1_MAIN).navigation();
+                    //ARouter.getInstance().build(RouteTable.MODULE1_ATY_MODULE1_MAIN).navigation();
                 } else {
-                    ARouter.getInstance().build(RouteTable.MODULE3_ATY_MVP_LOGIN).navigation();
+                    //ARouter.getInstance().build(RouteTable.MODULE3_ATY_MVP_LOGIN).navigation();
                 }
             }
         });
@@ -48,7 +40,7 @@ public class MainActivity extends BasicActivity {
         findViewById(R.id.item_module2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ARouter.getInstance().build(RouteTable.MODULE2_ATY_MODULE2_MAIN)
+                /*ARouter.getInstance().build(RouteTable.MODULE2_ATY_MODULE2_MAIN)
                         .navigation(MainActivity.this,
                                 new NavCallback() {
                                     @Override
@@ -79,7 +71,7 @@ public class MainActivity extends BasicActivity {
                                         super.onInterrupt(postcard);
                                         Log.d(mTag, "onInterrupt, " + postcard);
                                     }
-                                });
+                                });*/
             }
         });
 
@@ -105,7 +97,7 @@ public class MainActivity extends BasicActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(LoginEvent event) {
         if (event.isSuccess()) {
-            ARouter.getInstance().build(RouteTable.MODULE1_ATY_MODULE1_MAIN).navigation();
+            //ARouter.getInstance().build(RouteTable.MODULE1_ATY_MODULE1_MAIN).navigation();
         }
     }
 

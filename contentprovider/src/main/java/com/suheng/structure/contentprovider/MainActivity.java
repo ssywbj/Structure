@@ -13,8 +13,6 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.suheng.structure.database.bean.Person;
-
 import java.lang.ref.WeakReference;
 
 public class MainActivity extends AppCompatActivity {
@@ -98,16 +96,16 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.d("Wbj", "count: " + cursor.getCount());
 
-        Person person;
+        //Person person;
         int id, age;
         String name;
         while (cursor.moveToNext()) {
             id = cursor.getInt(cursor.getColumnIndex("id"));
             name = cursor.getString(cursor.getColumnIndex("name"));
             age = cursor.getInt(cursor.getColumnIndex("age"));
-            person = new Person(name, age);
+            /*person = new Person(name, age);
             person.setId(id);
-            Log.d("Wbj", "person-->" + person);
+            Log.d("Wbj", "person-->" + person);*/
         }
 
         cursor.close();

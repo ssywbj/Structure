@@ -13,12 +13,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.suheng.structure.data.net.request.LoginTask;
-import com.suheng.structure.data.net.request.LoginTask4;
+import com.suheng.structure.common.data.net.request.LoginTask;
+import com.suheng.structure.common.data.net.request.LoginTask4;
+import com.suheng.structure.common.ui.architecture.basic.PresenterFragment;
 import com.suheng.structure.module3.mvp.LoginPresenter;
 import com.suheng.structure.module3.mvp.LoginView;
-import com.suheng.structure.net.callback.OnFailureListener;
-import com.suheng.structure.ui.architecture.basic.PresenterFragment;
 
 public class MVPLoginFragment extends PresenterFragment<LoginPresenter> implements LoginView {
 
@@ -73,18 +72,18 @@ public class MVPLoginFragment extends PresenterFragment<LoginPresenter> implemen
             @Override
             public void onClick(View v) {
                 final LoginTask loginTask3 = new LoginTask("Wbj", "wbj89");
-                loginTask3.doRequest(MVPLoginFragment.this).addOnFailureListener(new OnFailureListener() {
+                /*loginTask3.doRequest(MVPLoginFragment.this).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(int code, String error) {
                     }
-                });
+                });*/
 
                 final LoginTask4 loginTask4 = new LoginTask4("Wbj", "wbj89");
-                loginTask4.doPostRequest().addOnFailureListener(new OnFailureListener() {
+                /*loginTask4.doPostRequest().addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(int code, String error) {
                     }
-                });
+                });*/
             }
         });
     }
