@@ -143,6 +143,10 @@ public class MediaDataRepository {
         mControllerHelper.skipToNext(pkg);
     }
 
+    public void actionClick(@NonNull MediaData.Action action) {
+        action.runnable.run();
+    }
+
     public abstract static class OnDataChangedListener {
         abstract void onMediaUpdated(@NonNull MediaData data);
 

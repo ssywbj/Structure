@@ -18,6 +18,8 @@ public class MediaData {
     public List<PlaybackState.CustomAction> customActions;
     public boolean existsPrevious;
     public boolean existsNext;
+    public boolean existsPlayOrPause;
+    public List<Action> actions;
 
     public String title;
     public String artist;
@@ -26,4 +28,14 @@ public class MediaData {
 
     public int progress;
     public int progressMax;
+
+    public static class Action {
+        public boolean isCustom;
+
+        public CharSequence name;
+        //public Drawable icon;
+        public int icon;
+        public Runnable runnable;
+    }
+
 }

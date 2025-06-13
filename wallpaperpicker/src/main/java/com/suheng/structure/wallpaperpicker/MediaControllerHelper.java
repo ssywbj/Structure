@@ -57,10 +57,10 @@ public class MediaControllerHelper {
             parseMediaMetadata(metadata, mediaData);
         }
 
-        final PlaybackState playbackState = mediaController.getPlaybackState();
-        if (playbackState != null) {
-            parsePlaybackState(playbackState, mediaData);
-        }
+        //final PlaybackState playbackState = mediaController.getPlaybackState();
+        //if (playbackState != null) {
+            parsePlaybackState(mediaController, mediaData);
+        //}
         return mediaData;
     }
 
@@ -115,14 +115,18 @@ public class MediaControllerHelper {
         }
     }
 
-    private void parsePlaybackState(@NonNull PlaybackState playbackState, @Nullable MediaData mediaData) {
+    private void parsePlaybackState(@NonNull MediaController mediaController, @Nullable MediaData mediaData) {
+        PlaybackState playbackState = mediaController.getPlaybackState();
+        if (playbackState == null) {
+            return;
+        }
         final String playbackStateStr = playbackState.toString();
         StringBuilder logInfo = new StringBuilder("PlaybackState->" + playbackStateStr);
         final String stateFlag = "state";
         final int startIndex = playbackStateStr.indexOf(stateFlag);
         final int endIndex = playbackStateStr.indexOf(")");
-        final String state = playbackStateStr.substring(startIndex + stateFlag.length() + 1, endIndex + 1);
-        logInfo.append("\n").append(stateFlag).append(": ").append(state);
+        final String stateText = playbackStateStr.substring(startIndex + stateFlag.length() + 1, endIndex + 1);
+        logInfo.append("\n").append(stateFlag).append(": ").append(stateText);
         long position = playbackState.getPosition();
         String formatPst = Utils.formatDuration(position);
         logInfo.append(", position: ").append(position).append("(").append(formatPst).append(")");
@@ -130,19 +134,71 @@ public class MediaControllerHelper {
         final long actions = playbackState.getActions();
         boolean existsPrevious = includesAction(actions, PlaybackState.ACTION_SKIP_TO_PREVIOUS);
         boolean existsNext = includesAction(actions, PlaybackState.ACTION_SKIP_TO_NEXT);
+        boolean existsPlayOrPause = includesAction(actions, PlaybackState.ACTION_PLAY_PAUSE)
+                || includesAction(actions, PlaybackState.ACTION_PLAY)
+                || includesAction(actions, PlaybackState.ACTION_PAUSE);
         logInfo.append(", actions: ").append(actions).append(", existsPrevious: ").append(existsPrevious)
-                .append(", existsNext: ").append(existsNext);
+                .append(", existsNext: ").append(existsNext).append(", existsPlayOrPause: ").append(existsPlayOrPause);
 
         Log.i(TAG, logInfo.toString());
 
         if (mediaData != null) {
-            mediaData.stateText = state;
-            mediaData.state = playbackState.getState();
+            mediaData.stateText = stateText;
+            final int state = playbackState.getState();
+            mediaData.state = state;
             mediaData.position = position;
             mediaData.progress = (int) (mediaData.position / 1000);
-            mediaData.customActions = playbackState.getCustomActions();
+            //mediaData.customActions = playbackState.getCustomActions();
             mediaData.existsPrevious = existsPrevious;
             mediaData.existsNext = existsNext;
+            mediaData.existsPlayOrPause = existsPlayOrPause;
+
+            MediaController.TransportControls transportControls = mediaController.getTransportControls();
+            List<MediaData.Action> actionList = new ArrayList<>();
+            if (existsPrevious) {
+                MediaData.Action action = new MediaData.Action();
+                action.name = "Previous";
+                action.icon = android.R.drawable.ic_media_previous;
+                action.runnable = transportControls::skipToPrevious;
+                actionList.add(action);
+            }
+            if (existsPlayOrPause) {
+                MediaData.Action action = new MediaData.Action();
+                action.name = stateText;
+                if (state == PlaybackState.STATE_PLAYING) {
+                    action.icon = android.R.drawable.ic_media_pause;
+                } else if (state == PlaybackState.STATE_PAUSED || state == PlaybackState.STATE_NONE) {
+                    action.icon = android.R.drawable.ic_media_play;
+                } else {
+                    action.icon = android.R.drawable.ic_lock_power_off;
+                }
+                action.runnable = () -> {
+                    if (state == PlaybackState.STATE_PLAYING) {
+                        transportControls.pause();
+                    } else if (state == PlaybackState.STATE_PAUSED || state == PlaybackState.STATE_NONE) {
+                        transportControls.play();
+                    } else {
+                        Log.w(TAG, "Neither in play state nor in pause/none state");
+                    }
+                };
+                actionList.add(action);
+            }
+            if (existsNext) {
+                MediaData.Action action = new MediaData.Action();
+                action.name = "Next";
+                action.icon = android.R.drawable.ic_media_next;
+                action.runnable = transportControls::skipToNext;
+                actionList.add(action);
+            }
+            for (PlaybackState.CustomAction customAction : playbackState.getCustomActions()) {
+                MediaData.Action action = new MediaData.Action();
+                action.isCustom = true;
+                action.name = customAction.getName();
+                action.icon = customAction.getIcon();
+                action.runnable = () -> transportControls.sendCustomAction(customAction, customAction.getExtras());
+                actionList.add(action);
+            }
+            mediaData.actions = actionList;
         }
     }
 
@@ -329,7 +385,7 @@ public class MediaControllerHelper {
             if (state != null) {
                 MediaController mediaController = mControllerCallbackMap.get(this);
                 MediaData mediaData = getCacheMediaData(mediaController);
-                parsePlaybackState(state, mediaData);
+                parsePlaybackState(mediaController, mediaData);
 
                 if (mOnDataChangedListener != null && mediaData != null) {
                     mOnDataChangedListener.onMediaUpdated(mediaData);
@@ -388,7 +444,7 @@ public class MediaControllerHelper {
             if (state != null) {
                 MediaController mediaController = mControllerCallbackMap.get(this);
                 MediaData mediaData = getCacheMediaData(mediaController);
-                parsePlaybackState(state, mediaData);
+                parsePlaybackState(mediaController, mediaData);
 
                 if (mOnDataChangedListener != null && mediaData != null) {
                     mOnDataChangedListener.onMediaUpdated(mediaData);

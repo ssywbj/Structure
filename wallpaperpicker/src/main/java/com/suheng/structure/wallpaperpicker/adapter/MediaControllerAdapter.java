@@ -57,11 +57,11 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
             holder.seekBar.setMax(data.progressMax);
             holder.ivAlbumArt.setImageBitmap(data.albumArt);
 
-            List<PlaybackState.CustomAction> customActions = data.customActions;
-            if (customActions != null && !customActions.isEmpty()) {
+            List<MediaData.Action> actions = data.actions;
+            if (actions != null && !actions.isEmpty()) {
                 holder.layoutActions.setVisibility(View.VISIBLE);
 
-                final int len = customActions.size();
+                final int len = actions.size();
                 if (holder.layoutActions.getTag() == null) {
                     holder.layoutActions.setTag("Inflate");
                     for (int i = 0; i < len; i++) {
@@ -91,11 +91,11 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                         break;
                     }
 
-                    PlaybackState.CustomAction customAction = customActions.get(i);
+                    MediaData.Action action = actions.get(i);
                     TextView textView = (TextView) child;
-                    CharSequence actionName = customAction.getName();
+                    CharSequence actionName = action.name;
                     textView.setText(actionName);
-                    Drawable actionIcon = Utils.getIconFromPackage(context, data.pkg, customAction.getIcon());
+                    Drawable actionIcon = Utils.getIconFromPackage(context, data.pkg, action.icon);
                     if (actionIcon != null) {
                         final float dimension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
                                 , 24f, context.getResources().getDisplayMetrics());
@@ -107,7 +107,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
 
                     textView.setOnClickListener(v -> {
                         Toast.makeText(context, actionName, Toast.LENGTH_SHORT).show();
-                        dataRepository.sendCustomAction(data.pkg, customAction.getAction(), customAction.getExtras());
+                        dataRepository.actionClick(action);
                     });
                 }
             } else {
