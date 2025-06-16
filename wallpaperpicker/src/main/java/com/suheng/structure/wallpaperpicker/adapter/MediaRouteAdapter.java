@@ -61,7 +61,9 @@ public final class MediaRouteAdapter extends RecyclerAdapter<RouteData, Recycler
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ContentHolder(getItemLayout(parent.getContext(), R.layout.wallpaperpick_activity_route_adt));
+        View view = getItemLayout(parent.getContext(), R.layout.wallpaperpick_activity_route_adt);
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        return new ContentHolder(view);
     }
 
     static class ContentHolder extends RecyclerView.ViewHolder {

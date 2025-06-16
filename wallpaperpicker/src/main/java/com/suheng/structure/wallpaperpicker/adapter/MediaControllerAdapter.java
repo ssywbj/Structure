@@ -3,13 +3,11 @@ package com.suheng.structure.wallpaperpicker.adapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.media.session.PlaybackState;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -45,7 +43,6 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
             icon.setBounds(0, 0, (int) (icon.getIntrinsicWidth() / 2.5f), (int) (icon.getIntrinsicHeight() / 2.5f));
             holder.tvPlayer.setCompoundDrawablesRelative(null, icon, null, null);
 
-            holder.btnState.setText(data.stateText);
             long pst = data.position;
             String fPst = Utils.formatDuration(pst);
             holder.tvPst.setText(fPst + "(" + pst + ")");
@@ -114,28 +111,6 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                 holder.layoutActions.setVisibility(View.GONE);
             }
 
-            holder.btnPrevious.setEnabled(data.existsPrevious);
-            if (data.existsPrevious) {
-                holder.btnPrevious.setOnClickListener(v -> dataRepository.skipToPrevious(data.pkg));
-            } else {
-                holder.btnPrevious.setOnClickListener(null);
-            }
-            holder.btnNext.setEnabled(data.existsNext);
-            if (data.existsNext) {
-                holder.btnNext.setOnClickListener(v -> dataRepository.skipToNext(data.pkg));
-            } else {
-                holder.btnNext.setOnClickListener(null);
-            }
-            holder.btnState.setOnClickListener(v -> {
-                if (data.state == PlaybackState.STATE_PLAYING) {
-                    dataRepository.pause(data.pkg);
-                } else if (data.state == PlaybackState.STATE_PAUSED
-                        || data.state == PlaybackState.STATE_NONE) {
-                    dataRepository.play(data.pkg);
-                } else {
-                    Log.w(TAG, "Neither in play state nor in pause/none state");
-                }
-            });
             holder.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -161,7 +136,9 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ContentHolder(getItemLayout(parent.getContext(), R.layout.wallpaperpick_activity_media_controller_adt));
+        View view = getItemLayout(parent.getContext(), R.layout.wallpaperpick_activity_media_controller_adt);
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        return new ContentHolder(view);
     }
 
     private void createViewAction(Context context, ContentHolder holder, int index) {
@@ -177,9 +154,6 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
 
     static class ContentHolder extends RecyclerView.ViewHolder {
         TextView tvPlayer;
-        Button btnState;
-        Button btnPrevious;
-        Button btnNext;
         TextView tvPst;
         TextView tvDuration;
         TextView tvTitle;
@@ -191,9 +165,6 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
         ContentHolder(View view) {
             super(view);
             tvPlayer = view.findViewById(R.id.tv_player);
-            btnState = view.findViewById(R.id.btn_state);
-            btnPrevious = view.findViewById(R.id.btn_previous);
-            btnNext = view.findViewById(R.id.btn_next);
             tvPst = view.findViewById(R.id.tv_pst);
             tvDuration = view.findViewById(R.id.tv_duration);
             tvTitle = view.findViewById(R.id.tv_title);
