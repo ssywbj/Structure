@@ -3,7 +3,6 @@ package com.suheng.structure.wallpaperpicker;
 import android.content.ComponentName;
 import android.content.Context;
 import android.media.session.MediaController;
-import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -119,28 +118,8 @@ public class MediaDataRepository {
         }, null);
     }
 
-    public void sendCustomAction(String pkg, @NonNull String action, @Nullable Bundle args) {
-        mControllerHelper.sendCustomAction(pkg, action, args);
-    }
-
     public void seekTo(String pkg, long pos) {
         mControllerHelper.seekTo(pkg, pos);
-    }
-
-    public void play(String pkg) {
-        mControllerHelper.play(pkg);
-    }
-
-    public void pause(String pkg) {
-        mControllerHelper.pause(pkg);
-    }
-
-    public void skipToPrevious(String pkg) {
-        mControllerHelper.skipToPrevious(pkg);
-    }
-
-    public void skipToNext(String pkg) {
-        mControllerHelper.skipToNext(pkg);
     }
 
     public void actionClick(@NonNull MediaData.Action action) {

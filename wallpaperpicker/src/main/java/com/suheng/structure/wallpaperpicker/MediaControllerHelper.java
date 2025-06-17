@@ -93,9 +93,9 @@ public class MediaControllerHelper {
 
     private void parseMediaMetadata(@NonNull MediaMetadata metadata, @Nullable MediaData mediaData) {
         StringBuilder logInfo = new StringBuilder("MediaMetadata->");
-        String title = metadata.getText(MediaMetadata.METADATA_KEY_TITLE).toString();
+        CharSequence title = metadata.getText(MediaMetadata.METADATA_KEY_TITLE);
         logInfo.append("title: ").append(title);
-        String artist = metadata.getText(MediaMetadata.METADATA_KEY_ARTIST).toString();
+        CharSequence artist = metadata.getText(MediaMetadata.METADATA_KEY_ARTIST);
         logInfo.append(", artist: ").append(artist);
         long duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
         String formatDuration = Utils.formatDuration(duration);
@@ -107,8 +107,8 @@ public class MediaControllerHelper {
         Log.i(TAG, logInfo.toString());
 
         if (mediaData != null) {
-            mediaData.title = title;
-            mediaData.artist = artist;
+            mediaData.title = (title == null ? "" : title.toString());
+            mediaData.artist = (artist == null ? "" : artist.toString());
             mediaData.duration = duration;
             mediaData.progressMax = (int) (mediaData.duration / 1000);
             mediaData.albumArt = albumArt;
@@ -148,12 +148,9 @@ public class MediaControllerHelper {
             mediaData.state = state;
             mediaData.position = position;
             mediaData.progress = (int) (mediaData.position / 1000);
-            //mediaData.customActions = playbackState.getCustomActions();
-            mediaData.existsPrevious = existsPrevious;
-            mediaData.existsNext = existsNext;
-            mediaData.existsPlayOrPause = existsPlayOrPause;
 
             MediaController.TransportControls transportControls = mediaController.getTransportControls();
+            //test app: Spotify、PocketFM、Music player(com.search.music.mp3.musicplayer)、YT Music、汽水音乐、番茄畅听音乐版
             List<MediaData.Action> actionList = new ArrayList<>();
             if (existsPrevious) {
                 MediaData.Action action = new MediaData.Action();
@@ -306,15 +303,6 @@ public class MediaControllerHelper {
         return (stateActions & action) != 0L;
     }
 
-    public void sendCustomAction(String pkg, @NonNull String action, @Nullable Bundle args) {
-        MediaController mediaController = getCacheController(pkg);
-        if (mediaController == null) {
-            return;
-        }
-        //test app: Spotify、PocketFM、Music player(com.search.music.mp3.musicplayer)、YT Music
-        mediaController.getTransportControls().sendCustomAction(action, args);
-    }
-
     public void seekTo(String pkg, long pos) {
         MediaController mediaController = getCacheController(pkg);
         if (mediaController == null) {
@@ -322,38 +310,6 @@ public class MediaControllerHelper {
         }
         mediaController.getTransportControls().seekTo(pos);
         seekTo(mediaController, pos);
-    }
-
-    public void play(String pkg) {
-        MediaController mediaController = getCacheController(pkg);
-        if (mediaController == null) {
-            return;
-        }
-        mediaController.getTransportControls().play();
-    }
-
-    public void pause(String pkg) {
-        MediaController mediaController = getCacheController(pkg);
-        if (mediaController == null) {
-            return;
-        }
-        mediaController.getTransportControls().pause();
-    }
-
-    public void skipToPrevious(String pkg) {
-        MediaController mediaController = getCacheController(pkg);
-        if (mediaController == null) {
-            return;
-        }
-        mediaController.getTransportControls().skipToPrevious();
-    }
-
-    public void skipToNext(String pkg) {
-        MediaController mediaController = getCacheController(pkg);
-        if (mediaController == null) {
-            return;
-        }
-        mediaController.getTransportControls().skipToNext();
     }
 
     private final class PlayProgressListener extends PlayProgressCallback {

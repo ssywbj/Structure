@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,7 +39,10 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
 
             holder.tvPlayer.setText(data.label);
             Drawable icon = data.icon;
-            icon.setBounds(0, 0, (int) (icon.getIntrinsicWidth() / 2.5f), (int) (icon.getIntrinsicHeight() / 2.5f));
+            final int iconWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
+                    , 20f, context.getResources().getDisplayMetrics());
+            final int iconHeight = iconWidth * icon.getIntrinsicWidth() / icon.getIntrinsicHeight();
+            icon.setBounds(0, 0, iconWidth, iconHeight);
             holder.tvPlayer.setCompoundDrawablesRelative(null, icon, null, null);
 
             long pst = data.position;
@@ -94,18 +96,14 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                     textView.setText(actionName);
                     Drawable actionIcon = Utils.getIconFromPackage(context, data.pkg, action.icon);
                     if (actionIcon != null) {
-                        final float dimension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
+                        final int actionIconWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
                                 , 24f, context.getResources().getDisplayMetrics());
-                        int intrinsicWidth = (int) dimension;
-                        int intrinsicHeight = (int) (dimension * actionIcon.getIntrinsicWidth() / actionIcon.getIntrinsicHeight());
-                        actionIcon.setBounds(0, 0, intrinsicWidth, intrinsicHeight);
+                        final int intrinsicHeight = actionIconWidth * actionIcon.getIntrinsicWidth() / actionIcon.getIntrinsicHeight();
+                        actionIcon.setBounds(0, 0, actionIconWidth, intrinsicHeight);
                         textView.setCompoundDrawables(null, actionIcon, null, null);
                     }
 
-                    textView.setOnClickListener(v -> {
-                        Toast.makeText(context, actionName, Toast.LENGTH_SHORT).show();
-                        dataRepository.actionClick(action);
-                    });
+                    textView.setOnClickListener(v -> dataRepository.actionClick(action));
                 }
             } else {
                 holder.layoutActions.setVisibility(View.GONE);

@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.session.PlaybackState;
 
+import androidx.annotation.Nullable;
+
 import java.util.List;
 
 public class MediaData {
@@ -15,15 +17,12 @@ public class MediaData {
     public String stateText;
     public int state = PlaybackState.STATE_NONE;
     public long position;
-    public List<PlaybackState.CustomAction> customActions;
-    public boolean existsPrevious;
-    public boolean existsNext;
-    public boolean existsPlayOrPause;
     public List<Action> actions;
 
     public String title;
     public String artist;
     public long duration;
+    @Nullable
     public Bitmap albumArt;
 
     public int progress;
