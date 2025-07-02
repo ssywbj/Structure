@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.suheng.structure.view.R
 import com.suheng.structure.view.kt.Derived2
 import com.suheng.structure.view.kt.MapObject
+import com.suheng.structure.view.kt.MapPairSL
 import com.suheng.structure.view.kt.MyClass
 import com.suheng.structure.view.kt.MyOtherClass
 import com.suheng.structure.view.kt.MyOtherClass2
@@ -39,6 +40,7 @@ import com.suheng.structure.view.kt.lastChar
 import com.suheng.structure.view.kt.lastChar2
 import com.suheng.structure.view.kt.lastTwoChar
 import com.suheng.structure.view.kt.let2
+import com.suheng.structure.view.kt.people3
 import com.suheng.structure.view.kt.run2
 import com.suheng.structure.view.kt.with2
 import kotlinx.android.synthetic.main.activity_kotlin.btnAsync
@@ -421,6 +423,25 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
 
         letterToInt2("abcde").onSuccess { Log.d("Wbj", "runBlocking result: $it") }
             .onFailure { Log.e("Wbj", "runBlocking result, fail: $it") }
+
+        val mapPairSL: MapPairSL = mutableMapOf()
+        mapPairSL.put("1", Pair(1, 2L))
+        mapPairSL.put("2", Pair(3, 4L))
+        mapPairSL.entries.forEach {
+            Log.d("Wbj", "key:${it.key}, value:(${it.value.first}, ${it.value.second})")
+        }
+
+        val pair = Pair("aaa", 21)
+        val name = pair.first
+        val age = pair.second
+        val (name2, age2) = Pair("bbb", 22)
+        Log.i("Wbj", "name:$name, age:$age, name2:$name2, age2:$age2")
+
+        val people34 = people3 {
+            printName()
+            printName3()
+        }
+        people34.printName()
     }
 
     var people3: People? = null

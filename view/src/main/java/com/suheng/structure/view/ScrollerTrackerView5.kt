@@ -69,9 +69,9 @@ class ScrollerTrackerView5 @JvmOverloads constructor(
 
     private fun drawText(canvas: Canvas, startX: Int, index: Int) {
         canvas.save {
-            canvas.translate(startX.toFloat(), 0f)
+            translate(startX.toFloat(), 0f)
             val text = "页面：$index"
-            canvas.drawText(text, 10f, 100f, mPaint)
+            drawText(text, 10f, 100f, mPaint)
             Log.w(TAG, "drawText, startX：$startX, index: $index")
         }
     }

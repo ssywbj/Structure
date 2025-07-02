@@ -3,6 +3,7 @@ package com.suheng.structure.view.kt
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
+import com.suheng.structure.view.kt.generic.People3
 import com.suheng.structure.view.paging.AdtItem
 import com.suheng.structure.view.paging.Repo
 import kotlin.reflect.KProperty
@@ -90,3 +91,13 @@ inline fun <R> Repo.mapItem(block: (Repo) -> R): R = block(this)
 
 fun Repo.asEntity2() =
     mapItem { AdtItem(id = id, name = name, description = description, starCount = starCount) }
+
+typealias PairSL = Pair<Int, Long>
+//typealias MapPairSL = Map<String, PairSL>
+typealias MapPairSL = MutableMap<String, PairSL>
+
+inline fun people3(init: People3.() -> Unit): People3 {
+    val peo = People3()
+    peo.init()
+    return peo
+}
