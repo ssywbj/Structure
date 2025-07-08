@@ -1,5 +1,6 @@
 package com.suheng.structure.wallpaperpicker;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationChannelGroup;
 import android.content.Intent;
@@ -54,6 +55,20 @@ public class NotificationListenerServiceImpl extends NotificationListenerService
     public void onNotificationPosted(StatusBarNotification sbn) {
         super.onNotificationPosted(sbn);
         Log.i(TAG, "onNotificationPosted, sbn: " + sbn);
+
+        Notification notification = sbn.getNotification();
+        final boolean isMediaNotification = NotificationToolkit.isMediaNotification(notification.extras);
+        Notification.Action[] actions = notification.actions;
+        if (actions == null) {
+            Log.w(TAG, "Notification actions is null");
+        } else {
+            final int length = actions.length;
+            Log.d(TAG, "isMediaNotification: " + isMediaNotification + ", length: " + length);
+            for (Notification.Action action : actions) {
+                Log.d(TAG, "action, title: " + action.title + ", icon: " + action.getIcon()
+                        + ", pendingIntent: " + action.actionIntent);
+            }
+        }
     }
 
     @Override
