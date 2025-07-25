@@ -1,12 +1,22 @@
 package com.suheng.structure.view.activity
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.PathInterpolator
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.lifecycleScope
+import com.google.android.renderscript.Toolkit
 import com.suheng.structure.view.R
 import com.suheng.structure.view.kt.Derived2
 import com.suheng.structure.view.kt.MapObject
@@ -21,6 +31,8 @@ import com.suheng.structure.view.kt.Square3
 import com.suheng.structure.view.kt.Student4
 import com.suheng.structure.view.kt.also2
 import com.suheng.structure.view.kt.apply2
+import com.suheng.structure.view.kt.areaBitmap
+import com.suheng.structure.view.kt.getBound
 import com.suheng.structure.view.kt.delegate.BundleHandler
 import com.suheng.structure.view.kt.delegate.BundleHandlerImpl
 import com.suheng.structure.view.kt.generic.American
@@ -36,6 +48,7 @@ import com.suheng.structure.view.kt.generic.People
 import com.suheng.structure.view.kt.generic.People2
 import com.suheng.structure.view.kt.generic.People3
 import com.suheng.structure.view.kt.generic.Production
+import com.suheng.structure.view.kt.intersectBitmap
 import com.suheng.structure.view.kt.lastChar
 import com.suheng.structure.view.kt.lastChar2
 import com.suheng.structure.view.kt.lastTwoChar
@@ -442,6 +455,74 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
             printName3()
         }
         people34.printName()
+
+        val filterView = findViewById<View>(R.id.maskFilterView).apply {
+            setOnClickListener {
+                if (tag == 1) {
+                    tag = 2
+                    background = null
+                } else {
+                    tag = 1
+                    background = ContextCompat.getDrawable(context, android.R.color.black)
+                }
+            }
+        }
+
+        val imageView = findViewById<ImageView>(R.id.imageView)
+        filterView.post {
+            //MaskFilterView.instance.createBitmap(filterView.width, filterView.height)?.let {
+            BitmapFactory.decodeResource(resources, R.drawable.girl_gaitubao)?.let {
+                (imageView.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+                    lp.topMargin = 20
+                    lp.width = filterView.width
+                    lp.height = filterView.height
+                    imageView.layoutParams = lp
+                }
+                imageView.background = it.toDrawable(resources)
+            }
+
+            val imageView2 = findViewById<View>(R.id.imageView2)
+            val composeShaderView = findViewById<View>(R.id.composeShaderView)
+            (imageView2.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+                lp.topMargin = 20
+                lp.width = filterView.width
+                lp.height = filterView.height
+                imageView2.layoutParams = lp
+            }
+            imageView2.post {
+                val full = imageView.getBound()
+                val area = Rect(full.left + 50, full.top + 40, full.right, full.bottom - 10)
+                imageView.areaBitmap(full, area)?.let {
+                    imageView2.background = it.toDrawable(resources)
+                }
+
+                imageView2.intersectBitmap(composeShaderView)?.let {
+                    //findViewById<ImageView>(R.id.intersectView).setImageBitmap(it)
+                    findViewById<ImageView>(R.id.intersectView).background = Toolkit.blur(it, 20).toDrawable(resources)
+                }
+
+                composeShaderView.intersectBitmap(imageView2)?.let {
+                    findViewById<ImageView>(R.id.intersectView2).setImageBitmap(it)
+                    //findViewById<ImageView>(R.id.intersectView2).background = it.toDrawable(resources)
+                    findViewById<ImageView>(R.id.intersectView2).background = Toolkit.blur(it, 20).toDrawable(resources)
+                }
+            }
+
+        }
+
+        val mView = findViewById<View>(R.id.composeShaderView);
+        val mAnimatorSet = AnimatorSet()
+        mAnimatorSet.playTogether(
+            ObjectAnimator.ofFloat(mView, "scaleX", 0.3f, 1f)
+                .setDuration(500),
+            ObjectAnimator.ofFloat(mView, "scaleY", 0.3f, 1f)
+                .setDuration(500),
+            ObjectAnimator.ofFloat(mView, "alpha", 0f, 1f)
+                .setDuration(400)
+        );
+        mAnimatorSet.interpolator = PathInterpolator(0.4f, 0f, 0.2f, 1f)
+        mView.setAlpha(0f)
+        mView.postDelayed({ mAnimatorSet.start() }, 300)
     }
 
     var people3: People? = null

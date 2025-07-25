@@ -1,9 +1,14 @@
 package com.suheng.structure.view.kt
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Rect
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.TextView
+import androidx.core.graphics.createBitmap
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
@@ -33,6 +38,98 @@ fun TextView.textChangedFlow(): Flow<String> = callbackFlow {
 fun View.onClickFlow() = callbackFlow {
     setOnClickListener { trySendBlocking(Unit) }
     awaitClose { setOnClickListener(null) }
+}
+
+fun View.getBound(dest: Rect) {
+    val location = IntArray(2)
+    getLocationOnScreen(location)
+    val x = location[0]
+    val y = location[1]
+    val width = this.width
+    val height = this.height
+    Log.d("ViewKt", "x: $x, y: $y, width: $width, height: $height")
+    dest.set(x, y, x + width, y + height)
+}
+
+fun View.getBound(): Rect {
+    return Rect().also {
+        getBound(it)
+    }
+}
+
+fun View.toBitmap(scaleFactor: Float = 1f): Bitmap? {
+    val width = this.width
+    val height = this.height
+    if (width <= 0 || height <= 0 || scaleFactor <= 0f) {
+        Log.w("ViewKt", "width: $width, height: $height, scaleFactor: $scaleFactor")
+        return null
+    }
+    val bmpWidth = (width / scaleFactor).toInt()
+    val bmpHeight = (height / scaleFactor).toInt()
+    val scale = 1 / scaleFactor
+    if (bmpWidth <= 0 || bmpHeight <= 0) {
+        Log.w("ViewKt", "bmpWidth: $bmpWidth, bmpHeight: $bmpHeight")
+        return null
+    }
+    Log.d("ViewKt", "width: $width, height: $height, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight")
+
+    val bitmap = createBitmap(bmpWidth, bmpHeight)
+    val canvas = Canvas(bitmap)
+    canvas.scale(scale, scale)
+    draw(canvas)
+    return bitmap
+}
+
+/*fun View.areaBitmap(): Bitmap? {
+    val source = getBitmap()
+    if (source == null) {
+        return null
+    }
+    val clip = Rect(0, 0, source.width, source.height)
+    clip.inset(20, 10)
+    val bitmap = Bitmap.createBitmap(source, clip.left, clip.top, clip.width(), clip.height())
+    source.recycle()
+    return bitmap
+}*/
+
+fun View.fullBitmap(scaleFactor: Float = 1f): Bitmap? {
+    return getBound().run { areaBitmap(this, this, scaleFactor) }
+}
+
+fun View.areaBitmap(full: Rect, area: Rect, scaleFactor: Float = 1f): Bitmap? {
+    if (scaleFactor == 0f) {
+        return null
+    }
+    val bmpWidth = (area.width() / scaleFactor).toInt()
+    val bmpHeight = (area.height() / scaleFactor).toInt()
+    if (bmpWidth <= 0 || bmpHeight <= 0) {
+        Log.w("ViewKt", "bmpWidth: $bmpWidth, bmpHeight: $bmpHeight")
+        return null
+    }
+    val dx = full.left - area.left
+    val dy = full.top - area.top
+    val sx = 1 / scaleFactor
+    Log.d("ViewKt", "bmpWidth: $bmpWidth, bmpHeight: $bmpHeight, dx: $dx, dy: $dy, sx: $sx")
+
+    val bitmap = createBitmap(bmpWidth, bmpHeight)
+    val canvas = Canvas(bitmap)
+    canvas.scale(sx, sx)
+    canvas.translate(dx.toFloat(), dy.toFloat())
+    draw(canvas)
+    return bitmap
+}
+
+fun View.intersectBitmap(intersectView: View, scaleFactor: Float = 1f): Bitmap? {
+    val rect = this.getBound()
+    val intersectRect = intersectView.getBound()
+    Log.d("ViewKt", "intersectRect:$intersectRect, before")
+    return if (intersectRect.setIntersect(rect, intersectRect)) {
+        Log.d("ViewKt", "intersectRect:$intersectRect, after")
+        areaBitmap(rect, intersectRect, scaleFactor)
+    } else {
+        Log.w("ViewKt", "not intersect area")
+        null
+    }
 }
 
 inline fun <reified T : Any> noOpDelegate(): T {
