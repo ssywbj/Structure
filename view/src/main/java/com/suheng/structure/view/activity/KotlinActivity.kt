@@ -5,12 +5,12 @@ import android.animation.ObjectAnimator
 import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.graphics.RectF
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.PathInterpolator
+import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -32,7 +32,6 @@ import com.suheng.structure.view.kt.Student4
 import com.suheng.structure.view.kt.also2
 import com.suheng.structure.view.kt.apply2
 import com.suheng.structure.view.kt.areaBitmap
-import com.suheng.structure.view.kt.getBound
 import com.suheng.structure.view.kt.delegate.BundleHandler
 import com.suheng.structure.view.kt.delegate.BundleHandlerImpl
 import com.suheng.structure.view.kt.generic.American
@@ -48,6 +47,7 @@ import com.suheng.structure.view.kt.generic.People
 import com.suheng.structure.view.kt.generic.People2
 import com.suheng.structure.view.kt.generic.People3
 import com.suheng.structure.view.kt.generic.Production
+import com.suheng.structure.view.kt.getBound
 import com.suheng.structure.view.kt.intersectBitmap
 import com.suheng.structure.view.kt.lastChar
 import com.suheng.structure.view.kt.lastChar2
@@ -56,8 +56,6 @@ import com.suheng.structure.view.kt.let2
 import com.suheng.structure.view.kt.people3
 import com.suheng.structure.view.kt.run2
 import com.suheng.structure.view.kt.with2
-import kotlinx.android.synthetic.main.activity_kotlin.btnAsync
-import kotlinx.android.synthetic.main.activity_kotlin.btnAsyncLazy
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -68,15 +66,9 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.math.BigDecimal
-import java.nio.file.Files
-import java.nio.file.Paths
 import kotlin.system.measureTimeMillis
 
 class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl() {
-
-    //顶层变量
-    private var aa = 11
-    private var s1 = "a is $aa" //字符串
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,33 +81,12 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         this.printSum(2, 46)
         this.printSum2(2, 3)
 
-        //局部变量
-        //定义常量：val，常量只能为其赋值一次
-        val a: Int = 1
-        //a = 6 //不能再次赋值
-        val b = 2 //自动推断是"Int"类型
-        val c: Int //如果没有初始值，则类型不能省略
-        c = 3
-        //定义变量：var
-        var x: Int = 5
-        x = 7
-        x += 1
-
-        println(s1)
-        aa = 22
-        val s2 = "${s1.replace("is", "was")}, but now is $aa"
-        println(s2)
-
-        println("max of $x and $aa is ${this.maxOf2(x, aa)}")
-
         printProduct("3", "5")
         printProduct("", "6")
 
         println("getStringLength: " + getStringLength("355"))
         println("getStringLength: " + getStringLength(9))
         println("getStringLength2: " + getStringLength2("19"))
-
-        this.forWhile()
 
         describe(1)
         println("describe(4659697576999): ${describe(4659697576999)}")
@@ -126,7 +97,6 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         this.demoCollection()
         this.demoClass()
 
-        this.accustomUse()
         this.foo() //都使用默认值
         this.foo(b = "B") //b属性不使用属性值
         this.foo(45) //a属性不使用属性值：a位置参数列表的第一位，不用像b一样需要显示指定参数名称
@@ -137,19 +107,10 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         println("lazy attr1: $lazyAttr")
         this.lazyAttr2()
 
-        Wei.age = 23
-        println("Wei: ${Wei.age}, ${Wei.name}")
-
         this.ifNotNull()
 
         this.testTry()
         println("arrayOfMinusOnes(10): ${this.arrayOfMinusOnes(10)}")
-
-        this.testApply()
-
-        this.nullableAlso()
-
-        //this.calcTaxes()
 
         val person = Person("Wbj")
         //person.name //name在主构造方法没有用var或val声明，是私有属性，外部访问不到
@@ -261,7 +222,7 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         p1 = people3
         p2 = people3
 
-        btnAsync.setOnClickListener {
+        findViewById<View>(R.id.btnAsync).setOnClickListener {
             lifecycleScope.launch {
                 val currentTimeMillis = System.currentTimeMillis()
                 Log.d(
@@ -311,6 +272,7 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
             }
         }
 
+        val btnAsyncLazy = findViewById<Button>(R.id.btnAsyncLazy)
         btnAsyncLazy.setOnClickListener {
             lifecycleScope.launch {
                 Log.w("Wbj", "---lazy async await start---")
@@ -616,22 +578,6 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
 
     private val items = listOf("apple", "banana", "kiwifruit")
 
-    private fun forWhile() { //for、while表达式
-        for (item in items) {
-            println("for fruit: $item")
-        }
-
-        for (index in items.indices) {
-            println("for fruit indices: $index, ${items[index]}")
-        }
-
-        var index = 0
-        while (index < items.size) {
-            println("while fruit $index, ${items[index]}")
-            index++
-        }
-    }
-
     private fun describe(obj: Any): String = when (obj) { //when表达式
         1 -> { //代码块
             val i = 5;
@@ -718,17 +664,6 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         println("rect: $rect, rectF: ${mRectF.toShortString()}, rectF2: $mRectF2")
     }
 
-    private fun accustomUse() {
-        val customer = Customer("wbj", "123@qq.com")
-        customer.name = "wbj123" //对于var定义的变量还有setter方法
-        //customer.email = "456@qq.com"  //val定义的没有setter方法
-        println("customer: $customer")
-    }
-
-    //习惯用法：start
-    //创建DTOs（POJOs/POCOs）
-    data class Customer(var name: String, val email: String)
-
     //函数的默认参数
     private fun foo(a: Int = 3, b: String = "A") {
         println("foo, a: $a, b: $b")
@@ -796,12 +731,6 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         println(lazyAttr2)
     }
 
-    //创建单例
-    object Wei {
-        const val name = "Wbj"
-        var age = 3
-    }
-
     //if null、if not null写法
     private fun ifNotNull() {
         val file = File("test").listFiles()
@@ -852,55 +781,8 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
     private fun theAnswer() = 3
     private fun theAnswer2() = this.maxOf2(7, 8)
 
-    //配置对象的属性(apply):这对于配置未出现在对象构造函数中的属性非常有用
-    private fun testApply() {
-        val rect = Rect().apply { //apply
-            left = 3
-            top = theAnswer()
-            right = theAnswer2()
-        }
-
-        println("testApply, rect: $rect")
-
-        val stream = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            try {
-                Files.newInputStream(Paths.get("/some/file.txt"))
-            } catch (e: Exception) {
-                //throw Exception("===/some/file.txt====")
-                println("reader.readText(), Exception")
-            }
-        } else {
-            TODO("VERSION.SDK_INT < O") //将代码标记为不完整
-        }
-
-        if (stream == null) {
-            println("reader.readText(), stream 111111")
-        } else {
-            println("reader.readText(), stream 222222")
-            /*stream.buffered().reader().use { reader ->
-                println("reader.readText()：${reader.readText()}")
-            }*/
-        }
-    }
-
-    private fun nullableAlso() {
-        val b: Boolean? = true //使用可空布尔值:Boolean?
-        if (b == true) {
-            println("nullableBoolean, b: $b")
-        } else {
-            println("nullableBoolean, b is null or false")
-        }
-
-        //交换两个变量:also
-        var c = 11
-        var d = 22
-        println("exchange c: $c, d:$d")
-        c = d.also { d = c }
-        println("exchange c: $c, d:$d")
-    }
-
     //TODO(String)：将代码标记为不完整
-    private fun calcTaxes(): BigDecimal = TODO("Waiting for feedback from accounting")
+    private fun todo(): BigDecimal = TODO("todo()")
     //习惯用法：end
 
     fun plus(a: Int, b: Int): Int = a + b
