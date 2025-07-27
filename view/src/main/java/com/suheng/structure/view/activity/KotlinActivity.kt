@@ -2,7 +2,6 @@ package com.suheng.structure.view.activity
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Bundle
@@ -17,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.lifecycleScope
 import com.google.android.renderscript.Toolkit
+import com.suheng.structure.view.MaskFilterView
 import com.suheng.structure.view.R
 import com.suheng.structure.view.kt.Derived2
 import com.suheng.structure.view.kt.MapObject
@@ -432,8 +432,8 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
 
         val imageView = findViewById<ImageView>(R.id.imageView)
         filterView.post {
-            //MaskFilterView.instance.createBitmap(filterView.width, filterView.height)?.let {
-            BitmapFactory.decodeResource(resources, R.drawable.girl_gaitubao)?.let {
+            MaskFilterView.instance.createBitmap(filterView.width, filterView.height)?.let {
+            //BitmapFactory.decodeResource(resources, R.drawable.girl_gaitubao)?.let {
                 (imageView.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
                     lp.topMargin = 20
                     lp.width = filterView.width
@@ -441,6 +441,9 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                     imageView.layoutParams = lp
                 }
                 imageView.background = it.toDrawable(resources)
+                imageView.background = MaskFilterView.instance.createSunshineEffect(this,it).toDrawable(resources)
+                imageView.background = MaskFilterView.instance.applyEdgeAlphaFade(it).toDrawable(resources)
+                imageView.background = MaskFilterView.instance.applyRectEdgeAlphaFade(it).toDrawable(resources)
             }
 
             val imageView2 = findViewById<View>(R.id.imageView2)
