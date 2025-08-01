@@ -32,9 +32,17 @@
 
     <com.suheng.structure.view.MaskFilterView
         android:id="@+id/maskFilterView"
-        android:layout_width="240dp"
-        android:layout_height="160dp"
-        android:layout_gravity="center_horizontal" />
+        android:layout_width="280dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp" />
+
+    <com.suheng.structure.view.SawToothClipView
+        android:id="@+id/sawToothClipView"
+        android:layout_width="280dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp" />
 
     <ImageView
         android:id="@+id/imageView"

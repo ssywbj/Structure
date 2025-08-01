@@ -7,8 +7,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
 import android.graphics.RadialGradient
 import android.graphics.Rect
 import android.graphics.Shader
@@ -20,6 +18,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import androidx.core.graphics.toColorInt
+import com.suheng.structure.view.drawable.SunlightDrawable
 
 class MaskFilterView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0
@@ -86,13 +85,13 @@ class MaskFilterView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val centerX = width.toFloat() / 2f
+        /*val centerX = width.toFloat() / 2f
         val centerY = height.toFloat() / 2f
         val radius = centerX.coerceAtMost(centerY)
 
         bitmap?.let {
             canvas.drawBitmap(it, null, rect, null)
-        }
+        }*/
     }
 
     fun createBitmap(w: Int, h: Int): Bitmap? {
@@ -107,11 +106,11 @@ class MaskFilterView @JvmOverloads constructor(
             isDither = true
             shader = LinearGradient(
                 0f, bitmap.height.toFloat(), bitmap.width.toFloat(), 0f, intArrayOf(
-                    "#AACB94FF".toColorInt(),
-                    "#AA9F84FF".toColorInt(),
-                    "#AA8297FF".toColorInt(),
-                    "#AA79BEFF".toColorInt(),
-                    "#AA9DCFFF".toColorInt()
+                    "#CB94FF".toColorInt(),
+                    "#9F84FF".toColorInt(),
+                    "#8297FF".toColorInt(),
+                    "#79BEFF".toColorInt(),
+                    "#9DCFFF".toColorInt()
                 ), floatArrayOf(0f, 0.26f, 0.6f, 0.79f, 1f), Shader.TileMode.CLAMP
             )
         }
@@ -176,106 +175,17 @@ class MaskFilterView @JvmOverloads constructor(
         return output
     }
 
-    /**
-     * 对图片的边缘做透明度渐变，中心完整，边缘“稀薄”
-     * @param source 原图
-     * @param edgeWidth 渐变宽度（外边框像素数）
-     * @return 处理后的Bitmap
-     */
-    fun applyEdgeAlphaFade(source: Bitmap, edgeWidth: Int = 30): Bitmap {
-        val width = source.width
-        val height = source.height
-
-        // 1. 创建alpha蒙版
-        val mask = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(mask)
-        val centerX = width / 2f
-        val centerY = height / 2f
-        val radius = Math.max(width, height) / 2f
-
-        // 渐变半径为中心到边缘减去edgeWidth，确保中心完全不透明
-        val fadeRadius = radius - edgeWidth
-
-        // 渐变：中心全不透明，fadeRadius后到边缘全透明
-        val gradient = RadialGradient(
-            centerX, centerY, radius,
-            intArrayOf(0xFFFFFFFF.toInt(), 0xFFFFFFFF.toInt(), 0x00FFFFFF),
-            floatArrayOf(0f, fadeRadius / radius, 1f),
-            Shader.TileMode.CLAMP
-        )
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        paint.shader = gradient
-
-        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
-
-        // 2. 将原图与alpha蒙版合成
-        val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val resultCanvas = Canvas(result)
-        val imgPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        resultCanvas.drawBitmap(source, 0f, 0f, imgPaint)
-
-        // 设置DST_IN模式，用蒙版的alpha覆盖原图
-        imgPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
-        resultCanvas.drawBitmap(mask, 0f, 0f, imgPaint)
-        imgPaint.xfermode = null
-
-        return result
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        Log.i("Wbj", "onAttachedToWindow, background: $background")
+        background = SunlightDrawable()/*.also { it.start() }*/
+        Log.i("Wbj", "onAttachedToWindow, background: $background")
     }
 
-    /**
-     * 对图片的四个矩形边缘做透明度渐变，中心完整，四边“稀薄”
-     * @param source 原图
-     * @param edgeWidth 渐变宽度（边缘像素数）
-     * @return 处理后的Bitmap
-     */
-    fun applyRectEdgeAlphaFade(source: Bitmap, edgeWidth: Int = 30): Bitmap {
-        val width = source.width
-        val height = source.height
-
-        // 创建alpha遮罩
-        val mask = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(mask)
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        paint.color = Color.WHITE
-
-        // 填充中心完全不透明
-        canvas.drawRect(edgeWidth.toFloat(), edgeWidth.toFloat(), (width-edgeWidth).toFloat(), (height-edgeWidth).toFloat(), paint)
-
-        // 四条边 alpha渐变
-        // 顶部
-        for (y in 0 until edgeWidth) {
-            val alpha = (255f * y / edgeWidth).toInt()
-            paint.color = Color.argb(alpha, 255, 255, 255)
-            canvas.drawRect(0f, y.toFloat(), width.toFloat(), (y+1).toFloat(), paint)
-        }
-        // 底部
-        for (y in height-edgeWidth until height) {
-            val alpha = (255f * (height-y-1) / edgeWidth).toInt()
-            paint.color = Color.argb(alpha, 255, 255, 255)
-            canvas.drawRect(0f, y.toFloat(), width.toFloat(), (y+1).toFloat(), paint)
-        }
-        // 左边
-        for (x in 0 until edgeWidth) {
-            val alpha = (255f * x / edgeWidth).toInt()
-            paint.color = Color.argb(alpha, 255, 255, 255)
-            canvas.drawRect(x.toFloat(), edgeWidth.toFloat(), (x+1).toFloat(), (height-edgeWidth).toFloat(), paint)
-        }
-        // 右边
-        for (x in width-edgeWidth until width) {
-            val alpha = (255f * (width-x-1) / edgeWidth).toInt()
-            paint.color = Color.argb(alpha, 255, 255, 255)
-            canvas.drawRect(x.toFloat(), edgeWidth.toFloat(), (x+1).toFloat(), (height-edgeWidth).toFloat(), paint)
-        }
-
-        // 合成遮罩与原图
-        val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val resultCanvas = Canvas(result)
-        val imgPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        resultCanvas.drawBitmap(source, 0f, 0f, imgPaint)
-        imgPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
-        resultCanvas.drawBitmap(mask, 0f, 0f, imgPaint)
-        imgPaint.xfermode = null
-
-        return result
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        Log.i("Wbj", "onDetachedFromWindow")
+        (background as? SunlightDrawable)?.cancel()
     }
+
 }

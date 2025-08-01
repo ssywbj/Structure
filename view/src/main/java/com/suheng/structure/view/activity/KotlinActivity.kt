@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.renderscript.Toolkit
 import com.suheng.structure.view.MaskFilterView
 import com.suheng.structure.view.R
+import com.suheng.structure.view.SawToothClipView
 import com.suheng.structure.view.kt.Derived2
 import com.suheng.structure.view.kt.MapObject
 import com.suheng.structure.view.kt.MapPairSL
@@ -430,6 +431,15 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
             }
         }
 
+        val sawToothClipView = findViewById<SawToothClipView>(R.id.sawToothClipView)
+        sawToothClipView.post {
+            MaskFilterView.instance.createBitmap(sawToothClipView.width, sawToothClipView.height)?.let {
+                //BitmapFactory.decodeResource(resources, R.drawable.girl_gaitubao)?.let {
+                sawToothClipView.background = it.toDrawable(resources)
+                //sawToothClipView.background = Toolkit.blur(it, 20).toDrawable(resources)
+            }
+        }
+
         val imageView = findViewById<ImageView>(R.id.imageView)
         filterView.post {
             MaskFilterView.instance.createBitmap(filterView.width, filterView.height)?.let {
@@ -442,8 +452,6 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                 }
                 imageView.background = it.toDrawable(resources)
                 imageView.background = MaskFilterView.instance.createSunshineEffect(this,it).toDrawable(resources)
-                imageView.background = MaskFilterView.instance.applyEdgeAlphaFade(it).toDrawable(resources)
-                imageView.background = MaskFilterView.instance.applyRectEdgeAlphaFade(it).toDrawable(resources)
             }
 
             val imageView2 = findViewById<View>(R.id.imageView2)
