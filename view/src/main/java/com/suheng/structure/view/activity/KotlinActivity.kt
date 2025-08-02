@@ -12,13 +12,13 @@ import android.view.animation.PathInterpolator
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.lifecycleScope
 import com.google.android.renderscript.Toolkit
 import com.suheng.structure.view.MaskFilterView
 import com.suheng.structure.view.R
 import com.suheng.structure.view.SawToothClipView
+import com.suheng.structure.view.drawable.SunlightDrawable
 import com.suheng.structure.view.kt.Derived2
 import com.suheng.structure.view.kt.MapObject
 import com.suheng.structure.view.kt.MapPairSL
@@ -421,13 +421,7 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
 
         val filterView = findViewById<View>(R.id.maskFilterView).apply {
             setOnClickListener {
-                if (tag == 1) {
-                    tag = 2
-                    background = null
-                } else {
-                    tag = 1
-                    background = ContextCompat.getDrawable(context, android.R.color.black)
-                }
+                (background as? SunlightDrawable)?.start()
             }
         }
 

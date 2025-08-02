@@ -30,48 +30,111 @@
         android:textAllCaps="false"
         android:visibility="gone" />
 
-    <com.suheng.structure.view.MaskFilterView
-        android:id="@+id/maskFilterView"
-        android:layout_width="280dp"
-        android:layout_height="200dp"
+    <FrameLayout
+        android:layout_width="330dp"
+        android:layout_height="210dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp" />
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:layout_marginTop="30dp">
+
+        <com.suheng.structure.view.MaskFilterView
+            android:id="@+id/maskFilterView"
+            android:layout_width="350dp"
+            android:layout_height="220dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/darker_gray"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@android:drawable/ic_menu_add"
+                android:gravity="center_vertical"
+                android:text="高斯模糊与图像处理"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@android:drawable/btn_star_big_on"
+                android:gravity="center_vertical"
+                android:lines="2"
+                android:text="高斯模糊. 以可调的量快速模糊选区。此效果将移去高频出现的细节，并产生一种朦胧"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@android:drawable/btn_star_big_on"
+                android:gravity="center_vertical"
+                android:lines="3"
+                android:text="高斯模糊. 以可调的量快速模糊选区。此效果将移去高频出现的细节，并产生一种朦胧"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@android:drawable/btn_star_big_on"
+                android:gravity="center_vertical"
+                android:lines="3"
+                android:text="高斯模糊. 以可调的量快速模糊选区。此效果将移去高频出现的细节，并产生一种朦胧"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+    </FrameLayout>
 
     <com.suheng.structure.view.SawToothClipView
         android:id="@+id/sawToothClipView"
         android:layout_width="280dp"
         android:layout_height="200dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="20dp"
+        android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"/>
 
     <com.suheng.structure.view.ComposeShaderView
         android:id="@+id/composeShaderView"
         android:layout_width="160dp"
         android:layout_height="160dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="-30dp" />
+        android:layout_marginTop="-30dp"
+        android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/intersectView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/intersectView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"/>
 </LinearLayout>
