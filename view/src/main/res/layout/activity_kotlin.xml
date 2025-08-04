@@ -1,156 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="6dp"
-    android:background="@android:color/white">
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/btnAsync"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@android:drawable/btn_default"
-        android:gravity="center"
-        android:padding="6dp"
-        android:text="Async"
-        android:textAllCaps="false"
-        android:visibility="gone" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="6dp">
 
-    <Button
-        android:id="@+id/btnAsyncLazy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="4dp"
-        android:background="@android:drawable/btn_default"
-        android:gravity="center"
-        android:padding="6dp"
-        android:text="AsyncLazy"
-        android:textAllCaps="false"
-        android:visibility="gone" />
+        <Button
+            android:id="@+id/btnAsync"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@android:drawable/btn_default"
+            android:gravity="center"
+            android:padding="6dp"
+            android:text="Async"
+            android:textAllCaps="false"
+            android:visibility="gone" />
 
-    <FrameLayout
-        android:id="@+id/sun_iv1_layout"
-        android:layout_width="@dimen/sunlight_width"
-        android:layout_height="@dimen/sunlight_height"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:visibility="gone">
+        <Button
+            android:id="@+id/btnAsyncLazy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:background="@android:drawable/btn_default"
+            android:gravity="center"
+            android:padding="6dp"
+            android:text="AsyncLazy"
+            android:textAllCaps="false"
+            android:visibility="gone" />
 
-        <com.suheng.structure.view.MaskFilterView
-            android:id="@+id/sun_iv1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/darker_gray"
-            android:orientation="vertical"
-            android:padding="8dp"
+        <FrameLayout
+            android:id="@+id/sun_iv1_layout"
+            android:layout_width="@dimen/sunlight_width"
+            android:layout_height="@dimen/sunlight_height"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
             android:visibility="gone">
 
-            <TextView
+            <com.suheng.structure.view.MaskFilterView
+                android:id="@+id/sun_iv1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@android:drawable/ic_menu_add"
-                android:gravity="center_vertical"
-                android:text="高斯模糊与图像处理"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:layout_height="match_parent" />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@android:drawable/btn_star_big_on"
-                android:gravity="center_vertical"
-                android:lines="2"
-                android:text="高斯模糊. 以可调的量快速模糊选区。此效果将移去高频出现的细节，并产生一种朦胧"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:layout_marginTop="6dp"/>
+                android:layout_height="match_parent"
+                android:background="@android:color/darker_gray"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:visibility="gone">
 
-            <TextView
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@android:drawable/ic_menu_add"
+                    android:gravity="center_vertical"
+                    android:text="高斯模糊与图像处理"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:drawableStart="@android:drawable/btn_star_big_on"
+                    android:gravity="center_vertical"
+                    android:lines="2"
+                    android:text="高斯模糊. 以可调的量快速模糊选区。此效果将移去高频出现的细节，并产生一种朦胧"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:drawableStart="@android:drawable/btn_star_big_on"
+                    android:gravity="center_vertical"
+                    android:lines="3"
+                    android:text="高斯模糊. 以可调的量快速模糊选区。此效果将移去高频出现的细节，并产生一种朦胧"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:drawableStart="@android:drawable/btn_star_big_on"
+                    android:gravity="center_vertical"
+                    android:lines="3"
+                    android:text="高斯模糊. 以可调的量快速模糊选区。此效果将移去高频出现的细节，并产生一种朦胧"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/sun_iv2"
+            android:layout_width="@dimen/sunlight_width"
+            android:layout_height="@dimen/sunlight_height"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp" />
+
+        <ImageView
+            android:id="@+id/sun_iv3"
+            android:layout_width="@dimen/sunlight_width"
+            android:layout_height="@dimen/sunlight_height"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp" />
+
+        <FrameLayout
+            android:layout_width="@dimen/sunlight_width"
+            android:layout_height="@dimen/sunlight_height"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp">
+
+            <ImageView
+                android:id="@+id/sun_iv4"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@android:drawable/btn_star_big_on"
-                android:gravity="center_vertical"
-                android:lines="3"
-                android:text="高斯模糊. 以可调的量快速模糊选区。此效果将移去高频出现的细节，并产生一种朦胧"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:layout_marginTop="4dp"/>
+                android:layout_height="match_parent" />
+        </FrameLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@android:drawable/btn_star_big_on"
-                android:gravity="center_vertical"
-                android:lines="3"
-                android:text="高斯模糊. 以可调的量快速模糊选区。此效果将移去高频出现的细节，并产生一种朦胧"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:layout_marginTop="4dp"/>
-        </LinearLayout>
-    </FrameLayout>
+        <ImageView
+            android:id="@+id/sun_iv5"
+            android:layout_width="@dimen/sunlight_width"
+            android:layout_height="@dimen/sunlight_height"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp" />
 
-    <ImageView
-        android:id="@+id/sun_iv2"
-        android:layout_width="@dimen/sunlight_width"
-        android:layout_height="@dimen/sunlight_height"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp" />
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/sun_iv3"
-        android:layout_width="@dimen/sunlight_width"
-        android:layout_height="@dimen/sunlight_height"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp" />
+        <com.suheng.structure.view.SawToothClipView
+            android:id="@+id/sawToothClipView"
+            android:layout_width="280dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/sun_iv4"
-        android:layout_width="@dimen/sunlight_width"
-        android:layout_height="@dimen/sunlight_height"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp" />
+        <com.suheng.structure.view.ComposeShaderView
+            android:id="@+id/composeShaderView"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="-30dp"
+            android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:visibility="gone"/>
+        <ImageView
+            android:id="@+id/intersectView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone" />
 
-    <com.suheng.structure.view.SawToothClipView
-        android:id="@+id/sawToothClipView"
-        android:layout_width="280dp"
-        android:layout_height="200dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"
-        android:visibility="gone"/>
-
-    <com.suheng.structure.view.ComposeShaderView
-        android:id="@+id/composeShaderView"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="-30dp"
-        android:visibility="gone"/>
-
-    <ImageView
-        android:id="@+id/intersectView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:visibility="gone"/>
-
-    <ImageView
-        android:id="@+id/intersectView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:visibility="gone"/>
-</LinearLayout>
+        <ImageView
+            android:id="@+id/intersectView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

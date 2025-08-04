@@ -2,18 +2,21 @@ package com.suheng.structure.view.activity
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.graphics.Outline
 import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.view.animation.PathInterpolator
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.lifecycleScope
+import com.google.android.renderscript.Toolkit
 import com.suheng.structure.view.R
 import com.suheng.structure.view.drawable.SunlightDrawable
 import com.suheng.structure.view.drawable.SunlightDrawable.Companion.TAG
@@ -51,6 +54,7 @@ import com.suheng.structure.view.kt.lastTwoChar
 import com.suheng.structure.view.kt.let2
 import com.suheng.structure.view.kt.people3
 import com.suheng.structure.view.kt.run2
+import com.suheng.structure.view.kt.toBitmap
 import com.suheng.structure.view.kt.with2
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
@@ -446,6 +450,13 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                 )?.let {
                     background = it.toDrawable(resources)
                 }
+
+                clipToOutline = true
+                outlineProvider = object : ViewOutlineProvider() {
+                    override fun getOutline(view: View, outline: Outline) {
+                        outline.setRoundRect(0, 0, view.width, view.height, 40f)
+                    }
+                }
             }
         }
 
@@ -453,12 +464,17 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
             post {
                 val w = this.width
                 val h = this.height
-                val inset = resources.getDimensionPixelOffset(R.dimen.sunlight_extend_round)
                 Log.i(TAG, "sun_iv4, w: $w, height: $h")
-                SunlightDrawable.instance.createBitmap2(
+                SunlightDrawable.instance.patternBlurBitmap(
                     w, h
                 )?.let {
                     background = it.toDrawable(resources)
+                    //setImageBitmap(it)
+                }
+
+                val sunIv5 = this@KotlinActivity.findViewById<ImageView>(R.id.sun_iv5)
+                toBitmap()?.let {
+                    sunIv5.setImageBitmap(Toolkit.blur(it,16))
                 }
             }
         }
