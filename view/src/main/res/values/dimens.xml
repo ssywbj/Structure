@@ -30,4 +30,7 @@
     <dimen name="path_delete_icon">48dp</dimen>
     <dimen name="path_delete_icon_max">130dp</dimen>
 
+    <dimen name="sunlight_width">250dp</dimen>
+    <dimen name="sunlight_height">180dp</dimen>
+    <dimen name="sunlight_extend_round">16dp</dimen>
 </resources>

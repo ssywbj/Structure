@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         mStringList.add("Constraint Layout");
         mStringArrayMap.put(mStringList.get(mStringList.size() - 1), ATY_PKG_PREFIX + "ConstraintLayoutActivity");
 
-        //startActivity(new Intent(this, VapMainActivity.class));
+        startActivity(new Intent(this, KotlinActivity.class));
 
         /*AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(this, R.drawable.map_my_location_img);
         //drawable.start();

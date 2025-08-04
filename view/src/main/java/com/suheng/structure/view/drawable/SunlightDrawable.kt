@@ -2,6 +2,8 @@ package com.suheng.structure.view.drawable
 
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
+import android.graphics.Bitmap
+import android.graphics.BlurMaskFilter
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.ColorFilter
@@ -9,6 +11,7 @@ import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.PixelFormat
 import android.graphics.RadialGradient
+import android.graphics.Rect
 import android.graphics.Shader
 import android.graphics.drawable.Drawable
 import android.util.Log
@@ -18,7 +21,12 @@ import androidx.core.graphics.toColorInt
 class SunlightDrawable() : Drawable() {
 
     companion object {
-        const val TAG = "HPNotificationBg"
+        lateinit var instance: SunlightDrawable
+        const val TAG = "Wbj"
+    }
+
+    init {
+        instance = this
     }
 
     private val paint = Paint()
@@ -30,6 +38,14 @@ class SunlightDrawable() : Drawable() {
         "#79BEFF".toColorInt(),
         "#9DCFFF".toColorInt()
     )
+
+    /*private val colors = intArrayOf(
+        "#99CB94FF".toColorInt(),
+        "#999F84FF".toColorInt(),
+        "#998297FF".toColorInt(),
+        "#9979BEFF".toColorInt(),
+        "#999DCFFF".toColorInt()
+    )*/
 
     private val endColors = intArrayOf(
         "#B69FFF".toColorInt(),
@@ -171,4 +187,142 @@ class SunlightDrawable() : Drawable() {
     fun Int.toArgb(): IntArray = intArrayOf(
         Color.alpha(this), Color.red(this), Color.green(this), Color.blue(this)
     )
+
+    /*fun createBitmap(w: Int, h: Int, scaleRatio: Float = 1f): Bitmap? {
+        if (w <= 0 || h <= 0 || scaleRatio == 0f) {
+            return null
+        }
+        val bmpWidth = (w / scaleRatio).toInt()
+        val bmpHeight = (h / scaleRatio).toInt()
+        if (bmpWidth <= 0 || bmpHeight <= 0) {
+            return null
+        }
+
+        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint: Paint = Paint().apply {
+            isAntiAlias = true
+            isDither = true
+            shader = LinearGradient(
+                0f, bmpHeight.toFloat(), bmpWidth.toFloat(), 0f,
+                colors, positions, Shader.TileMode.CLAMP
+            )
+        }
+
+        Log.i(TAG, "createBitmap width: $w, height: $h")
+        canvas.drawRect(0f, 0f, bmpWidth.toFloat(), bmpHeight.toFloat(), paint)
+        return bitmap
+    }*/
+
+    fun createBitmap(w: Int, h: Int, scaleRatio: Float = 1f, inset: Int = 0): Bitmap? {
+        if (w <= 0 || h <= 0 || scaleRatio == 0f) {
+            return null
+        }
+        val bmpWidth = (w / scaleRatio).toInt()
+        val bmpHeight = (h / scaleRatio).toInt()
+        if (bmpWidth <= 0 || bmpHeight <= 0) {
+            return null
+        }
+
+        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint: Paint = Paint().apply {
+            isAntiAlias = true
+            isDither = true
+            setMaskFilter(BlurMaskFilter(30f, BlurMaskFilter.Blur.NORMAL))
+            shader = LinearGradient(
+                0f, bmpHeight.toFloat(), bmpWidth.toFloat(), 0f,
+                colors, positions, Shader.TileMode.CLAMP
+            )
+        }
+
+        Log.i(TAG, "createBitmap, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
+                ", scaleRatio: $scaleRatio, inset: ${inset / scaleRatio}")
+        if (inset == 0) {
+            canvas.drawRect(0f, 0f, bmpWidth.toFloat(), bmpHeight.toFloat(), paint)
+        } else {
+            val rect = Rect(0, 0, bitmap.width, bitmap.height)
+            val dx = (inset / scaleRatio / 2f).toInt()
+            rect.inset(dx, dx)
+            Log.i(TAG, "insert, rect: $rect, ${rect.width()}, ${rect.height()}")
+            canvas.drawRect(rect, paint)
+        }
+        return bitmap
+    }
+
+    fun createBitmap2(w: Int, h: Int, scaleRatio: Float = 1f, inset: Int = 0): Bitmap? {
+        if (w <= 0 || h <= 0 || scaleRatio == 0f) {
+            return null
+        }
+        val bmpWidth = (w / scaleRatio).toInt()
+        val bmpHeight = (h / scaleRatio).toInt()
+        if (bmpWidth <= 0 || bmpHeight <= 0) {
+            return null
+        }
+
+        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ALPHA_8)
+        val canvas = Canvas(bitmap)
+        val paint: Paint = Paint().apply {
+            setMaskFilter(BlurMaskFilter(30f, BlurMaskFilter.Blur.NORMAL))
+        }
+
+        val rect = Rect(0, 0, bmpWidth, bmpHeight)
+
+        Log.i(TAG, "createBitmap2, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
+                ", scaleRatio: $scaleRatio, actually inset: ${inset / scaleRatio}")
+        //canvas.scale(2f,2f,rect.centerX().toFloat(),rect.centerY().toFloat())
+        canvas.drawRect(rect, paint)
+        val extractAlpha = bitmap.extractAlpha(paint, intArrayOf())
+        return extractAlpha
+    }
+
+    /*fun createBitmap2(w: Int, h: Int, scaleRatio: Float = 1f, inset: Int = 0): Bitmap? {
+        if (w <= 0 || h <= 0 || scaleRatio == 0f) {
+            return null
+        }
+        val bmpWidth = (w / scaleRatio).toInt()
+        val bmpHeight = (h / scaleRatio).toInt()
+        if (bmpWidth <= 0 || bmpHeight <= 0) {
+            return null
+        }
+
+        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint: Paint = Paint().apply {
+            isAntiAlias = true
+            isDither = true
+            setMaskFilter(BlurMaskFilter(50f, BlurMaskFilter.Blur.NORMAL))
+            val linearGradient = LinearGradient(
+                0f, bmpHeight.toFloat(), bmpWidth.toFloat(), 0f,
+                colors, positions, Shader.TileMode.CLAMP
+            )
+            shader = linearGradient
+        }
+
+        val rect = Rect(0, 0, bmpWidth, bmpHeight)
+
+        Log.i(TAG, "createBitmap2, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
+                ", scaleRatio: $scaleRatio, actually inset: ${inset / scaleRatio}")
+        if (inset == 0) {
+            canvas.drawRect(0f, 0f, bmpWidth.toFloat(), bmpHeight.toFloat(), paint)
+        } else {
+            //val rect = Rect(0, 0, bmpWidth, bmpHeight)
+            val dx = (inset / scaleRatio / 2f).toInt()
+            //rect.inset(dx, dx)
+            Log.i(TAG, "insert, rect: $rect, ${rect.width()}, ${rect.height()}")
+            //canvas.scale(0.85f, 0.85f, rect.centerX().toFloat(), rect.centerY().toFloat())
+            canvas.drawRect(rect, paint)
+        }
+        //return bitmap
+        //return bitmap.extractAlpha(paint,intArrayOf(-2,-2))
+        val extractAlpha = bitmap.extractAlpha(paint, intArrayOf(0, 0))
+
+        val bitmap2 = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+        val canvas2 = Canvas(bitmap2)
+        canvas2.drawBitmap(extractAlpha, null, rect, paint)
+        //return extractAlpha
+        bitmap.recycle()
+        return bitmap2
+    }*/
+
 }

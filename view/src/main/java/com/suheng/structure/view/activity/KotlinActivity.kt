@@ -14,11 +14,9 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.lifecycleScope
-import com.google.android.renderscript.Toolkit
-import com.suheng.structure.view.MaskFilterView
 import com.suheng.structure.view.R
-import com.suheng.structure.view.SawToothClipView
 import com.suheng.structure.view.drawable.SunlightDrawable
+import com.suheng.structure.view.drawable.SunlightDrawable.Companion.TAG
 import com.suheng.structure.view.kt.Derived2
 import com.suheng.structure.view.kt.MapObject
 import com.suheng.structure.view.kt.MapPairSL
@@ -32,7 +30,6 @@ import com.suheng.structure.view.kt.Square3
 import com.suheng.structure.view.kt.Student4
 import com.suheng.structure.view.kt.also2
 import com.suheng.structure.view.kt.apply2
-import com.suheng.structure.view.kt.areaBitmap
 import com.suheng.structure.view.kt.delegate.BundleHandler
 import com.suheng.structure.view.kt.delegate.BundleHandlerImpl
 import com.suheng.structure.view.kt.generic.American
@@ -48,8 +45,6 @@ import com.suheng.structure.view.kt.generic.People
 import com.suheng.structure.view.kt.generic.People2
 import com.suheng.structure.view.kt.generic.People3
 import com.suheng.structure.view.kt.generic.Production
-import com.suheng.structure.view.kt.getBound
-import com.suheng.structure.view.kt.intersectBitmap
 import com.suheng.structure.view.kt.lastChar
 import com.suheng.structure.view.kt.lastChar2
 import com.suheng.structure.view.kt.lastTwoChar
@@ -419,63 +414,82 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         }
         people34.printName()
 
-        val filterView = findViewById<View>(R.id.maskFilterView).apply {
+        findViewById<ViewGroup>(R.id.sun_iv1_layout).apply {
+            this.clipChildren = false
+        }
+        val filterView = findViewById<View>(R.id.sun_iv1).apply {
             setOnClickListener {
                 (background as? SunlightDrawable)?.start()
             }
         }
 
-        val sawToothClipView = findViewById<SawToothClipView>(R.id.sawToothClipView)
-        sawToothClipView.post {
-            MaskFilterView.instance.createBitmap(sawToothClipView.width, sawToothClipView.height)?.let {
-                //BitmapFactory.decodeResource(resources, R.drawable.girl_gaitubao)?.let {
-                sawToothClipView.background = it.toDrawable(resources)
-                //sawToothClipView.background = Toolkit.blur(it, 20).toDrawable(resources)
+        findViewById<ImageView>(R.id.sun_iv2).apply {
+            post {
+                val w = this.width
+                val h = this.height
+                Log.i(TAG, "sun_iv2, w: $w, height: $h")
+                SunlightDrawable.instance.createBitmap(w, h)?.let {
+                    //BitmapFactory.decodeResource(resources, R.drawable.girl_gaitubao)?.let {
+                    this.background = it.toDrawable(resources)
+                }
             }
         }
 
-        val imageView = findViewById<ImageView>(R.id.imageView)
-        filterView.post {
-            MaskFilterView.instance.createBitmap(filterView.width, filterView.height)?.let {
-            //BitmapFactory.decodeResource(resources, R.drawable.girl_gaitubao)?.let {
-                (imageView.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
-                    lp.topMargin = 20
-                    lp.width = filterView.width
-                    lp.height = filterView.height
-                    imageView.layoutParams = lp
-                }
-                imageView.background = it.toDrawable(resources)
-                imageView.background = MaskFilterView.instance.createSunshineEffect(this,it).toDrawable(resources)
-            }
-
-            val imageView2 = findViewById<View>(R.id.imageView2)
-            val composeShaderView = findViewById<View>(R.id.composeShaderView)
-            (imageView2.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
-                lp.topMargin = 20
-                lp.width = filterView.width
-                lp.height = filterView.height
-                imageView2.layoutParams = lp
-            }
-            imageView2.post {
-                val full = imageView.getBound()
-                val area = Rect(full.left + 50, full.top + 40, full.right, full.bottom - 10)
-                imageView.areaBitmap(full, area)?.let {
-                    imageView2.background = it.toDrawable(resources)
-                }
-
-                imageView2.intersectBitmap(composeShaderView)?.let {
-                    //findViewById<ImageView>(R.id.intersectView).setImageBitmap(it)
-                    findViewById<ImageView>(R.id.intersectView).background = Toolkit.blur(it, 20).toDrawable(resources)
-                }
-
-                composeShaderView.intersectBitmap(imageView2)?.let {
-                    findViewById<ImageView>(R.id.intersectView2).setImageBitmap(it)
-                    //findViewById<ImageView>(R.id.intersectView2).background = it.toDrawable(resources)
-                    findViewById<ImageView>(R.id.intersectView2).background = Toolkit.blur(it, 20).toDrawable(resources)
+        findViewById<ImageView>(R.id.sun_iv3).apply {
+            post {
+                val w = this.width
+                val h = this.height
+                val inset = resources.getDimensionPixelOffset(R.dimen.sunlight_extend_round)
+                Log.i(TAG, "sun_iv3, w: $w, height: $h")
+                SunlightDrawable.instance.createBitmap(
+                    w + inset, h + inset, scaleRatio = 2f, inset = inset
+                )?.let {
+                    background = it.toDrawable(resources)
                 }
             }
-
         }
+
+        findViewById<ImageView>(R.id.sun_iv4).apply {
+            post {
+                val w = this.width
+                val h = this.height
+                val inset = resources.getDimensionPixelOffset(R.dimen.sunlight_extend_round)
+                Log.i(TAG, "sun_iv4, w: $w, height: $h")
+                SunlightDrawable.instance.createBitmap2(
+                    w, h
+                )?.let {
+                    background = it.toDrawable(resources)
+                }
+            }
+        }
+
+        val imageView2 = findViewById<View>(R.id.imageView2)
+        val composeShaderView = findViewById<View>(R.id.composeShaderView)
+        (imageView2.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+            lp.topMargin = 20
+            lp.width = filterView.width
+            lp.height = filterView.height
+            imageView2.layoutParams = lp
+        }
+        /*imageView2.post {
+            val full = imageView.getBound()
+            val area = Rect(full.left + 50, full.top + 40, full.right, full.bottom - 10)
+            imageView.areaBitmap(full, area)?.let {
+                imageView2.background = it.toDrawable(resources)
+            }
+
+            imageView2.intersectBitmap(composeShaderView)?.let {
+                findViewById<ImageView>(R.id.intersectView).background =
+                    Toolkit.blur(it, 20).toDrawable(resources)
+            }
+
+            composeShaderView.intersectBitmap(imageView2)?.let {
+                findViewById<ImageView>(R.id.intersectView2).setImageBitmap(it)
+                //findViewById<ImageView>(R.id.intersectView2).background = it.toDrawable(resources)
+                findViewById<ImageView>(R.id.intersectView2).background =
+                    Toolkit.blur(it, 20).toDrawable(resources)
+            }
+        }*/
 
         val mView = findViewById<View>(R.id.composeShaderView);
         val mAnimatorSet = AnimatorSet()

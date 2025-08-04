@@ -52,9 +52,7 @@ fun View.getBound(dest: Rect) {
 }
 
 fun View.getBound(): Rect {
-    return Rect().also {
-        getBound(it)
-    }
+    return Rect().also { getBound(it) }
 }
 
 fun View.toBitmap(scaleFactor: Float = 1f): Bitmap? {

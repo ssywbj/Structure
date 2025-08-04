@@ -79,46 +79,19 @@ class MaskFilterView @JvmOverloads constructor(
         rect.set(0, 0, w, h)
         bitmap?.takeUnless { it.isRecycled }?.recycle()
         bitmap = null
-        //bitmap = this.createBitmap(w, h)
-        bitmap = this.createBitmap(w, h)
+        bitmap = this.createBitmap(w, h, 3f)
     }
 
-    override fun onDraw(canvas: Canvas) {
+    /*override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        /*val centerX = width.toFloat() / 2f
+        val centerX = width.toFloat() / 2f
         val centerY = height.toFloat() / 2f
         val radius = centerX.coerceAtMost(centerY)
 
         bitmap?.let {
             canvas.drawBitmap(it, null, rect, null)
-        }*/
-    }
-
-    fun createBitmap(w: Int, h: Int): Bitmap? {
-        if (w <= 0 || h <= 0) {
-            return null
         }
-
-        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        val paint: Paint = Paint().apply {
-            isAntiAlias = true
-            isDither = true
-            shader = LinearGradient(
-                0f, bitmap.height.toFloat(), bitmap.width.toFloat(), 0f, intArrayOf(
-                    "#CB94FF".toColorInt(),
-                    "#9F84FF".toColorInt(),
-                    "#8297FF".toColorInt(),
-                    "#79BEFF".toColorInt(),
-                    "#9DCFFF".toColorInt()
-                ), floatArrayOf(0f, 0.26f, 0.6f, 0.79f, 1f), Shader.TileMode.CLAMP
-            )
-        }
-
-        Log.i(TAG, "createBitmap width: $w, height: $h")
-        canvas.drawRect(0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat(), paint)
-        return bitmap
-    }
+    }*/
 
     fun createSunshineEffect(context: Context, source: Bitmap): Bitmap {
         val width = source.width
