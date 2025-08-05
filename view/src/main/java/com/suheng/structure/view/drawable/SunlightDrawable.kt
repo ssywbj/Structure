@@ -40,7 +40,7 @@ class SunlightDrawable(ctx: Context) : Drawable() {
     private var blurBgBitmap: Bitmap? = null
 
     private var blurBgInsert = TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_DIP, 10f, ctx.resources.displayMetrics
+        TypedValue.COMPLEX_UNIT_DIP, 16f, ctx.resources.displayMetrics
     ).toInt()
 
     private val blurBgScale: Float = 2f

@@ -423,8 +423,8 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
             overlay.add(View(this@KotlinActivity))
             post {
                 filterView.layoutParams?.let { lp ->
-                    lp.width = this.width + 120
-                    lp.height = this.height + 80
+                    lp.width = this.width + 60
+                    lp.height = this.height + 60
                     filterView.layoutParams = lp
                 }
             }
