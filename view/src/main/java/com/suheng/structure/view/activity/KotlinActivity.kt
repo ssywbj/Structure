@@ -2,21 +2,18 @@ package com.suheng.structure.view.activity
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.graphics.Outline
 import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewOutlineProvider
 import android.view.animation.PathInterpolator
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.lifecycleScope
-import com.google.android.renderscript.Toolkit
 import com.suheng.structure.view.R
 import com.suheng.structure.view.drawable.SunlightDrawable
 import com.suheng.structure.view.drawable.SunlightDrawable.Companion.TAG
@@ -54,7 +51,6 @@ import com.suheng.structure.view.kt.lastTwoChar
 import com.suheng.structure.view.kt.let2
 import com.suheng.structure.view.kt.people3
 import com.suheng.structure.view.kt.run2
-import com.suheng.structure.view.kt.toBitmap
 import com.suheng.structure.view.kt.with2
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
@@ -418,12 +414,19 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         }
         people34.printName()
 
-        findViewById<ViewGroup>(R.id.sun_iv1_layout).apply {
-            this.clipChildren = false
-        }
         val filterView = findViewById<View>(R.id.sun_iv1).apply {
             setOnClickListener {
                 (background as? SunlightDrawable)?.start()
+            }
+        }
+        findViewById<ViewGroup>(R.id.sun_iv1_layout).apply {
+            overlay.add(View(this@KotlinActivity))
+            post {
+                filterView.layoutParams?.let { lp ->
+                    lp.width = this.width + 120
+                    lp.height = this.height + 80
+                    filterView.layoutParams = lp
+                }
             }
         }
 
@@ -432,7 +435,7 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                 val w = this.width
                 val h = this.height
                 Log.i(TAG, "sun_iv2, w: $w, height: $h")
-                SunlightDrawable.instance.createBitmap(w, h)?.let {
+                SunlightDrawable.instance.createBitmap(w, h, scaleRatio = 2f)?.let {
                     //BitmapFactory.decodeResource(resources, R.drawable.girl_gaitubao)?.let {
                     this.background = it.toDrawable(resources)
                 }
@@ -451,12 +454,12 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                     background = it.toDrawable(resources)
                 }
 
-                clipToOutline = true
+                /*clipToOutline = true
                 outlineProvider = object : ViewOutlineProvider() {
                     override fun getOutline(view: View, outline: Outline) {
                         outline.setRoundRect(0, 0, view.width, view.height, 40f)
                     }
-                }
+                }*/
             }
         }
 
@@ -465,7 +468,7 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                 val w = this.width
                 val h = this.height
                 Log.i(TAG, "sun_iv4, w: $w, height: $h")
-                SunlightDrawable.instance.patternBlurBitmap(
+                /*SunlightDrawable.instance.patternBlurBitmap(
                     w, h
                 )?.let {
                     background = it.toDrawable(resources)
@@ -475,7 +478,7 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                 val sunIv5 = this@KotlinActivity.findViewById<ImageView>(R.id.sun_iv5)
                 toBitmap()?.let {
                     sunIv5.setImageBitmap(Toolkit.blur(it,16))
-                }
+                }*/
             }
         }
 
