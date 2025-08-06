@@ -32,12 +32,17 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kotlin)
         bundleHandler(this, savedInstanceState)
+
+        val layoutPanel = findViewById<ViewGroup>(R.id.sunlight_panel)
         val filterView = findViewById<View>(R.id.sun_iv1).apply {
-            setOnClickListener {
+            /*setOnClickListener {
                 (background as? SunlightDrawable)?.start()
-            }
+            }*/
         }
         findViewById<ViewGroup>(R.id.sun_iv1_layout).apply {
+            setOnClickListener {
+                (filterView.background as? SunlightDrawable)?.start()
+            }
             clipToOutline = true
             outlineProvider = object : ViewOutlineProvider() {
                 override fun getOutline(view: View, outline: Outline) {
@@ -45,18 +50,34 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                 }
             }
             post {
+                layoutPanel.background = null
+                /*(filterView.background as? SunlightDrawable)?.setAnimatorListener(object :
+                    AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator) {
+                        super.onAnimationStart(animation)
+                        layoutPanel.background = null
+                        filterView.visibility = View.VISIBLE
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        super.onAnimationEnd(animation)
+                        filterView.visibility = View.GONE
+                        layoutPanel.background =
+                            ContextCompat.getColor(context, android.R.color.darker_gray)
+                                .toDrawable()
+                    }
+                })*/
+
                 /*filterView.layoutParams?.let { lp ->
                     lp.width = this.width + 120
                     lp.height = this.height + 60
                     filterView.layoutParams = lp
                 }*/
 
-                val bound = filterView.getBound()
-                bound.inset(
-                    SunlightDrawable.instance.blurBgInsert,
-                    SunlightDrawable.instance.blurBgInsert
-                )
-                filterView.areaBitmap(bound)?.let {
+                filterView.areaBitmap(filterView.getBound().apply {
+                    val insert = SunlightDrawable.instance.blurBgInsert
+                    inset(insert, insert)
+                })?.let {
                     this@KotlinActivity.findViewById<ImageView>(R.id.sun_iv2).setImageBitmap(it)
                 }
 

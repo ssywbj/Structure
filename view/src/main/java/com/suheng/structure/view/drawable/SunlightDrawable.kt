@@ -1,5 +1,6 @@
 package com.suheng.structure.view.drawable
 
+import android.animation.AnimatorListenerAdapter
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.content.Context
@@ -47,37 +48,37 @@ class SunlightDrawable(ctx: Context) : Drawable() {
     private var blurBgBitmap: Bitmap? = null
     private val dstRect = Rect()
 
-    private val colors = intArrayOf(
+    /*private val colors = intArrayOf(
         "#CB94FF".toColorInt(),
         "#9F84FF".toColorInt(),
         "#8297FF".toColorInt(),
         "#79BEFF".toColorInt(),
         "#9DCFFF".toColorInt()
-    )
+    )*/
 
-    /*private val colors = intArrayOf(
+    private val colors = intArrayOf(
         "#7FCB94FF".toColorInt(),
         "#7F9F84FF".toColorInt(),
         "#7F8297FF".toColorInt(),
         "#7F79BEFF".toColorInt(),
         "#7F9DCFFF".toColorInt()
-    )*/
+    )
 
-    private val endColors = intArrayOf(
+    /*private val endColors = intArrayOf(
         "#B69FFF".toColorInt(),
         "#CB94FF".toColorInt(),
         "#9F84FF".toColorInt(),
         "#8297FF".toColorInt(),
         "#8297FF".toColorInt()
-    )
+    )*/
 
-    /*private val endColors = intArrayOf(
+    private val endColors = intArrayOf(
         "#7FB69FFF".toColorInt(),
         "#7FCB94FF".toColorInt(),
         "#7F9F84FF".toColorInt(),
         "#7F8297FF".toColorInt(),
         "#7F8297FF".toColorInt()
-    )*/
+    )
 
     private val positions = floatArrayOf(0f, 0.26f, 0.6f, 0.79f, 1f)
     private val endPositions = floatArrayOf(0f, 0.51f, 0.7f, 0.88f, 1f)
@@ -253,44 +254,13 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         val sx = bmpWidth.toFloat() / dstRect.width()
         val sy = bmpHeight.toFloat() / dstRect.height()
         Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}, $sx, $sy")
-        //canvas.scale(1.04f, 1.1f, dstRect.centerX().toFloat(), dstRect.centerY().toFloat())
-        //canvas.drawColor(Color.BLACK)
         canvas.drawRect(dstRect, blurBgPaint)
-        //canvas.drawRoundRect(dstRect, 26f, 26f, blurBgPaint)
 
         return bitmap
     }
 
-    private fun createBgBitmap2(w: Int, h: Int): Bitmap? {
-        if (w <= 0 || h <= 0 || blurBgScale == 0f) {
-            return null
-        }
-        val bmpWidth = (w / blurBgScale).toInt()
-        val bmpHeight = (h / blurBgScale).toInt()
-        if (bmpWidth <= 0 || bmpHeight <= 0) {
-            return null
-        }
-
-        blurBgBitmap?.takeUnless { it.isRecycled }?.recycle()
-        blurBgPaint.shader = LinearGradient(
-            0f, bmpHeight.toFloat(), bmpWidth.toFloat(), 0f,
-            colors, positions, Shader.TileMode.CLAMP
-        )
-
-        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-
-        Log.i(
-            TAG, "createBitmap, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
-                    ", blurBgScale: $blurBgScale, insetBlurBg: $blurBgInsert"
-        )
-
-        dstRect.set(0, 0, bmpWidth, bmpHeight)
-        dstRect.inset(blurBgInsert, blurBgInsert)
-        Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}")
-        canvas.drawRect(dstRect, blurBgPaint)
-
-        return bitmap
+    fun setAnimatorListener(animatorListener: AnimatorListenerAdapter) {
+        animator.addListener(animatorListener)
     }
 
     fun createBitmap(w: Int, h: Int, scaleRatio: Float = 1f, inset: Int = 0): Bitmap? {

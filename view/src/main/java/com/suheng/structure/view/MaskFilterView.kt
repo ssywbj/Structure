@@ -151,7 +151,7 @@ class MaskFilterView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         Log.i("Wbj", "onAttachedToWindow, background: $background")
-        background = SunlightDrawable(context)/*.also { it.start() }*/
+        background = SunlightDrawable(context)
         Log.i("Wbj", "onAttachedToWindow, background: $background")
     }
 
