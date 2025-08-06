@@ -24,7 +24,7 @@ class SunlightDrawable(ctx: Context) : Drawable() {
 
     companion object {
         lateinit var instance: SunlightDrawable
-        const val TAG = "HPNotificationBg"
+        const val TAG = "Wbj"
     }
 
     init {

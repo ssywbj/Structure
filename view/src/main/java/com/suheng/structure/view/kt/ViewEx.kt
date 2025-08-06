@@ -78,18 +78,6 @@ fun View.toBitmap(scaleFactor: Float = 1f): Bitmap? {
     return bitmap
 }
 
-/*fun View.areaBitmap(): Bitmap? {
-    val source = getBitmap()
-    if (source == null) {
-        return null
-    }
-    val clip = Rect(0, 0, source.width, source.height)
-    clip.inset(20, 10)
-    val bitmap = Bitmap.createBitmap(source, clip.left, clip.top, clip.width(), clip.height())
-    source.recycle()
-    return bitmap
-}*/
-
 fun View.areaBitmap(area: Rect, scaleFactor: Float = 1f): Bitmap? {
     val full = this.getBound()
     Log.d("ViewKt", "before setIntersect, area: $area")
@@ -125,6 +113,14 @@ fun View.areaBitmap(area: Rect, scaleFactor: Float = 1f): Bitmap? {
 
 fun View.intersectBitmap(intersectView: View, scaleFactor: Float = 1f): Bitmap? {
     return this.areaBitmap(intersectView.getBound(), scaleFactor)
+}
+
+fun Bitmap.clipArea(area: Rect, isRecycle: Boolean = false): Bitmap {
+    val bitmap = Bitmap.createBitmap(this, area.left, area.top, area.width(), area.height())
+    if (isRecycle && !isRecycled) {
+        recycle()
+    }
+    return bitmap
 }
 
 inline fun <reified T : Any> noOpDelegate(): T {
