@@ -90,44 +90,41 @@ fun View.toBitmap(scaleFactor: Float = 1f): Bitmap? {
     return bitmap
 }*/
 
-fun View.fullBitmap(scaleFactor: Float = 1f): Bitmap? {
-    return getBound().run { areaBitmap(this, this, scaleFactor) }
-}
+fun View.areaBitmap(area: Rect, scaleFactor: Float = 1f): Bitmap? {
+    val full = this.getBound()
+    Log.d("ViewKt", "before setIntersect, area: $area")
+    if (area.setIntersect(full, area)) {
+        Log.d("ViewKt", " after setIntersect, area: $area")
+        if (scaleFactor == 0f) {
+            Log.e("ViewKt", "scaleFactor is zero")
+            return null
+        }
+        val bmpWidth = (area.width() / scaleFactor).toInt()
+        val bmpHeight = (area.height() / scaleFactor).toInt()
+        if (bmpWidth <= 0 || bmpHeight <= 0) {
+            Log.e("ViewKt", "bmpWidth: $bmpWidth, bmpHeight: $bmpHeight")
+            return null
+        }
 
-fun View.areaBitmap(full: Rect, area: Rect, scaleFactor: Float = 1f): Bitmap? {
-    if (scaleFactor == 0f) {
+        val dx = full.left - area.left
+        val dy = full.top - area.top
+        val sx = 1 / scaleFactor
+        Log.d("ViewKt", "bmpWidth: $bmpWidth, bmpHeight: $bmpHeight, dx: $dx, dy: $dy, sx: $sx")
+
+        val bitmap = createBitmap(bmpWidth, bmpHeight)
+        val canvas = Canvas(bitmap)
+        canvas.scale(sx, sx)
+        canvas.translate(dx.toFloat(), dy.toFloat())
+        draw(canvas)
+        return bitmap
+    } else {
+        Log.w("ViewKt", "not intersect area")
         return null
     }
-    val bmpWidth = (area.width() / scaleFactor).toInt()
-    val bmpHeight = (area.height() / scaleFactor).toInt()
-    if (bmpWidth <= 0 || bmpHeight <= 0) {
-        Log.w("ViewKt", "bmpWidth: $bmpWidth, bmpHeight: $bmpHeight")
-        return null
-    }
-    val dx = full.left - area.left
-    val dy = full.top - area.top
-    val sx = 1 / scaleFactor
-    Log.d("ViewKt", "bmpWidth: $bmpWidth, bmpHeight: $bmpHeight, dx: $dx, dy: $dy, sx: $sx")
-
-    val bitmap = createBitmap(bmpWidth, bmpHeight)
-    val canvas = Canvas(bitmap)
-    canvas.scale(sx, sx)
-    canvas.translate(dx.toFloat(), dy.toFloat())
-    draw(canvas)
-    return bitmap
 }
 
 fun View.intersectBitmap(intersectView: View, scaleFactor: Float = 1f): Bitmap? {
-    val rect = this.getBound()
-    val intersectRect = intersectView.getBound()
-    Log.d("ViewKt", "intersectRect:$intersectRect, before")
-    return if (intersectRect.setIntersect(rect, intersectRect)) {
-        Log.d("ViewKt", "intersectRect:$intersectRect, after")
-        areaBitmap(rect, intersectRect, scaleFactor)
-    } else {
-        Log.w("ViewKt", "not intersect area")
-        null
-    }
+    return this.areaBitmap(intersectView.getBound(), scaleFactor)
 }
 
 inline fun <reified T : Any> noOpDelegate(): T {

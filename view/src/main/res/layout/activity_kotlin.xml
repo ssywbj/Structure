@@ -7,8 +7,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:clipChildren="false"
-        android:padding="6dp">
+        android:padding="6dp"
+        android:background="@android:color/black">
 
         <Button
             android:id="@+id/btnAsync"
@@ -37,30 +37,32 @@
 
         <FrameLayout
             android:id="@+id/sun_iv1_layout"
-            android:layout_width="@dimen/sunlight_width"
-            android:layout_height="@dimen/sunlight_height"
+            android:layout_width="@dimen/sunlight_width_out"
+            android:layout_height="@dimen/sunlight_heigh_out"
             android:layout_gravity="center_horizontal"
-            android:clipChildren="false"
+            android:background="@android:color/transparent"
             android:layout_marginTop="30dp">
 
             <com.suheng.structure.view.MaskFilterView
                 android:id="@+id/sun_iv1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/sunlight_width_out"
+                android:layout_height="@dimen/sunlight_heigh_out"
                 android:layout_gravity="center" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="@dimen/sunlight_width"
+                android:layout_height="@dimen/sunlight_height"
+                android:layout_gravity="center"
                 android:orientation="vertical"
-                android:padding="8dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableStart="@android:drawable/ic_menu_add"
+                    android:drawablePadding="16dp"
                     android:gravity="center_vertical"
-                    android:text="高斯模糊与图像处理"
+                    android:text="Priority Notifications"
                     android:textColor="@android:color/black"
                     android:textSize="16sp" />
 

@@ -24,27 +24,27 @@ class SunlightDrawable(ctx: Context) : Drawable() {
 
     companion object {
         lateinit var instance: SunlightDrawable
-        const val TAG = "Wbj"
+        const val TAG = "HPNotificationBg"
     }
 
     init {
         instance = this
     }
 
-    private var blurBgPaint: Paint = Paint().apply {
-        isAntiAlias = true
-        isDither = true
-        maskFilter = BlurMaskFilter(40f, BlurMaskFilter.Blur.NORMAL)
-    }
-
-    private var blurBgBitmap: Bitmap? = null
-
-    private var blurBgInsert = TypedValue.applyDimension(
+    var blurBgInsert = TypedValue.applyDimension(
         TypedValue.COMPLEX_UNIT_DIP, 16f, ctx.resources.displayMetrics
     ).toInt()
 
-    private val blurBgScale: Float = 2f
+    val blurBgScale: Float = 2f
+    private val blurBgRadio: Float = 20f
+    private var blurBgPaint: Paint = Paint().apply {
+        isFilterBitmap = true
+        isAntiAlias = true
+        isDither = true
+        maskFilter = BlurMaskFilter(blurBgRadio, BlurMaskFilter.Blur.NORMAL)
+    }
 
+    private var blurBgBitmap: Bitmap? = null
     private val dstRect = Rect()
 
     private val colors = intArrayOf(
@@ -55,6 +55,14 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         "#9DCFFF".toColorInt()
     )
 
+    /*private val colors = intArrayOf(
+        "#7FCB94FF".toColorInt(),
+        "#7F9F84FF".toColorInt(),
+        "#7F8297FF".toColorInt(),
+        "#7F79BEFF".toColorInt(),
+        "#7F9DCFFF".toColorInt()
+    )*/
+
     private val endColors = intArrayOf(
         "#B69FFF".toColorInt(),
         "#CB94FF".toColorInt(),
@@ -62,6 +70,14 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         "#8297FF".toColorInt(),
         "#8297FF".toColorInt()
     )
+
+    /*private val endColors = intArrayOf(
+        "#7FB69FFF".toColorInt(),
+        "#7FCB94FF".toColorInt(),
+        "#7F9F84FF".toColorInt(),
+        "#7F8297FF".toColorInt(),
+        "#7F8297FF".toColorInt()
+    )*/
 
     private val positions = floatArrayOf(0f, 0.26f, 0.6f, 0.79f, 1f)
     private val endPositions = floatArrayOf(0f, 0.51f, 0.7f, 0.88f, 1f)
@@ -135,9 +151,9 @@ class SunlightDrawable(ctx: Context) : Drawable() {
             dstRect.set(0, 0, width, height)
             canvas.drawBitmap(it, null, dstRect, null)
         }
-        /*paintLeftBlur(width, height, canvas)
-        paintBottomRightBlur(width, height, canvas)
-        paintTopRightBlur(width, height, canvas)*/
+        //paintLeftBlur(width, height, canvas)
+        //paintBottomRightBlur(width, height, canvas)
+        //paintTopRightBlur(width, height, canvas)
     }
 
     private val paintBlur = Paint()
@@ -209,6 +225,46 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         if (w <= 0 || h <= 0 || blurBgScale == 0f) {
             return null
         }
+        var bmpWidth = (w / blurBgScale).toInt()
+        var bmpHeight = (h / blurBgScale).toInt()
+        Log.i(TAG, "origin area, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight")
+        bmpWidth += blurBgInsert * 2
+        bmpHeight += blurBgInsert * 2
+        if (bmpWidth <= 0 || bmpHeight <= 0) {
+            return null
+        }
+
+        blurBgBitmap?.takeUnless { it.isRecycled }?.recycle()
+        blurBgPaint.shader = LinearGradient(
+            0f, bmpHeight.toFloat(), bmpWidth.toFloat(), 0f,
+            colors, positions, Shader.TileMode.CLAMP
+        )
+
+        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        Log.i(
+            TAG, "createBitmap, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
+                    ", blurBgScale: $blurBgScale, insetBlurBg: $blurBgInsert"
+        )
+
+        dstRect.set(0, 0, bmpWidth, bmpHeight)
+        dstRect.inset(blurBgInsert, blurBgInsert)
+        val sx = bmpWidth.toFloat() / dstRect.width()
+        val sy = bmpHeight.toFloat() / dstRect.height()
+        Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}, $sx, $sy")
+        //canvas.scale(1.04f, 1.1f, dstRect.centerX().toFloat(), dstRect.centerY().toFloat())
+        //canvas.drawColor(Color.BLACK)
+        canvas.drawRect(dstRect, blurBgPaint)
+        //canvas.drawRoundRect(dstRect, 26f, 26f, blurBgPaint)
+
+        return bitmap
+    }
+
+    private fun createBgBitmap2(w: Int, h: Int): Bitmap? {
+        if (w <= 0 || h <= 0 || blurBgScale == 0f) {
+            return null
+        }
         val bmpWidth = (w / blurBgScale).toInt()
         val bmpHeight = (h / blurBgScale).toInt()
         if (bmpWidth <= 0 || bmpHeight <= 0) {
@@ -226,14 +282,12 @@ class SunlightDrawable(ctx: Context) : Drawable() {
 
         Log.i(
             TAG, "createBitmap, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
-                    ", blurBgScale: $blurBgScale, insetBlurBg: ${blurBgInsert / blurBgScale}"
+                    ", blurBgScale: $blurBgScale, insetBlurBg: $blurBgInsert"
         )
 
         dstRect.set(0, 0, bmpWidth, bmpHeight)
-        val dx = (blurBgInsert / blurBgScale / 2f).toInt()
-        dstRect.inset(dx, dx)
-        Log.i(TAG, "dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}")
-        canvas.drawColor(Color.BLACK)
+        dstRect.inset(blurBgInsert, blurBgInsert)
+        Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}")
         canvas.drawRect(dstRect, blurBgPaint)
 
         return bitmap
@@ -243,8 +297,11 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         if (w <= 0 || h <= 0 || scaleRatio == 0f) {
             return null
         }
-        val bmpWidth = (w / scaleRatio).toInt()
-        val bmpHeight = (h / scaleRatio).toInt()
+        var bmpWidth = (w / scaleRatio).toInt()
+        var bmpHeight = (h / scaleRatio).toInt()
+        Log.i(TAG, "origin area, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight")
+        bmpWidth += inset * 2
+        bmpHeight += inset * 2
         if (bmpWidth <= 0 || bmpHeight <= 0) {
             return null
         }
@@ -262,13 +319,17 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         }
 
         Log.i(TAG, "createBitmap, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
-                ", scaleRatio: $scaleRatio, inset: ${inset / scaleRatio}")
+                ", scaleRatio: $scaleRatio, inset: $inset")
 
         val rect = Rect(0, 0, bmpWidth, bmpHeight)
-        val dx = (inset / scaleRatio / 2f).toInt()
-        rect.inset(dx, dx)
-        Log.i(TAG, "insert, rect: $rect, ${rect.width()}, ${rect.height()}")
-        canvas.drawColor(Color.BLACK)
+        //val dx = (inset / scaleRatio / 2f).toInt()
+        //rect.inset(dx, dx)
+        rect.inset(inset, inset)
+        val sx = bmpWidth.toFloat() / rect.width()
+        val sy = bmpHeight.toFloat() / rect.height()
+        Log.i(TAG, "insert, rect: $rect, ${rect.width()}, ${rect.height()}, $sx, $sy")
+        //canvas.scale(sx, sy, dstRect.centerX().toFloat(), dstRect.centerY().toFloat())
+        //canvas.drawColor(Color.BLACK)
         canvas.drawRect(rect, paint)
 
         return bitmap

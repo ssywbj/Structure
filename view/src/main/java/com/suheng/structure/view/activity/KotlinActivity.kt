@@ -2,485 +2,119 @@ package com.suheng.structure.view.activity
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.graphics.Outline
 import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.view.animation.PathInterpolator
-import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.drawable.toDrawable
-import androidx.lifecycle.lifecycleScope
 import com.suheng.structure.view.R
 import com.suheng.structure.view.drawable.SunlightDrawable
-import com.suheng.structure.view.drawable.SunlightDrawable.Companion.TAG
-import com.suheng.structure.view.kt.Derived2
-import com.suheng.structure.view.kt.MapObject
-import com.suheng.structure.view.kt.MapPairSL
-import com.suheng.structure.view.kt.MyClass
-import com.suheng.structure.view.kt.MyOtherClass
-import com.suheng.structure.view.kt.MyOtherClass2
-import com.suheng.structure.view.kt.Person
-import com.suheng.structure.view.kt.Person6
-import com.suheng.structure.view.kt.Square
-import com.suheng.structure.view.kt.Square3
-import com.suheng.structure.view.kt.Student4
-import com.suheng.structure.view.kt.also2
-import com.suheng.structure.view.kt.apply2
+import com.suheng.structure.view.kt.areaBitmap
 import com.suheng.structure.view.kt.delegate.BundleHandler
 import com.suheng.structure.view.kt.delegate.BundleHandlerImpl
-import com.suheng.structure.view.kt.generic.American
-import com.suheng.structure.view.kt.generic.Burger
-import com.suheng.structure.view.kt.generic.BurgerStore
-import com.suheng.structure.view.kt.generic.Consumer
-import com.suheng.structure.view.kt.generic.Everybody
-import com.suheng.structure.view.kt.generic.FastFoodStore
-import com.suheng.structure.view.kt.generic.Food
-import com.suheng.structure.view.kt.generic.FoodStore
-import com.suheng.structure.view.kt.generic.ModernPeople
 import com.suheng.structure.view.kt.generic.People
-import com.suheng.structure.view.kt.generic.People2
-import com.suheng.structure.view.kt.generic.People3
-import com.suheng.structure.view.kt.generic.Production
-import com.suheng.structure.view.kt.lastChar
-import com.suheng.structure.view.kt.lastChar2
-import com.suheng.structure.view.kt.lastTwoChar
-import com.suheng.structure.view.kt.let2
-import com.suheng.structure.view.kt.people3
-import com.suheng.structure.view.kt.run2
-import com.suheng.structure.view.kt.with2
-import kotlinx.coroutines.CoroutineStart
+import com.suheng.structure.view.kt.getBound
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.IOException
 import java.math.BigDecimal
-import kotlin.system.measureTimeMillis
 
 class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        bundleHandler(this, savedInstanceState)
-        Log.d(BundleHandlerImpl.TAG, "${bundleSum(1, 2)}")
         setContentView(R.layout.activity_kotlin)
-
-        this.main()
-        println("sum = " + sum(3, 9))
-        this.printSum(2, 46)
-        this.printSum2(2, 3)
-
-        printProduct("3", "5")
-        printProduct("", "6")
-
-        println("getStringLength: " + getStringLength("355"))
-        println("getStringLength: " + getStringLength(9))
-        println("getStringLength2: " + getStringLength2("19"))
-
-        describe(1)
-        println("describe(4659697576999): ${describe(4659697576999)}")
-        println("describe2(465576): ${describe2(465576)}")
-
-        this.inOperator()
-
-        this.demoCollection()
-        this.demoClass()
-
-        this.foo() //都使用默认值
-        this.foo(b = "B") //b属性不使用属性值
-        this.foo(45) //a属性不使用属性值：a位置参数列表的第一位，不用像b一样需要显示指定参数名称
-        this.foo(4, "C") //a、b属性都不使用属性值
-        this.filterList()
-        this.mapDemo()
-        println("lazy attr1: $lazyAttr")
-        println("lazy attr1: $lazyAttr")
-        this.lazyAttr2()
-
-        this.ifNotNull()
-
-        this.testTry()
-        println("arrayOfMinusOnes(10): ${this.arrayOfMinusOnes(10)}")
-
-        val person = Person("Wbj")
-        //person.name //name在主构造方法没有用var或val声明，是私有属性，外部访问不到
-        //Person(person)
-        Person("Wbj2", Person("11111"))
-
-        val derived2 = Derived2("wbj", "world")
-        println("derived2, name: ${derived2.name}, size: ${derived2.size}")
-        //derived2.size
-        //derived2.name
-        derived2.draw()
-
-        val square = Square("Wbj Square")
-        square.draw()
-
-        var operation = this.operation(2, 4, ::plus)
-        Log.d("Wbj", "operation, plus: $operation")
-        operation = this.operation(2, 4, ::minus)
-        Log.d("Wbj", "operation, minus: $operation")
-        operation = this.operation(3, 6) { num_a, num_b ->
-            num_a + num_b
-        }
-        Log.d("Wbj", "operation, Lambda, plus: $operation")
-        operation = this.operation(3, 6) { num_a, num_b ->
-            num_a - num_b
-        }
-        Log.d("Wbj", "operation, Lambda, minus: $operation")
-
-        Log.d("Wbj", "operation, funType: $funType")
-        Log.d("Wbj", "operation, funType: ${funType(1, 4)}")
-        funType = ::minus
-        Log.d("Wbj", "operation, funType: $funType")
-        Log.d("Wbj", "operation, funType: ${funType(1, 4)}")
-        Log.d("Wbj", "operation, funType: $funType2")
-        Log.d("Wbj", "operation, funType: ${funType2(11, 4)}")
-        funType2 = { funA1: Int, funA2: Int -> funA1 - funA2 }
-        Log.d("Wbj", "operation, funType: $funType2")
-        Log.d("Wbj", "operation, funType: ${funType2(11, 4)}")
-
-        val returnFunType = this.returnFunType(0)
-        Log.d("Wbj", "operation, returnFunType: ${returnFunType(1, 4)}")
-        Log.d("Wbj", "operation, returnFunType: ${this.returnFunType(1)(1, 4)}")
-
-        intArrayOf(2, 1, 3).forEach(action2)
-        intArrayOf(2, 1, 3).forEach(::printInt) //直接把自定义的printInt方法传进来
-        intArrayOf(2, 1, 3).forEach(::println) //直接把标准库的println方法传进来
-        intArrayOf(2, 1, 3).forEach(action)
-        //对action简化2：如果Lambda表达式只有一个参数，那么可以直接用it来代替，并且不需要声明参数名
-        intArrayOf(2, 1, 3).forEach({ Log.d("Wbj", "simple2 value, $it") })
-        //对action简化3：如果Lambda参数是函数的最后一个参数，那么可以将Lambda表达式移到函数括号的外面
-        intArrayOf(2, 1, 3).forEach() { Log.d("Wbj", "simple3 value, $it") }
-        //对action简化4：如果Lambda表达式是函数的唯一一个参数，那么可以将函数的括号省略
-        intArrayOf(2, 1, 3).forEach { Log.d("Wbj", "simple4 value, $it") }
-
-        val production1: Production<Food> = FoodStore()
-        production1.produce()
-        val production2: Production<Food> = FastFoodStore()
-        production2.produce()
-        val production3: Production<Food> = BurgerStore()
-        production3.produce()
-
-        /*val production1: Production<Burger> = FoodStore() //Error
-        val production2: Production<Burger> = FastFoodStore() //Error
-        val production3: Production<Burger> = InOutBurger()*/
-
-        val consumer1: Consumer<Burger> = Everybody()
-        consumer1.consume(Burger())
-        val consumer2: Consumer<Burger> = ModernPeople()
-        consumer2.consume(Burger())
-        val consumer3: Consumer<Burger> = American()
-        consumer3.consume(Burger())
-
-        /*val consumer1: Consumer<Food> = Everybody()
-        val consumer2: Consumer<Food> = ModernPeople() //Error
-        val consumer3: Consumer<Food> = American() //Error*/
-
-        Log.d("Wbj", "lastTwoChar fun: ${"hello world!".lastTwoChar()}")
-        Log.d("Wbj", "lastChar attr: ${"hello world!".lastChar}")
-        Log.d("Wbj", "lastChar attr: ${"hello world!".lastChar2}")
-
-        val takeIf = "hello world!".takeIf { it.startsWith("kko") }
-        val takeUnless = "hello world!".takeUnless { it.startsWith("kko") }
-        Log.d("Wbj", "takeIf: $takeIf, takeUnless: $takeUnless")
-        repeat(3) {
-            Log.d("Wbj", "repeat time: $it")
-        }
-
-        val str = "hello wo rld!"
-        str.filter { !it.isWhitespace() }
-            .let { Log.d("Wbj", "filter: $it") } //return string
-        str.filter { !it.isWhitespace() }.groupBy { it }  //return map
-            .let { Log.d("Wbj", "filter groupBy: $it") }
-        str.filter { !it.isWhitespace() }.groupBy { it }
-            .map { it.key to it.value.size } //return list
-            .let { Log.d("Wbj", "filter groupBy map: $it, element 2: ${it[1]}") }
-        str.filter { !it.isWhitespace() }.toList().sorted().groupBy { it }
-            .map { it.key to it.value.size }
-            .let { Log.d("Wbj", "filter toList sorted groupBy, map: $it, element 2: ${it[1]}") }
-        str.toSortedSet().let { Log.d("Wbj", "toSortedSet: $it") }
-
-        people3 = getPeople<People2>()
-        people3!!.printName()
-        (people3 as People2).printName2()
-        people3 = getPeople<People3>()
-        people3!!.printName()
-        (people3 as People3).printName3()
-        getPeople2<People2>().printName2()
-        getPeople2<People3>().printName3()
-        p1 = people3
-        p2 = people3
-
-        findViewById<View>(R.id.btnAsync).setOnClickListener {
-            lifecycleScope.launch {
-                val currentTimeMillis = System.currentTimeMillis()
-                Log.d(
-                    "Wbj",
-                    "avatar, companyLogo, start: ${Thread.currentThread().name}, currentTimeMillis: $currentTimeMillis"
-                )
-                val avatar = getAvatar()
-                val companyLogo = getCompanyLogo()
-                Log.d(
-                    "Wbj",
-                    "avatar: $avatar, companyLogo: $companyLogo, end: ${Thread.currentThread().name}" +
-                            ", take time: ${1.0 * (System.currentTimeMillis() - currentTimeMillis) / 1000}s"
-                )
-
-                Log.i("Wbj", "---sync start---")
-                measureTimeMillis {
-                    val avatar2 = getAvatar()
-                    val companyLogo2 = getCompanyLogo()
-                    Log.i(
-                        "Wbj",
-                        "avatar2: $avatar2, companyLogo2: $companyLogo2, end: ${Thread.currentThread().name}"
-                    )
-                }.also {
-                    Log.i("Wbj", "sync take time: ${1.0 * it / 1000}s")
-                }
-
-                Log.w("Wbj", "---async await start---")
-                measureTimeMillis {
-                    val avatar2 = async { getAvatar() }
-                    val companyLogo2 = async { getCompanyLogo() }
-                    Log.w(
-                        "Wbj",
-                        "avatar2: ${avatar2.await()}, companyLogo2: ${companyLogo2.await()}, end: ${Thread.currentThread().name}"
-                    )
-                }.also {
-                    Log.w("Wbj", "async take time: ${1.0 * it / 1000}s")
-                }
-
-                deferredAvatar2 = async(start = CoroutineStart.LAZY) { getAvatar() }
-                deferredCompanyLogo2 = async(start = CoroutineStart.LAZY) { getCompanyLogo() }
-                /*val await = deferredAvatar2!!.await()
-                val await1 = deferredCompanyLogo2!!.await()
-                Log.w(
-                    "Wbj",
-                    "lazy avatar2: $await, companyLogo2: $await1, end: ${Thread.currentThread().name}"
-                )*/
-            }
-        }
-
-        val btnAsyncLazy = findViewById<Button>(R.id.btnAsyncLazy)
-        btnAsyncLazy.setOnClickListener {
-            lifecycleScope.launch {
-                Log.w("Wbj", "---lazy async await start---")
-                measureTimeMillis {
-                    deferredAvatar2?.start()
-                    deferredCompanyLogo2?.start()
-                    Log.w(
-                        "Wbj",
-                        "avatar2: ${deferredAvatar2?.await()}, companyLogo2: ${deferredCompanyLogo2?.await()}, end: ${Thread.currentThread().name}"
-                    )
-                }.also {
-                    Log.w("Wbj", "lazy async take time: ${1.0 * it / 1000}s")
-                }
-            }
-
-            Square("Wbj Square").draw()
-            MyOtherClass().draw()
-            MyOtherClass2(Square("Delegate class")).draw()
-            MyOtherClass2(Square3()).draw()
-            var myProperty = MyClass().myProperty
-            Log.i("Wbj", "myProperty: $myProperty")
-            MyClass().myProperty = "set delegate from out"
-            myProperty = MyClass().myProperty
-            Log.i("Wbj", "myProperty: $myProperty")
-
-            val mapObj = MapObject(mutableMapOf())
-            mapObj.myProperty = "Hello"
-            mapObj.myOtherProperty = 12
-            Log.i("Wbj", "mapObj myProperty: ${mapObj.myProperty}")
-            Log.i("Wbj", "mapObj myOtherProperty: ${mapObj.myOtherProperty}")
-            Log.i("Wbj", "mapObj map: ${mapObj.map}")
-
-            val psn = Person6()
-            psn.name = "wbj"
-            psn.lastname = "wei"
-            Log.i(
-                "Wbj",
-                "person name: ${psn.name}, lastname: ${psn.lastname}, updateCount: ${psn.updateCount}, person: $psn"
-            )
-            val student = Student4()
-            student.name = "sbj"
-            student.lastname = "sei"
-            Log.i(
-                "Wbj",
-                "student name: ${student.name}, lastname: ${student.lastname}, updateCount: ${student.updateCount}, student: $student}"
-            )
-        }
-
-        with2(btnAsyncLazy) {
-            isEnabled
-            "DDDDD"
-        }.also { Log.i("Wbj", "with2Result: $it") }
-        btnAsyncLazy?.let2 {
-            it.isEnabled
-        }.also {
-            Log.i("Wbj", "let2Result: $it")
-        }
-        btnAsyncLazy?.run2 {
-            textScaleX
-        }.also {
-            Log.i("Wbj", "let2Result: $it")
-        }
-        btnAsyncLazy.apply2 {
-            text = "$text, 1"
-        }.also {
-            Log.i("Wbj", "apply2Result: $it")
-        }
-        btnAsyncLazy?.run2 {
-            textScaleX
-        }.also2 {
-            Log.i("Wbj", "also2 log: $it")
-        }
-        btnAsyncLazy.apply2 {
-            text = "$text, 1"
-        }.also2 {
-            Log.i("Wbj", "also2 log: $it")
-        }
-
-        try {
-            assets.open("use_func.txt")
-        } catch (e: IOException) { //try...catch...表达式
-            Log.e("Wbj", "read assets file error: $e")
-            null
-        }?.use {
-            val outputStream = ByteArrayOutputStream()
-            val buffer = ByteArray(1024 * 4)
-            var len: Int = it.read(buffer)
-            while (len != -1) {
-                outputStream.write(buffer, 0, len)
-                len = it.read(buffer)
-            }
-            String(outputStream.use { output ->
-                output.toByteArray()
-            })
-        }.also {
-            Log.i("Wbj", "read result: $it")
-        }
-
-        val people31 = People3(10)
-        val people32 = People3(20)
-        val people33 = people31 + people32
-        Log.i("Wbj", "people33: ${people33.age}, > result: ${people31 > people32}")
-
-        letterToInt("abc").also {
-            if (it == null) {
-                Log.e("Wbj", "runBlocking try...catch fail")
-            } else {
-                Log.d("Wbj", "runBlocking try...catch, number: $it")
-            }
-        }
-
-        letterToInt2("abc").getOrNull().also {
-            if (it == null) {
-                Log.e("Wbj", "runBlocking getOrNull fail")
-            } else {
-                Log.d("Wbj", "runBlocking getOrNull, number: $it")
-            }
-        }
-
-        letterToInt2("abcd").exceptionOrNull().also {
-            Log.e("Wbj", "runBlocking exceptionOrNull: $it")
-        }
-
-        letterToInt2("abcde").onSuccess { Log.d("Wbj", "runBlocking result: $it") }
-            .onFailure { Log.e("Wbj", "runBlocking result, fail: $it") }
-
-        val mapPairSL: MapPairSL = mutableMapOf()
-        mapPairSL.put("1", Pair(1, 2L))
-        mapPairSL.put("2", Pair(3, 4L))
-        mapPairSL.entries.forEach {
-            Log.d("Wbj", "key:${it.key}, value:(${it.value.first}, ${it.value.second})")
-        }
-
-        val pair = Pair("aaa", 21)
-        val name = pair.first
-        val age = pair.second
-        val (name2, age2) = Pair("bbb", 22)
-        Log.i("Wbj", "name:$name, age:$age, name2:$name2, age2:$age2")
-
-        val people34 = people3 {
-            printName()
-            printName3()
-        }
-        people34.printName()
-
+        bundleHandler(this, savedInstanceState)
         val filterView = findViewById<View>(R.id.sun_iv1).apply {
             setOnClickListener {
                 (background as? SunlightDrawable)?.start()
             }
         }
         findViewById<ViewGroup>(R.id.sun_iv1_layout).apply {
-            overlay.add(View(this@KotlinActivity))
+            clipToOutline = true
+            outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: Outline) {
+                    outline.setRoundRect(0, 0, view.width, view.height, 50f)
+                }
+            }
             post {
-                filterView.layoutParams?.let { lp ->
-                    lp.width = this.width + 60
+                /*filterView.layoutParams?.let { lp ->
+                    lp.width = this.width + 120
                     lp.height = this.height + 60
                     filterView.layoutParams = lp
+                }*/
+
+                val bound = filterView.getBound()
+                bound.inset(
+                    SunlightDrawable.instance.blurBgInsert,
+                    SunlightDrawable.instance.blurBgInsert
+                )
+                filterView.areaBitmap(bound)?.let {
+                    this@KotlinActivity.findViewById<ImageView>(R.id.sun_iv2).setImageBitmap(it)
                 }
+
             }
         }
 
-        findViewById<ImageView>(R.id.sun_iv2).apply {
+        /*findViewById<ImageView>(R.id.sun_iv2).apply {
             post {
-                val w = this.width
-                val h = this.height
-                Log.i(TAG, "sun_iv2, w: $w, height: $h")
-                SunlightDrawable.instance.createBitmap(w, h, scaleRatio = 2f)?.let {
-                    //BitmapFactory.decodeResource(resources, R.drawable.girl_gaitubao)?.let {
+                val w = this.width + 200
+                val h = this.height + 100
+                SunlightDrawable.instance.createBitmap(
+                    w, h, scaleRatio = SunlightDrawable.instance.blurBgScale,
+                    inset = SunlightDrawable.instance.blurBgInsert
+                )?.let {
                     this.background = it.toDrawable(resources)
                 }
             }
-        }
+        }*/
 
-        findViewById<ImageView>(R.id.sun_iv3).apply {
-            post {
-                val w = this.width
-                val h = this.height
-                val inset = resources.getDimensionPixelOffset(R.dimen.sunlight_extend_round)
-                Log.i(TAG, "sun_iv3, w: $w, height: $h")
-                SunlightDrawable.instance.createBitmap(
-                    w + inset, h + inset, scaleRatio = 2f, inset = inset
-                )?.let {
-                    background = it.toDrawable(resources)
-                }
+//        findViewById<ImageView>(R.id.sun_iv3).apply {
+//            post {
+//                val w = this.width
+//                val h = this.height
+//                val inset = resources.getDimensionPixelOffset(R.dimen.sunlight_extend_round)
+//                Log.i(TAG, "sun_iv3, w: $w, height: $h")
+//                SunlightDrawable.instance.createBitmap(
+//                    w + inset, h + inset, scaleRatio = 2f, inset = inset
+//                )?.let {
+//                    background = it.toDrawable(resources)
+//                }
+//
+//                /*clipToOutline = true
+//                outlineProvider = object : ViewOutlineProvider() {
+//                    override fun getOutline(view: View, outline: Outline) {
+//                        outline.setRoundRect(0, 0, view.width, view.height, 40f)
+//                    }
+//                }*/
+//            }
+//        }
 
-                /*clipToOutline = true
-                outlineProvider = object : ViewOutlineProvider() {
-                    override fun getOutline(view: View, outline: Outline) {
-                        outline.setRoundRect(0, 0, view.width, view.height, 40f)
-                    }
-                }*/
-            }
-        }
-
-        findViewById<ImageView>(R.id.sun_iv4).apply {
-            post {
-                val w = this.width
-                val h = this.height
-                Log.i(TAG, "sun_iv4, w: $w, height: $h")
-                /*SunlightDrawable.instance.patternBlurBitmap(
-                    w, h
-                )?.let {
-                    background = it.toDrawable(resources)
-                    //setImageBitmap(it)
-                }
-
-                val sunIv5 = this@KotlinActivity.findViewById<ImageView>(R.id.sun_iv5)
-                toBitmap()?.let {
-                    sunIv5.setImageBitmap(Toolkit.blur(it,16))
-                }*/
-            }
-        }
+//        findViewById<ImageView>(R.id.sun_iv4).apply {
+//            post {
+//                val w = this.width
+//                val h = this.height
+//                Log.i(TAG, "sun_iv4, w: $w, height: $h")
+//                /*SunlightDrawable.instance.patternBlurBitmap(
+//                    w, h
+//                )?.let {
+//                    background = it.toDrawable(resources)
+//                    //setImageBitmap(it)
+//                }
+//
+//                val sunIv5 = this@KotlinActivity.findViewById<ImageView>(R.id.sun_iv5)
+//                toBitmap()?.let {
+//                    sunIv5.setImageBitmap(Toolkit.blur(it,16))
+//                }*/
+//            }
+//        }
 
         val imageView2 = findViewById<View>(R.id.imageView2)
         val composeShaderView = findViewById<View>(R.id.composeShaderView)
