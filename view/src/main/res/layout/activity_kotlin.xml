@@ -55,10 +55,10 @@
                 android:layout_height="@dimen/sunlight_height"
                 android:layout_gravity="center"
                 android:orientation="vertical"
-                android:background="@android:color/darker_gray"
+                android:background="@drawable/rect_border_light_bg"
                 android:padding="8dp">
 
-                <TextView
+                <!--<TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableStart="@android:drawable/ic_menu_add"
@@ -99,7 +99,7 @@
                     android:lines="3"
                     android:text="高斯模糊. 以可调的量快速模糊选区。此效果将移去高频出现的细节，并产生一种朦胧"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp" />
+                    android:textSize="14sp" />-->
             </LinearLayout>
         </FrameLayout>
 
@@ -108,7 +108,9 @@
             android:layout_width="@dimen/sunlight_width"
             android:layout_height="@dimen/sunlight_height"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="20dp"
+            android:background="@drawable/sunlight_panel"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/sun_iv3"

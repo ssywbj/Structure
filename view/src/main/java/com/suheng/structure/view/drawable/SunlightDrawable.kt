@@ -12,14 +12,18 @@ import android.graphics.ColorFilter
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.PixelFormat
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.graphics.RadialGradient
 import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.util.TypedValue
 import android.view.animation.PathInterpolator
 import androidx.core.graphics.toColorInt
+import com.suheng.structure.view.kt.saveLayer
 
 class SunlightDrawable(ctx: Context) : Drawable() {
 
@@ -45,7 +49,15 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         maskFilter = BlurMaskFilter(blurBgRadio, BlurMaskFilter.Blur.NORMAL)
     }
 
+    private var xfermodePaint: Paint = Paint().apply {
+        isFilterBitmap = true
+        isAntiAlias = true
+        isDither = true
+        xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP)
+    }
+
     private var blurBgBitmap: Bitmap? = null
+    private var transBitmap: Bitmap? = null
     private val dstRect = Rect()
 
     /*private val colors = intArrayOf(
@@ -142,67 +154,37 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         super.onBoundsChange(bounds)
         Log.d(TAG, "onBoundsChange: width: ${bounds.width()}, height: ${bounds.height()}")
         blurBgBitmap = createBgBitmap(bounds.width(), bounds.height())
+        leftRadialBitmap = createLeftRadialBitmap(bounds.width(), bounds.height())
+        topRightRadialBitmap = createTopRightRadialBitmap(bounds.width(), bounds.height())
+        bottomRightRadialBitmap = createBottomRightRadialBitmap(bounds.width(), bounds.height())
+        transBitmap = createTransBitmap(bounds.width(), bounds.height())
     }
 
     override fun draw(canvas: Canvas) {
         val width = bounds.width()
         val height = bounds.height()
         Log.d(TAG, "draw: width: $width, height: $height")
-        blurBgBitmap?.let {
-            dstRect.set(0, 0, width, height)
+        dstRect.set(0, 0, width, height)
+        /*blurBgBitmap?.let {
             canvas.drawBitmap(it, null, dstRect, null)
+        }*/
+
+        val rectF = RectF(0f, 0f, width.toFloat(), height.toFloat())
+        leftRadialBitmap?.let {
+            canvas.saveLayer(rectF, null) {
+                blurBgBitmap?.let { bm ->
+                    drawBitmap(bm, null, rectF, null)
+                }
+                drawBitmap(it, null, rectF, xfermodePaint)
+            }
         }
-        //paintLeftBlur(width, height, canvas)
-        //paintBottomRightBlur(width, height, canvas)
-        //paintTopRightBlur(width, height, canvas)
-    }
 
-    private val paintBlur = Paint()
-
-    private fun paintLeftBlur(width: Int, height: Int, canvas: Canvas) {
-        val radius = width / 2f
-        val centerX = -width / 11f
-        val centerY = height / 3.5f
-        val startColor = "#80C1FF".toColorInt()
-        val endColor = Color.TRANSPARENT
-        val shader = RadialGradient(
-            centerX, centerY, radius,
-            intArrayOf(startColor, endColor),
-            floatArrayOf(0f, 1.0f), Shader.TileMode.CLAMP
-        )
-        paintBlur.setShader(shader)
-        canvas.drawCircle(centerX, centerY, radius, paintBlur)
-    }
-
-    private fun paintBottomRightBlur(width: Int, height: Int, canvas: Canvas) {
-        val radius = width / 1.7f
-        val centerX = width / 0.9f
-        val centerY = height / 1.2f
-        val startColor = "#80E6FF".toColorInt()
-        val endColor = Color.TRANSPARENT
-        val shader = RadialGradient(
-            centerX, centerY, radius,
-            intArrayOf(startColor, endColor),
-            floatArrayOf(0f, 1.0f), Shader.TileMode.CLAMP
-        )
-        paintBlur.setShader(shader)
-        canvas.drawCircle(centerX, centerY, radius, paintBlur)
-    }
-
-    private fun paintTopRightBlur(width: Int, height: Int, canvas: Canvas) {
-        val radius = width / 2.4f
-        val centerX = width / 0.9f
-        val centerY = height / 5f
-        val startColor = "#8297FF".toColorInt()
-        val endColor = Color.TRANSPARENT
-        //val endColor = with(startColor.toArgb()) { Color.argb(0, this[1], this[2], this[3]) }
-        val shader = RadialGradient(
-            centerX, centerY, radius,
-            intArrayOf(startColor, endColor),
-            floatArrayOf(0f, 1.0f), Shader.TileMode.CLAMP
-        )
-        paintBlur.setShader(shader)
-        canvas.drawCircle(centerX, centerY, radius, paintBlur)
+        /*topRightRadialBitmap?.let {
+            canvas.drawBitmap(it, null, dstRect, null)
+        }*/
+        /*bottomRightRadialBitmap?.let {
+            canvas.drawBitmap(it, null, dstRect, null)
+        }*/
     }
 
     fun start() {
@@ -243,18 +225,187 @@ class SunlightDrawable(ctx: Context) : Drawable() {
 
         val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-
         Log.i(
             TAG, "createBitmap, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
                     ", blurBgScale: $blurBgScale, insetBlurBg: $blurBgInsert"
         )
-
         dstRect.set(0, 0, bmpWidth, bmpHeight)
         dstRect.inset(blurBgInsert, blurBgInsert)
-        val sx = bmpWidth.toFloat() / dstRect.width()
-        val sy = bmpHeight.toFloat() / dstRect.height()
-        Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}, $sx, $sy")
+        Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}")
         canvas.drawRect(dstRect, blurBgPaint)
+
+        return bitmap
+    }
+
+    private fun createTransBitmap(w: Int, h: Int): Bitmap? {
+        if (w <= 0 || h <= 0 || blurBgScale == 0f) {
+            return null
+        }
+        var bmpWidth = (w / blurBgScale).toInt()
+        var bmpHeight = (h / blurBgScale).toInt()
+        Log.i(TAG, "origin area, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight")
+        bmpWidth += blurBgInsert * 2
+        bmpHeight += blurBgInsert * 2
+        if (bmpWidth <= 0 || bmpHeight <= 0) {
+            return null
+        }
+
+        transBitmap?.takeUnless { it.isRecycled }?.recycle()
+        val paint = Paint().apply {
+            style = Paint.Style.FILL_AND_STROKE
+            color = Color.WHITE
+        }
+
+        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        Log.i(
+            TAG, "createBitmap, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
+                    ", blurBgScale: $blurBgScale, insetBlurBg: $blurBgInsert"
+        )
+        dstRect.set(0, 0, bmpWidth, bmpHeight)
+        dstRect.inset(blurBgInsert, blurBgInsert)
+        Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}")
+        canvas.drawRect(dstRect, paint)
+
+        return bitmap
+    }
+
+    private fun createBgBitmap2(w: Int, h: Int): Bitmap? {
+        if (w <= 0 || h <= 0 || blurBgScale == 0f) {
+            return null
+        }
+        var bmpWidth = (w / blurBgScale).toInt()
+        var bmpHeight = (h / blurBgScale).toInt()
+        Log.i(TAG, "origin area, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight")
+        bmpWidth += blurBgInsert * 2
+        bmpHeight += blurBgInsert * 2
+        if (bmpWidth <= 0 || bmpHeight <= 0) {
+            return null
+        }
+
+        blurBgBitmap?.takeUnless { it.isRecycled }?.recycle()
+        blurBgPaint.shader = LinearGradient(
+            0f, bmpHeight.toFloat(), bmpWidth.toFloat(), 0f,
+            colors, positions, Shader.TileMode.CLAMP
+        )
+
+        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        Log.i(
+            TAG, "createBitmap, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
+                    ", blurBgScale: $blurBgScale, insetBlurBg: $blurBgInsert"
+        )
+        dstRect.set(0, 0, bmpWidth, bmpHeight)
+        dstRect.inset(blurBgInsert, blurBgInsert)
+        Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}")
+        canvas.drawRect(dstRect, blurBgPaint)
+
+        return bitmap
+    }
+
+    private var leftRadialBitmap: Bitmap? = null
+
+    private fun createLeftRadialBitmap(w: Int, h: Int): Bitmap? {
+        if (w <= 0 || h <= 0 || blurBgScale == 0f) {
+            return null
+        }
+        val bmpWidth = (w / blurBgScale).toInt()
+        val bmpHeight = (h / blurBgScale).toInt()
+        if (bmpWidth <= 0 || bmpHeight <= 0) {
+            return null
+        }
+
+        leftRadialBitmap?.takeUnless { it.isRecycled }?.recycle()
+
+        val centerX = bmpWidth / 2f
+        val centerY = bmpHeight / 2f
+        val radius = centerX.coerceAtMost(centerY)
+        val startColor = "#FF80C1FF".toColorInt()
+        val middleColor = "#9E8BE8FF".toColorInt()
+        val endColor = "#009DCFFF".toColorInt()
+        //val endColor = "#FF0000".toColorInt()
+
+        val paint = Paint().apply {
+            shader = RadialGradient(
+                centerX, centerY, radius,
+                intArrayOf(startColor, middleColor, endColor),
+                floatArrayOf(0f, 0.46f, 1f), Shader.TileMode.CLAMP
+            )
+        }
+        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.translate(-bmpWidth.toFloat() / 2, 0f)
+        canvas.drawCircle(centerX, centerY, radius, paint)
+
+        return bitmap
+    }
+
+    private var topRightRadialBitmap: Bitmap? = null
+
+    private fun createTopRightRadialBitmap(w: Int, h: Int): Bitmap? {
+        if (w <= 0 || h <= 0 || blurBgScale == 0f) {
+            return null
+        }
+        val bmpWidth = (w / blurBgScale).toInt()
+        val bmpHeight = (h / blurBgScale).toInt()
+        if (bmpWidth <= 0 || bmpHeight <= 0) {
+            return null
+        }
+
+        topRightRadialBitmap?.takeUnless { it.isRecycled }?.recycle()
+
+        val centerX = bmpWidth / 2f
+        val centerY = bmpHeight / 2f
+        val radius = centerX.coerceAtMost(centerY)
+        val startColor = "#FF8297FF".toColorInt()
+        val middleColor = "#D696A8FF".toColorInt()
+        val endColor = "#00FFFFFF".toColorInt()
+
+        val paint = Paint().apply {
+            shader = RadialGradient(
+                centerX, centerY, radius,
+                intArrayOf(startColor, middleColor, endColor),
+                floatArrayOf(0f, 0.34f, 1f), Shader.TileMode.CLAMP
+            )
+        }
+        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.drawCircle(centerX, centerY, radius, paint)
+
+        return bitmap
+    }
+
+    private var bottomRightRadialBitmap: Bitmap? = null
+
+    private fun createBottomRightRadialBitmap(w: Int, h: Int): Bitmap? {
+        if (w <= 0 || h <= 0 || blurBgScale == 0f) {
+            return null
+        }
+        val bmpWidth = (w / blurBgScale).toInt()
+        val bmpHeight = (h / blurBgScale).toInt()
+        if (bmpWidth <= 0 || bmpHeight <= 0) {
+            return null
+        }
+
+        bottomRightRadialBitmap?.takeUnless { it.isRecycled }?.recycle()
+
+        val centerX = bmpWidth / 2f
+        val centerY = bmpHeight / 2f
+        val radius = centerX.coerceAtMost(centerY)
+        val startColor = "#FF80E6FF".toColorInt()
+        val middleColor = "#9E8BE8FF".toColorInt()
+        val endColor = "#009DCFFF".toColorInt()
+
+        val paint = Paint().apply {
+            shader = RadialGradient(
+                centerX, centerY, radius,
+                intArrayOf(startColor, middleColor, endColor),
+                floatArrayOf(0f, 0.46f, 1f), Shader.TileMode.CLAMP
+            )
+        }
+        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.drawCircle(centerX, centerY, radius, paint)
 
         return bitmap
     }
@@ -281,7 +432,7 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         val paint: Paint = Paint().apply {
             isAntiAlias = true
             isDither = true
-            maskFilter = BlurMaskFilter(50f, BlurMaskFilter.Blur.NORMAL)
+            maskFilter = BlurMaskFilter(30f, BlurMaskFilter.Blur.NORMAL)
             shader = LinearGradient(
                 0f, bmpHeight.toFloat(), bmpWidth.toFloat(), 0f,
                 colors, positions, Shader.TileMode.CLAMP
@@ -292,14 +443,8 @@ class SunlightDrawable(ctx: Context) : Drawable() {
                 ", scaleRatio: $scaleRatio, inset: $inset")
 
         val rect = Rect(0, 0, bmpWidth, bmpHeight)
-        //val dx = (inset / scaleRatio / 2f).toInt()
-        //rect.inset(dx, dx)
         rect.inset(inset, inset)
-        val sx = bmpWidth.toFloat() / rect.width()
-        val sy = bmpHeight.toFloat() / rect.height()
-        Log.i(TAG, "insert, rect: $rect, ${rect.width()}, ${rect.height()}, $sx, $sy")
-        //canvas.scale(sx, sy, dstRect.centerX().toFloat(), dstRect.centerY().toFloat())
-        //canvas.drawColor(Color.BLACK)
+        Log.i(TAG, "insert, rect: $rect, ${rect.width()}, ${rect.height()}")
         canvas.drawRect(rect, paint)
 
         return bitmap

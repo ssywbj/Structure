@@ -11,15 +11,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.animation.PathInterpolator
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.suheng.structure.view.R
 import com.suheng.structure.view.drawable.SunlightDrawable
-import com.suheng.structure.view.kt.areaBitmap
 import com.suheng.structure.view.kt.delegate.BundleHandler
 import com.suheng.structure.view.kt.delegate.BundleHandlerImpl
 import com.suheng.structure.view.kt.generic.People
-import com.suheng.structure.view.kt.getBound
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -55,16 +52,15 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                     AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: Animator) {
                         super.onAnimationStart(animation)
+                        //filterView.visibility = View.VISIBLE
                         layoutPanel.background = null
-                        filterView.visibility = View.VISIBLE
                     }
 
                     override fun onAnimationEnd(animation: Animator) {
                         super.onAnimationEnd(animation)
-                        filterView.visibility = View.GONE
+                        //filterView.visibility = View.GONE
                         layoutPanel.background =
-                            ContextCompat.getColor(context, android.R.color.darker_gray)
-                                .toDrawable()
+                            ContextCompat.getDrawable(context, R.drawable.rect_border_light_bg)
                     }
                 })*/
 
@@ -74,12 +70,12 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                     filterView.layoutParams = lp
                 }*/
 
-                filterView.areaBitmap(filterView.getBound().apply {
+                /*filterView.areaBitmap(filterView.getBound().apply {
                     val insert = SunlightDrawable.instance.blurBgInsert
                     inset(insert, insert)
                 })?.let {
                     this@KotlinActivity.findViewById<ImageView>(R.id.sun_iv2).setImageBitmap(it)
-                }
+                }*/
 
             }
         }

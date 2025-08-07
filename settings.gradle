@@ -1,4 +1,4 @@
-//include ':apidemos'
+include ':apidemos'
 include ':contentprovider'
 include ':wallpaper:roamimg'
 include ':wallpaper:myhealth'

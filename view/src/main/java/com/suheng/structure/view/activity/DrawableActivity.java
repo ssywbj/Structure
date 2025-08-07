@@ -33,7 +33,6 @@ public class DrawableActivity extends AppCompatActivity {
 
         LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{one, two});
         imageView.setImageDrawable(layerDrawable);
-        MaskCircleDrawable maskCircleDrawable = new MaskCircleDrawable(new Drawable[]{one, two});
 
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,10 +45,6 @@ public class DrawableActivity extends AppCompatActivity {
                 }
                 Drawable drawable = layerDrawable.getDrawable(0);
                 imageView.setImageDrawable(drawable);*/
-
-                Drawable drawable = maskCircleDrawable.getDrawable(0);
-                maskCircleDrawable.startTransition();
-                imageView.setImageDrawable(drawable);
             }
         });
 
