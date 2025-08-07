@@ -42,17 +42,15 @@ class SunlightDrawable(ctx: Context) : Drawable() {
 
     val blurBgScale: Float = 2f
     private val blurBgRadio: Float = 20f
+
     private var blurBgPaint: Paint = Paint().apply {
         isFilterBitmap = true
         isAntiAlias = true
         isDither = true
         maskFilter = BlurMaskFilter(blurBgRadio, BlurMaskFilter.Blur.NORMAL)
     }
-
     private var xfermodePaint: Paint = Paint().apply {
-        isFilterBitmap = true
-        isAntiAlias = true
-        isDither = true
+        set(blurBgPaint)
         xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP)
     }
 
@@ -114,7 +112,7 @@ class SunlightDrawable(ctx: Context) : Drawable() {
             pvhList.add(PropertyValuesHolder.ofFloat(property, positions[i], endPositions[i]))
         }
         ValueAnimator.ofPropertyValuesHolder(*pvhList.toTypedArray()).apply {
-            setDuration(500)
+            duration = 500
             interpolator = PathInterpolator(0.2f, 0f, 0.1f, 1f)
             addUpdateListener { animation ->
                 for ((i, prop) in colorProps.withIndex()) {
@@ -169,6 +167,8 @@ class SunlightDrawable(ctx: Context) : Drawable() {
             canvas.saveLayer(dstRect, null) {
                 drawBitmap(it, null, dstRect, null)
 
+                val dx = blurBgInsert.toFloat() * 2
+                dstRect.inset(dx, dx)
                 leftRadialBitmap?.let { bm ->
                     drawBitmap(bm, null, dstRect, xfermodePaint)
                 }
@@ -283,7 +283,9 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         val centerY = bmpHeight / 2f
         val radius = centerX.coerceAtMost(centerY)
         val startColor = "#FF80C1FF".toColorInt()
+        //val startColor = "#0000FF".toColorInt()
         val middleColor = "#9E8BE8FF".toColorInt()
+        //val middleColor = "#00FF00".toColorInt()
         val endColor = "#009DCFFF".toColorInt()
         //val endColor = "#FF0000".toColorInt()
 
