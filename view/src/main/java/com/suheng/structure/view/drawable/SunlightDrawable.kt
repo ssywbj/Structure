@@ -57,8 +57,8 @@ class SunlightDrawable(ctx: Context) : Drawable() {
     }
 
     private var blurBgBitmap: Bitmap? = null
-    private var transBitmap: Bitmap? = null
-    private val dstRect = Rect()
+
+    private val dstRect = RectF()
 
     /*private val colors = intArrayOf(
         "#CB94FF".toColorInt(),
@@ -157,34 +157,29 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         leftRadialBitmap = createLeftRadialBitmap(bounds.width(), bounds.height())
         topRightRadialBitmap = createTopRightRadialBitmap(bounds.width(), bounds.height())
         bottomRightRadialBitmap = createBottomRightRadialBitmap(bounds.width(), bounds.height())
-        transBitmap = createTransBitmap(bounds.width(), bounds.height())
     }
 
     override fun draw(canvas: Canvas) {
         val width = bounds.width()
         val height = bounds.height()
+        dstRect.set(0f, 0f, width.toFloat(), height.toFloat())
         Log.d(TAG, "draw: width: $width, height: $height")
-        dstRect.set(0, 0, width, height)
-        /*blurBgBitmap?.let {
-            canvas.drawBitmap(it, null, dstRect, null)
-        }*/
 
-        val rectF = RectF(0f, 0f, width.toFloat(), height.toFloat())
-        leftRadialBitmap?.let {
-            canvas.saveLayer(rectF, null) {
-                blurBgBitmap?.let { bm ->
-                    drawBitmap(bm, null, rectF, null)
+        blurBgBitmap?.let {
+            canvas.saveLayer(dstRect, null) {
+                drawBitmap(it, null, dstRect, null)
+
+                leftRadialBitmap?.let { bm ->
+                    drawBitmap(bm, null, dstRect, xfermodePaint)
                 }
-                drawBitmap(it, null, rectF, xfermodePaint)
+                topRightRadialBitmap?.let { bm ->
+                    drawBitmap(bm, null, dstRect, xfermodePaint)
+                }
+                bottomRightRadialBitmap?.let { bm ->
+                    canvas.drawBitmap(bm, null, dstRect, xfermodePaint)
+                }
             }
         }
-
-        /*topRightRadialBitmap?.let {
-            canvas.drawBitmap(it, null, dstRect, null)
-        }*/
-        /*bottomRightRadialBitmap?.let {
-            canvas.drawBitmap(it, null, dstRect, null)
-        }*/
     }
 
     fun start() {
@@ -229,43 +224,10 @@ class SunlightDrawable(ctx: Context) : Drawable() {
             TAG, "createBitmap, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
                     ", blurBgScale: $blurBgScale, insetBlurBg: $blurBgInsert"
         )
-        dstRect.set(0, 0, bmpWidth, bmpHeight)
-        dstRect.inset(blurBgInsert, blurBgInsert)
+        dstRect.set(0f, 0f, bmpWidth.toFloat(), bmpHeight.toFloat())
+        dstRect.inset(blurBgInsert.toFloat(), blurBgInsert.toFloat())
         Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}")
         canvas.drawRect(dstRect, blurBgPaint)
-
-        return bitmap
-    }
-
-    private fun createTransBitmap(w: Int, h: Int): Bitmap? {
-        if (w <= 0 || h <= 0 || blurBgScale == 0f) {
-            return null
-        }
-        var bmpWidth = (w / blurBgScale).toInt()
-        var bmpHeight = (h / blurBgScale).toInt()
-        Log.i(TAG, "origin area, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight")
-        bmpWidth += blurBgInsert * 2
-        bmpHeight += blurBgInsert * 2
-        if (bmpWidth <= 0 || bmpHeight <= 0) {
-            return null
-        }
-
-        transBitmap?.takeUnless { it.isRecycled }?.recycle()
-        val paint = Paint().apply {
-            style = Paint.Style.FILL_AND_STROKE
-            color = Color.WHITE
-        }
-
-        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        Log.i(
-            TAG, "createBitmap, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
-                    ", blurBgScale: $blurBgScale, insetBlurBg: $blurBgInsert"
-        )
-        dstRect.set(0, 0, bmpWidth, bmpHeight)
-        dstRect.inset(blurBgInsert, blurBgInsert)
-        Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}")
-        canvas.drawRect(dstRect, paint)
 
         return bitmap
     }
@@ -295,8 +257,8 @@ class SunlightDrawable(ctx: Context) : Drawable() {
             TAG, "createBitmap, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
                     ", blurBgScale: $blurBgScale, insetBlurBg: $blurBgInsert"
         )
-        dstRect.set(0, 0, bmpWidth, bmpHeight)
-        dstRect.inset(blurBgInsert, blurBgInsert)
+        dstRect.set(0f, 0f, bmpWidth.toFloat(), bmpHeight.toFloat())
+        dstRect.inset(blurBgInsert.toFloat(), blurBgInsert.toFloat())
         Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}")
         canvas.drawRect(dstRect, blurBgPaint)
 
@@ -360,6 +322,7 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         val startColor = "#FF8297FF".toColorInt()
         val middleColor = "#D696A8FF".toColorInt()
         val endColor = "#00FFFFFF".toColorInt()
+        //val endColor = "#FF0000".toColorInt()
 
         val paint = Paint().apply {
             shader = RadialGradient(
@@ -370,6 +333,7 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         }
         val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
+        canvas.translate(bmpWidth.toFloat() / 3, -bmpWidth.toFloat() / 4)
         canvas.drawCircle(centerX, centerY, radius, paint)
 
         return bitmap
@@ -395,6 +359,7 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         val startColor = "#FF80E6FF".toColorInt()
         val middleColor = "#9E8BE8FF".toColorInt()
         val endColor = "#009DCFFF".toColorInt()
+        //val endColor = "#00FF00".toColorInt()
 
         val paint = Paint().apply {
             shader = RadialGradient(
@@ -405,6 +370,7 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         }
         val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
+        canvas.translate(bmpWidth.toFloat() / 3, bmpWidth.toFloat() / 4)
         canvas.drawCircle(centerX, centerY, radius, paint)
 
         return bitmap
