@@ -25,7 +25,7 @@ import android.view.animation.PathInterpolator
 import androidx.core.graphics.toColorInt
 import com.suheng.structure.view.kt.saveLayer
 
-class SunlightDrawable(ctx: Context) : Drawable() {
+class SunlightDrawable(val ctx: Context) : Drawable() {
 
     companion object {
         lateinit var instance: SunlightDrawable
@@ -232,39 +232,6 @@ class SunlightDrawable(ctx: Context) : Drawable() {
         return bitmap
     }
 
-    private fun createBgBitmap2(w: Int, h: Int): Bitmap? {
-        if (w <= 0 || h <= 0 || blurBgScale == 0f) {
-            return null
-        }
-        var bmpWidth = (w / blurBgScale).toInt()
-        var bmpHeight = (h / blurBgScale).toInt()
-        Log.i(TAG, "origin area, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight")
-        bmpWidth += blurBgInsert * 2
-        bmpHeight += blurBgInsert * 2
-        if (bmpWidth <= 0 || bmpHeight <= 0) {
-            return null
-        }
-
-        blurBgBitmap?.takeUnless { it.isRecycled }?.recycle()
-        blurBgPaint.shader = LinearGradient(
-            0f, bmpHeight.toFloat(), bmpWidth.toFloat(), 0f,
-            colors, positions, Shader.TileMode.CLAMP
-        )
-
-        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        Log.i(
-            TAG, "createBitmap, width: $w, height: $h, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight" +
-                    ", blurBgScale: $blurBgScale, insetBlurBg: $blurBgInsert"
-        )
-        dstRect.set(0f, 0f, bmpWidth.toFloat(), bmpHeight.toFloat())
-        dstRect.inset(blurBgInsert.toFloat(), blurBgInsert.toFloat())
-        Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}")
-        canvas.drawRect(dstRect, blurBgPaint)
-
-        return bitmap
-    }
-
     private var leftRadialBitmap: Bitmap? = null
 
     private fun createLeftRadialBitmap(w: Int, h: Int): Bitmap? {
@@ -279,27 +246,31 @@ class SunlightDrawable(ctx: Context) : Drawable() {
 
         leftRadialBitmap?.takeUnless { it.isRecycled }?.recycle()
 
-        val centerX = bmpWidth / 2f
-        val centerY = bmpHeight / 2f
-        val radius = centerX.coerceAtMost(centerY)
+        /*val cx = bmpWidth / 2f
+        val cy = bmpHeight / 2f
+        val radius = cx.coerceAtMost(cy)*/
+        val cx = 0f
+        val cy = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 54f, ctx.resources.displayMetrics
+        )
+        val radius = bmpWidth * 0.73f / 2
+        /*val startColor = "#0000FF".toColorInt()
+        val middleColor = "#00FF00".toColorInt()
+        val endColor = "#FF0000".toColorInt()*/
         val startColor = "#FF80C1FF".toColorInt()
-        //val startColor = "#0000FF".toColorInt()
         val middleColor = "#9E8BE8FF".toColorInt()
-        //val middleColor = "#00FF00".toColorInt()
         val endColor = "#009DCFFF".toColorInt()
-        //val endColor = "#FF0000".toColorInt()
 
         val paint = Paint().apply {
             shader = RadialGradient(
-                centerX, centerY, radius,
+                cx, cy, radius,
                 intArrayOf(startColor, middleColor, endColor),
                 floatArrayOf(0f, 0.46f, 1f), Shader.TileMode.CLAMP
             )
         }
         val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        canvas.translate(-bmpWidth.toFloat() / 2, 0f)
-        canvas.drawCircle(centerX, centerY, radius, paint)
+        canvas.drawCircle(cx, cy, radius, paint)
 
         return bitmap
     }
@@ -318,25 +289,32 @@ class SunlightDrawable(ctx: Context) : Drawable() {
 
         topRightRadialBitmap?.takeUnless { it.isRecycled }?.recycle()
 
-        val centerX = bmpWidth / 2f
-        val centerY = bmpHeight / 2f
-        val radius = centerX.coerceAtMost(centerY)
+        /*val cx = bmpWidth / 2f
+        val cy = bmpHeight / 2f
+        val radius = cx.coerceAtMost(cy)*/
+        val offset = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 10f, ctx.resources.displayMetrics
+        )
+        val cx = bmpWidth.toFloat() - offset
+        val cy = offset
+        val radius = bmpWidth * 0.86f / 2
+        /*val startColor = "#0000FF".toColorInt()
+        val middleColor = "#00FF00".toColorInt()
+        val endColor = "#FF0000".toColorInt()*/
         val startColor = "#FF8297FF".toColorInt()
         val middleColor = "#D696A8FF".toColorInt()
         val endColor = "#00FFFFFF".toColorInt()
-        //val endColor = "#FF0000".toColorInt()
 
         val paint = Paint().apply {
             shader = RadialGradient(
-                centerX, centerY, radius,
+                cx, cy, radius,
                 intArrayOf(startColor, middleColor, endColor),
                 floatArrayOf(0f, 0.34f, 1f), Shader.TileMode.CLAMP
             )
         }
         val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        canvas.translate(bmpWidth.toFloat() / 3, -bmpWidth.toFloat() / 4)
-        canvas.drawCircle(centerX, centerY, radius, paint)
+        canvas.drawCircle(cx, cy, radius, paint)
 
         return bitmap
     }
@@ -355,25 +333,31 @@ class SunlightDrawable(ctx: Context) : Drawable() {
 
         bottomRightRadialBitmap?.takeUnless { it.isRecycled }?.recycle()
 
-        val centerX = bmpWidth / 2f
-        val centerY = bmpHeight / 2f
-        val radius = centerX.coerceAtMost(centerY)
+        /*val cx = bmpWidth / 2f
+        val cy = bmpHeight / 2f
+        val radius = cx.coerceAtMost(cy)*/
+        val cx = bmpWidth / 1.3f
+        val cy = bmpHeight+TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 30f, ctx.resources.displayMetrics
+        )
+        val radius = bmpWidth * 0.98f / 2
         val startColor = "#FF80E6FF".toColorInt()
         val middleColor = "#9E8BE8FF".toColorInt()
         val endColor = "#009DCFFF".toColorInt()
-        //val endColor = "#00FF00".toColorInt()
+        /*val startColor = "#0000FF".toColorInt()
+        val middleColor = "#00FF00".toColorInt()
+        val endColor = "#FF0000".toColorInt()*/
 
         val paint = Paint().apply {
             shader = RadialGradient(
-                centerX, centerY, radius,
+                cx, cy, radius,
                 intArrayOf(startColor, middleColor, endColor),
                 floatArrayOf(0f, 0.46f, 1f), Shader.TileMode.CLAMP
             )
         }
         val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        canvas.translate(bmpWidth.toFloat() / 3, bmpWidth.toFloat() / 4)
-        canvas.drawCircle(centerX, centerY, radius, paint)
+        canvas.drawCircle(cx, cy, radius, paint)
 
         return bitmap
     }
