@@ -1,5 +1,7 @@
 package com.suheng.structure.view.activity
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.graphics.Outline
@@ -47,22 +49,18 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                 }
             }
             post {
-                layoutPanel.background = null
-                /*(filterView.background as? SunlightDrawable)?.setAnimatorListener(object :
+                (filterView.background as? SunlightDrawable)?.setAnimatorListener(object :
                     AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: Animator) {
                         super.onAnimationStart(animation)
-                        //filterView.visibility = View.VISIBLE
-                        layoutPanel.background = null
+                        layoutPanel.alpha = 0.5f
                     }
 
                     override fun onAnimationEnd(animation: Animator) {
                         super.onAnimationEnd(animation)
-                        //filterView.visibility = View.GONE
-                        layoutPanel.background =
-                            ContextCompat.getDrawable(context, R.drawable.rect_border_light_bg)
+                        layoutPanel.alpha = 1f
                     }
-                })*/
+                })
 
                 /*filterView.layoutParams?.let { lp ->
                     lp.width = this.width + 120

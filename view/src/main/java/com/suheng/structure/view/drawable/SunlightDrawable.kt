@@ -22,8 +22,11 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import android.util.TypedValue
 import android.view.animation.PathInterpolator
+import androidx.core.animation.doOnEnd
 import androidx.core.graphics.toColorInt
 import com.suheng.structure.view.kt.saveLayer
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class SunlightDrawable(val ctx: Context) : Drawable() {
 
@@ -52,6 +55,11 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
     private var xfermodePaint: Paint = Paint().apply {
         set(blurBgPaint)
         xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP)
+    }
+
+    private var maskCirclePaint: Paint = Paint().apply {
+        set(blurBgPaint)
+        xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
     }
 
     private var blurBgBitmap: Bitmap? = null
@@ -112,7 +120,8 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
             pvhList.add(PropertyValuesHolder.ofFloat(property, positions[i], endPositions[i]))
         }
         ValueAnimator.ofPropertyValuesHolder(*pvhList.toTypedArray()).apply {
-            duration = 500
+            //duration = 500
+            duration = 1200
             interpolator = PathInterpolator(0.2f, 0f, 0.1f, 1f)
             addUpdateListener { animation ->
                 for ((i, prop) in colorProps.withIndex()) {
@@ -134,6 +143,11 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
                 blurBgBitmap = createBgBitmap(bounds.width(), bounds.height())
                 invalidateSelf()
             }
+
+            addListener(doOnEnd {
+                maskCircleBitmap = createMaskCircleBitmap(bounds.width(), bounds.height(), 0f)
+                invalidateSelf()
+            })
         }
     }
 
@@ -155,6 +169,8 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
         leftRadialBitmap = createLeftRadialBitmap(bounds.width(), bounds.height())
         topRightRadialBitmap = createTopRightRadialBitmap(bounds.width(), bounds.height())
         bottomRightRadialBitmap = createBottomRightRadialBitmap(bounds.width(), bounds.height())
+        maskRadius = null
+        maskCircleBitmap = createMaskCircleBitmap(bounds.width(), bounds.height(), 0f)
     }
 
     override fun draw(canvas: Canvas) {
@@ -176,7 +192,12 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
                     drawBitmap(bm, null, dstRect, xfermodePaint)
                 }
                 bottomRightRadialBitmap?.let { bm ->
-                    canvas.drawBitmap(bm, null, dstRect, xfermodePaint)
+                    drawBitmap(bm, null, dstRect, xfermodePaint)
+                }
+
+                maskCircleBitmap?.let { bm ->
+                    dstRect.set(0f, 0f, width.toFloat(), height.toFloat())
+                    drawBitmap(bm, null, dstRect, maskCirclePaint)
                 }
             }
         }
@@ -187,11 +208,20 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
             return
         }
         animator.start()
+
+        if (animatorCircleBitmap.isRunning) {
+            return
+        }
+        animatorCircleBitmap.start()
     }
 
     fun cancel() {
         if (animator.isRunning) {
             animator.cancel()
+        }
+
+        if (animatorCircleBitmap.isRunning) {
+            animatorCircleBitmap.cancel()
         }
     }
 
@@ -354,6 +384,62 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
                 intArrayOf(startColor, middleColor, endColor),
                 floatArrayOf(0f, 0.46f, 1f), Shader.TileMode.CLAMP
             )
+        }
+        val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.drawCircle(cx, cy, radius, paint)
+
+        return bitmap
+    }
+
+    private var maskCircleBitmap: Bitmap? = null
+    private var maskRadius: Float? = null
+    private var animatorCircleBitmap = ValueAnimator.ofFloat().apply {
+        duration = 1000
+        interpolator = PathInterpolator(0.2f, 0f, 0.1f, 1f)
+        addUpdateListener {
+            (animatedValue as? Float)?.let { radius ->
+                maskCircleBitmap = createMaskCircleBitmap(bounds.width(), bounds.height(), radius)
+            }
+        }
+    }
+
+    private fun createMaskCircleBitmap(w: Int, h: Int, radius: Float): Bitmap? {
+        if (w <= 0 || h <= 0 || blurBgScale == 0f) {
+            return null
+        }
+        val bmpWidth = (w / blurBgScale).toInt()
+        val bmpHeight = (h / blurBgScale).toInt()
+        if (bmpWidth <= 0 || bmpHeight <= 0) {
+            return null
+        }
+
+        maskCircleBitmap?.takeUnless { it.isRecycled }?.recycle()
+
+        val offset = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 60f, ctx.resources.displayMetrics
+        )
+        val cx = bmpWidth / 2f
+        var cy = bmpHeight.toFloat() - blurBgInsert
+        cy += offset
+        if (maskRadius == null) {
+            maskRadius = radius
+            animatorCircleBitmap.setFloatValues(0f, sqrt((cx - bmpWidth).pow(2) + (cy - 0).pow(2)))
+        }
+
+        val startColor = Color.WHITE
+        val endColor = Color.BLACK
+        /*val startColor = "#0000FF".toColorInt()
+        val endColor = "#FF0000".toColorInt()*/
+
+        val paint = Paint().apply {
+            if (radius > 0) {
+                shader = RadialGradient(
+                    cx, cy, radius,
+                    intArrayOf(startColor, endColor),
+                    floatArrayOf(0f, 1f), Shader.TileMode.CLAMP
+                )
+            }
         }
         val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
