@@ -4,14 +4,12 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.graphics.Outline
 import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewOutlineProvider
 import android.view.animation.PathInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import com.suheng.structure.view.R
@@ -42,13 +40,14 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
             setOnClickListener {
                 (filterView.background as? SunlightDrawable)?.start()
             }
-            clipToOutline = true
+            /*clipToOutline = true
             outlineProvider = object : ViewOutlineProvider() {
                 override fun getOutline(view: View, outline: Outline) {
                     outline.setRoundRect(0, 0, view.width, view.height, 50f)
                 }
-            }
+            }*/
             post {
+                //layoutPanel.alpha = 0f
                 (filterView.background as? SunlightDrawable)?.setAnimatorListener(object :
                     AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: Animator) {
