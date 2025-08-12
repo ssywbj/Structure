@@ -30,32 +30,36 @@ import com.suheng.structure.view.kt.saveLayer
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class SunlightDrawable(val ctx: Context) : Drawable() {
+class SunlightDrawable(
+    val ctx: Context,
+    val showBottomBitmap: Boolean = true,
+    val showEdgeRadial: Boolean = true,
+    val showBlurBg: Boolean = true,
+    val showLinearColor: Boolean = true
+) : Drawable() {
 
     companion object {
-        lateinit var instance: SunlightDrawable
         const val TAG = "Wbj"
     }
+
+    private val itWidth = ctx.resources.getDimensionPixelOffset(R.dimen.sunlight_width_out)
+    private val itHeight = ctx.resources.getDimensionPixelOffset(R.dimen.sunlight_heigh_out)
 
     private var topBitmap: Bitmap? = null
     private var topBitmapScale: Float = 1f
     private var topBitmapRotate: Float = 0f
     private val topOriginBitmap by lazy {
         BitmapFactory.decodeResource(
-            ctx.resources,
-            R.drawable.top_rotate)
+            ctx.resources, R.drawable.top_rotate,
+            BitmapFactory.Options().apply { inScaled = false })
     }
     private var bottomBitmap: Bitmap? = null
     private var bottomBitmapScale: Float = 0f
     private var bottomBitmapRotate: Float = 0f
     private val bottomOriginBitmap by lazy {
         BitmapFactory.decodeResource(
-            ctx.resources,
-            R.drawable.bottom_rotate)
-    }
-
-    init {
-        instance = this
+            ctx.resources, R.drawable.bottom_rotate,
+            BitmapFactory.Options().apply { inScaled = false })
     }
 
     private fun createTopBitmap(w: Int, h: Int): Bitmap? {
@@ -73,16 +77,18 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
         val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         dstRect.set(0f, 0f, bmpWidth.toFloat(), bmpHeight.toFloat())
-        //canvas.translate(200f, 100f)
         canvas.scale(
             topBitmapScale, topBitmapScale, bmpWidth.toFloat() / 2, bmpHeight.toFloat() / 2
         )
-        //canvas.rotate(topBitmapRotate, bmpWidth.toFloat() / 2, bmpHeight.toFloat() / 2)
+        canvas.rotate(topBitmapRotate, bmpWidth.toFloat() / 2, bmpHeight.toFloat() / 2)
         canvas.drawBitmap(topOriginBitmap, null, dstRect, null)
         return bitmap
     }
 
     private fun createBottomBitmap(w: Int, h: Int): Bitmap? {
+        if (!showBottomBitmap) {
+            return null
+        }
         if (w <= 0 || h <= 0 || blurBgScale == 0f) {
             return null
         }
@@ -102,23 +108,24 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
             bottomBitmapScale, bottomBitmapScale, bmpWidth.toFloat() / 2, bmpHeight.toFloat() / 2
         )
         canvas.rotate(bottomBitmapRotate, bmpWidth.toFloat() / 2, bmpHeight.toFloat() / 2)
-        //canvas.drawBitmap(bottomOriginBitmap, null, dstRect, null)
         canvas.drawBitmap(bottomOriginBitmap, null, dstRect, null)
         return bitmap
     }
 
-    var blurBgInsert = TypedValue.applyDimension(
+    private var blurBgInsert = TypedValue.applyDimension(
         TypedValue.COMPLEX_UNIT_DIP, 16f, ctx.resources.displayMetrics
     ).toInt()
 
-    val blurBgScale: Float = 2f
+    private val blurBgScale: Float = 2f
     private val blurBgRadio: Float = 20f
 
     private var blurBgPaint: Paint = Paint().apply {
         isFilterBitmap = true
         isAntiAlias = true
         isDither = true
-        maskFilter = BlurMaskFilter(blurBgRadio, BlurMaskFilter.Blur.NORMAL)
+        if (showBlurBg) {
+            maskFilter = BlurMaskFilter(blurBgRadio, BlurMaskFilter.Blur.NORMAL)
+        }
     }
     private var xfermodePaint: Paint = Paint().apply {
         set(blurBgPaint)
@@ -171,30 +178,35 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
 
     private val animator by lazy {
         val pvhList = mutableListOf<PropertyValuesHolder>()
-        val colorLen = colors.size.coerceAtMost(endColors.size)
         val colorProps = mutableListOf<String>()
-        for (i in 0 until colorLen) {
-            val property = "color$i".also { colorProps.add(it) }
-            pvhList.add(
-                PropertyValuesHolder.ofMultiInt(
-                    property, arrayOf(colors[i].toArgb(), endColors[i].toArgb())
-                )
-            )
-        }
-        val pstLen = positions.size.coerceAtMost(endPositions.size)
         val pstProps = mutableListOf<String>()
-        for (i in 0 until pstLen) {
-            val property = "position$i".also { pstProps.add(it) }
-            pvhList.add(PropertyValuesHolder.ofFloat(property, positions[i], endPositions[i]))
+        if (showLinearColor) {
+            val colorLen = colors.size.coerceAtMost(endColors.size)
+            for (i in 0 until colorLen) {
+                val property = "color$i".also { colorProps.add(it) }
+                pvhList.add(
+                    PropertyValuesHolder.ofMultiInt(
+                        property, arrayOf(colors[i].toArgb(), endColors[i].toArgb())
+                    )
+                )
+            }
+            val pstLen = positions.size.coerceAtMost(endPositions.size)
+            for (i in 0 until pstLen) {
+                val property = "position$i".also { pstProps.add(it) }
+                pvhList.add(PropertyValuesHolder.ofFloat(property, positions[i], endPositions[i]))
+            }
         }
         /*val propTopBitmapScale = "propTopBitmapScale"
         val propTopBitmapRotate = "propTopBitmapScale"
         pvhList.add(PropertyValuesHolder.ofFloat(propTopBitmapScale, 0f, 3f))
         pvhList.add(PropertyValuesHolder.ofFloat(propTopBitmapRotate, 0f, 360f))*/
-        /*val propBottomBitmapScale = "propBottomBitmapScale"
+
+        val propBottomBitmapScale = "propBottomBitmapScale"
         val propBottomBitmapRotate = "propBottomBitmapRotate"
-        pvhList.add(PropertyValuesHolder.ofFloat(propBottomBitmapScale, 0f, 3f))
-        pvhList.add(PropertyValuesHolder.ofFloat(propBottomBitmapRotate, 0f, 360f))*/
+        if (showBottomBitmap) {
+            pvhList.add(PropertyValuesHolder.ofFloat(propBottomBitmapScale, 0f, 3f))
+            pvhList.add(PropertyValuesHolder.ofFloat(propBottomBitmapRotate, 0f, 360f))
+        }
 
         ValueAnimator.ofPropertyValuesHolder(*pvhList.toTypedArray()).apply {
             //duration = 500
@@ -218,6 +230,7 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
                 }
                 //Log.d(TAG, "position0:${positions[0]}, position1:${positions[1]}, positions:${positions[2]}, position3:${positions[3]}, position4:${positions[4]}")
                 blurBgBitmap = createBgBitmap(bounds.width(), bounds.height())
+                //blurBgBitmap = createBgBitmap(itWidth, itHeight)
                 /*(animation.getAnimatedValue(propTopBitmapScale) as? Float)?.let {
                     topBitmapScale = it
                 }
@@ -226,13 +239,13 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
                 }
                 topBitmap = createTopBitmap(topOriginBitmap.width, topOriginBitmap.height)*/
 
-                /*(animation.getAnimatedValue(propBottomBitmapScale) as? Float)?.let {
+                (animation.getAnimatedValue(propBottomBitmapScale) as? Float)?.let {
                     bottomBitmapScale = it
                 }
                 (animation.getAnimatedValue(propBottomBitmapRotate) as? Float)?.let {
                     bottomBitmapRotate = it
-                }*/
-                //bottomBitmap = createBottomBitmap(bottomOriginBitmap.width, bottomOriginBitmap.height)
+                }
+                bottomBitmap = createBottomBitmap(bottomOriginBitmap.width, bottomOriginBitmap.height)
 
                 invalidateSelf()
             }
@@ -259,13 +272,16 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
         super.onBoundsChange(bounds)
         Log.d(TAG, "onBoundsChange: width: ${bounds.width()}, height: ${bounds.height()}")
         blurBgBitmap = createBgBitmap(bounds.width(), bounds.height())
-        leftRadialBitmap = createLeftRadialBitmap(bounds.width(), bounds.height())
-        topRightRadialBitmap = createTopRightRadialBitmap(bounds.width(), bounds.height())
-        bottomRightRadialBitmap = createBottomRightRadialBitmap(bounds.width(), bounds.height())
+        if (showEdgeRadial) {
+            leftRadialBitmap = createLeftRadialBitmap(bounds.width(), bounds.height())
+            topRightRadialBitmap = createTopRightRadialBitmap(bounds.width(), bounds.height())
+            bottomRightRadialBitmap = createBottomRightRadialBitmap(bounds.width(), bounds.height())
+        }
+
         maskRadius = null
         maskCircleBitmap = createMaskCircleBitmap(bounds.width(), bounds.height(), 0f)
-        /*topBitmap = createTopBitmap(topOriginBitmap.width, topOriginBitmap.height)
-        bottomBitmap = createBottomBitmap(bottomOriginBitmap.width, bottomOriginBitmap.height)*/
+        //topBitmap = createTopBitmap(topOriginBitmap.width, topOriginBitmap.height)
+        bottomBitmap = createBottomBitmap(bottomOriginBitmap.width, bottomOriginBitmap.height)
     }
 
     override fun draw(canvas: Canvas) {
@@ -279,16 +295,18 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
             canvas.saveLayer(dstRect, null) {
                 drawBitmap(it, null, dstRect, null)
 
-                val dx = blurBgInsert.toFloat() * 2
-                dstRect.inset(dx, dx)
+                if (showBlurBg) {
+                    val dx = blurBgInsert.toFloat() * 2
+                    dstRect.inset(dx, dx)
+                }
 
                 /*topBitmap?.let { bm ->
                     drawBitmap(bm, null, dstRect, xfermodePaint)
                 }*/
 
-                /*bottomBitmap?.let { bm ->
+                bottomBitmap?.let { bm ->
                     drawBitmap(bm, null, dstRect, xfermodePaint)
-                }*/
+                }
 
                 leftRadialBitmap?.let { bm ->
                     drawBitmap(bm, null, dstRect, xfermodePaint)
@@ -309,15 +327,15 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
     }
 
     fun start() {
-        if (animator.isRunning) {
-            return
+        if (showLinearColor) {
+            if (!animator.isRunning) {
+                animator.start()
+            }
         }
-        animator.start()
 
-        if (animatorCircleBitmap.isRunning) {
-            return
+        if (!animatorCircleBitmap.isRunning) {
+            animatorCircleBitmap.start()
         }
-        animatorCircleBitmap.start()
     }
 
     fun cancel() {
@@ -334,6 +352,8 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
         Color.alpha(this), Color.red(this), Color.green(this), Color.blue(this)
     )
 
+    private var linearGradient: LinearGradient? = null
+
     private fun createBgBitmap(w: Int, h: Int): Bitmap? {
         if (w <= 0 || h <= 0 || blurBgScale == 0f) {
             return null
@@ -341,17 +361,29 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
         var bmpWidth = (w / blurBgScale).toInt()
         var bmpHeight = (h / blurBgScale).toInt()
         Log.i(TAG, "origin area, bmpWidth: $bmpWidth, bmpHeight: $bmpHeight")
-        bmpWidth += blurBgInsert * 2
-        bmpHeight += blurBgInsert * 2
+        //bmpWidth += blurBgInsert * 2
+        //bmpHeight += blurBgInsert * 2
         if (bmpWidth <= 0 || bmpHeight <= 0) {
             return null
         }
 
         blurBgBitmap?.takeUnless { it.isRecycled }?.recycle()
-        blurBgPaint.shader = LinearGradient(
-            0f, bmpHeight.toFloat(), bmpWidth.toFloat(), 0f,
-            colors, positions, Shader.TileMode.CLAMP
-        )
+        if (showLinearColor) {
+            blurBgPaint.shader = LinearGradient(
+                0f, bmpHeight.toFloat(), bmpWidth.toFloat(), 0f,
+                colors, positions, Shader.TileMode.CLAMP
+            )
+        } else {
+            if (linearGradient == null) {
+                LinearGradient(
+                    0f, bmpHeight.toFloat(), bmpWidth.toFloat(), 0f,
+                    colors, positions, Shader.TileMode.CLAMP
+                ).also {
+                    linearGradient = it
+                    blurBgPaint.shader = it
+                }
+            }
+        }
 
         val bitmap = Bitmap.createBitmap(bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -360,7 +392,9 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
                     ", blurBgScale: $blurBgScale, insetBlurBg: $blurBgInsert"
         )
         dstRect.set(0f, 0f, bmpWidth.toFloat(), bmpHeight.toFloat())
-        dstRect.inset(blurBgInsert.toFloat(), blurBgInsert.toFloat())
+        if (showBlurBg) {
+            dstRect.inset(blurBgInsert.toFloat(), blurBgInsert.toFloat())
+        }
         Log.i(TAG, "insert, dstRect: $dstRect, ${dstRect.width()}, ${dstRect.height()}")
         canvas.drawRect(dstRect, blurBgPaint)
 
@@ -505,6 +539,12 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
         addUpdateListener {
             (animatedValue as? Float)?.let { radius ->
                 maskCircleBitmap = createMaskCircleBitmap(bounds.width(), bounds.height(), radius)
+                if (!showLinearColor) {
+                    if (blurBgBitmap == null) {
+                        blurBgBitmap = createBgBitmap(bounds.width(), bounds.height())
+                    }
+                    invalidateSelf()
+                }
             }
         }
         addListener(doOnEnd {
@@ -512,6 +552,10 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
             invalidateSelf()
         })
     }
+
+    private val offset = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP, 60f, ctx.resources.displayMetrics
+    )
 
     private fun createMaskCircleBitmap(w: Int, h: Int, radius: Float): Bitmap? {
         if (w <= 0 || h <= 0 || blurBgScale == 0f) {
@@ -525,9 +569,6 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
 
         maskCircleBitmap?.takeUnless { it.isRecycled }?.recycle()
 
-        val offset = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 60f, ctx.resources.displayMetrics
-        )
         val cx = bmpWidth / 2f
         var cy = bmpHeight.toFloat() - blurBgInsert
         cy += offset
@@ -558,7 +599,11 @@ class SunlightDrawable(val ctx: Context) : Drawable() {
     }
 
     fun setAnimatorListener(animatorListener: AnimatorListenerAdapter) {
-        animator.addListener(animatorListener)
+        if (showLinearColor) {
+            animator.addListener(animatorListener)
+        } else {
+            animatorCircleBitmap.addListener(animatorListener)
+        }
     }
 
     fun createBitmap(w: Int, h: Int, scaleRatio: Float = 1f, inset: Int = 0): Bitmap? {

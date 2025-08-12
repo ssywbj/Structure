@@ -2,15 +2,14 @@ package com.suheng.structure.view.activity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
+import android.graphics.Outline
 import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.PathInterpolator
+import android.view.ViewOutlineProvider
 import androidx.appcompat.app.AppCompatActivity
 import com.suheng.structure.view.R
 import com.suheng.structure.view.drawable.SunlightDrawable
@@ -30,25 +29,14 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         setContentView(R.layout.activity_kotlin)
         bundleHandler(this, savedInstanceState)
 
-        val layoutPanel = findViewById<ViewGroup>(R.id.sunlight_panel)
-        val filterView = findViewById<View>(R.id.sun_iv1).apply {
-            /*setOnClickListener {
-                (background as? SunlightDrawable)?.start()
-            }*/
-        }
         findViewById<ViewGroup>(R.id.sun_iv1_layout).apply {
+            val layoutPanel = findViewById<View>(R.id.sunlight_panel)
             setOnClickListener {
-                (filterView.background as? SunlightDrawable)?.start()
+                (background as? SunlightDrawable)?.start()
             }
-            /*clipToOutline = true
-            outlineProvider = object : ViewOutlineProvider() {
-                override fun getOutline(view: View, outline: Outline) {
-                    outline.setRoundRect(0, 0, view.width, view.height, 50f)
-                }
-            }*/
             post {
-                //layoutPanel.alpha = 0f
-                (filterView.background as? SunlightDrawable)?.setAnimatorListener(object :
+                background = SunlightDrawable(context)
+                (background as? SunlightDrawable)?.setAnimatorListener(object :
                     AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: Animator) {
                         super.onAnimationStart(animation)
@@ -60,117 +48,129 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                         layoutPanel.alpha = 1f
                     }
                 })
-
-                /*filterView.layoutParams?.let { lp ->
-                    lp.width = this.width + 120
-                    lp.height = this.height + 60
-                    filterView.layoutParams = lp
-                }*/
-
-                /*filterView.areaBitmap(filterView.getBound().apply {
-                    val insert = SunlightDrawable.instance.blurBgInsert
-                    inset(insert, insert)
-                })?.let {
-                    this@KotlinActivity.findViewById<ImageView>(R.id.sun_iv2).setImageBitmap(it)
-                }*/
-
             }
         }
 
-        /*findViewById<ImageView>(R.id.sun_iv2).apply {
+        findViewById<ViewGroup>(R.id.sun_iv1_layout2).apply {
+            val layoutPanel = findViewById<View>(R.id.sunlight_panel2)
+            setOnClickListener {
+                (background as? SunlightDrawable)?.start()
+            }
             post {
-                val w = this.width + 200
-                val h = this.height + 100
-                SunlightDrawable.instance.createBitmap(
-                    w, h, scaleRatio = SunlightDrawable.instance.blurBgScale,
-                    inset = SunlightDrawable.instance.blurBgInsert
-                )?.let {
-                    this.background = it.toDrawable(resources)
+                background = SunlightDrawable(context, showBottomBitmap = false)
+                (background as? SunlightDrawable)?.setAnimatorListener(object :
+                    AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator) {
+                        super.onAnimationStart(animation)
+                        layoutPanel.alpha = 0.5f
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        super.onAnimationEnd(animation)
+                        layoutPanel.alpha = 1f
+                    }
+                })
+            }
+        }
+
+        findViewById<ViewGroup>(R.id.sun_iv1_layout3).apply {
+            val layoutPanel = findViewById<View>(R.id.sunlight_panel3)
+            setOnClickListener {
+                (background as? SunlightDrawable)?.start()
+            }
+            post {
+                background =
+                    SunlightDrawable(context, showBottomBitmap = false, showEdgeRadial = false)
+                /*layoutParams?.let {
+                    it.width = resources.getDimensionPixelOffset(R.dimen.sunlight_width)
+                    it.height = resources.getDimensionPixelOffset(R.dimen.sunlight_height)
+                    layoutParams = it
+                }*/
+                (background as? SunlightDrawable)?.setAnimatorListener(object :
+                    AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator) {
+                        super.onAnimationStart(animation)
+                        layoutPanel.alpha = 0.5f
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        super.onAnimationEnd(animation)
+                        layoutPanel.alpha = 1f
+                    }
+                })
+            }
+        }
+
+        findViewById<ViewGroup>(R.id.sun_iv1_layout4).apply {
+            val layoutPanel = findViewById<View>(R.id.sunlight_panel4)
+            setOnClickListener {
+                (background as? SunlightDrawable)?.start()
+            }
+            val radius = resources.getDimensionPixelOffset(R.dimen.sunlight_extend_round)
+            clipToOutline = true
+            outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: Outline) {
+                    outline.setRoundRect(0, 0, view.width, view.height, radius.toFloat())
                 }
             }
-        }*/
+            post {
+                background = SunlightDrawable(
+                    context,
+                    showBottomBitmap = false,
+                    showEdgeRadial = false,
+                    showBlurBg = false
+                )
+                //layoutPanel.alpha = 0f
+                (background as? SunlightDrawable)?.setAnimatorListener(object :
+                    AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator) {
+                        super.onAnimationStart(animation)
+                        layoutPanel.alpha = 0.5f
+                    }
 
-//        findViewById<ImageView>(R.id.sun_iv3).apply {
-//            post {
-//                val w = this.width
-//                val h = this.height
-//                val inset = resources.getDimensionPixelOffset(R.dimen.sunlight_extend_round)
-//                Log.i(TAG, "sun_iv3, w: $w, height: $h")
-//                SunlightDrawable.instance.createBitmap(
-//                    w + inset, h + inset, scaleRatio = 2f, inset = inset
-//                )?.let {
-//                    background = it.toDrawable(resources)
-//                }
-//
-//                /*clipToOutline = true
-//                outlineProvider = object : ViewOutlineProvider() {
-//                    override fun getOutline(view: View, outline: Outline) {
-//                        outline.setRoundRect(0, 0, view.width, view.height, 40f)
-//                    }
-//                }*/
-//            }
-//        }
-
-//        findViewById<ImageView>(R.id.sun_iv4).apply {
-//            post {
-//                val w = this.width
-//                val h = this.height
-//                Log.i(TAG, "sun_iv4, w: $w, height: $h")
-//                /*SunlightDrawable.instance.patternBlurBitmap(
-//                    w, h
-//                )?.let {
-//                    background = it.toDrawable(resources)
-//                    //setImageBitmap(it)
-//                }
-//
-//                val sunIv5 = this@KotlinActivity.findViewById<ImageView>(R.id.sun_iv5)
-//                toBitmap()?.let {
-//                    sunIv5.setImageBitmap(Toolkit.blur(it,16))
-//                }*/
-//            }
-//        }
-
-        val imageView2 = findViewById<View>(R.id.imageView2)
-        val composeShaderView = findViewById<View>(R.id.composeShaderView)
-        (imageView2.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
-            lp.topMargin = 20
-            lp.width = filterView.width
-            lp.height = filterView.height
-            imageView2.layoutParams = lp
+                    override fun onAnimationEnd(animation: Animator) {
+                        super.onAnimationEnd(animation)
+                        layoutPanel.alpha = 1f
+                    }
+                })
+            }
         }
-        /*imageView2.post {
-            val full = imageView.getBound()
-            val area = Rect(full.left + 50, full.top + 40, full.right, full.bottom - 10)
-            imageView.areaBitmap(full, area)?.let {
-                imageView2.background = it.toDrawable(resources)
-            }
 
-            imageView2.intersectBitmap(composeShaderView)?.let {
-                findViewById<ImageView>(R.id.intersectView).background =
-                    Toolkit.blur(it, 20).toDrawable(resources)
+        findViewById<ViewGroup>(R.id.sun_iv1_layout5).apply {
+            val layoutPanel = findViewById<View>(R.id.sunlight_panel5)
+            setOnClickListener {
+                (background as? SunlightDrawable)?.start()
             }
-
-            composeShaderView.intersectBitmap(imageView2)?.let {
-                findViewById<ImageView>(R.id.intersectView2).setImageBitmap(it)
-                //findViewById<ImageView>(R.id.intersectView2).background = it.toDrawable(resources)
-                findViewById<ImageView>(R.id.intersectView2).background =
-                    Toolkit.blur(it, 20).toDrawable(resources)
+            val radius = resources.getDimensionPixelOffset(R.dimen.sunlight_extend_round)
+            clipToOutline = true
+            outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: Outline) {
+                    outline.setRoundRect(0, 0, view.width, view.height, radius.toFloat())
+                }
             }
-        }*/
+            post {
+                background = SunlightDrawable(
+                    context,
+                    showBottomBitmap = false,
+                    showEdgeRadial = false,
+                    showBlurBg = false,
+                    showLinearColor = false
+                )
+                //layoutPanel.alpha = 0f
+                (background as? SunlightDrawable)?.setAnimatorListener(object :
+                    AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator) {
+                        super.onAnimationStart(animation)
+                        layoutPanel.alpha = 0.5f
+                    }
 
-        val mView = findViewById<View>(R.id.composeShaderView);
-        val mAnimatorSet = AnimatorSet()
-        mAnimatorSet.playTogether(
-            ObjectAnimator.ofFloat(mView, "scaleX", 0.3f, 1f)
-                .setDuration(500),
-            ObjectAnimator.ofFloat(mView, "scaleY", 0.3f, 1f)
-                .setDuration(500),
-            ObjectAnimator.ofFloat(mView, "alpha", 0f, 1f)
-                .setDuration(400)
-        );
-        mAnimatorSet.interpolator = PathInterpolator(0.4f, 0f, 0.2f, 1f)
-        mView.setAlpha(0f)
-        mView.postDelayed({ mAnimatorSet.start() }, 300)
+                    override fun onAnimationEnd(animation: Animator) {
+                        super.onAnimationEnd(animation)
+                        layoutPanel.alpha = 1f
+                    }
+                })
+            }
+        }
     }
 
     var people3: People? = null
