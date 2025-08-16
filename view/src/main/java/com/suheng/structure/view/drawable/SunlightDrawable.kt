@@ -26,6 +26,7 @@ import android.view.animation.PathInterpolator
 import androidx.core.animation.doOnEnd
 import androidx.core.graphics.toColorInt
 import com.suheng.structure.view.R
+import com.suheng.structure.view.kt.beginSection
 import com.suheng.structure.view.kt.saveLayer
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -293,7 +294,9 @@ class SunlightDrawable(
         blurBgBitmap?.let {
             //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
             canvas.saveLayer(dstRect, null) {
-                drawBitmap(it, null, dstRect, null)
+                beginSection("111111") {
+                    drawBitmap(it, null, dstRect, null)
+                }
 
                 if (showBlurBg) {
                     val dx = blurBgInsert.toFloat() * 2
@@ -304,23 +307,29 @@ class SunlightDrawable(
                     drawBitmap(bm, null, dstRect, xfermodePaint)
                 }*/
 
-                bottomBitmap?.let { bm ->
-                    drawBitmap(bm, null, dstRect, xfermodePaint)
+                beginSection("222222") {
+                    bottomBitmap?.let { bm ->
+                        drawBitmap(bm, null, dstRect, xfermodePaint)
+                    }
                 }
 
-                leftRadialBitmap?.let { bm ->
-                    drawBitmap(bm, null, dstRect, xfermodePaint)
-                }
-                topRightRadialBitmap?.let { bm ->
-                    drawBitmap(bm, null, dstRect, xfermodePaint)
-                }
-                bottomRightRadialBitmap?.let { bm ->
-                    drawBitmap(bm, null, dstRect, xfermodePaint)
+                beginSection("333333") {
+                    leftRadialBitmap?.let { bm ->
+                        drawBitmap(bm, null, dstRect, xfermodePaint)
+                    }
+                    topRightRadialBitmap?.let { bm ->
+                        drawBitmap(bm, null, dstRect, xfermodePaint)
+                    }
+                    bottomRightRadialBitmap?.let { bm ->
+                        drawBitmap(bm, null, dstRect, xfermodePaint)
+                    }
                 }
 
-                maskCircleBitmap?.let { bm ->
-                    dstRect.set(0f, 0f, width.toFloat(), height.toFloat())
-                    drawBitmap(bm, null, dstRect, maskCirclePaint)
+                beginSection("444444") {
+                    maskCircleBitmap?.let { bm ->
+                        dstRect.set(0f, 0f, width.toFloat(), height.toFloat())
+                        drawBitmap(bm, null, dstRect, maskCirclePaint)
+                    }
                 }
             }
         }

@@ -32,7 +32,7 @@
 
     <dimen name="sunlight_width_out">379dp</dimen>
     <dimen name="sunlight_heigh_out">244dp</dimen>
-    <dimen name="sunlight_width">316dp</dimen>
-    <dimen name="sunlight_height">184dp</dimen>
+    <dimen name="sunlight_width">312dp</dimen>
+    <dimen name="sunlight_height">180dp</dimen>
     <dimen name="sunlight_extend_round">16dp</dimen>
 </resources>

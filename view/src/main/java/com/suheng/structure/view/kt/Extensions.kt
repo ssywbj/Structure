@@ -3,6 +3,7 @@ package com.suheng.structure.view.kt
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
+import android.os.Trace
 import com.suheng.structure.view.kt.generic.People3
 import com.suheng.structure.view.paging.AdtItem
 import com.suheng.structure.view.paging.Repo
@@ -82,6 +83,12 @@ inline fun Canvas.saveLayerAlpha(
     val saveLayer = saveLayerAlpha(left, top, right, bottom, alpha)
     block()
     restoreToCount(saveLayer)
+}
+
+inline fun beginSection(sectionName: String, block: () -> Unit) {
+    Trace.beginSection(sectionName)
+    block()
+    Trace.endSection()
 }
 
 fun Repo.asEntity() =

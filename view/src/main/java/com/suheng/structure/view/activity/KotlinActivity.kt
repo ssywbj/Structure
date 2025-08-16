@@ -16,6 +16,10 @@ import com.suheng.structure.view.drawable.SunlightDrawable
 import com.suheng.structure.view.kt.delegate.BundleHandler
 import com.suheng.structure.view.kt.delegate.BundleHandlerImpl
 import com.suheng.structure.view.kt.generic.People
+import com.tencent.qgame.animplayer.AnimConfig
+import com.tencent.qgame.animplayer.AnimView
+import com.tencent.qgame.animplayer.inter.IAnimListener
+import com.tencent.qgame.animplayer.util.ScaleType
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -169,6 +173,44 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                         layoutPanel.alpha = 1f
                     }
                 })
+            }
+        }
+
+        findViewById<ViewGroup>(R.id.sun_iv1_layout6).apply {
+            val layoutPanel = findViewById<View>(R.id.sunlight_panel6)
+            val animView = findViewById<AnimView>(R.id.animView6).apply {
+                setLoop(1)
+                setScaleType(ScaleType.FIT_XY)
+                setAnimListener(object : IAnimListener {
+                    override fun onVideoStart() {
+                        layoutPanel.alpha = 0.5f
+                    }
+
+                    override fun onVideoRender(
+                        frameIndex: Int, config: AnimConfig?
+                    ) {
+                    }
+
+                    override fun onVideoComplete() {
+                        layoutPanel.alpha = 1f
+                    }
+
+                    override fun onVideoDestroy() {
+                    }
+
+                    override fun onFailed(errorType: Int, errorMsg: String?) {
+                    }
+                })
+            }
+            layoutPanel.setOnClickListener {
+                animView.startPlay(assets, "demo.mp4")
+            }
+            val radius = resources.getDimensionPixelOffset(R.dimen.sunlight_extend_round)
+            clipToOutline = true
+            outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: Outline) {
+                    outline.setRoundRect(0, 0, view.width, view.height, radius.toFloat())
+                }
             }
         }
     }
