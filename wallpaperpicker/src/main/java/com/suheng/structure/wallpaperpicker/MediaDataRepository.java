@@ -53,6 +53,10 @@ public class MediaDataRepository {
         return mediaDataList;
     }
 
+    public List<MediaData> getMediaDataList(@Nullable OnDataChangedListener onDataChangedListener) {
+        return getMediaDataList(null, onDataChangedListener);
+    }
+
     public void addOnActiveSessionsChangedListener(@Nullable OnDataChangedListener onDataChangedListener) {
         mMediaSessionHelper.addOnActiveSessionsChangedListener(controllers -> {
             if (controllers == null) {
@@ -124,6 +128,10 @@ public class MediaDataRepository {
 
     public void actionClick(@NonNull MediaData.Action action) {
         action.runnable.run();
+    }
+
+    public boolean existPlayingPlayer() {
+        return mMediaSessionHelper.existPlayingPlayer();
     }
 
     public abstract static class OnDataChangedListener {

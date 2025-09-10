@@ -94,7 +94,7 @@ public class MediaSessionHelper {
     }
 
     public boolean existPlayingPlayer() {
-        return existPlayingPlayer(false);
+        return this.existPlayingPlayer(false);
     }
 
     public @Nullable List<String> getPlayingPlayers(final boolean includeBuffering) {
@@ -127,6 +127,10 @@ public class MediaSessionHelper {
         }
 
         return pkgs;
+    }
+
+    public @Nullable List<String> getPlayingPlayers() {
+        return this.getPlayingPlayers(false);
     }
 
 }

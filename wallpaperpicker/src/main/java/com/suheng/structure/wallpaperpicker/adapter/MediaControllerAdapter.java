@@ -2,12 +2,15 @@ package com.suheng.structure.wallpaperpicker.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Outline;
 import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -151,6 +154,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
     }
 
     static class ContentHolder extends RecyclerView.ViewHolder {
+        private final Context ctx;
         TextView tvPlayer;
         TextView tvPst;
         TextView tvDuration;
@@ -162,6 +166,8 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
 
         ContentHolder(View view) {
             super(view);
+            ctx = view.getContext();
+
             tvPlayer = view.findViewById(R.id.tv_player);
             tvPst = view.findViewById(R.id.tv_pst);
             tvDuration = view.findViewById(R.id.tv_duration);
@@ -170,6 +176,20 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
             ivAlbumArt = view.findViewById(R.id.tv_album_art);
             seekBar = view.findViewById(R.id.seekBar);
             layoutActions = view.findViewById(R.id.layout_actions);
+
+            this.init();
+        }
+
+        private void init() {
+            DisplayMetrics metrics = ctx.getResources().getDisplayMetrics();
+            final float albumArtRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, metrics);
+            ivAlbumArt.setClipToOutline(true);
+            ivAlbumArt.setOutlineProvider(new ViewOutlineProvider() {
+                @Override
+                public void getOutline(View view, Outline outline) {
+                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), albumArtRadius);
+                }
+            });
         }
     }
 }
