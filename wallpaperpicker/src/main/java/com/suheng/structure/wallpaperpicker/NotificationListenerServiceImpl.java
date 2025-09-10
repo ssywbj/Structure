@@ -58,15 +58,16 @@ public class NotificationListenerServiceImpl extends NotificationListenerService
 
         Notification notification = sbn.getNotification();
         final boolean isMediaNotification = NotificationToolkit.isMediaNotification(notification.extras);
-        Notification.Action[] actions = notification.actions;
-        if (actions == null) {
-            Log.w(TAG, "Notification actions is null");
-        } else {
-            final int length = actions.length;
-            Log.d(TAG, "isMediaNotification: " + isMediaNotification + ", length: " + length);
-            for (Notification.Action action : actions) {
-                Log.d(TAG, "action, title: " + action.title + ", icon: " + action.getIcon()
-                        + ", pendingIntent: " + action.actionIntent);
+        Log.d(TAG, "isMediaNotification: " + isMediaNotification + ", pkg: " + sbn.getPackageName());
+        if (isMediaNotification) {
+            final Notification.Action[] actions = notification.actions;
+            if (actions == null || actions.length == 0) {
+                Log.w(TAG, "notification actions is empty");
+            } else {
+                for (Notification.Action action : actions) {
+                    Log.d(TAG, "action, title: " + action.title + ", icon: " + action.getIcon()
+                            + ", semantic action: " + action.getSemanticAction() + ", pending intent: " + action.actionIntent);
+                }
             }
         }
     }
