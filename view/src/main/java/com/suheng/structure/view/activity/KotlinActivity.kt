@@ -12,7 +12,7 @@ import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import androidx.appcompat.app.AppCompatActivity
 import com.suheng.structure.view.R
-import com.suheng.structure.view.drawable.SunlightDrawable
+import com.suheng.structure.view.drawable.Halo
 import com.suheng.structure.view.kt.delegate.BundleHandler
 import com.suheng.structure.view.kt.delegate.BundleHandlerImpl
 import com.suheng.structure.view.kt.generic.People
@@ -36,11 +36,11 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         findViewById<ViewGroup>(R.id.sun_iv1_layout).apply {
             val layoutPanel = findViewById<View>(R.id.sunlight_panel)
             setOnClickListener {
-                (background as? SunlightDrawable)?.start()
+                (background as? Halo)?.start()
             }
             post {
-                background = SunlightDrawable(context)
-                (background as? SunlightDrawable)?.setAnimatorListener(object :
+                background = Halo(context)
+                (background as? Halo)?.setAnimatorListener(object :
                     AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: Animator) {
                         super.onAnimationStart(animation)
@@ -58,11 +58,11 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         findViewById<ViewGroup>(R.id.sun_iv1_layout2).apply {
             val layoutPanel = findViewById<View>(R.id.sunlight_panel2)
             setOnClickListener {
-                (background as? SunlightDrawable)?.start()
+                (background as? Halo)?.start()
             }
             post {
-                background = SunlightDrawable(context, showBottomBitmap = false)
-                (background as? SunlightDrawable)?.setAnimatorListener(object :
+                background = Halo(context, showBottomBitmap = false)
+                (background as? Halo)?.setAnimatorListener(object :
                     AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: Animator) {
                         super.onAnimationStart(animation)
@@ -80,17 +80,17 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         findViewById<ViewGroup>(R.id.sun_iv1_layout3).apply {
             val layoutPanel = findViewById<View>(R.id.sunlight_panel3)
             setOnClickListener {
-                (background as? SunlightDrawable)?.start()
+                (background as? Halo)?.start()
             }
             post {
                 background =
-                    SunlightDrawable(context, showBottomBitmap = false, showEdgeRadial = false)
+                    Halo(context, showBottomBitmap = false, showEdgeRadial = false)
                 /*layoutParams?.let {
                     it.width = resources.getDimensionPixelOffset(R.dimen.sunlight_width)
                     it.height = resources.getDimensionPixelOffset(R.dimen.sunlight_height)
                     layoutParams = it
                 }*/
-                (background as? SunlightDrawable)?.setAnimatorListener(object :
+                (background as? Halo)?.setAnimatorListener(object :
                     AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: Animator) {
                         super.onAnimationStart(animation)
@@ -108,7 +108,7 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         findViewById<ViewGroup>(R.id.sun_iv1_layout4).apply {
             val layoutPanel = findViewById<View>(R.id.sunlight_panel4)
             setOnClickListener {
-                (background as? SunlightDrawable)?.start()
+                (background as? Halo)?.start()
             }
             val radius = resources.getDimensionPixelOffset(R.dimen.sunlight_extend_round)
             clipToOutline = true
@@ -118,14 +118,14 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                 }
             }
             post {
-                background = SunlightDrawable(
+                background = Halo(
                     context,
                     showBottomBitmap = false,
                     showEdgeRadial = false,
                     showBlurBg = false
                 )
                 //layoutPanel.alpha = 0f
-                (background as? SunlightDrawable)?.setAnimatorListener(object :
+                (background as? Halo)?.setAnimatorListener(object :
                     AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: Animator) {
                         super.onAnimationStart(animation)
@@ -143,7 +143,7 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         findViewById<ViewGroup>(R.id.sun_iv1_layout5).apply {
             val layoutPanel = findViewById<View>(R.id.sunlight_panel5)
             setOnClickListener {
-                (background as? SunlightDrawable)?.start()
+                (background as? Halo)?.start()
             }
             val radius = resources.getDimensionPixelOffset(R.dimen.sunlight_extend_round)
             clipToOutline = true
@@ -153,7 +153,7 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                 }
             }
             post {
-                background = SunlightDrawable(
+                background = Halo(
                     context,
                     showBottomBitmap = false,
                     showEdgeRadial = false,
@@ -161,7 +161,7 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
                     showLinearColor = false
                 )
                 //layoutPanel.alpha = 0f
-                (background as? SunlightDrawable)?.setAnimatorListener(object :
+                (background as? Halo)?.setAnimatorListener(object :
                     AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: Animator) {
                         super.onAnimationStart(animation)

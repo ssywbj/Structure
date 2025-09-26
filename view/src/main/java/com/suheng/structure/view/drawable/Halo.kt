@@ -31,7 +31,7 @@ import com.suheng.structure.view.kt.saveLayer
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class SunlightDrawable(
+class Halo(
     val ctx: Context,
     val showBottomBitmap: Boolean = true,
     val showEdgeRadial: Boolean = true,
