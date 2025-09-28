@@ -21,7 +21,7 @@ import android.view.animation.PathInterpolator
 import androidx.core.animation.doOnEnd
 import androidx.core.graphics.toColorInt
 
-class HighPrioritySunlight(
+class Halo2(
     val ctx: Context,
 ) : Drawable() {
 
