@@ -26,7 +26,7 @@ class Halo2(
 ) : Drawable() {
 
     companion object {
-        const val TAG = "HighPrioritySunlight"
+        const val TAG = "Halo2"
     }
 
     private val blurBgScale: Float = 2f
