@@ -53,7 +53,8 @@ public final class MediaRouteAdapter extends RecyclerAdapter<RouteData, Recycler
                 status = "Idle";
                 holder.seekBarVolume.setVisibility(View.GONE);
             }
-            String info = "(" + data.getVolume() + ", " + data.getVolumeMax() + ")" + ", " + data.getConnectionState() + ", " + status;
+            String info = "(" + data.getVolume() + ", " + data.getVolumeMax() + ")" + ", "
+                    + data.getConnectionState() + ", " + status + ", type: " + data.getType();
             holder.textInfo.setText(info);
         }
     }

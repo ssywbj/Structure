@@ -5,7 +5,6 @@ import android.media.AudioManager;
 import android.media.MediaRoute2Info;
 import android.media.MediaRouter2;
 import android.media.RouteDiscoveryPreference;
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -67,10 +66,7 @@ public class MediaRouteRepository {
             for (MediaRoute2Info route : controller.getSelectedRoutes()) {
                 String routeId = route.getId();
                 String name = route.getName().toString();
-                int type = -1;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    type = route.getType();
-                }
+                int type = route.getType();
                 Log.d(TAG, "selectedRoutes, controllerId: " + controllerId + ", routeId: "
                         + routeId + "\nname: " + name + ", type: " + type + ", HashCode: "
                         + System.identityHashCode(route));
@@ -88,20 +84,14 @@ public class MediaRouteRepository {
             for (MediaRoute2Info route : controller.getSelectableRoutes()) {
                 String routeId = route.getId();
                 String name = route.getName().toString();
-                int type = -1;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    type = route.getType();
-                }
+                int type = route.getType();
                 Log.d(TAG, "selectableRoutes, controllerId: " + controllerId + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
 
             for (MediaRoute2Info route : controller.getDeselectableRoutes()) {
                 String routeId = route.getId();
                 String name = route.getName().toString();
-                int type = -1;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    type = route.getType();
-                }
+                int type = route.getType();
                 Log.d(TAG, "deselectableRoutes, controllerId: " + controllerId + ", routeId: " + routeId + ", name: " + name + ", type: " + type);
             }
         }
@@ -115,6 +105,9 @@ public class MediaRouteRepository {
                 Log.d(TAG, "onRoutesUpdated, routes.size(): " + routes.size());
                 for (MediaRoute2Info route : routes) {
                     final String id = route.getId();
+                    final int type = route.getType();
+                    final CharSequence name = route.getName();
+
                     final RouteData cacheRouteData = mMapRouteData.get(id);
                     if (cacheRouteData == null) {
                         mMapRoute2Info.put(id, route);
@@ -122,13 +115,15 @@ public class MediaRouteRepository {
                         mMapRouteData.put(id, routeData);
 
                         if (onDataLChangedListener != null) {
-                            Log.i(TAG, "onRoutesUpdated, onRouteAdded: " + routeData);
+                            Log.i(TAG, "onRoutesUpdated, onRouteAdded: " + routeData
+                                    + "\nid: " + id + ", type: " + type + ", name: " + name);
                             onDataLChangedListener.onRouteAdded(routeData);
                         }
                     } else {
                         cacheRouteData.updateData(route);
                         if (onDataLChangedListener != null) {
-                            Log.i(TAG, "onRoutesUpdated, onRouteUpdated: " + cacheRouteData);
+                            Log.i(TAG, "onRoutesUpdated, onRouteUpdated: " + cacheRouteData
+                                    + "\nid: " + id + ", type: " + type + ", name: " + name);
                             onDataLChangedListener.onRouteUpdated(cacheRouteData);
                         }
                     }

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 public class RouteData {
 
     private String id;
+    private int type;
     private String name;
     private int volume;
     private int volumeMax;
@@ -27,6 +28,7 @@ public class RouteData {
         volumeMax = route2Info.getVolumeMax();
         volumeHandling = route2Info.getVolumeHandling();
         connectionState = route2Info.getConnectionState();
+        type = route2Info.getType();
     }
 
     public String getId() {
@@ -51,6 +53,10 @@ public class RouteData {
 
     public int getConnectionState() {
         return connectionState;
+    }
+
+    public int getType() {
+        return type;
     }
 
     @NonNull
