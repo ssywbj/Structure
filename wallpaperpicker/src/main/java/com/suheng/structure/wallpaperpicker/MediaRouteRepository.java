@@ -158,7 +158,7 @@ public class MediaRouteRepository {
         mMediaRouter2.registerRouteCallback(executor, routeCallback, discoveryPreference);
         mRouteCallback = routeCallback;
 
-        /*mMediaRouter2.registerTransferCallback(ctx.getMainExecutor(), new MediaRouter2.TransferCallback() {
+        mMediaRouter2.registerTransferCallback(executor, new MediaRouter2.TransferCallback() {
             @Override
             public void onTransfer(@NonNull MediaRouter2.RoutingController oldController, @NonNull MediaRouter2.RoutingController newController) {
                 super.onTransfer(oldController, newController);
@@ -176,7 +176,15 @@ public class MediaRouteRepository {
                 super.onStop(controller);
                 Log.i("Wbj", "onStop, controller");
             }
-        });*/
+        });
+
+        mMediaRouter2.registerControllerCallback(executor, new MediaRouter2.ControllerCallback() {
+            @Override
+            public void onControllerUpdated(@NonNull MediaRouter2.RoutingController controller) {
+                super.onControllerUpdated(controller);
+                Log.i("Wbj", "onControllerUpdated: " + controller);
+            }
+        });
 
         return routeDataList;
     }
