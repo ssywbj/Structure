@@ -4,6 +4,8 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationChannelGroup;
 import android.content.Intent;
+import android.media.session.MediaController;
+import android.media.session.MediaSession;
 import android.os.IBinder;
 import android.os.UserHandle;
 import android.service.notification.NotificationListenerService;
@@ -56,17 +58,23 @@ public class NotificationListenerServiceImpl extends NotificationListenerService
         super.onNotificationPosted(sbn);
         Log.i(TAG, "onNotificationPosted, sbn: " + sbn);
 
-        Notification notification = sbn.getNotification();
-        final boolean isMediaNotification = NotificationToolkit.isMediaNotification(notification.extras);
-        Log.d(TAG, "isMediaNotification: " + isMediaNotification + ", pkg: " + sbn.getPackageName());
-        if (isMediaNotification) {
+        final Notification notification = sbn.getNotification();
+        final boolean isMediaStyle = NotificationToolkit.isMediaStyle(notification.extras);
+        if (isMediaStyle) {
+            final MediaSession.Token mediaToken = NotificationToolkit.getSessionToken(notification.extras);
+            if (mediaToken != null) {
+                final MediaController mediaController = new MediaController(NotificationListenerServiceImpl.this, mediaToken);
+            }
             final Notification.Action[] actions = notification.actions;
-            if (actions == null || actions.length == 0) {
-                Log.w(TAG, "notification actions is empty");
+            if (actions == null) {
+                Log.w(TAG, "Notification actions is null");
             } else {
+                final int length = actions.length;
+                String pkg = sbn.getPackageName();
+                Log.d(TAG, "pkg: " + pkg + ", actions: " + length);
                 for (Notification.Action action : actions) {
                     Log.d(TAG, "action, title: " + action.title + ", icon: " + action.getIcon()
-                            + ", semantic action: " + action.getSemanticAction() + ", pending intent: " + action.actionIntent);
+                            + ", pendingIntent: " + action.actionIntent);
                 }
             }
         }

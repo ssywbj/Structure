@@ -1,5 +1,6 @@
 package com.suheng.structure.wallpaperpicker.bean;
 
+import android.app.Notification;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.session.PlaybackState;
@@ -27,6 +28,9 @@ public class MediaData {
 
     public int progress;
     public int progressMax;
+
+    @Nullable
+    public List<Notification.Action> notiActions;
 
     public static class Action {
         public boolean isCustom;
