@@ -57,7 +57,10 @@ public class MediaDataRepository {
         return getMediaDataList(null, onDataChangedListener);
     }
 
+    private OnDataChangedListener mOnDataChangedListener;
+
     public void addOnActiveSessionsChangedListener(@Nullable OnDataChangedListener onDataChangedListener) {
+        mOnDataChangedListener = onDataChangedListener;
         mMediaSessionHelper.addOnActiveSessionsChangedListener(controllers -> {
             if (controllers == null) {
                 Log.w(TAG, "onActiveSessionsChanged, controllers object is null");
@@ -131,7 +134,18 @@ public class MediaDataRepository {
     }
 
     public boolean existPlayingPlayer() {
-        return mMediaSessionHelper.existPlayingPlayer();
+        //return mMediaSessionHelper.existPlayingPlayer();
+        return false;
+    }
+
+    public @Nullable MediaData getCacheMediaData(MediaController mediaController) {
+        return mControllerHelper.getCacheMediaData(mediaController);
+    }
+
+    public void onMediaUpdated(MediaData mediaData) {
+        if (mOnDataChangedListener != null && mediaData != null) {
+            mOnDataChangedListener.onMediaUpdated(mediaData);
+        }
     }
 
     public abstract static class OnDataChangedListener {

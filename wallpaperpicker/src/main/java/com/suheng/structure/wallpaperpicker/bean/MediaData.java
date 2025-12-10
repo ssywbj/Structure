@@ -30,7 +30,7 @@ public class MediaData {
     public int progressMax;
 
     @Nullable
-    public List<Notification.Action> notiActions;
+    public Notification.Action[] notiActions;
 
     public static class Action {
         public boolean isCustom;

@@ -187,13 +187,16 @@ public class MediaControllerHelper {
                 action.runnable = transportControls::skipToNext;
                 actionList.add(action);
             }
-            for (PlaybackState.CustomAction customAction : playbackState.getCustomActions()) {
-                MediaData.Action action = new MediaData.Action();
-                action.isCustom = true;
-                action.name = customAction.getName();
-                action.icon = customAction.getIcon();
-                action.runnable = () -> transportControls.sendCustomAction(customAction, customAction.getExtras());
-                actionList.add(action);
+            final List<PlaybackState.CustomAction> customActions = playbackState.getCustomActions();
+            if (customActions != null) {
+                for (PlaybackState.CustomAction customAction : customActions) {
+                    MediaData.Action action = new MediaData.Action();
+                    action.isCustom = true;
+                    action.name = customAction.getName();
+                    action.icon = customAction.getIcon();
+                    action.runnable = () -> transportControls.sendCustomAction(customAction, customAction.getExtras());
+                    actionList.add(action);
+                }
             }
             mediaData.actions = actionList;
         }

@@ -12,6 +12,8 @@ import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
+import com.suheng.structure.wallpaperpicker.bean.MediaData;
+
 public class NotificationListenerServiceImpl extends NotificationListenerService {
 
     public static final String TAG = "NotificationListenerServiceImpl";
@@ -62,8 +64,11 @@ public class NotificationListenerServiceImpl extends NotificationListenerService
         final boolean isMediaStyle = NotificationToolkit.isMediaStyle(notification.extras);
         if (isMediaStyle) {
             final MediaSession.Token mediaToken = NotificationToolkit.getSessionToken(notification.extras);
+            MediaData cacheMediaData = null;
+            final NotificationListenerServiceImpl context = NotificationListenerServiceImpl.this;
             if (mediaToken != null) {
-                final MediaController mediaController = new MediaController(NotificationListenerServiceImpl.this, mediaToken);
+                final MediaController mediaController = new MediaController(context, mediaToken);
+                cacheMediaData = MediaDataRepository.getInstance(context).getCacheMediaData(mediaController);
             }
             final Notification.Action[] actions = notification.actions;
             if (actions == null) {
@@ -72,6 +77,10 @@ public class NotificationListenerServiceImpl extends NotificationListenerService
                 final int length = actions.length;
                 String pkg = sbn.getPackageName();
                 Log.d(TAG, "pkg: " + pkg + ", actions: " + length);
+                if (cacheMediaData != null) {
+                    cacheMediaData.notiActions = actions;
+                    MediaDataRepository.getInstance(context).onMediaUpdated(cacheMediaData);
+                }
                 for (Notification.Action action : actions) {
                     Log.d(TAG, "action, title: " + action.title + ", icon: " + action.getIcon()
                             + ", pendingIntent: " + action.actionIntent);
