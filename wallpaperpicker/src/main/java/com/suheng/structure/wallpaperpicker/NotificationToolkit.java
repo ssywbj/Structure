@@ -39,21 +39,21 @@ public class NotificationToolkit {
         return null;
     }
 
+    public static boolean isMediaStyle(@NonNull Bundle extras) {
+        final Class<? extends Notification.Style> style = getNotificationStyle(extras);
+        final boolean isMediaStyle = Notification.MediaStyle.class.equals(style)
+                || Notification.DecoratedMediaCustomViewStyle.class.equals(style);
+        Log.i(TAG, "isMediaStyle: " + isMediaStyle);
+        return isMediaStyle;
+    }
+
     public static boolean isMediaNotification(@NonNull Bundle extras) {
-        Class<? extends Notification.Style> style = getNotificationStyle(extras);
-        boolean isMediaStyle = (Notification.MediaStyle.class.equals(style)
-                || Notification.DecoratedMediaCustomViewStyle.class.equals(style));
-
-        MediaSession.Token sessionToken = getSessionToken(extras);
-        boolean hasMediaSession = sessionToken != null;
-        Log.i(TAG, "isMediaStyle: " + isMediaStyle + ", hasMediaSession: " + hasMediaSession);
-
-        return isMediaStyle && hasMediaSession;
+        return isMediaStyle(extras) && (getSessionToken(extras) != null);
     }
 
     public static @Nullable MediaSession.Token getSessionToken(@NonNull Bundle extras) {
         MediaSession.Token token = extras.getParcelable(Notification.EXTRA_MEDIA_SESSION, MediaSession.Token.class);
-        Log.i(TAG, "token: " + token);
+        Log.i(TAG, "media token: " + token);
         return token;
     }
 }

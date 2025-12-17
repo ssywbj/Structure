@@ -1,5 +1,7 @@
 package com.suheng.structure.wallpaperpicker.adapter;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Outline;
@@ -59,7 +61,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
             holder.seekBar.setMax(data.progressMax);
             holder.ivAlbumArt.setImageBitmap(data.albumArt);
 
-            List<MediaData.Action> actions = data.actions;
+            final List<MediaData.Action> actions = data.actions;
             if (actions != null && !actions.isEmpty()) {
                 holder.layoutActions.setVisibility(View.VISIBLE);
 
@@ -67,14 +69,14 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                 if (holder.layoutActions.getTag() == null) {
                     holder.layoutActions.setTag("Inflate");
                     for (int i = 0; i < len; i++) {
-                        createViewAction(context, holder, i);
+                        createViewAction(context, holder.layoutActions, i);
                     }
                 }
 
                 final int countCompareLen = holder.layoutActions.getChildCount();
                 if (countCompareLen < len) { //example: 4<6
                     for (int i = countCompareLen; i < len; i++) {
-                        createViewAction(context, holder, i);
+                        createViewAction(context, holder.layoutActions, i);
                     }
                 } else if (countCompareLen > len) { //example: 4>2
                     for (int i = len; i < countCompareLen; i++) {
@@ -112,6 +114,65 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                 holder.layoutActions.setVisibility(View.GONE);
             }
 
+            final Notification.Action[] notiActions = data.notiActions;
+            if (notiActions != null && notiActions.length > 0) {
+                holder.layoutNotiActions.setVisibility(View.VISIBLE);
+
+                final int len = notiActions.length;
+                if (holder.layoutNotiActions.getTag() == null) {
+                    holder.layoutNotiActions.setTag("Inflate");
+                    for (int i = 0; i < len; i++) {
+                        createViewAction(context, holder.layoutNotiActions, i);
+                    }
+                }
+
+                final int countCompareLen = holder.layoutNotiActions.getChildCount();
+                if (countCompareLen < len) { //example: 4<6
+                    for (int i = countCompareLen; i < len; i++) {
+                        createViewAction(context, holder.layoutNotiActions, i);
+                    }
+                } else if (countCompareLen > len) { //example: 4>2
+                    for (int i = len; i < countCompareLen; i++) {
+                        holder.layoutNotiActions.removeViewAt(len);
+                    }
+                }
+
+                final int childCount = holder.layoutNotiActions.getChildCount();
+                for (int i = 0; i < childCount; i++) {
+                    if (i >= len) {
+                        break;
+                    }
+
+                    View child = holder.layoutNotiActions.getChildAt(i);
+                    if (!(child instanceof TextView)) {
+                        break;
+                    }
+
+                    Notification.Action action = notiActions[i];
+                    TextView textView = (TextView) child;
+                    CharSequence actionName = action.title;
+                    textView.setText(actionName);
+                    Drawable actionIcon = Utils.getIconFromPackage(context, data.pkg, action.getIcon().getResId());
+                    if (actionIcon != null) {
+                        final int actionIconWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
+                                , 24f, context.getResources().getDisplayMetrics());
+                        final int intrinsicHeight = actionIconWidth * actionIcon.getIntrinsicWidth() / actionIcon.getIntrinsicHeight();
+                        actionIcon.setBounds(0, 0, actionIconWidth, intrinsicHeight);
+                        textView.setCompoundDrawables(null, actionIcon, null, null);
+                    }
+
+                    textView.setOnClickListener(v -> {
+                        try {
+                            action.actionIntent.send();
+                        } catch (PendingIntent.CanceledException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+            } else {
+                holder.layoutNotiActions.setVisibility(View.GONE);
+            }
+
             holder.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -142,7 +203,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
         return new ContentHolder(view);
     }
 
-    private void createViewAction(Context context, ContentHolder holder, int index) {
+    private void createViewAction(Context context, ViewGroup layout, int index) {
         TextView textView = new TextView(context);
         textView.setGravity(Gravity.CENTER);
         textView.setPaddingRelative(10, 6, 10, 6);
@@ -150,7 +211,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
         textView.setTextColor(Color.CYAN);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        holder.layoutActions.addView(textView, index, layoutParams);
+        layout.addView(textView, index, layoutParams);
     }
 
     static class ContentHolder extends RecyclerView.ViewHolder {
@@ -163,6 +224,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
         ImageView ivAlbumArt;
         SeekBar seekBar;
         LinearLayout layoutActions;
+        LinearLayout layoutNotiActions;
 
         ContentHolder(View view) {
             super(view);
@@ -176,6 +238,7 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
             ivAlbumArt = view.findViewById(R.id.tv_album_art);
             seekBar = view.findViewById(R.id.seekBar);
             layoutActions = view.findViewById(R.id.layout_actions);
+            layoutNotiActions = view.findViewById(R.id.layout_noti_actions);
 
             this.init();
         }
