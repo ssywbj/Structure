@@ -1,5 +1,7 @@
 package com.suheng.structure.view.kt
 
+import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Rect
@@ -122,6 +124,15 @@ fun Bitmap.clipArea(area: Rect, isRecycle: Boolean = false): Bitmap {
     }
     return bitmap
 }
+
+fun Context.createUiModeCtx(targetUiMode: Int): Context {
+    val config = Configuration(resources.configuration)
+    config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or targetUiMode
+    return createConfigurationContext(config)
+}
+
+fun Context.darkModeCtx() = createUiModeCtx(Configuration.UI_MODE_NIGHT_YES)
+fun Context.lightModeCtx() = createUiModeCtx(Configuration.UI_MODE_NIGHT_NO)
 
 inline fun <reified T : Any> noOpDelegate(): T {
     val javaClass = T::class.java

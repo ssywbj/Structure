@@ -23,6 +23,16 @@
                 android:layout_height="@dimen/sunlight_height"
                 android:layout_gravity="center"
                 android:background="@drawable/rect_border_light_bg" />
+
+            <TextView
+                android:id="@+id/text_night"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="6dp"
+                android:text="text_night"
+                android:textSize="18sp" />
+
         </FrameLayout>
 
         <FrameLayout
@@ -38,6 +48,15 @@
                 android:layout_height="@dimen/sunlight_height"
                 android:layout_gravity="center"
                 android:background="@drawable/rect_border_light_bg" />
+
+            <TextView
+                android:id="@+id/text_light"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="6dp"
+                android:text="text_light"
+                android:textSize="18sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -53,6 +72,15 @@
                 android:layout_height="@dimen/sunlight_height"
                 android:layout_gravity="center"
                 android:background="@drawable/rect_border_light_bg" />
+
+            <TextView
+                android:id="@+id/text_ui_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="6dp"
+                android:text="text_ui_mode"
+                android:textSize="18sp" />
         </FrameLayout>
 
         <FrameLayout

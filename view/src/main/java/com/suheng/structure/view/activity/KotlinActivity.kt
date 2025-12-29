@@ -10,12 +10,16 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.suheng.structure.view.R
 import com.suheng.structure.view.drawable.Halo
+import com.suheng.structure.view.kt.darkModeCtx
 import com.suheng.structure.view.kt.delegate.BundleHandler
 import com.suheng.structure.view.kt.delegate.BundleHandlerImpl
 import com.suheng.structure.view.kt.generic.People
+import com.suheng.structure.view.kt.lightModeCtx
 import com.tencent.qgame.animplayer.AnimConfig
 import com.tencent.qgame.animplayer.AnimView
 import com.tencent.qgame.animplayer.inter.IAnimListener
@@ -32,6 +36,21 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kotlin)
         bundleHandler(this, savedInstanceState)
+
+        findViewById<TextView>(R.id.text_night).apply {
+            /*AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark))*/
+
+            setTextColor(ContextCompat.getColor(context.darkModeCtx(), R.color.colorPrimaryDark))
+
+            this@KotlinActivity.findViewById<TextView>(R.id.text_light).setTextColor(
+                ContextCompat.getColor(context.lightModeCtx(), R.color.colorPrimaryDark)
+            )
+
+            this@KotlinActivity.findViewById<TextView>(R.id.text_ui_mode).setTextColor(
+                ContextCompat.getColor(context, R.color.colorPrimaryDark)
+            )
+        }
 
         findViewById<ViewGroup>(R.id.sun_iv1_layout).apply {
             val layoutPanel = findViewById<View>(R.id.sunlight_panel)
