@@ -9,4 +9,7 @@
     <color name="os_text_tertiary_color">#66000000</color>
     <color name="os_text_quaternary_color">#40000000</color>
     <color name="os_altitude_tertiary_color">#FFFFFF</color>
+
+    <color name="brand_color_a">#00FF00</color>
+    <color name="brand_color_b">#FF0000</color>
 </resources>

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimaryDark">#FF00B3</color>
+    <color name="brand_color_a">#FFFFFF</color>
+    <color name="brand_color_b">#000000</color>
 </resources>

@@ -13,4 +13,11 @@
 
     <style name="ThemeNoActionBar" parent="Theme.AppCompat.Light.NoActionBar" />
 
+    <style name="ThemeBrandA" parent="AppTheme">
+        <item name="brand_color">@color/brand_color_a</item>
+    </style>
+
+    <style name="ThemeBrandB" parent="AppTheme">
+        <item name="brand_color">@color/brand_color_b</item>
+    </style>
 </resources>

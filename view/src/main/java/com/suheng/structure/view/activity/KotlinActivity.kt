@@ -2,6 +2,7 @@ package com.suheng.structure.view.activity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.graphics.Color
 import android.graphics.Outline
 import android.graphics.Rect
 import android.graphics.RectF
@@ -34,6 +35,8 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //setTheme(R.style.ThemeBrandA)
+        setTheme(R.style.ThemeBrandB)
         setContentView(R.layout.activity_kotlin)
         bundleHandler(this, savedInstanceState)
 
@@ -41,7 +44,20 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
             /*AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark))*/
 
-            setTextColor(ContextCompat.getColor(context.darkModeCtx(), R.color.colorPrimaryDark))
+            val attributes = context.darkModeCtx().obtainStyledAttributes(R.style.ThemeBrandB, intArrayOf(R.attr.brand_color))
+            val color = attributes.getColor(0, Color.GRAY)
+            attributes.recycle()
+
+            /*val ctxA = ContextThemeWrapper(context.darkModeCtx(), R.style.ThemeBrandB)
+            //val ctxA = ContextThemeWrapper(context.darkModeCtx(), context.theme)
+            val color = ctxA.obtainStyledAttributes(intArrayOf(R.attr.brand_color)).let {
+                val c = it.getColor(0, Color.GRAY)
+                it.recycle()
+                c
+            }*/
+
+            //setTextColor(ContextCompat.getColor(context.darkModeCtx(), R.color.colorPrimaryDark))
+            setTextColor(color)
 
             this@KotlinActivity.findViewById<TextView>(R.id.text_light).setTextColor(
                 ContextCompat.getColor(context.lightModeCtx(), R.color.colorPrimaryDark)

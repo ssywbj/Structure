@@ -41,4 +41,6 @@
             <enum name="bottom_corners_round" value="3" />
         </attr>
     </declare-styleable>
+
+    <attr name="brand_color" format="color" />
 </resources>

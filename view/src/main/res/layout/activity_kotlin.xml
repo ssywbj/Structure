@@ -95,6 +95,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/rect_border_light_bg" />
+
+            <TextView
+                android:id="@+id/text_brand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="6dp"
+                android:text="text_brand"
+                android:textColor="?attr/brand_color"
+                android:textSize="18sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -109,6 +119,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/rect_border_light_bg" />
+
+            <TextView
+                android:id="@+id/text_brand_attr_"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="6dp"
+                android:text="text_brand"
+                android:textColor="?attr/brand_color"
+                android:textSize="18sp" />
         </FrameLayout>
 
         <FrameLayout
