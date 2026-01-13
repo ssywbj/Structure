@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -209,8 +210,11 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
         textView.setPaddingRelative(10, 6, 10, 6);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         textView.setTextColor(Color.CYAN);
+        textView.setMaxLines(1);
+        textView.setEllipsize(TextUtils.TruncateAt.END);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                0, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.weight = 1;
         layout.addView(textView, index, layoutParams);
     }
 

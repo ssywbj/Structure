@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.suheng.structure.wallpaperpicker">
     <!--普通app变系统app步骤：1.手机已root的前提下，把apk push到system_ext的app目录或system的priv-app目录（本例演示的是push到/system/priv-app目录）；
     2.重启手机(若重启手机apk没有被安装，可以使用adb shell stop;start只重启系统服务即可)-->
@@ -94,6 +95,15 @@
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".MediaPlayService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
     </application>
