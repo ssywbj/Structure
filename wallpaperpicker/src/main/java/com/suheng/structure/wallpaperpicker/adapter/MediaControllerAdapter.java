@@ -3,6 +3,7 @@ package com.suheng.structure.wallpaperpicker.adapter;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.drawable.Drawable;
@@ -62,11 +63,10 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
             holder.seekBar.setMax(data.progressMax);
             holder.ivAlbumArt.setImageBitmap(data.albumArt);
 
-            final List<MediaData.Action> actions = data.actions;
-            if (actions != null && !actions.isEmpty()) {
+            if (data.actions != null && !data.actions.isEmpty()) {
                 holder.layoutActions.setVisibility(View.VISIBLE);
 
-                final int len = actions.size();
+                final int len = data.actions.size();
                 if (holder.layoutActions.getTag() == null) {
                     holder.layoutActions.setTag("Inflate");
                     for (int i = 0; i < len; i++) {
@@ -86,40 +86,32 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                 }
 
                 final int childCount = holder.layoutActions.getChildCount();
-                for (int i = 0; i < childCount; i++) {
-                    if (i >= len) {
-                        break;
-                    }
-
+                for (int i = 0; i < childCount && i < len; i++) {
                     View child = holder.layoutActions.getChildAt(i);
-                    if (!(child instanceof TextView)) {
-                        break;
+                    MediaData.Action action = data.actions.get(i);
+                    child.setOnClickListener(v -> dataRepository.actionClick(action));
+                    if (child instanceof ViewGroup) {
+                        ViewGroup pLayout = (ViewGroup) child;
+                        View child0 = pLayout.getChildAt(0);
+                        if (child0 instanceof TextView) {
+                            TextView tv = (TextView) child0;
+                            tv.setText(action.name);
+                        }
+                        View child1 = pLayout.getChildAt(1);
+                        if (child1 instanceof ImageView) {
+                            ImageView iv = (ImageView) child1;
+                            iv.setImageDrawable(Utils.getIconFromPackage(context, data.pkg, action.icon));
+                        }
                     }
-
-                    MediaData.Action action = actions.get(i);
-                    TextView textView = (TextView) child;
-                    CharSequence actionName = action.name;
-                    textView.setText(actionName);
-                    Drawable actionIcon = Utils.getIconFromPackage(context, data.pkg, action.icon);
-                    if (actionIcon != null) {
-                        final int actionIconWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
-                                , 24f, context.getResources().getDisplayMetrics());
-                        final int intrinsicHeight = actionIconWidth * actionIcon.getIntrinsicWidth() / actionIcon.getIntrinsicHeight();
-                        actionIcon.setBounds(0, 0, actionIconWidth, intrinsicHeight);
-                        textView.setCompoundDrawables(null, actionIcon, null, null);
-                    }
-
-                    textView.setOnClickListener(v -> dataRepository.actionClick(action));
                 }
             } else {
                 holder.layoutActions.setVisibility(View.GONE);
             }
 
-            final Notification.Action[] notiActions = data.notiActions;
-            if (notiActions != null && notiActions.length > 0) {
+            if (data.notiActions != null && data.notiActions.length > 0) {
                 holder.layoutNotiActions.setVisibility(View.VISIBLE);
 
-                final int len = notiActions.length;
+                final int len = data.notiActions.length;
                 if (holder.layoutNotiActions.getTag() == null) {
                     holder.layoutNotiActions.setTag("Inflate");
                     for (int i = 0; i < len; i++) {
@@ -139,36 +131,29 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                 }
 
                 final int childCount = holder.layoutNotiActions.getChildCount();
-                for (int i = 0; i < childCount; i++) {
-                    if (i >= len) {
-                        break;
-                    }
-
+                for (int i = 0; i < childCount && i < len; i++) {
                     View child = holder.layoutNotiActions.getChildAt(i);
-                    if (!(child instanceof TextView)) {
-                        break;
-                    }
-
-                    Notification.Action action = notiActions[i];
-                    TextView textView = (TextView) child;
-                    CharSequence actionName = action.title;
-                    textView.setText(actionName);
-                    Drawable actionIcon = Utils.getIconFromPackage(context, data.pkg, action.getIcon().getResId());
-                    if (actionIcon != null) {
-                        final int actionIconWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP
-                                , 24f, context.getResources().getDisplayMetrics());
-                        final int intrinsicHeight = actionIconWidth * actionIcon.getIntrinsicWidth() / actionIcon.getIntrinsicHeight();
-                        actionIcon.setBounds(0, 0, actionIconWidth, intrinsicHeight);
-                        textView.setCompoundDrawables(null, actionIcon, null, null);
-                    }
-
-                    textView.setOnClickListener(v -> {
+                    Notification.Action action = data.notiActions[i];
+                    child.setOnClickListener(v -> {
                         try {
                             action.actionIntent.send();
                         } catch (PendingIntent.CanceledException e) {
-                            throw new RuntimeException(e);
+                            e.fillInStackTrace();
                         }
                     });
+                    if (child instanceof ViewGroup) {
+                        ViewGroup pLayout = (ViewGroup) child;
+                        View child0 = pLayout.getChildAt(0);
+                        if (child0 instanceof TextView) {
+                            TextView tv = (TextView) child0;
+                            tv.setText(action.title);
+                        }
+                        View child1 = pLayout.getChildAt(1);
+                        if (child1 instanceof ImageView) {
+                            ImageView iv = (ImageView) child1;
+                            iv.setImageDrawable(Utils.getIconFromPackage(context, data.pkg, action.getIcon().getResId()));
+                        }
+                    }
                 }
             } else {
                 holder.layoutNotiActions.setVisibility(View.GONE);
@@ -205,17 +190,30 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
     }
 
     private void createViewAction(Context context, ViewGroup layout, int index) {
-        TextView textView = new TextView(context);
-        textView.setGravity(Gravity.CENTER);
-        textView.setPaddingRelative(10, 6, 10, 6);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        textView.setTextColor(Color.CYAN);
-        textView.setMaxLines(1);
-        textView.setEllipsize(TextUtils.TruncateAt.END);
+        LinearLayout pLayout = new LinearLayout(context);
+        //pLayout.setBackgroundColor(Color.RED);
+        pLayout.setPaddingRelative(10, 10, 10, 10);
+        pLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 0, LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.weight = 1;
-        layout.addView(textView, index, layoutParams);
+        layout.addView(pLayout, index, layoutParams);
+
+        TextView textView = new TextView(context);
+        textView.setPaddingRelative(0, 8, 0, 8);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        textView.setTextColor(Color.CYAN);
+        textView.setMaxLines(1);
+        textView.setGravity(Gravity.CENTER);
+        textView.setEllipsize(TextUtils.TruncateAt.END);
+        pLayout.addView(textView);
+
+        ImageView iv = new ImageView(context);
+        iv.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+        LinearLayout.LayoutParams ivParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT
+                , ViewGroup.LayoutParams.WRAP_CONTENT);
+        ivParams.gravity = Gravity.CENTER_HORIZONTAL;
+        pLayout.addView(iv, ivParams);
     }
 
     static class ContentHolder extends RecyclerView.ViewHolder {
