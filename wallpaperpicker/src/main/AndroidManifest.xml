@@ -98,6 +98,8 @@
             </intent-filter>
         </service>
 
+        <activity android:name=".MusicPlayerActivity" />
+
         <service
             android:name=".MediaPlayService"
             android:exported="true"

@@ -115,14 +115,14 @@ public class WallpaperPickActivity extends AppCompatActivity {
             public void onMediaUpdated(@NonNull MediaData data) {
                 final int position = mMediaControllerList.indexOf(data);
                 mediaControllerAdapter.notifyItemChanged(position, data);
-                tvExistPlayingPlayer.setText(mediaDataRepository.existPlayingPlayer() ? "有" : "无");
+                updateUI(tvExistPlayingPlayer, mediaDataRepository);
             }
 
             @Override
             public void onMediaAdded(@NonNull MediaData data) {
                 mMediaControllerList.add(data);
                 mediaControllerAdapter.notifyItemInserted(mMediaControllerList.indexOf(data));
-                tvExistPlayingPlayer.setText(mediaDataRepository.existPlayingPlayer() ? "有" : "无");
+                updateUI(tvExistPlayingPlayer, mediaDataRepository);
             }
 
             @Override
@@ -130,13 +130,14 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 final int position = mMediaControllerList.indexOf(data);
                 mediaControllerAdapter.notifyItemRemoved(position);
                 mMediaControllerList.remove(data);
-                tvExistPlayingPlayer.setText(mediaDataRepository.existPlayingPlayer() ? "有" : "无");
+                updateUI(tvExistPlayingPlayer, mediaDataRepository);
             }
         };
         List<MediaData> mediaControllers = mediaDataRepository.getMediaDataList(onDataChangedListener);
         mediaDataRepository.addOnActiveSessionsChangedListener(onDataChangedListener);
         mMediaControllerList.addAll(mediaControllers);
         mediaControllerAdapter.notifyItemRangeChanged(0, mMediaControllerList.size());
+        updateUI(tvExistPlayingPlayer, mediaDataRepository);
     }
 
     @Override
@@ -160,4 +161,8 @@ public class WallpaperPickActivity extends AppCompatActivity {
         Log.d(TAG, "onBackPressed()");
     }
 
+    private void updateUI(TextView tvExistPlayingPlayer, MediaDataRepository mediaDataRepository) {
+        tvExistPlayingPlayer.setText(String.format(getString(R.string.exist_playing_player)
+                , mediaDataRepository.existPlayingPlayer() ? "Yes" : "No"));
+    }
 }

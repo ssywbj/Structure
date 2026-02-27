@@ -125,6 +125,10 @@ public class MediaDataRepository {
         }, null);
     }
 
+    public void removeOnActiveSessionsChangedListener() {
+        mMediaSessionHelper.removeOnActiveSessionsChangedListener(null);
+    }
+
     public void seekTo(String pkg, long pos) {
         mControllerHelper.seekTo(pkg, pos);
     }
@@ -134,8 +138,7 @@ public class MediaDataRepository {
     }
 
     public boolean existPlayingPlayer() {
-        //return mMediaSessionHelper.existPlayingPlayer();
-        return false;
+        return mMediaSessionHelper.existPlayingPlayer();
     }
 
     public @Nullable MediaData getCacheMediaData(MediaController mediaController) {
