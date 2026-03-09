@@ -28,6 +28,7 @@ public class MediaData {
 
     public int progress;
     public int progressMax;
+    public boolean isSeekAvailable;
 
     @Nullable
     public Notification.Action[] notiActions;

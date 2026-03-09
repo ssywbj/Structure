@@ -124,7 +124,7 @@ public class MediaControllerHelper {
     }
 
     private void parsePlaybackState(@NonNull MediaController mediaController, @Nullable MediaData mediaData) {
-        PlaybackState playbackState = mediaController.getPlaybackState();
+        final PlaybackState playbackState = mediaController.getPlaybackState();
         if (playbackState == null) {
             return;
         }
@@ -140,13 +140,16 @@ public class MediaControllerHelper {
         logInfo.append(", position: ").append(position).append("(").append(formatPst).append(")");
         customActionsLog(playbackState, logInfo);
         final long actions = playbackState.getActions();
-        boolean existsPrevious = includesAction(actions, PlaybackState.ACTION_SKIP_TO_PREVIOUS);
-        boolean existsNext = includesAction(actions, PlaybackState.ACTION_SKIP_TO_NEXT);
-        boolean existsPlayOrPause = includesAction(actions, PlaybackState.ACTION_PLAY_PAUSE)
+        final boolean existsPrevious = includesAction(actions, PlaybackState.ACTION_SKIP_TO_PREVIOUS);
+        final boolean existsNext = includesAction(actions, PlaybackState.ACTION_SKIP_TO_NEXT);
+        final boolean existsPlayOrPause = includesAction(actions, PlaybackState.ACTION_PLAY_PAUSE)
                 || includesAction(actions, PlaybackState.ACTION_PLAY)
                 || includesAction(actions, PlaybackState.ACTION_PAUSE);
+        //final boolean isSeekAvailable = (actions & PlaybackState.ACTION_SEEK_TO) != 0L;
+        final boolean isSeekAvailable = includesAction(actions, PlaybackState.ACTION_SEEK_TO);
         logInfo.append(", actions: ").append(actions).append(", existsPrevious: ").append(existsPrevious)
-                .append(", existsNext: ").append(existsNext).append(", existsPlayOrPause: ").append(existsPlayOrPause);
+                .append(", existsNext: ").append(existsNext).append(", existsPlayOrPause: ").append(existsPlayOrPause)
+                .append(", isSeekAvailable: ").append(isSeekAvailable);
 
         Log.i(TAG, logInfo.toString());
 
@@ -156,6 +159,7 @@ public class MediaControllerHelper {
             mediaData.state = state;
             mediaData.position = position;
             mediaData.progress = (int) (mediaData.position / 1000);
+            mediaData.isSeekAvailable = isSeekAvailable;
 
             MediaController.TransportControls transportControls = mediaController.getTransportControls();
             //test app: Spotify、PocketFM、Music player(com.search.music.mp3.musicplayer)、YT Music、汽水音乐、番茄畅听音乐版
@@ -306,12 +310,12 @@ public class MediaControllerHelper {
         return null;
     }
 
-    private boolean includesAction(long stateActions, long action) {
-        if ((action == PlaybackState.ACTION_PLAY || action == PlaybackState.ACTION_PAUSE)
-                && (stateActions & PlaybackState.ACTION_PLAY_PAUSE) > 0L) {
+    private boolean includesAction(long actions, long stateAction) {
+        if ((stateAction == PlaybackState.ACTION_PLAY || stateAction == PlaybackState.ACTION_PAUSE)
+                && (actions & PlaybackState.ACTION_PLAY_PAUSE) > 0L) {
             return true;
         }
-        return (stateActions & action) != 0L;
+        return (actions & stateAction) != 0L;
     }
 
     public void seekTo(String pkg, long pos) {
