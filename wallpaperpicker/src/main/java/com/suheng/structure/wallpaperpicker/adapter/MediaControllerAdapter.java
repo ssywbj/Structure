@@ -55,12 +55,10 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
             long pst = data.position;
             String fPst = Utils.formatDuration(pst);
             holder.tvPst.setText(fPst + "(" + pst + ")");
-            holder.seekBar.setProgress(data.progress);
             holder.tvTitle.setText(data.title);
             holder.tvArtist.setText(data.artist);
             String duration = Utils.formatDuration(data.duration);
             holder.tvDuration.setText(duration + "(" + data.duration + ")");
-            holder.seekBar.setMax(data.progressMax);
             holder.ivAlbumArt.setImageBitmap(data.albumArt);
 
             if (data.actions != null && !data.actions.isEmpty()) {
@@ -159,6 +157,9 @@ public final class MediaControllerAdapter extends RecyclerAdapter<MediaData, Rec
                 holder.layoutNotiActions.setVisibility(View.GONE);
             }
 
+            holder.seekBar.setEnabled(data.isSeekAvailable);
+            holder.seekBar.setProgress(data.progress);
+            holder.seekBar.setMax(data.progressMax);
             holder.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
