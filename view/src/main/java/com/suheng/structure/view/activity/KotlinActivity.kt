@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.graphics.Outline
 import android.graphics.Rect
 import android.graphics.RectF
+import android.media.MediaRouter2
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -66,6 +68,12 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
             this@KotlinActivity.findViewById<TextView>(R.id.text_ui_mode).setTextColor(
                 ContextCompat.getColor(context, R.color.colorPrimaryDark)
             )
+
+            setOnClickListener {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    MediaRouter2.getInstance(this@KotlinActivity).showSystemOutputSwitcher()
+                }
+            }
         }
 
         findViewById<ViewGroup>(R.id.sun_iv1_layout).apply {

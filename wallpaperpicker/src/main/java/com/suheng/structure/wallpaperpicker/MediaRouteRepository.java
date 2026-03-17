@@ -198,6 +198,14 @@ public class MediaRouteRepository {
         mMediaRouter2.transferTo(route2Info);
     }
 
+    public void showSystemOutputSwitcher(@NonNull RouteData routeData) {
+        MediaRoute2Info route2Info = mMapRoute2Info.get(routeData.getId());
+        if (route2Info == null) {
+            return;
+        }
+        mMediaRouter2.showSystemOutputSwitcher();
+    }
+
     public void setVolume(@NonNull RouteData routeData, int volume) {
         MediaRoute2Info route2Info = mMapRoute2Info.get(routeData.getId());
         Log.i(TAG, "setVolume, volume: " + volume + ", route2Info: " + route2Info
