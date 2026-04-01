@@ -3,6 +3,7 @@ package com.suheng.structure.wallpaperpicker;
 import android.content.ComponentName;
 import android.content.Context;
 import android.media.session.MediaController;
+import android.media.session.MediaSession;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -69,12 +70,13 @@ public class MediaDataRepository {
                 Log.i(TAG, "onActiveSessionsChanged, controllers size is " + controllerSize
                         + ", pkg size: " + mPkgList.size());
                 for (MediaController controller : controllers) {
+                    final MediaSession.Token sessionToken = controller.getSessionToken();
                     String packageName = controller.getPackageName();
                     if (mPkgList.contains(packageName)) {
                         continue;
                     }
 
-                    Log.i(TAG, "onActiveSessionsChanged, add player: " + packageName);
+                    Log.i(TAG, "onActiveSessionsChanged, add player: " + packageName + ", sessionToken: " + sessionToken);
                     mPkgList.add(packageName);
                     if (onDataChangedListener != null) {
                         MediaData mediaData = mControllerHelper.resolveMediaController(controller);

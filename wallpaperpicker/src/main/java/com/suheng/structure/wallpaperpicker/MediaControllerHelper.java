@@ -100,8 +100,11 @@ public class MediaControllerHelper {
         long duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
         String formatDuration = Utils.formatDuration(duration);
         logInfo.append(", duration: ").append(duration).append("(").append(formatDuration).append(")");
-        Bitmap albumArt = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
+        final Bitmap albumArt = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
         logInfo.append(", albumArt: ").append(System.identityHashCode(albumArt));
+        if (albumArt != null) {
+            logInfo.append("-W").append(albumArt.getWidth()).append("H").append(albumArt.getHeight());
+        }
         String mediaId = metadata.getString(MediaMetadata.METADATA_KEY_MEDIA_ID);
         logInfo.append(", mediaId: ").append(mediaId);
         String mediaUri = metadata.getString(MediaMetadata.METADATA_KEY_MEDIA_URI);
@@ -109,7 +112,7 @@ public class MediaControllerHelper {
         String albumArtUri = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI);
         logInfo.append(", albumArtUri: ").append(albumArtUri);
         String artUri = metadata.getString(MediaMetadata.METADATA_KEY_ART_URI);
-        logInfo.append("\nartUri: ").append(artUri);
+        logInfo.append(", artUri: ").append(artUri);
         String displayIconUri = metadata.getString(MediaMetadata.METADATA_KEY_DISPLAY_ICON_URI);
         logInfo.append(", displayIconUri: ").append(displayIconUri);
         Log.i(TAG, logInfo.toString());

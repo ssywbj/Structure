@@ -5,6 +5,7 @@ import android.media.AudioManager;
 import android.media.MediaRoute2Info;
 import android.media.MediaRouter2;
 import android.media.RouteDiscoveryPreference;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -107,7 +108,7 @@ public class MediaRouteRepository {
                     final String id = route.getId();
                     final int type = route.getType();
                     final CharSequence name = route.getName();
-
+                    final Uri iconUri = route.getIconUri();
                     final RouteData cacheRouteData = mMapRouteData.get(id);
                     if (cacheRouteData == null) {
                         mMapRoute2Info.put(id, route);
@@ -116,14 +117,14 @@ public class MediaRouteRepository {
 
                         if (onDataLChangedListener != null) {
                             Log.i(TAG, "onRoutesUpdated, onRouteAdded: " + routeData
-                                    + "\nid: " + id + ", type: " + type + ", name: " + name);
+                                    + "\nid: " + id + ", type: " + type + ", name: " + name + ", iconUri: " + iconUri);
                             onDataLChangedListener.onRouteAdded(routeData);
                         }
                     } else {
                         cacheRouteData.updateData(route);
                         if (onDataLChangedListener != null) {
                             Log.i(TAG, "onRoutesUpdated, onRouteUpdated: " + cacheRouteData
-                                    + "\nid: " + id + ", type: " + type + ", name: " + name);
+                                    + "\nid: " + id + ", type: " + type + ", name: " + name + ", iconUri: " + iconUri);
                             onDataLChangedListener.onRouteUpdated(cacheRouteData);
                         }
                     }
