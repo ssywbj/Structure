@@ -5,10 +5,12 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.media.MediaDescription;
 import android.media.MediaMetadata;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -105,10 +107,19 @@ public class MediaControllerHelper {
         if (albumArt != null) {
             logInfo.append("-W").append(albumArt.getWidth()).append("H").append(albumArt.getHeight());
         }
+        logInfo.append(", bdLimit: ").append(metadata.getBitmapDimensionLimit());
+        final MediaDescription description = metadata.getDescription();
+        final String dMediaId = description.getMediaId();
+        final Uri dMediaUri = description.getMediaUri();
+        final Bitmap dBitmap = description.getIconBitmap();
+        final CharSequence dTitle = description.getTitle();
+        final CharSequence dSubtitle = description.getSubtitle();
+        logInfo.append("\ndescription: ").append(dMediaId).append("-").append(dMediaUri).append("-")
+                .append(System.identityHashCode(dBitmap)).append("-").append(dTitle).append("-").append(dSubtitle);
         String mediaId = metadata.getString(MediaMetadata.METADATA_KEY_MEDIA_ID);
-        logInfo.append(", mediaId: ").append(mediaId);
+        logInfo.append("\nmediaId: ").append(mediaId);
         String mediaUri = metadata.getString(MediaMetadata.METADATA_KEY_MEDIA_URI);
-        logInfo.append("\nmediaUri: ").append(mediaUri);
+        logInfo.append(", mediaUri: ").append(mediaUri);
         String albumArtUri = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI);
         logInfo.append(", albumArtUri: ").append(albumArtUri);
         String artUri = metadata.getString(MediaMetadata.METADATA_KEY_ART_URI);
