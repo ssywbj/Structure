@@ -16,6 +16,7 @@ import android.view.ViewOutlineProvider
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.suheng.structure.view.R
 import com.suheng.structure.view.drawable.Halo
 import com.suheng.structure.view.kt.darkModeCtx
@@ -35,12 +36,20 @@ import java.math.BigDecimal
 
 class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl() {
 
+    companion object {
+        const val TAG = "KotlinActivity"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setTheme(R.style.ThemeBrandA)
         setTheme(R.style.ThemeBrandB)
         setContentView(R.layout.activity_kotlin)
         bundleHandler(this, savedInstanceState)
+        Log.d(TAG, "bundleSum: ${bundleSum(10, 23)}" +
+                    ", ::minus: ${returnFunType(10)(10, 10)}" +
+                    ", ::plus: ${returnFunType(0)(10, 10)}"
+        )
 
         findViewById<TextView>(R.id.text_night).apply {
             /*AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -61,19 +70,23 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
             //setTextColor(ContextCompat.getColor(context.darkModeCtx(), R.color.colorPrimaryDark))
             setTextColor(color)
 
-            this@KotlinActivity.findViewById<TextView>(R.id.text_light).setTextColor(
-                ContextCompat.getColor(context.lightModeCtx(), R.color.colorPrimaryDark)
-            )
-
             this@KotlinActivity.findViewById<TextView>(R.id.text_ui_mode).setTextColor(
                 ContextCompat.getColor(context, R.color.colorPrimaryDark)
             )
 
             setOnClickListener {
+                testSync(lifecycleScope)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     MediaRouter2.getInstance(this@KotlinActivity).showSystemOutputSwitcher()
                 }
             }
+        }
+
+        findViewById<TextView>(R.id.text_light).apply {
+            setOnClickListener {
+                testProdCus(lifecycleScope)
+            }
+            setTextColor(ContextCompat.getColor(context.lightModeCtx(), R.color.colorPrimaryDark))
         }
 
         findViewById<ViewGroup>(R.id.sun_iv1_layout).apply {

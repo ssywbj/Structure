@@ -13,8 +13,10 @@ import android.widget.TextView
 import androidx.core.graphics.createBitmap
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
 
@@ -140,4 +142,11 @@ inline fun <reified T : Any> noOpDelegate(): T {
 }
 
 val noOpHandler = InvocationHandler { _, _, _ ->
+}
+
+fun countDownFlow(total: Int = Int.MAX_VALUE, timeMillis: Long = 1000) = flow {
+    for (i in total downTo 0) {
+        emit(i)
+        delay(timeMillis)
+    }
 }
