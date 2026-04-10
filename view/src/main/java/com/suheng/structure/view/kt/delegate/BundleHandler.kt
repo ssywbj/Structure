@@ -13,4 +13,8 @@ interface BundleHandler {
     fun testSync(scope: CoroutineScope)
 
     fun testProdCus(scope: CoroutineScope)
+
+    fun linkedHashMap(scope: CoroutineScope)
+
+    fun synchronizedMap(scope: CoroutineScope)
 }

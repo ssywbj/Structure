@@ -70,10 +70,6 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
             //setTextColor(ContextCompat.getColor(context.darkModeCtx(), R.color.colorPrimaryDark))
             setTextColor(color)
 
-            this@KotlinActivity.findViewById<TextView>(R.id.text_ui_mode).setTextColor(
-                ContextCompat.getColor(context, R.color.colorPrimaryDark)
-            )
-
             setOnClickListener {
                 testSync(lifecycleScope)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -89,9 +85,19 @@ class KotlinActivity : AppCompatActivity(), BundleHandler by BundleHandlerImpl()
             setTextColor(ContextCompat.getColor(context.lightModeCtx(), R.color.colorPrimaryDark))
         }
 
+        findViewById<TextView>(R.id.text_ui_mode).apply {
+            setOnClickListener {
+                linkedHashMap(lifecycleScope)
+            }
+            setTextColor(
+                ContextCompat.getColor(context, R.color.colorPrimaryDark)
+            )
+        }
+
         findViewById<ViewGroup>(R.id.sun_iv1_layout).apply {
             val layoutPanel = findViewById<View>(R.id.sunlight_panel)
             setOnClickListener {
+                synchronizedMap(lifecycleScope)
                 (background as? Halo)?.start()
             }
             post {
