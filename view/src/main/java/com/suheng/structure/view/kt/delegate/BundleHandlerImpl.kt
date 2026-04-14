@@ -94,18 +94,20 @@ class BundleHandlerImpl : BundleHandler {
 
     private val linkedHashMap = LinkedHashMap<Int, String>()
 
-    private val synchronizedMap = Collections.synchronizedMap(LinkedHashMap<Int, String>())
+    private val synchronizedMap = Collections.synchronizedMap(linkedHashMap) // decorate LinkedHashMap
 
     override fun linkedHashMap(scope: CoroutineScope) {
         countDownFlow(timeMillis = 50).onEach {
-            synchronized(linkedHashMap) {
+            //synchronized(linkedHashMap) { //wrong
+            synchronized(synchronizedMap) {
                 linkedHashMap[it] = it.toString()
             }
         }.flowOn(Dispatchers.Unconfined).launchIn(scope)
 
         countDownFlow(timeMillis = 50).onEach {
             val sb = StringBuilder()
-            synchronized(linkedHashMap) {
+            //synchronized(linkedHashMap) { //wrong
+            synchronized(synchronizedMap) {
                 //linkedHashMap.filter { entry -> entry.key % 5 == 0 || entry.value.endsWith("6") }
                 linkedHashMap.filter { (key, value) -> key % 5 == 0 || value.endsWith("6") }.entries.forEach {
                     sb.append(it).append(" ")
@@ -115,30 +117,57 @@ class BundleHandlerImpl : BundleHandler {
         }.launchIn(scope)
 
         countDownFlow(timeMillis = 50).onEach {
-            synchronized(linkedHashMap) {
+            //synchronized(linkedHashMap) { //wrong
+            synchronized(synchronizedMap) {
                 linkedHashMap.remove(it)
             }
         }.flowOn(Dispatchers.IO).launchIn(scope)
     }
 
     override fun synchronizedMap(scope: CoroutineScope) {
-        countDownFlow(timeMillis = 50).onEach {
+        countDownFlow(timeMillis = 50, isCountDown = false).onEach {
+            if (it % 3 == 0 && synchronizedMap.containsKey(it)) {
+                synchronizedMap.remove(it)
+            }
             synchronizedMap[it] = it.toString()
         }.flowOn(Dispatchers.Unconfined).launchIn(scope)
 
         countDownFlow(timeMillis = 50).onEach {
             val sb = StringBuilder()
-            //synchronized(linkedHashMap) {
+
+            synchronizedMap.keys.toList()
+
+            //synchronized(linkedHashMap) { //wrong
             synchronized(synchronizedMap) {
+                synchronizedMap.values.toMutableSet()
                 synchronizedMap.filter { (key, value) -> key % 5 == 0 || value.endsWith("6") }.entries.forEach {
-                    sb.append(it).append(" ")
+                    sb.append(it).append(", ")
                 }
             }
-            Log.d(TAG, "synchronizedMap entries.forEach: $sb")
+
+            synchronized(synchronizedMap) {
+                synchronizedMap.filter { (key, value) ->
+                    key % 5 == 0 || value.endsWith("6")
+                }
+            }.forEach {
+                sb.append(it).append(" ")
+            }
+            Log.i(TAG, "synchronizedMap entries.forEach: $sb")
         }.launchIn(scope)
 
         countDownFlow(timeMillis = 50).onEach {
+            synchronized(synchronizedMap) {
+                synchronizedMap.keys.toSet()
+                synchronizedMap.keys.toMutableSet()
+            }
+
             synchronizedMap.remove(it)
+
+            synchronizedMap.keys.toMutableList()
+
+            val has100 = synchronized(synchronizedMap) {
+                synchronizedMap.any { (key, data) -> key % 10 == 0 && data.length == 3 } }
+            Log.d(TAG, "remove has100: $has100")
         }.flowOn(Dispatchers.IO).launchIn(scope)
     }
 

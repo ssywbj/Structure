@@ -144,9 +144,18 @@ inline fun <reified T : Any> noOpDelegate(): T {
 val noOpHandler = InvocationHandler { _, _, _ ->
 }
 
-fun countDownFlow(total: Int = Int.MAX_VALUE, timeMillis: Long = 1000) = flow {
-    for (i in total downTo 0) {
-        emit(i)
-        delay(timeMillis)
+fun countDownFlow(
+    total: Int = Int.MAX_VALUE, timeMillis: Long = 1000, isCountDown: Boolean = true
+) = flow {
+    if (isCountDown) {
+        for (i in total downTo 0) {
+            emit(i)
+            delay(timeMillis)
+        }
+    } else {
+        for (i in 0..total) {
+            emit(i)
+            delay(timeMillis)
+        }
     }
 }
