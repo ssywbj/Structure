@@ -120,47 +120,6 @@ object NotificationTools {
         builder.setStyle(style)
 
         notificationManager.notify("TEST_MEDIA_NOTIFICATION", notifyId, builder.build())
-
-        /*val customAction = PlaybackStateCompat.CustomAction.Builder(
-            "com.example.MY_CUSTOM_ACTION", // action ID
-            "Custom Action", // title - used as content description for the button
-            R.drawable.alphabet_uppercase_b
-        ).build()
-        playbackStateBuilder.addCustomAction(customAction)*/
-
-
-        /*val callback = object : MediaSessionCompat.Callback() {
-            override fun onPlay() {
-                // start playback
-            }
-
-            override fun onPause() {
-                // pause playback
-            }
-
-            override fun onSkipToPrevious() {
-                // skip to previous
-            }
-
-            override fun onSkipToNext() {
-                // skip to next
-            }
-
-            override fun onSeekTo(pos: Long) {
-                // jump to position in track
-            }
-
-            override fun onCustomAction(action: String, extras: Bundle?) {
-                when (action) {
-                    "CUSTOM_ACTION_1" -> "doCustomAction1(extras)"
-                    "CUSTOM_ACTION_2" -> "doCustomAction2(extras)"
-                    else -> {
-                        Log.w("TAG", "Unknown custom action $action")
-                    }
-                }
-            }
-        }
-        session.setCallback(callback)*/
     }
 
     //https://github.com/android/socialite

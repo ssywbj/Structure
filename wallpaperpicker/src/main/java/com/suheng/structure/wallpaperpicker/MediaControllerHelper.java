@@ -18,6 +18,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.media.utils.MediaConstants;
 
 import com.suheng.structure.wallpaperpicker.bean.MediaData;
 
@@ -164,6 +165,14 @@ public class MediaControllerHelper {
         logInfo.append(", actions: ").append(actions).append(", existsPrevious: ").append(existsPrevious)
                 .append(", existsNext: ").append(existsNext).append(", existsPlayOrPause: ").append(existsPlayOrPause)
                 .append(", isSeekAvailable: ").append(isSeekAvailable);
+
+        final Bundle extras = mediaController.getExtras();
+        if (extras != null) {
+            final boolean isReservePrev = extras.getBoolean(MediaConstants.SESSION_EXTRAS_KEY_SLOT_RESERVATION_SKIP_TO_PREV);
+            logInfo.append(", isReservePrev: ").append(isReservePrev);
+            final boolean isReserveNext = extras.getBoolean(MediaConstants.SESSION_EXTRAS_KEY_SLOT_RESERVATION_SKIP_TO_NEXT);
+            logInfo.append(", isReserveNext: ").append(isReserveNext);
+        }
 
         Log.i(TAG, logInfo.toString());
 
