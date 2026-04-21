@@ -1,12 +1,21 @@
 package com.suheng.structure.wallpaperpicker;
 
 import android.app.WallpaperInfo;
+import android.content.Intent;
 import android.media.MediaRoute2Info;
+import android.media.Rating;
+import android.media.Session2Token;
+import android.media.session.MediaController;
+import android.media.session.MediaSession;
+import android.media.session.MediaSessionManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,6 +41,145 @@ public class WallpaperPickActivity extends AppCompatActivity {
     private ComponentName mComponentNotification;*/
     //private @Nullable MediaRouter2 mMediaRouter2;
 
+    private MediaSessionHelper mMediaSessionHelper;
+
+    private final MediaSessionManager.OnSession2TokensChangedListener mSessionTokensChangedListener = tokens -> {
+        Log.d(TAG, "tokens.size(): " + tokens.size());
+        for (Session2Token token : tokens) {
+            Log.d(TAG, "token uid: " + token.getUid() + ", " + token);
+        }
+    };
+
+    private final MediaSessionManager.OnMediaKeyEventSessionChangedListener mMediaKeyEventSessionChangedListener = (packageName, sessionToken) -> {
+        Log.d(TAG, "sessionToken pkg: " + packageName + ", " + sessionToken);
+        if (sessionToken != null) {
+            WallpaperPickActivity context = WallpaperPickActivity.this;
+            final MediaController mediaController = new MediaController(context, sessionToken);
+            final MediaSession mediaSession = new MediaSession(context, TAG, mediaController.getSessionInfo());
+            boolean active = mediaSession.isActive();
+            Log.d(TAG, "sessionToken, active: " + active);
+            mediaSession.setCallback(new MediaSession.Callback() {
+                @Override
+                public void onCommand(@NonNull String command, @Nullable Bundle args, @Nullable ResultReceiver cb) {
+                    super.onCommand(command, args, cb);
+                    MediaSessionManager.RemoteUserInfo currentControllerInfo = mediaSession.getCurrentControllerInfo();
+                    final int uid = currentControllerInfo.getUid();
+                    final int pid = currentControllerInfo.getPid();
+                    Log.d(TAG, "onCommand, command: " + command + ", pid: " + pid + ", uid: " + uid);
+                }
+
+                @Override
+                public void onCustomAction(@NonNull String action, @Nullable Bundle extras) {
+                    super.onCustomAction(action, extras);
+                    Log.d(TAG, "onCustomAction, action: " + action);
+                }
+
+                @Override
+                public void onFastForward() {
+                    super.onFastForward();
+                }
+
+                @Override
+                public boolean onMediaButtonEvent(@NonNull Intent mediaButtonIntent) {
+                    return super.onMediaButtonEvent(mediaButtonIntent);
+                }
+
+                @Override
+                public void onPause() {
+                    super.onPause();
+                    MediaSessionManager.RemoteUserInfo currentControllerInfo = mediaSession.getCurrentControllerInfo();
+                    final int uid = currentControllerInfo.getUid();
+                    final int pid = currentControllerInfo.getPid();
+                    Log.d(TAG, "onPause, uid: " + uid + ", pid: " + pid);
+                }
+
+                @Override
+                public void onPlay() {
+                    super.onPlay();
+                    MediaSessionManager.RemoteUserInfo currentControllerInfo = mediaSession.getCurrentControllerInfo();
+                    final int uid = currentControllerInfo.getUid();
+                    final int pid = currentControllerInfo.getPid();
+                    Log.d(TAG, "onPlay, uid: " + uid + ", pid: " + pid);
+                }
+
+                @Override
+                public void onPlayFromMediaId(String mediaId, Bundle extras) {
+                    super.onPlayFromMediaId(mediaId, extras);
+                }
+
+                @Override
+                public void onPlayFromSearch(String query, Bundle extras) {
+                    super.onPlayFromSearch(query, extras);
+                }
+
+                @Override
+                public void onPlayFromUri(Uri uri, Bundle extras) {
+                    super.onPlayFromUri(uri, extras);
+                }
+
+                @Override
+                public void onPrepare() {
+                    super.onPrepare();
+                }
+
+                @Override
+                public void onPrepareFromMediaId(String mediaId, Bundle extras) {
+                    super.onPrepareFromMediaId(mediaId, extras);
+                }
+
+                @Override
+                public void onPrepareFromSearch(String query, Bundle extras) {
+                    super.onPrepareFromSearch(query, extras);
+                }
+
+                @Override
+                public void onPrepareFromUri(Uri uri, Bundle extras) {
+                    super.onPrepareFromUri(uri, extras);
+                }
+
+                @Override
+                public void onRewind() {
+                    super.onRewind();
+                }
+
+                @Override
+                public void onSeekTo(long pos) {
+                    super.onSeekTo(pos);
+                }
+
+                @Override
+                public void onSetPlaybackSpeed(float speed) {
+                    super.onSetPlaybackSpeed(speed);
+                }
+
+                @Override
+                public void onSetRating(@NonNull Rating rating) {
+                    super.onSetRating(rating);
+                }
+
+                @Override
+                public void onSkipToNext() {
+                    super.onSkipToNext();
+                }
+
+                @Override
+                public void onSkipToPrevious() {
+                    super.onSkipToPrevious();
+                }
+
+                @Override
+                public void onSkipToQueueItem(long id) {
+                    super.onSkipToQueueItem(id);
+                }
+
+                @Override
+                public void onStop() {
+                    super.onStop();
+                }
+            });
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +197,10 @@ public class WallpaperPickActivity extends AppCompatActivity {
             mComponentNotification = new ComponentName(this, NotificationListenerServiceImpl.class);
             NotificationListenerService.requestRebind(mComponentNotification);
         }*/
+
+        mMediaSessionHelper = new MediaSessionHelper(this);
+        mMediaSessionHelper.addOnSession2TokensChangedListener(mSessionTokensChangedListener);
+        mMediaSessionHelper.addOnMediaKeyEventSessionChangedListener(getMainExecutor(), mMediaKeyEventSessionChangedListener);
     }
 
     private void initRecyclerView() {
@@ -153,6 +305,8 @@ public class WallpaperPickActivity extends AppCompatActivity {
                 NotificationListenerService.requestRebind(mComponentNotification);
             }
         }*/
+        mMediaSessionHelper.removeOnSession2TokensChangedListener(mSessionTokensChangedListener);
+        mMediaSessionHelper.removeOnMediaKeyEventSessionChangedListener(mMediaKeyEventSessionChangedListener);
     }
 
     @Override
