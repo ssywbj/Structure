@@ -49,7 +49,7 @@ operator fun Delegate.setValue(thisRef: Any, property: KProperty<*>, value: Stri
 operator fun Delegate.getValue(thisRef: Any, property: KProperty<*>) =
     formattedString + "-" + formattedString.length
 
-inline fun Canvas.save(block: Canvas.() -> Unit) {
+inline fun Canvas.save(crossinline block: Canvas.() -> Unit) {
     save()
     block()
     restore()
@@ -57,20 +57,20 @@ inline fun Canvas.save(block: Canvas.() -> Unit) {
 
 inline fun Canvas.saveLayer(
     left: Float, top: Float, right: Float, bottom: Float, paint: Paint?,
-    block: Canvas.() -> Unit
+    crossinline block: Canvas.() -> Unit
 ) {
     val saveLayer = saveLayer(left, top, right, bottom, paint)
     block()
     restoreToCount(saveLayer)
 }
 
-inline fun Canvas.saveLayer(bounds: RectF?, paint: Paint?, block: Canvas.() -> Unit) {
+inline fun Canvas.saveLayer(bounds: RectF?, paint: Paint?, crossinline block: Canvas.() -> Unit) {
     val saveLayer = saveLayer(bounds, paint)
     block()
     restoreToCount(saveLayer)
 }
 
-inline fun Canvas.saveLayerAlpha(bounds: RectF?, alpha: Int, block: Canvas.() -> Unit) {
+inline fun Canvas.saveLayerAlpha(bounds: RectF?, alpha: Int, crossinline block: Canvas.() -> Unit) {
     val saveLayer = saveLayerAlpha(bounds, alpha)
     block()
     restoreToCount(saveLayer)
@@ -78,14 +78,14 @@ inline fun Canvas.saveLayerAlpha(bounds: RectF?, alpha: Int, block: Canvas.() ->
 
 inline fun Canvas.saveLayerAlpha(
     left: Float, top: Float, right: Float, bottom: Float, alpha: Int,
-    block: Canvas.() -> Unit
+    crossinline block: Canvas.() -> Unit
 ) {
     val saveLayer = saveLayerAlpha(left, top, right, bottom, alpha)
     block()
     restoreToCount(saveLayer)
 }
 
-inline fun beginSection(sectionName: String, block: () -> Unit) {
+inline fun beginSection(sectionName: String, crossinline block: () -> Unit) {
     Trace.beginSection(sectionName)
     block()
     Trace.endSection()
