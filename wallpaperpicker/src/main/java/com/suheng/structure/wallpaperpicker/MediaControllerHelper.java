@@ -224,13 +224,18 @@ public class MediaControllerHelper {
             }
             final List<PlaybackState.CustomAction> customActions = playbackState.getCustomActions();
             if (customActions != null) {
-                for (PlaybackState.CustomAction customAction : customActions) {
+                for (int i = 0; i < customActions.size(); i++) {
+                    PlaybackState.CustomAction customAction = customActions.get(i);
                     MediaData.Action action = new MediaData.Action();
                     action.isCustom = true;
                     action.name = customAction.getName();
                     action.icon = customAction.getIcon();
                     action.runnable = () -> transportControls.sendCustomAction(customAction, customAction.getExtras());
-                    actionList.add(action);
+                    if (i == 0) {
+                        actionList.add(0, action);
+                    } else {
+                        actionList.add(action);
+                    }
                 }
             }
             mediaData.actions = actionList;
@@ -239,8 +244,10 @@ public class MediaControllerHelper {
 
     private void customActionsLog(@NonNull PlaybackState playbackState, StringBuilder logInfo) {
         List<PlaybackState.CustomAction> customActions = playbackState.getCustomActions();
-        if (customActions != null) {
-            logInfo.append(", customActions: ").append(customActions.size()).append(" ");
+        if (customActions == null) {
+            logInfo.append(", custom actions is null");
+        } else {
+            logInfo.append(", custom actions: ").append(customActions.size()).append(" ");
             for (PlaybackState.CustomAction customAction : customActions) {
                 String action = customAction.getAction();
                 CharSequence name = customAction.getName();
