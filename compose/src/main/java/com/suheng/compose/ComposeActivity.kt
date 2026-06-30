@@ -7,6 +7,12 @@ import android.util.TypedValue
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.RemeasureToBounds
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -25,6 +31,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -42,8 +49,10 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
@@ -61,6 +70,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -84,7 +94,8 @@ class ComposeActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Greeting("Android")
+                    //Greeting("Android")
+                    SharedElements()
                 }
             }
         }
@@ -92,11 +103,159 @@ class ComposeActivity : ComponentActivity() {
 
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun SharedElements() {
+    var showDetails by remember {
+        mutableStateOf(false)
+    }
+
+    /*if (showDetails) {
+        DetailsScreen(onBack = { showDetails = false })
+    } else {
+        MainScreen(onShowDetails = { showDetails = true })
+    }*/
+
+    SharedTransitionLayout {
+        /*if (showDetails) {
+            DetailsScreen(onBack = { showDetails = false })
+        } else {
+            MainScreen(onShowDetails = { showDetails = true })
+        }*/
+        AnimatedContent(targetState = showDetails, label = "") { inDetails ->
+            if (inDetails) {
+                DetailsScreen(
+                    onBack = { showDetails = false },
+                    animatedVisibilityScope = this@AnimatedContent
+                )
+            } else {
+                MainScreen(
+                    onShowDetails = { showDetails = true },
+                    animatedVisibilityScope = this@AnimatedContent
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+//private fun MainScreen(onShowDetails: () -> Unit, modifier: Modifier = Modifier) {
+private fun SharedTransitionScope.MainScreen(
+    onShowDetails: () -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+    ) {
+        Row(
+            modifier = modifier
+                .padding(all = 16.dp)
+                .sharedBounds(
+                    sharedContentState = rememberSharedContentState(key = "bounds"),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    resizeMode = RemeasureToBounds
+                )
+                .border(
+                    width = 1.dp,
+                    color = Color.Gray.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .background(color = Color.Red, shape = RoundedCornerShape(8.dp))
+                .clickable { onShowDetails() }
+                .padding(all = 8.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.girl_gaitubao), contentDescription = null,
+                modifier = Modifier
+                    .sharedElement(
+                        state = rememberSharedContentState(key = "image"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                    .size(size = 100.dp)
+            )
+            Text(
+                text = stringResource(R.string.share_text1),
+                fontSize = 21.sp,
+                modifier = Modifier/*.sharedElement(
+                    state = rememberSharedContentState(key = "title"),
+                    animatedVisibilityScope = animatedVisibilityScope
+                )*/.sharedBounds(
+                    sharedContentState = rememberSharedContentState(key = "title"),
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+//private fun DetailsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
+private fun SharedTransitionScope.DetailsScreen(
+    onBack: () -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .systemBarsPadding(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = modifier
+                .padding(16.dp)
+                .sharedBounds(
+                    sharedContentState = rememberSharedContentState(key = "bounds"),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    resizeMode = RemeasureToBounds
+                )
+                .border(
+                    width = 1.dp,
+                    color = Color.Gray.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .background(color = Color.Green, shape = RoundedCornerShape(8.dp))
+                .clickable { onBack() }
+                .padding(8.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.girl_gaitubao), contentDescription = null,
+                modifier = Modifier
+                    .sharedElement(
+                        state = rememberSharedContentState(key = "image"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                    .size(200.dp)
+            )
+            Text(
+                text = stringResource(R.string.share_text1),
+                fontSize = 28.sp,
+                modifier = Modifier/*.sharedElement(
+                    state = rememberSharedContentState(key = "title"),
+                    animatedVisibilityScope = animatedVisibilityScope
+                )*/.sharedBounds(
+                    sharedContentState = rememberSharedContentState(key = "title"),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                )
+            )
+            Text(text = stringResource(R.string.share_text2))
+        }
+    }
+}
+
 @Composable
 fun Greeting(name: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize().padding(6.dp).verticalScroll(rememberScrollState())
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(6.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         val context = LocalContext.current
 
@@ -106,19 +265,33 @@ fun Greeting(name: String) {
             fontSize = 23.sp,
             fontStyle = FontStyle.Italic,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.background(Color.Yellow).padding(all = 20.dp).width(100.dp)
+            modifier = Modifier
+                .background(Color.Yellow)
+                .padding(all = 20.dp)
+                .width(100.dp)
                 .clickable { context.startActivity(Intent(context, ListGridActivity::class.java)) }
         )
 
-        Spacer(Modifier.background(Color.Red).size(10.dp))
+        Spacer(
+            Modifier
+                .background(Color.Red)
+                .size(10.dp)
+        )
 
         Text(
-            modifier = Modifier.height(15.dp).background(Color.Green).padding(horizontal = 6.dp),
+            modifier = Modifier
+                .height(15.dp)
+                .background(Color.Green)
+                .padding(horizontal = 6.dp),
             text = "Hello Hello Hello",
             fontFamily = FontFamily.Cursive
         )
 
-        Spacer(Modifier.background(Color.Red).size(8.dp))
+        Spacer(
+            Modifier
+                .background(Color.Red)
+                .size(8.dp)
+        )
 
         val clickText = remember { mutableStateOf("ClickableText") }
         ClickableText(
@@ -133,7 +306,11 @@ fun Greeting(name: String) {
             Toast.makeText(context, "${clickText.value}, it: $it", Toast.LENGTH_SHORT).show()
         }
 
-        Spacer(Modifier.background(Color.Red).size(6.dp))
+        Spacer(
+            Modifier
+                .background(Color.Red)
+                .size(6.dp)
+        )
 
         SelectionContainer {
             Text(
@@ -142,7 +319,11 @@ fun Greeting(name: String) {
             )
         }
 
-        Spacer(Modifier.background(Color.Red).size(6.dp))
+        Spacer(
+            Modifier
+                .background(Color.Red)
+                .size(6.dp)
+        )
 
         val inputText = remember { mutableStateOf("Input Text") }
         OutlinedTextField(
@@ -532,7 +713,9 @@ fun Greeting(name: String) {
                 elevation = 0.dp,
                 backgroundColor = Color.Green,
                 shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth().fillMaxWidth() //fillMaxXxx：占满剩下的空间
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxWidth() //fillMaxXxx：占满剩下的空间
             ) {
                 Column(modifier = Modifier.padding(all = 10.dp)) {
                     Text("AB CDE", fontWeight = FontWeight.W700)
@@ -546,7 +729,11 @@ fun Greeting(name: String) {
 
         val textMeasurer = rememberTextMeasurer()
         //Canvas(modifier = Modifier.width(150.dp).height(200.dp).background(Color.Gray)) {
-        Canvas(modifier = Modifier.requiredSize(150.dp, 200.dp).background(Color.Gray)) {
+        Canvas(
+            modifier = Modifier
+                .requiredSize(150.dp, 200.dp)
+                .background(Color.Gray)
+        ) {
             val quadrantSize = size / 2f
             drawCircle(color = Color.Green)
             drawRect(color = Color.Magenta, size = (quadrantSize))

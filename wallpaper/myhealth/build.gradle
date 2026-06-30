@@ -66,7 +66,7 @@ dependencies {
 
     implementation project(path: ':wallpaper:basic')
     //implementation "io.github.tencent:vap:2.0.28"
-    implementation project(path: ':animplayer')
+    //implementation project(path: ':animplayer')
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
 
     implementation 'androidx.activity:activity-compose:1.8.0'

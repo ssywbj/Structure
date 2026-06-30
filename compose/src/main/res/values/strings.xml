@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">SuCompose</string>
+    <string name="share_text1">ShareText</string>
+    <string name="share_text2">在Compose中，有一些高级别 API 可帮助您创建共享元素：
+\nSharedTransitionLayout：实现共享元素转换所需的最外层布局。它提供 SharedTransitionScope。可组合项必须位于 SharedTransitionScope 中，才能使用共享元素修饰符。
+\nModifier.sharedElement()：此修饰符会向 SharedTransitionScope 标记应与另一个可组合项匹配的可组合项。
+\nModifier.sharedBounds()：此修饰符会向 SharedTransitionScope 标记此可组合项的边界应作为转换发生位置的容器边界。与 sharedElement() 相比，sharedBounds() 专为视觉上不同的内容而设计。</string>
 </resources>
