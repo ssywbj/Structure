@@ -126,6 +126,7 @@ fun SharedTransitionScope.MusicCard(
             dampingRatio = Spring.DampingRatioLowBouncy,
             stiffness = Spring.StiffnessLow,
         ),
+        //animationSpec = tween(2000),
         label = "MusicTitleOffsetX",
     )
 
@@ -136,19 +137,27 @@ fun SharedTransitionScope.MusicCard(
             dampingRatio = Spring.DampingRatioLowBouncy,
             stiffness = Spring.StiffnessLow,
         ),
+        //animationSpec = tween(2000),
         label = "MusicDescribeOffsetY",
     )
 
     Log.d("Wbj", "isVisible: $isVisible, $alpha, offset: $titleOffsetX, $describeOffsetY")
 
     LaunchedEffect(Unit) {
+        Log.i("Wbj", "MusicCard LaunchedEffect")
         isVisible = true
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .clickable(onClick = onShowDeviceCard)
+            //.clickable(onClick = onShowDeviceCard)
+            .clickable {
+                if (isVisible) {
+                    isVisible = false
+                    onShowDeviceCard()
+                }
+            }
     ) {
         Row {
             AlbumImage(Modifier.size(size = 120.dp), 8, animatedVisibilityScope)
