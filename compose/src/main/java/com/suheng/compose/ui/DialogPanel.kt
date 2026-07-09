@@ -106,9 +106,10 @@ fun SharedTransitionScope.MusicCard(
 ) {
     var isVisible by remember { mutableStateOf(false) }
 
+    val durationMsOut = 400
     val alpha by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0f,
-        animationSpec = tween(durationMillis = 250, easing = LinearEasing),
+        animationSpec = tween(durationMillis = if (isVisible) 250 else durationMsOut, easing = LinearEasing),
         label = "MusicAlpha"
     )
 
@@ -122,22 +123,20 @@ fun SharedTransitionScope.MusicCard(
 
     val titleOffsetX by animateDpAsState(
         targetValue = if (isVisible) 0.dp else 160.dp,
-        animationSpec = spring(
+        animationSpec = if (isVisible) spring(
             dampingRatio = Spring.DampingRatioLowBouncy,
             stiffness = Spring.StiffnessLow,
-        ),
-        //animationSpec = tween(2000),
+        ) else tween(durationMsOut, easing = LinearEasing),
         label = "MusicTitleOffsetX",
     )
 
     //val describeOffsetY = 324.dp
     val describeOffsetY by animateDpAsState(
         targetValue = if (isVisible) 0.dp else 324.dp,
-        animationSpec = spring(
+        animationSpec = if (isVisible) spring(
             dampingRatio = Spring.DampingRatioLowBouncy,
             stiffness = Spring.StiffnessLow,
-        ),
-        //animationSpec = tween(2000),
+        ) else tween(durationMsOut, easing = LinearEasing),
         label = "MusicDescribeOffsetY",
     )
 
