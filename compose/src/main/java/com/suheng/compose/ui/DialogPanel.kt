@@ -1,9 +1,23 @@
 package com.suheng.compose.ui
 
-import android.app.appsearch.Migrator
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +27,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
@@ -21,10 +36,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 //import androidx.compose.material.Slider
 //import androidx.compose.material.SliderDefaults
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -32,53 +47,103 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.suheng.compose.R
 
+private const val KEY_SHARED_ELEMENT_IMAGE = "image"
+
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun DialogPanel() {
     var isShowMusicCard by remember { mutableStateOf(false) }
+    val bgColor by animateColorAsState(
+        targetValue = if (isShowMusicCard) Color.Green else Color.Red,
+        animationSpec = tween(300),
+        label = "BgColorAnim",
+    )
 
     Box(
         modifier = Modifier
             .requiredSize(300.dp, 464.dp)
-            //.clip(RoundedCornerShape(16.dp))
             .background(
-                if (isShowMusicCard) Color.Green else Color.Red, shape = RoundedCornerShape(16.dp)
+                bgColor/*if (isShowMusicCard) Color.Green else Color.Red*/,
+                shape = RoundedCornerShape(16.dp)
             )
             .padding(14.dp)
     ) {
-        if (isShowMusicCard) {
-            MusicCard(onShowDeviceCard = { isShowMusicCard = false })
-        } else {
-            DeviceCard(onShowMusicCard = { isShowMusicCard = true })
+        SharedTransitionLayout {
+            AnimatedContent(
+                targetState = isShowMusicCard,
+                /*transitionSpec = {
+                    fadeIn(animationSpec = tween(220)) togetherWith fadeOut(
+                        animationSpec = tween(220)
+                    )
+                },*/
+            ) { isMusicCard ->
+                if (isMusicCard) {
+                    MusicCard(onShowDeviceCard = { isShowMusicCard = false }, this)
+                } else {
+                    DeviceCard(onShowMusicCard = { isShowMusicCard = true }, this)
+                }
+            }
         }
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun MusicCard(onShowDeviceCard: () -> Unit) {
+fun SharedTransitionScope.MusicCard(
+    onShowDeviceCard: () -> Unit, animatedVisibilityScope: AnimatedVisibilityScope
+) {
+    var titleVisible by remember { mutableStateOf(false) }
+
+    val titleAlpha by animateFloatAsState(
+        targetValue = if (titleVisible) 1f else 0f,
+        animationSpec = tween(durationMillis = 300, easing = LinearEasing),
+        label = "MusicTitleAlpha"
+    )
+
+    /*val titleAlpha = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        titleAlpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 3000, easing = LinearEasing)
+        )
+    }*/
+
+    val titleOffsetX by animateDpAsState(
+        targetValue = if (titleVisible) 0.dp else 180.dp,
+        //animationSpec = tween(durationMillis = 300, easing = LinearEasing),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessLow,
+        ),
+        label = "MusicTitleOffsetX"
+    )
+
+    LaunchedEffect(Unit) {
+        titleVisible = true
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .clickable(onClick = onShowDeviceCard)
     ) {
         Row {
-            Image(
-                painter = painterResource(id = R.drawable.girl_gaitubao),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(size = 120.dp)
-                    .clip(RoundedCornerShape(8.dp))
-            )
+            AlbumImage(Modifier.size(size = 120.dp), 8, animatedVisibilityScope)
 
             Text(
                 text = stringResource(R.string.share_text1),
@@ -87,20 +152,26 @@ fun MusicCard(onShowDeviceCard: () -> Unit) {
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .padding(start = 10.dp)
+                    .offset(x = titleOffsetX)
+                    .alpha(titleAlpha)
             )
         }
 
         Text(
-            text = stringResource(R.string.share_text2), fontSize = 16.sp, color = Color.Gray,
+            text = stringResource(R.string.share_text2),
+            fontSize = 16.sp,
+            color = Color.Gray,
             modifier = Modifier.padding(top = 10.dp)
         )
     }
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun DeviceCard(onShowMusicCard: () -> Unit) {
+fun SharedTransitionScope.DeviceCard(
+    onShowMusicCard: () -> Unit, animatedVisibilityScope: AnimatedVisibilityScope
+) {
     var volume by remember { mutableFloatStateOf(50f) }
 
     Column(
@@ -108,14 +179,10 @@ fun DeviceCard(onShowMusicCard: () -> Unit) {
             .fillMaxSize()
             .clickable(onClick = onShowMusicCard)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.girl_gaitubao),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
+        AlbumImage(
+            Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(16.dp))
+                .aspectRatio(1f), 16, animatedVisibilityScope
         )
 
         Text(
@@ -146,8 +213,7 @@ fun DeviceCard(onShowMusicCard: () -> Unit) {
             )
 
             val minVolume = 0f
-            val maxVolume = 100f
-            /*Slider(
+            val maxVolume = 100f/*Slider(
                 value = volume,
                 onValueChange = { volume = it },
                 valueRange = minVolume..maxVolume,
@@ -179,8 +245,7 @@ fun DeviceCard(onShowMusicCard: () -> Unit) {
                                 .background(Color.Yellow, RoundedCornerShape(trackRadius.dp))
                         )
                     }
-                }
-            )
+                })
 
             Text(
                 text = "${maxVolume.toInt()}",
@@ -195,28 +260,41 @@ fun DeviceCard(onShowMusicCard: () -> Unit) {
     }
 }
 
-/*
-Row {
-    var volume by remember { mutableFloatStateOf(10f) }
-    val minVolume = 0f
-    val maxVolume = 100f
-
-    Text(
-        text = "${volume.toInt()}",
-        fontSize = 14.sp,
-        color = Color.Black,
-        modifier = Modifier
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun SharedTransitionScope.AlbumImage(
+    modifier: Modifier,
+    radius: Int,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+) {
+    Image(
+        painter = painterResource(id = R.drawable.girl_gaitubao),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = modifier
+            .clip(RoundedCornerShape(radius.dp))
+            .sharedElement(
+                state = rememberSharedContentState(KEY_SHARED_ELEMENT_IMAGE),
+                animatedVisibilityScope = animatedVisibilityScope,
+                /*clipInOverlayDuringTransition = object : SharedTransitionScope.OverlayClip {
+                    override fun getClipPath(
+                        state: SharedTransitionScope.SharedContentState,
+                        bounds: Rect,
+                        layoutDirection: LayoutDirection,
+                        density: Density
+                    ): Path? {
+                        return null
+                    }
+                },*/
+                clipInOverlayDuringTransition = OverlayClip(RoundedCornerShape(radius.dp)),
+                boundsTransform = { _, _ ->
+                    spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessLow,
+                        visibilityThreshold = Rect.VisibilityThreshold
+                    )
+                    //tween(1700)
+                }
+            )
     )
-    Slider(
-        value = volume,
-        onValueChange = { volume = it },
-        valueRange = minVolume..maxVolume,
-        modifier = Modifier
-    )
-    Text(
-        text = "${maxVolume.toInt()}",
-        fontSize = 14.sp,
-        color = Color.Black,
-        modifier = Modifier
-    )
-}*/
+}
