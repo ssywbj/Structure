@@ -1,5 +1,6 @@
 package com.suheng.compose.ui
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -13,9 +14,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -51,13 +49,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.suheng.compose.R
@@ -86,12 +81,14 @@ fun DialogPanel() {
         SharedTransitionLayout {
             AnimatedContent(
                 targetState = isShowMusicCard,
+                label = "DeviceMusicAnim",
                 /*transitionSpec = {
                     fadeIn(animationSpec = tween(220)) togetherWith fadeOut(
                         animationSpec = tween(220)
                     )
                 },*/
             ) { isMusicCard ->
+                //Log.i("Wbj", "isShowMusicCard: $isShowMusicCard, isMusicCard: $isMusicCard")
                 if (isMusicCard) {
                     MusicCard(onShowDeviceCard = { isShowMusicCard = false }, this)
                 } else {
@@ -107,34 +104,45 @@ fun DialogPanel() {
 fun SharedTransitionScope.MusicCard(
     onShowDeviceCard: () -> Unit, animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    var titleVisible by remember { mutableStateOf(false) }
+    var isVisible by remember { mutableStateOf(false) }
 
-    val titleAlpha by animateFloatAsState(
-        targetValue = if (titleVisible) 1f else 0f,
-        animationSpec = tween(durationMillis = 300, easing = LinearEasing),
-        label = "MusicTitleAlpha"
+    val alpha by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = tween(durationMillis = 250, easing = LinearEasing),
+        label = "MusicAlpha"
     )
 
-    /*val titleAlpha = remember { Animatable(0f) }
+    /*val alpha = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
-        titleAlpha.animateTo(
+        alpha.animateTo(
             targetValue = 1f,
             animationSpec = tween(durationMillis = 3000, easing = LinearEasing)
         )
     }*/
 
     val titleOffsetX by animateDpAsState(
-        targetValue = if (titleVisible) 0.dp else 180.dp,
-        //animationSpec = tween(durationMillis = 300, easing = LinearEasing),
+        targetValue = if (isVisible) 0.dp else 160.dp,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioLowBouncy,
             stiffness = Spring.StiffnessLow,
         ),
-        label = "MusicTitleOffsetX"
+        label = "MusicTitleOffsetX",
     )
 
+    //val describeOffsetY = 324.dp
+    val describeOffsetY by animateDpAsState(
+        targetValue = if (isVisible) 0.dp else 324.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessLow,
+        ),
+        label = "MusicDescribeOffsetY",
+    )
+
+    Log.d("Wbj", "isVisible: $isVisible, $alpha, offset: $titleOffsetX, $describeOffsetY")
+
     LaunchedEffect(Unit) {
-        titleVisible = true
+        isVisible = true
     }
 
     Column(
@@ -153,7 +161,7 @@ fun SharedTransitionScope.MusicCard(
                     .align(Alignment.CenterVertically)
                     .padding(start = 10.dp)
                     .offset(x = titleOffsetX)
-                    .alpha(titleAlpha)
+                    .alpha(alpha)
             )
         }
 
@@ -161,10 +169,12 @@ fun SharedTransitionScope.MusicCard(
             text = stringResource(R.string.share_text2),
             fontSize = 16.sp,
             color = Color.Gray,
-            modifier = Modifier.padding(top = 10.dp)
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .alpha(alpha)
+                .offset(y = describeOffsetY)
         )
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
