@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -62,9 +63,9 @@ private const val KEY_SHARED_ELEMENT_IMAGE = "image"
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun DialogPanel() {
-    var isShowMusicCard by remember { mutableStateOf(false) }
+    var isShowMusicCard by remember { mutableStateOf(true) }
     val bgColor by animateColorAsState(
-        targetValue = if (isShowMusicCard) Color.Green else Color.Red,
+        targetValue = if (isShowMusicCard) Color.Red else Color.Green,
         animationSpec = tween(300),
         label = "BgColorAnim",
     )
@@ -101,8 +102,8 @@ fun DialogPanel() {
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SharedTransitionScope.MusicCard(
-    onShowDeviceCard: () -> Unit, animatedVisibilityScope: AnimatedVisibilityScope
+fun SharedTransitionScope.DeviceCard(
+    onShowMusicCard: () -> Unit, animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     var isVisible by remember { mutableStateOf(false) }
 
@@ -110,7 +111,7 @@ fun SharedTransitionScope.MusicCard(
     val alpha by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0f,
         animationSpec = tween(durationMillis = if (isVisible) 250 else durationMsOut, easing = LinearEasing),
-        label = "MusicAlpha"
+        label = "DeviceAlpha"
     )
 
     /*val alpha = remember { Animatable(0f) }
@@ -127,7 +128,7 @@ fun SharedTransitionScope.MusicCard(
             dampingRatio = Spring.DampingRatioLowBouncy,
             stiffness = Spring.StiffnessLow,
         ) else tween(durationMsOut, easing = LinearEasing),
-        label = "MusicTitleOffsetX",
+        label = "DeviceTitleOffsetX",
     )
 
     //val describeOffsetY = 324.dp
@@ -137,13 +138,13 @@ fun SharedTransitionScope.MusicCard(
             dampingRatio = Spring.DampingRatioLowBouncy,
             stiffness = Spring.StiffnessLow,
         ) else tween(durationMsOut, easing = LinearEasing),
-        label = "MusicDescribeOffsetY",
+        label = "DeviceDescribeOffsetY",
     )
 
-    Log.d("Wbj", "isVisible: $isVisible, $alpha, offset: $titleOffsetX, $describeOffsetY")
+    Log.d("Wbj", "DeviceCard isVisible: $isVisible, alpha: $alpha, offset: $titleOffsetX, $describeOffsetY")
 
     LaunchedEffect(Unit) {
-        Log.i("Wbj", "MusicCard LaunchedEffect")
+        Log.d("Wbj", "DeviceCard LaunchedEffect")
         isVisible = true
     }
 
@@ -154,7 +155,7 @@ fun SharedTransitionScope.MusicCard(
             .clickable {
                 if (isVisible) {
                     isVisible = false
-                    onShowDeviceCard()
+                    onShowMusicCard()
                 }
             }
     ) {
@@ -187,15 +188,47 @@ fun SharedTransitionScope.MusicCard(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun SharedTransitionScope.DeviceCard(
-    onShowMusicCard: () -> Unit, animatedVisibilityScope: AnimatedVisibilityScope
+fun SharedTransitionScope.MusicCard(
+    onShowDeviceCard: () -> Unit, animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    var volume by remember { mutableFloatStateOf(50f) }
+    var volume by remember { mutableFloatStateOf(10f) }
+
+    var isVisible by remember { mutableStateOf(false) }
+    val durationMsOut = 400
+    val alpha by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = tween(durationMillis = if (isVisible) 200 else durationMsOut, easing = LinearEasing),
+        label = "MusicAlpha"
+    )
+
+    val scale by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = if (isVisible) spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessLow,
+        ) else tween(
+            durationMillis = if (isVisible) 200 else durationMsOut,
+            easing = LinearEasing
+        ),
+        label = "MusicScale"
+    )
+
+    LaunchedEffect(Unit) {
+        Log.i("Wbj", "MusicCard LaunchedEffect")
+        isVisible = true
+    }
+
+    Log.i("Wbj", "MusicCard isVisible: $isVisible, alpha: $alpha, scale: $scale")
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .clickable(onClick = onShowMusicCard)
+            .clickable {
+                if (isVisible) {
+                    isVisible = false
+                    onShowDeviceCard()
+                }
+            }
     ) {
         AlbumImage(
             Modifier
@@ -210,6 +243,8 @@ fun SharedTransitionScope.DeviceCard(
             modifier = Modifier
                 .padding(top = 10.dp)
                 .background(Color.Cyan)
+                .alpha(alpha)
+                .scale(scale)
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -218,6 +253,8 @@ fun SharedTransitionScope.DeviceCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White)
+                .alpha(alpha)
+                .scale(scale)
         ) {
             val textWidth = 26.dp
             Text(
@@ -231,7 +268,8 @@ fun SharedTransitionScope.DeviceCard(
             )
 
             val minVolume = 0f
-            val maxVolume = 100f/*Slider(
+            val maxVolume = 100f
+            /*Slider(
                 value = volume,
                 onValueChange = { volume = it },
                 valueRange = minVolume..maxVolume,
@@ -274,7 +312,6 @@ fun SharedTransitionScope.DeviceCard(
                     .background(Color.Blue),
             )
         }
-
     }
 }
 
@@ -311,8 +348,6 @@ private fun SharedTransitionScope.AlbumImage(
                         stiffness = Spring.StiffnessLow,
                         visibilityThreshold = Rect.VisibilityThreshold
                     )
-                    //tween(1700)
-                }
-            )
+                })
     )
 }
