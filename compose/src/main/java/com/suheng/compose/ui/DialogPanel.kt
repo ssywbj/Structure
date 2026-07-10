@@ -64,6 +64,8 @@ private const val KEY_SHARED_ELEMENT_IMAGE = "image"
 @Composable
 fun DialogPanel() {
     var isShowMusicCard by remember { mutableStateOf(true) }
+    var enableAnimation by remember { mutableStateOf(false) }
+
     val bgColor by animateColorAsState(
         targetValue = if (isShowMusicCard) Color.Red else Color.Green,
         animationSpec = tween(300),
@@ -91,9 +93,23 @@ fun DialogPanel() {
             ) { isMusicCard ->
                 //Log.i("Wbj", "isShowMusicCard: $isShowMusicCard, isMusicCard: $isMusicCard")
                 if (isMusicCard) {
-                    MusicCard(onShowDeviceCard = { isShowMusicCard = false }, this)
+                    MusicCard(
+                        onShowDeviceCard = {
+                            enableAnimation = true
+                            isShowMusicCard = false
+                        },
+                        animatedVisibilityScope = this,
+                        enableAnimation = enableAnimation
+                    )
                 } else {
-                    DeviceCard(onShowMusicCard = { isShowMusicCard = true }, this)
+                    DeviceCard(
+                        onShowMusicCard = {
+                            enableAnimation = true
+                            isShowMusicCard = true
+                        },
+                        animatedVisibilityScope = this,
+                        enableAnimation = enableAnimation
+                    )
                 }
             }
         }
@@ -103,9 +119,12 @@ fun DialogPanel() {
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.DeviceCard(
-    onShowMusicCard: () -> Unit, animatedVisibilityScope: AnimatedVisibilityScope
+    onShowMusicCard: () -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    enableAnimation: Boolean,
 ) {
-    var isVisible by remember { mutableStateOf(false) }
+    //var isVisible by remember { mutableStateOf(false) }
+    var isVisible by remember { mutableStateOf(!enableAnimation) }
 
     val durationMsOut = 400
     val alpha by animateFloatAsState(
@@ -144,8 +163,10 @@ fun SharedTransitionScope.DeviceCard(
     Log.d("Wbj", "DeviceCard isVisible: $isVisible, alpha: $alpha, offset: $titleOffsetX, $describeOffsetY")
 
     LaunchedEffect(Unit) {
-        Log.d("Wbj", "DeviceCard LaunchedEffect")
-        isVisible = true
+        Log.d("Wbj", "DeviceCard LaunchedEffect: $enableAnimation")
+        if (enableAnimation) {
+            isVisible = true
+        }
     }
 
     Column(
@@ -189,11 +210,14 @@ fun SharedTransitionScope.DeviceCard(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.MusicCard(
-    onShowDeviceCard: () -> Unit, animatedVisibilityScope: AnimatedVisibilityScope
+    onShowDeviceCard: () -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    enableAnimation: Boolean,
 ) {
     var volume by remember { mutableFloatStateOf(10f) }
+    //var isVisible by remember { mutableStateOf(false) }
+    var isVisible by remember { mutableStateOf(!enableAnimation) }
 
-    var isVisible by remember { mutableStateOf(false) }
     val durationMsOut = 400
     val alpha by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0f,
@@ -214,8 +238,10 @@ fun SharedTransitionScope.MusicCard(
     )
 
     LaunchedEffect(Unit) {
-        Log.i("Wbj", "MusicCard LaunchedEffect")
-        isVisible = true
+        Log.i("Wbj", "MusicCard LaunchedEffect: $enableAnimation")
+        if (enableAnimation) {
+            isVisible = true
+        }
     }
 
     Log.i("Wbj", "MusicCard isVisible: $isVisible, alpha: $alpha, scale: $scale")
