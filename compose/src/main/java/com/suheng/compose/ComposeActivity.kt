@@ -81,9 +81,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.suheng.compose.ui.DeviceCard
-import com.suheng.compose.ui.DialogPanel
-import com.suheng.compose.ui.MusicCard
+import com.suheng.compose.ui.MediaWidget
 import com.suheng.compose.ui.theme.structureTheme
 
 class ComposeActivity : ComponentActivity() {
@@ -108,8 +106,7 @@ class ComposeActivity : ComponentActivity() {
                     } else {
                         DeviceCard(onShowMusicCard = { isShowMusicCard = true })
                     }*/
-
-                    DialogPanel()
+                    MediaWidget()
                 }
             }
         }

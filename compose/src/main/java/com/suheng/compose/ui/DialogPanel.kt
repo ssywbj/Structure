@@ -17,6 +17,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,9 +65,142 @@ private const val KEY_SHARED_ELEMENT_IMAGE = "image"
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun DialogPanel() {
-    var isShowMusicCard by remember { mutableStateOf(true) }
-    var enableAnimation by remember { mutableStateOf(false) }
+fun MediaWidget() {
+    var showDialog by remember { mutableStateOf(false) }
+    var showMusicCard by remember { mutableStateOf(true) }
+    var dialogAnimType by remember { mutableIntStateOf(0) }
+
+    SharedTransitionLayout {
+        AnimatedContent(
+            targetState = showDialog,
+            label = "MediaWidgetAnimated",
+        ) { dialogVisible ->
+            Log.d("Wbj", "showDialog: $showDialog, dialogVisible: $dialogVisible")
+            if (dialogVisible) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f))
+                        .clickable {
+                            showDialog = false
+                            dialogAnimType = 2
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    DialogPanel(
+                        showMusicCard = showMusicCard,
+                        animType = dialogAnimType,
+                        outAnimatedScope = this@AnimatedContent,
+                    )
+                }
+            } else {
+                SmartMediaPanel(
+                    animatedVisibilityScope = this@AnimatedContent,
+                    onAlbumClick = {
+                        showDialog = true
+                        dialogAnimType = 1
+                        showMusicCard = true
+                    },
+                    onDeviceClick = {
+                        showDialog = true
+                        dialogAnimType = 1
+                        showMusicCard = false
+                    })
+
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun SharedTransitionScope.SmartMediaPanel(
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    onAlbumClick: () -> Unit,
+    onDeviceClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .requiredSize(130.dp)
+            .background(Color.Blue, shape = RoundedCornerShape(16.dp))
+            .padding(12.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            AlbumImage(
+                modifier = Modifier
+                    .size(56.dp)
+                    .clickable(onClick = onAlbumClick),
+                animatedVisibilityScope = animatedVisibilityScope,
+                radius = 8,
+                isDialogPanelCardSwitchAnimation = false
+            )
+
+            Image(
+                painter = painterResource(id = android.R.drawable.ic_input_get),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(Color.White),
+                modifier = Modifier
+                    .size(26.dp)
+                    .clickable(onClick = onDeviceClick)
+            )
+        }
+
+        MediaControlRow(modifier = Modifier.fillMaxWidth())
+    }
+}
+
+@Composable
+private fun MediaControlRow(modifier: Modifier) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = android.R.drawable.ic_media_previous),
+            contentDescription = null,
+            contentScale = ContentScale.FillBounds,
+            colorFilter = ColorFilter.tint(Color.White),
+            modifier = Modifier
+                .size(22.dp)
+        )
+
+        Image(
+            painter = painterResource(id = android.R.drawable.ic_media_play),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(Color.White),
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
+                .size(28.dp)
+        )
+
+        Image(
+            painter = painterResource(id = android.R.drawable.ic_media_next),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(Color.White),
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
+                .size(22.dp)
+        )
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun SharedTransitionScope.DialogPanel(
+    showMusicCard: Boolean = true,
+    animType: Int = 0,
+    outAnimatedScope: AnimatedVisibilityScope,
+) {
+    var isShowMusicCard by remember { mutableStateOf(showMusicCard) }
+    var invokeOutAnimatedScope by remember(animType) { mutableStateOf(true) }
+    var isCardSwitchAnimation by remember { mutableStateOf(!invokeOutAnimatedScope) }
+
+    //Log.d("Wbj", "DialogPanel init - enableAnimation2: $enableAnimation2, enableAnimation21: $enableAnimation21")
 
     val bgColor by animateColorAsState(
         targetValue = if (isShowMusicCard) Color.Red else Color.Green,
@@ -81,36 +217,31 @@ fun DialogPanel() {
             )
             .padding(14.dp)
     ) {
-        SharedTransitionLayout {
-            AnimatedContent(
-                targetState = isShowMusicCard,
-                label = "DeviceMusicAnim",
-                /*transitionSpec = {
-                    fadeIn(animationSpec = tween(220)) togetherWith fadeOut(
-                        animationSpec = tween(220)
-                    )
-                },*/
-            ) { isMusicCard ->
-                //Log.i("Wbj", "isShowMusicCard: $isShowMusicCard, isMusicCard: $isMusicCard")
-                if (isMusicCard) {
-                    MusicCard(
-                        onShowDeviceCard = {
-                            enableAnimation = true
-                            isShowMusicCard = false
-                        },
-                        animatedVisibilityScope = this,
-                        enableAnimation = enableAnimation
-                    )
-                } else {
-                    DeviceCard(
-                        onShowMusicCard = {
-                            enableAnimation = true
-                            isShowMusicCard = true
-                        },
-                        animatedVisibilityScope = this,
-                        enableAnimation = enableAnimation
-                    )
-                }
+        AnimatedContent(
+            targetState = isShowMusicCard,
+            label = "DialogPanelAnimated",
+        ) { isMusicCard ->
+            Log.i("Wbj", "isShowMusicCard: $isShowMusicCard, isMusicCard: $isMusicCard, animType: $animType, invokeOutAnimatedScope: $invokeOutAnimatedScope")
+            if (isMusicCard) {
+                MusicCard(
+                    onShowDeviceCard = {
+                        isCardSwitchAnimation = true
+                        invokeOutAnimatedScope = false
+                        isShowMusicCard = false
+                    },
+                    animatedVisibilityScope = if (invokeOutAnimatedScope) outAnimatedScope else this,
+                    isCardSwitchAnimation = isCardSwitchAnimation
+                )
+            } else {
+                DeviceCard(
+                    onShowMusicCard = {
+                        isCardSwitchAnimation = true
+                        invokeOutAnimatedScope = false
+                        isShowMusicCard = true
+                    },
+                    animatedVisibilityScope = if (invokeOutAnimatedScope) outAnimatedScope else this,
+                    isCardSwitchAnimation = isCardSwitchAnimation
+                )
             }
         }
     }
@@ -121,10 +252,10 @@ fun DialogPanel() {
 fun SharedTransitionScope.DeviceCard(
     onShowMusicCard: () -> Unit,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    enableAnimation: Boolean,
+    isCardSwitchAnimation: Boolean,
 ) {
     //var isVisible by remember { mutableStateOf(false) }
-    var isVisible by remember { mutableStateOf(!enableAnimation) }
+    var isVisible by remember { mutableStateOf(!isCardSwitchAnimation) }
 
     val durationMsOut = 400
     val alpha by animateFloatAsState(
@@ -163,8 +294,8 @@ fun SharedTransitionScope.DeviceCard(
     Log.d("Wbj", "DeviceCard isVisible: $isVisible, alpha: $alpha, offset: $titleOffsetX, $describeOffsetY")
 
     LaunchedEffect(Unit) {
-        Log.d("Wbj", "DeviceCard LaunchedEffect: $enableAnimation")
-        if (enableAnimation) {
+        Log.d("Wbj", "DeviceCard LaunchedEffect: $isCardSwitchAnimation")
+        if (isCardSwitchAnimation) {
             isVisible = true
         }
     }
@@ -181,7 +312,12 @@ fun SharedTransitionScope.DeviceCard(
             }
     ) {
         Row {
-            AlbumImage(Modifier.size(size = 120.dp), 8, animatedVisibilityScope)
+            AlbumImage(
+                Modifier.size(size = 120.dp),
+                animatedVisibilityScope = animatedVisibilityScope,
+                radius = 8,
+                isDialogPanelCardSwitchAnimation = isCardSwitchAnimation
+            )
 
             Text(
                 text = stringResource(R.string.share_text1),
@@ -212,11 +348,11 @@ fun SharedTransitionScope.DeviceCard(
 fun SharedTransitionScope.MusicCard(
     onShowDeviceCard: () -> Unit,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    enableAnimation: Boolean,
+    isCardSwitchAnimation: Boolean,
 ) {
     var volume by remember { mutableFloatStateOf(10f) }
     //var isVisible by remember { mutableStateOf(false) }
-    var isVisible by remember { mutableStateOf(!enableAnimation) }
+    var isVisible by remember { mutableStateOf(!isCardSwitchAnimation) }
 
     val durationMsOut = 400
     val alpha by animateFloatAsState(
@@ -238,8 +374,8 @@ fun SharedTransitionScope.MusicCard(
     )
 
     LaunchedEffect(Unit) {
-        Log.i("Wbj", "MusicCard LaunchedEffect: $enableAnimation")
-        if (enableAnimation) {
+        Log.i("Wbj", "MusicCard LaunchedEffect: $isCardSwitchAnimation")
+        if (isCardSwitchAnimation) {
             isVisible = true
         }
     }
@@ -259,7 +395,10 @@ fun SharedTransitionScope.MusicCard(
         AlbumImage(
             Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f), 16, animatedVisibilityScope
+                .aspectRatio(1f),
+            animatedVisibilityScope = animatedVisibilityScope,
+            radius = 16,
+            isDialogPanelCardSwitchAnimation = isCardSwitchAnimation
         )
 
         Text(
@@ -345,35 +484,39 @@ fun SharedTransitionScope.MusicCard(
 @Composable
 private fun SharedTransitionScope.AlbumImage(
     modifier: Modifier,
-    radius: Int,
     animatedVisibilityScope: AnimatedVisibilityScope,
+    radius: Int,
+    isDialogPanelCardSwitchAnimation: Boolean = false,
 ) {
+    val sharedContentState = rememberSharedContentState(KEY_SHARED_ELEMENT_IMAGE)
+
     Image(
         painter = painterResource(id = R.drawable.girl_gaitubao),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = modifier
             .clip(RoundedCornerShape(radius.dp))
-            .sharedElement(
-                state = rememberSharedContentState(KEY_SHARED_ELEMENT_IMAGE),
-                animatedVisibilityScope = animatedVisibilityScope,
-                /*clipInOverlayDuringTransition = object : SharedTransitionScope.OverlayClip {
-                    override fun getClipPath(
-                        state: SharedTransitionScope.SharedContentState,
-                        bounds: Rect,
-                        layoutDirection: LayoutDirection,
-                        density: Density
-                    ): Path? {
-                        return null
-                    }
-                },*/
-                clipInOverlayDuringTransition = OverlayClip(RoundedCornerShape(radius.dp)),
-                boundsTransform = { _, _ ->
-                    spring(
-                        dampingRatio = Spring.DampingRatioLowBouncy,
-                        stiffness = Spring.StiffnessLow,
-                        visibilityThreshold = Rect.VisibilityThreshold
+            .let {
+                if (isDialogPanelCardSwitchAnimation) {
+                    it.sharedElement(
+                        state = sharedContentState,
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        clipInOverlayDuringTransition = OverlayClip(RoundedCornerShape(radius.dp)),
+                        boundsTransform = { _, _ ->
+                            spring(
+                                dampingRatio = Spring.DampingRatioLowBouncy,
+                                stiffness = Spring.StiffnessLow,
+                                visibilityThreshold = Rect.VisibilityThreshold
+                            )
+                        }
                     )
-                })
+                } else {
+                    it.sharedElement(
+                        state = sharedContentState,
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        clipInOverlayDuringTransition = OverlayClip(RoundedCornerShape(radius.dp))
+                    )
+                }
+            }
     )
 }
