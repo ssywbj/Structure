@@ -61,7 +61,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.suheng.compose.R
 
-private const val KEY_SHARED_ELEMENT_IMAGE = "image"
+private const val KEY_SHARED_ELEMENT_IMAGE = "shared_element_image"
+private const val KEY_SHARED_PANEL_BOUNDS = "shared_panel_bounds"
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -122,6 +123,11 @@ fun SharedTransitionScope.SmartMediaPanel(
     Column(
         modifier = Modifier
             .requiredSize(130.dp)
+            .sharedBounds(
+                sharedContentState = rememberSharedContentState(key = KEY_SHARED_PANEL_BOUNDS),
+                animatedVisibilityScope = animatedVisibilityScope,
+                resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+            )
             .background(Color.Blue, shape = RoundedCornerShape(16.dp))
             .padding(12.dp),
         verticalArrangement = Arrangement.SpaceBetween
@@ -200,8 +206,6 @@ fun SharedTransitionScope.DialogPanel(
     var invokeOutAnimatedScope by remember(animType) { mutableStateOf(true) }
     var isCardSwitchAnimation by remember { mutableStateOf(!invokeOutAnimatedScope) }
 
-    //Log.d("Wbj", "DialogPanel init - enableAnimation2: $enableAnimation2, enableAnimation21: $enableAnimation21")
-
     val bgColor by animateColorAsState(
         targetValue = if (isShowMusicCard) Color.Red else Color.Green,
         animationSpec = tween(300),
@@ -211,18 +215,24 @@ fun SharedTransitionScope.DialogPanel(
     Box(
         modifier = Modifier
             .requiredSize(300.dp, 464.dp)
+            .sharedBounds(
+                sharedContentState = rememberSharedContentState(key = KEY_SHARED_PANEL_BOUNDS),
+                animatedVisibilityScope = outAnimatedScope,
+                resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+            )
             .background(
                 bgColor/*if (isShowMusicCard) Color.Green else Color.Red*/,
                 shape = RoundedCornerShape(16.dp)
             )
             .padding(14.dp)
+            .clickable(enabled = false, onClick = {})
     ) {
         AnimatedContent(
             targetState = isShowMusicCard,
             label = "DialogPanelAnimated",
-        ) { isMusicCard ->
-            Log.i("Wbj", "isShowMusicCard: $isShowMusicCard, isMusicCard: $isMusicCard, animType: $animType, invokeOutAnimatedScope: $invokeOutAnimatedScope")
-            if (isMusicCard) {
+        ) { musicCardVisible ->
+            Log.i("Wbj", "isShowMusicCard: $isShowMusicCard, musicCardVisible: $musicCardVisible, animType: $animType, invokeOutAnimatedScope: $invokeOutAnimatedScope")
+            if (musicCardVisible) {
                 MusicCard(
                     onShowDeviceCard = {
                         isCardSwitchAnimation = true
@@ -301,19 +311,18 @@ fun SharedTransitionScope.DeviceCard(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            //.clickable(onClick = onShowDeviceCard)
-            .clickable {
-                if (isVisible) {
-                    isVisible = false
-                    onShowMusicCard()
-                }
-            }
+        modifier = Modifier.fillMaxSize()
     ) {
         Row {
             AlbumImage(
-                Modifier.size(size = 120.dp),
+                modifier = Modifier
+                    .size(size = 120.dp)
+                    .clickable {
+                        if (isVisible) {
+                            isVisible = false
+                            onShowMusicCard()
+                        }
+                    },
                 animatedVisibilityScope = animatedVisibilityScope,
                 radius = 8,
                 isDialogPanelCardSwitchAnimation = isCardSwitchAnimation
@@ -383,19 +392,18 @@ fun SharedTransitionScope.MusicCard(
     Log.i("Wbj", "MusicCard isVisible: $isVisible, alpha: $alpha, scale: $scale")
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable {
-                if (isVisible) {
-                    isVisible = false
-                    onShowDeviceCard()
-                }
-            }
+        modifier = Modifier.fillMaxSize()
     ) {
         AlbumImage(
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f),
+                .aspectRatio(1f)
+                .clickable {
+                    if (isVisible) {
+                        isVisible = false
+                        onShowDeviceCard()
+                    }
+                },
             animatedVisibilityScope = animatedVisibilityScope,
             radius = 16,
             isDialogPanelCardSwitchAnimation = isCardSwitchAnimation

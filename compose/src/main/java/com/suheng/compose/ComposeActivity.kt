@@ -82,14 +82,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.suheng.compose.ui.MediaWidget
-import com.suheng.compose.ui.theme.structureTheme
+import com.suheng.compose.ui.theme.StructureTheme
+import java.util.Locale
 
 class ComposeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            structureTheme {
+            StructureTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -769,7 +770,7 @@ fun Greeting(name: String) {
                 )
             }
             val textArea = paint.descent() + paint.ascent()
-            val text = "Txp${String.format("%.2f", textArea)}"
+            val text = "Txp${String.format(Locale.getDefault(), "%.2f", textArea)}"
             val nativeCanvas = drawContext.canvas.nativeCanvas
             nativeCanvas.save()
             nativeCanvas.translate(size.width / 2f, size.height / 2f)
@@ -810,7 +811,7 @@ fun Greeting(name: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    structureTheme {
+    StructureTheme {
         Greeting("Android")
     }
 }

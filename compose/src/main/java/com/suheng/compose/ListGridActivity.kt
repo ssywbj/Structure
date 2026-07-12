@@ -41,7 +41,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.suheng.compose.ui.theme.colorsPalette
-import com.suheng.compose.ui.theme.structureTheme
+import com.suheng.compose.ui.theme.StructureTheme
 
 class ListGridActivity : ComponentActivity() {
 
@@ -66,7 +66,7 @@ class ListGridActivity : ComponentActivity() {
             val primaryColor = colorsPalette().primary
             window.statusBarColor = primaryColor.toArgb()
 
-            structureTheme {
+            StructureTheme {
                 val navController = rememberNavController()
                 Scaffold(
                     topBar = {
