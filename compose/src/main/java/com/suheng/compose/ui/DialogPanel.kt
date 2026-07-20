@@ -264,8 +264,8 @@ fun SharedTransitionScope.DeviceCard(
     animatedVisibilityScope: AnimatedVisibilityScope,
     isCardSwitchAnimation: Boolean,
 ) {
-    //var isVisible by remember { mutableStateOf(false) }
     var isVisible by remember { mutableStateOf(!isCardSwitchAnimation) }
+    var isRunning by remember { mutableStateOf(false) }
 
     val durationMsOut = 400
     val alpha by animateFloatAsState(
@@ -289,6 +289,10 @@ fun SharedTransitionScope.DeviceCard(
             stiffness = Spring.StiffnessLow,
         ) else tween(durationMsOut, easing = LinearEasing),
         label = "DeviceTitleOffsetX",
+        finishedListener = { fraction ->
+            Log.v("Wbj", "DeviceCard finishedListener fraction: $fraction")
+            isRunning = false
+        }
     )
 
     //val describeOffsetY = 324.dp
@@ -301,12 +305,13 @@ fun SharedTransitionScope.DeviceCard(
         label = "DeviceDescribeOffsetY",
     )
 
-    Log.d("Wbj", "DeviceCard isVisible: $isVisible, alpha: $alpha, offset: $titleOffsetX, $describeOffsetY")
+    Log.d("Wbj", "DeviceCard isVisible: $isVisible, alpha: $alpha, offset: $titleOffsetX, $describeOffsetY, isRunning: $isRunning")
 
     LaunchedEffect(Unit) {
         Log.d("Wbj", "DeviceCard LaunchedEffect: $isCardSwitchAnimation")
         if (isCardSwitchAnimation) {
             isVisible = true
+            isRunning = true
         }
     }
 
@@ -318,8 +323,14 @@ fun SharedTransitionScope.DeviceCard(
                 modifier = Modifier
                     .size(size = 120.dp)
                     .clickable {
+                        if (isRunning) {
+                            Log.w("Wbj", "DeviceCard Switch Animation is Running")
+                            isVisible = true
+                            return@clickable
+                        }
                         if (isVisible) {
                             isVisible = false
+                            isRunning = true
                             onShowMusicCard()
                         }
                     },
@@ -360,8 +371,8 @@ fun SharedTransitionScope.MusicCard(
     isCardSwitchAnimation: Boolean,
 ) {
     var volume by remember { mutableFloatStateOf(10f) }
-    //var isVisible by remember { mutableStateOf(false) }
     var isVisible by remember { mutableStateOf(!isCardSwitchAnimation) }
+    var isRunning by remember { mutableStateOf(false) }
 
     val durationMsOut = 400
     val alpha by animateFloatAsState(
@@ -379,17 +390,22 @@ fun SharedTransitionScope.MusicCard(
             durationMillis = if (isVisible) 200 else durationMsOut,
             easing = LinearEasing
         ),
-        label = "MusicScale"
+        label = "MusicScale",
+        finishedListener = { fraction ->
+            Log.v("Wbj", "MusicCard finishedListener fraction: $fraction")
+            isRunning = false
+        }
     )
 
     LaunchedEffect(Unit) {
         Log.i("Wbj", "MusicCard LaunchedEffect: $isCardSwitchAnimation")
         if (isCardSwitchAnimation) {
             isVisible = true
+            isRunning = true
         }
     }
 
-    Log.i("Wbj", "MusicCard isVisible: $isVisible, alpha: $alpha, scale: $scale")
+    Log.i("Wbj", "MusicCard isVisible: $isVisible, alpha: $alpha, scale: $scale, isRunning: $isRunning")
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -399,8 +415,13 @@ fun SharedTransitionScope.MusicCard(
                 .fillMaxWidth()
                 .aspectRatio(1f)
                 .clickable {
+                    if (isRunning) {
+                        Log.w("Wbj", "MusicCard Switch Animation is Running")
+                        return@clickable
+                    }
                     if (isVisible) {
                         isVisible = false
+                        isRunning = true
                         onShowDeviceCard()
                     }
                 },
