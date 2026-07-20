@@ -325,7 +325,6 @@ fun SharedTransitionScope.DeviceCard(
                     .clickable {
                         if (isRunning) {
                             Log.w("Wbj", "DeviceCard Switch Animation is Running")
-                            isVisible = true
                             return@clickable
                         }
                         if (isVisible) {
