@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +32,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 //import androidx.compose.material.Slider
 //import androidx.compose.material.SliderDefaults
@@ -469,7 +471,6 @@ fun SharedTransitionScope.MusicCard(
                 modifier = Modifier.weight(1f)
             )*/
             val trackHeight = 8
-            val trackRadius = (trackHeight + 1) / 2
             Slider(
                 value = volume,
                 onValueChange = { volume = it },
@@ -485,13 +486,15 @@ fun SharedTransitionScope.MusicCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(trackHeight.dp)
-                            .background(Color(0xFFBDBDBD), RoundedCornerShape(trackRadius.dp))
+                            .clip(CircleShape)
+                            .background(Color(0xFFBDBDBD))
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth(fraction)
-                                .height(trackHeight.dp)
-                                .background(Color.Yellow, RoundedCornerShape(trackRadius.dp))
+                                .fillMaxHeight()
+                                //.background(Color.Yellow, CircleShape)
+                                .background(Color.Yellow)
                         )
                     }
                 })
