@@ -7,6 +7,9 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
@@ -232,6 +235,10 @@ fun SharedTransitionScope.DialogPanel(
         AnimatedContent(
             targetState = isShowMusicCard,
             label = "DialogPanelAnimated",
+            transitionSpec = {
+                fadeIn(animationSpec = tween(durationMillis = 260))
+                    .togetherWith(fadeOut(animationSpec = tween(durationMillis = 260)))
+            },
         ) { musicCardVisible ->
             Log.i("Wbj", "isShowMusicCard: $isShowMusicCard, musicCardVisible: $musicCardVisible, animType: $animType, invokeOutAnimatedScope: $invokeOutAnimatedScope")
             if (musicCardVisible) {
@@ -267,7 +274,9 @@ fun SharedTransitionScope.DeviceCard(
     isCardSwitchAnimation: Boolean,
 ) {
     var isVisible by remember { mutableStateOf(!isCardSwitchAnimation) }
-    var isRunning by remember { mutableStateOf(false) }
+    var isRunning2 by remember { mutableStateOf(false) }
+    var isRunning3 by remember { mutableStateOf(false) }
+    var isRunning by remember(isRunning2 || isRunning3) { mutableStateOf(isRunning2 || isRunning3) }
 
     val durationMsOut = 400
     val alpha by animateFloatAsState(
@@ -275,6 +284,7 @@ fun SharedTransitionScope.DeviceCard(
         animationSpec = tween(durationMillis = if (isVisible) 250 else durationMsOut, easing = LinearEasing),
         label = "DeviceAlpha"
     )
+    val alphaList = if (isVisible) 1f else alpha
 
     /*val alpha = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
@@ -292,8 +302,8 @@ fun SharedTransitionScope.DeviceCard(
         ) else tween(durationMsOut, easing = LinearEasing),
         label = "DeviceTitleOffsetX",
         finishedListener = { fraction ->
-            Log.v("Wbj", "DeviceCard finishedListener fraction: $fraction")
-            isRunning = false
+            Log.v("Wbj", "DeviceCard finishedListener titleOffsetX fraction: $fraction")
+            isRunning2 = false
         }
     )
 
@@ -305,15 +315,20 @@ fun SharedTransitionScope.DeviceCard(
             stiffness = Spring.StiffnessLow,
         ) else tween(durationMsOut, easing = LinearEasing),
         label = "DeviceDescribeOffsetY",
+        finishedListener = { fraction ->
+            Log.v("Wbj", "DeviceCard finishedListener DeviceDescribeOffsetY fraction: $fraction")
+            isRunning3 = false
+        }
     )
 
-    Log.d("Wbj", "DeviceCard isVisible: $isVisible, alpha: $alpha, offset: $titleOffsetX, $describeOffsetY, isRunning: $isRunning")
+    Log.d("Wbj", "DeviceCard isVisible: $isVisible, alpha: $alpha, $alphaList; offset: $titleOffsetX, $describeOffsetY, isRunning: $isRunning")
 
     LaunchedEffect(Unit) {
         Log.d("Wbj", "DeviceCard LaunchedEffect: $isCardSwitchAnimation")
         if (isCardSwitchAnimation) {
             isVisible = true
-            isRunning = true
+            isRunning2 = true
+            isRunning3 = true
         }
     }
 
@@ -331,7 +346,8 @@ fun SharedTransitionScope.DeviceCard(
                         }
                         if (isVisible) {
                             isVisible = false
-                            isRunning = true
+                            isRunning2 = true
+                            isRunning3 = true
                             onShowMusicCard()
                         }
                     },
@@ -358,7 +374,7 @@ fun SharedTransitionScope.DeviceCard(
             color = Color.Gray,
             modifier = Modifier
                 .padding(top = 10.dp)
-                .alpha(alpha)
+                .alpha(alphaList)
                 .offset(y = describeOffsetY)
         )
     }
