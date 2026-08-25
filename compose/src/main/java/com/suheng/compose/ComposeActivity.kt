@@ -15,6 +15,7 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.RemeasureToBounds
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,10 +30,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
@@ -49,9 +60,11 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,9 +79,12 @@ import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import kotlinx.coroutines.launch
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -78,10 +94,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.suheng.compose.ui.MediaWidget
 import com.suheng.compose.ui.theme.StructureTheme
 import java.util.Locale
 
@@ -96,7 +112,7 @@ class ComposeActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    //Greeting("Android")
+                    Greeting("Android")
                     //SharedElements()
 
                     /*var isShowMusicCard by remember {
@@ -107,7 +123,7 @@ class ComposeActivity : ComponentActivity() {
                     } else {
                         DeviceCard(onShowMusicCard = { isShowMusicCard = true })
                     }*/
-                    MediaWidget()
+                    //MediaWidget()
                 }
             }
         }
@@ -260,13 +276,16 @@ private fun SharedTransitionScope.DetailsScreen(
     }
 }
 
+private val PADDING_HORIZONTAL = 8.dp
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Greeting(name: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(6.dp)
+            .padding(vertical = PADDING_HORIZONTAL)
             .verticalScroll(rememberScrollState())
     ) {
         val context = LocalContext.current
@@ -283,6 +302,100 @@ fun Greeting(name: String) {
                 .width(100.dp)
                 .clickable { context.startActivity(Intent(context, ListGridActivity::class.java)) }
         )
+
+        Spacer(
+            Modifier
+                .background(Color.Red)
+                .size(10.dp)
+        )
+
+        val pagerState = rememberPagerState(initialPage = 0, pageCount = { 3 })
+        val coroutineScope = rememberCoroutineScope()
+        val overTranslateX = remember { Animatable(0f) }
+        var isDragging by remember { mutableStateOf(false) }
+        val maxOverScrollPx = with(LocalDensity.current) { 120.dp.toPx() }
+        val draggableState = rememberDraggableState { delta ->
+            if (pagerState.pageCount == 0) return@rememberDraggableState
+            val atStart = pagerState.currentPage == 0 &&
+                    pagerState.currentPageOffsetFraction == 0f &&
+                    delta > 0f
+            val atEnd = pagerState.currentPage == pagerState.pageCount - 1 &&
+                    pagerState.currentPageOffsetFraction == 0f &&
+                    delta < 0f
+            if (atStart || atEnd) {
+                isDragging = true
+                val rawTarget = overTranslateX.value + delta
+                val clampedRaw = rawTarget.coerceIn(-maxOverScrollPx, maxOverScrollPx)
+                val dampedTarget = if (kotlin.math.abs(clampedRaw) > 0.5f) {
+                    kotlin.math.sign(clampedRaw) * maxOverScrollPx *
+                            (1f - kotlin.math.exp(-kotlin.math.abs(clampedRaw) / maxOverScrollPx))
+                } else {
+                    clampedRaw
+                }
+                coroutineScope.launch { overTranslateX.snapTo(dampedTarget) }
+            }
+        }
+        LaunchedEffect(isDragging) {
+            if (!isDragging && overTranslateX.value != 0f) {
+                overTranslateX.animateTo(
+                    targetValue = 0f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
+            }
+        }
+
+        Box() {
+            Text(
+                text = "删除",
+                color = Color.Red,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .align(Alignment.CenterStart)
+            )
+
+            Text(
+                text = "Delete",
+                color = Color.Red,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .align(Alignment.CenterEnd)
+            )
+
+            HorizontalPager(
+                pagerState,
+                contentPadding = PaddingValues(horizontal = PADDING_HORIZONTAL),
+                pageSpacing = PADDING_HORIZONTAL,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .requiredHeight(200.dp)
+                    .graphicsLayer { translationX = overTranslateX.value }
+                    .draggable(
+                        state = draggableState,
+                        orientation = Orientation.Horizontal,
+                        onDragStarted = { isDragging = true },
+                        onDragStopped = { isDragging = false }
+                    )
+            ) { pageIndex ->
+                Text(
+                    text = "HorizontalPager-$pageIndex",
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    fontStyle = FontStyle.Italic,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                )
+            }
+        }
 
         Spacer(
             Modifier
@@ -651,8 +764,7 @@ fun Greeting(name: String) {
                 modifier = Modifier
                     .size(120.dp)
                     .border(
-                        BorderStroke(5.dp, Color.Gray),
-                        RectangleShape
+                        BorderStroke(5.dp, Color.Gray), RectangleShape
                     )
             )
 
