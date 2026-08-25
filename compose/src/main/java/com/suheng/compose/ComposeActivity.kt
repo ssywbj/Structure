@@ -38,9 +38,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -60,17 +58,17 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -79,12 +77,13 @@ import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import kotlinx.coroutines.launch
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -96,10 +95,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.suheng.compose.ui.theme.StructureTheme
 import java.util.Locale
+import kotlin.math.roundToInt
 
 class ComposeActivity : ComponentActivity() {
 
@@ -310,44 +312,69 @@ fun Greeting(name: String) {
         )
 
         val pagerState = rememberPagerState(initialPage = 0, pageCount = { 3 })
-        val coroutineScope = rememberCoroutineScope()
-        val overTranslateX = remember { Animatable(0f) }
-        var isDragging by remember { mutableStateOf(false) }
-        val maxOverScrollPx = with(LocalDensity.current) { 120.dp.toPx() }
-        val draggableState = rememberDraggableState { delta ->
-            if (pagerState.pageCount == 0) return@rememberDraggableState
-            val atStart = pagerState.currentPage == 0 &&
-                    pagerState.currentPageOffsetFraction == 0f &&
-                    delta > 0f
-            val atEnd = pagerState.currentPage == pagerState.pageCount - 1 &&
-                    pagerState.currentPageOffsetFraction == 0f &&
-                    delta < 0f
-            if (atStart || atEnd) {
-                isDragging = true
-                val rawTarget = overTranslateX.value + delta
-                val clampedRaw = rawTarget.coerceIn(-maxOverScrollPx, maxOverScrollPx)
-                val dampedTarget = if (kotlin.math.abs(clampedRaw) > 0.5f) {
-                    kotlin.math.sign(clampedRaw) * maxOverScrollPx *
-                            (1f - kotlin.math.exp(-kotlin.math.abs(clampedRaw) / maxOverScrollPx))
-                } else {
-                    clampedRaw
+        val density = LocalDensity.current
+        val maxOverScrollPx = with(density) { 120.dp.toPx() }
+        val revealThresholdPx = with(density) { 40.dp.toPx() }
+        val overTranslateX = remember { mutableFloatStateOf(0f) }
+        val nestedScrollConnection = remember(maxOverScrollPx, revealThresholdPx, pagerState) {
+            object : NestedScrollConnection {
+                private fun consumeHorizontal(delta: Float): Float {
+                    if (delta == 0f) return 0f
+                    val current = overTranslateX.floatValue
+                    val min = if (current < 0f || !pagerState.canScrollForward) -maxOverScrollPx else 0f
+                    val max = if (current > 0f || !pagerState.canScrollBackward) maxOverScrollPx else 0f
+                    val new = (current + delta).coerceIn(min, max)
+                    val used = new - current
+                    if (used != 0f) overTranslateX.floatValue = new
+                    return used
                 }
-                coroutineScope.launch { overTranslateX.snapTo(dampedTarget) }
-            }
-        }
-        LaunchedEffect(isDragging) {
-            if (!isDragging && overTranslateX.value != 0f) {
-                overTranslateX.animateTo(
-                    targetValue = 0f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMediumLow
-                    )
-                )
+
+                private fun isDrag(source: NestedScrollSource): Boolean {
+                    return source == NestedScrollSource.UserInput ||
+                            source == NestedScrollSource.Drag
+                }
+
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    if (!isDrag(source) || overTranslateX.floatValue == 0f) return Offset.Zero
+                    return Offset(consumeHorizontal(available.x), 0f)
+                }
+
+                override fun onPostScroll(
+                    consumed: Offset,
+                    available: Offset,
+                    source: NestedScrollSource
+                ): Offset {
+                    if (!isDrag(source)) return Offset.Zero
+                    return Offset(consumeHorizontal(available.x), 0f)
+                }
+
+                override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                    val current = overTranslateX.floatValue
+                    val target = when {
+                        current < -revealThresholdPx || available.x < -800f -> -maxOverScrollPx
+                        current > revealThresholdPx || available.x > 800f -> maxOverScrollPx
+                        else -> 0f
+                    }
+                    Animatable(current).animateTo(
+                        targetValue = target,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ) {
+                        overTranslateX.floatValue = value
+                    }
+                    return Velocity(available.x, 0f)
+                }
             }
         }
 
-        Box() {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clipToBounds()
+                .nestedScroll(nestedScrollConnection)
+        ) {
             Text(
                 text = "删除",
                 color = Color.Red,
@@ -356,6 +383,9 @@ fun Greeting(name: String) {
                 modifier = Modifier
                     .wrapContentSize()
                     .align(Alignment.CenterStart)
+                    .clickable {
+                        Toast.makeText(context, "删除", Toast.LENGTH_SHORT).show()
+                    }
             )
 
             Text(
@@ -366,6 +396,9 @@ fun Greeting(name: String) {
                 modifier = Modifier
                     .wrapContentSize()
                     .align(Alignment.CenterEnd)
+                    .clickable {
+                        Toast.makeText(context, "Delete", Toast.LENGTH_SHORT).show()
+                    }
             )
 
             HorizontalPager(
@@ -375,13 +408,7 @@ fun Greeting(name: String) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .requiredHeight(200.dp)
-                    .graphicsLayer { translationX = overTranslateX.value }
-                    .draggable(
-                        state = draggableState,
-                        orientation = Orientation.Horizontal,
-                        onDragStarted = { isDragging = true },
-                        onDragStopped = { isDragging = false }
-                    )
+                    .offset { IntOffset(overTranslateX.floatValue.roundToInt(), 0) }
             ) { pageIndex ->
                 Text(
                     text = "HorizontalPager-$pageIndex",
