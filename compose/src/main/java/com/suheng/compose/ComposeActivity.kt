@@ -39,7 +39,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -313,20 +312,32 @@ fun Greeting(name: String) {
 
         val pagerState = rememberPagerState(initialPage = 0, pageCount = { 3 })
         val density = LocalDensity.current
-        val maxOverScrollPx = with(density) { 120.dp.toPx() }
-        val revealThresholdPx = with(density) { 40.dp.toPx() }
+        val maxOverScrollPx = with(density) { 80.dp.toPx() }
+        // 从收起态展开：超过该距离（或甩动）就吸附打开
+        val openThresholdPx = with(density) { 24.dp.toPx() }
+        // 从展开态复位：往回拖到该距离以内就吸附关闭（越大越容易复位）
+        // 复位所需拖动距离 ≈ maxOverScrollPx - closeThresholdPx
+        val closeThresholdPx = with(density) { 56.dp.toPx() }
         val overTranslateX = remember { mutableFloatStateOf(0f) }
-        val nestedScrollConnection = remember(maxOverScrollPx, revealThresholdPx, pagerState) {
+        val isRevealed = remember { mutableStateOf(false) }
+        val nestedScrollConnection = remember(
+            maxOverScrollPx,
+            openThresholdPx,
+            closeThresholdPx,
+            pagerState
+        ) {
             object : NestedScrollConnection {
                 private fun consumeHorizontal(delta: Float): Float {
                     if (delta == 0f) return 0f
                     val current = overTranslateX.floatValue
                     val min = if (current < 0f || !pagerState.canScrollForward) -maxOverScrollPx else 0f
                     val max = if (current > 0f || !pagerState.canScrollBackward) maxOverScrollPx else 0f
-                    val new = (current + delta).coerceIn(min, max)
+                    // 1.2x 放大跟手量，边界过滑更灵敏
+                    val new = (current + delta * 1.2f).coerceIn(min, max)
                     val used = new - current
                     if (used != 0f) overTranslateX.floatValue = new
-                    return used
+                    // 按实际消耗的手势量回报，避免子组件再二次消费
+                    return if (used == 0f) 0f else delta
                 }
 
                 private fun isDrag(source: NestedScrollSource): Boolean {
@@ -350,16 +361,34 @@ fun Greeting(name: String) {
 
                 override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
                     val current = overTranslateX.floatValue
+                    val flingOpenLeft = available.x < -400f
+                    val flingOpenRight = available.x > 400f
+                    val flingClose = when {
+                        current < 0f -> available.x > 400f
+                        current > 0f -> available.x < -400f
+                        else -> false
+                    }
                     val target = when {
-                        current < -revealThresholdPx || available.x < -800f -> -maxOverScrollPx
-                        current > revealThresholdPx || available.x > 800f -> maxOverScrollPx
+                        // 已展开：往回拖过 closeThreshold，或反向甩动 → 复位
+                        isRevealed.value -> when {
+                            flingClose -> 0f
+                            current < 0f && current > -closeThresholdPx -> 0f
+                            current > 0f && current < closeThresholdPx -> 0f
+                            current < 0f -> -maxOverScrollPx
+                            current > 0f -> maxOverScrollPx
+                            else -> 0f
+                        }
+                        // 未展开：超过 openThreshold，或甩动 → 打开
+                        flingOpenLeft || current < -openThresholdPx -> -maxOverScrollPx
+                        flingOpenRight || current > openThresholdPx -> maxOverScrollPx
                         else -> 0f
                     }
+                    isRevealed.value = target != 0f
                     Animatable(current).animateTo(
                         targetValue = target,
                         animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMediumLow
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMedium
                         )
                     ) {
                         overTranslateX.floatValue = value
@@ -375,13 +404,16 @@ fun Greeting(name: String) {
                 .clipToBounds()
                 .nestedScroll(nestedScrollConnection)
         ) {
+            val btnHorizontalMargin = 26.dp
             Text(
                 text = "删除",
-                color = Color.Red,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .wrapContentSize()
+                    .padding(start = btnHorizontalMargin)
+                    .requiredSize(50.dp)
+                    .background(Color.Red)
                     .align(Alignment.CenterStart)
                     .clickable {
                         Toast.makeText(context, "删除", Toast.LENGTH_SHORT).show()
@@ -389,12 +421,14 @@ fun Greeting(name: String) {
             )
 
             Text(
-                text = "Delete",
-                color = Color.Red,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
+                text = "删除",
+                color = Color.White,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .wrapContentSize()
+                    .padding(end = btnHorizontalMargin)
+                    .requiredSize(50.dp)
+                    .background(Color.Blue)
                     .align(Alignment.CenterEnd)
                     .clickable {
                         Toast.makeText(context, "Delete", Toast.LENGTH_SHORT).show()
@@ -408,6 +442,7 @@ fun Greeting(name: String) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .requiredHeight(200.dp)
+                    //.clip(RoundedCornerShape(20.dp))
                     .offset { IntOffset(overTranslateX.floatValue.roundToInt(), 0) }
             ) { pageIndex ->
                 Text(
@@ -419,6 +454,7 @@ fun Greeting(name: String) {
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxSize()
+                        .clip(RoundedCornerShape(20.dp))
                         .background(Color.Black)
                 )
             }
